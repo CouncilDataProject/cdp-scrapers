@@ -52,7 +52,6 @@ In-progress or completed scrapers.
 
 ```python
 from cdp_scrapers.instances.seattle import get_events
-from datetime import datetime
 
 # This is an in-progress or completed scraper
 # Returns List[cdp_backend.pipeline.ingestion_models.EventIngestionModel]
