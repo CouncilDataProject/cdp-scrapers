@@ -5,20 +5,20 @@ helps, and credit will always be given.
 
 ## Get Started!
 
-Ready to contribute? Here's how to set up `cdp_scrapers` for local development.
+Ready to contribute? Here's how to set up `cdp-scrapers` for local development.
 
-1. Fork the `cdp_scrapers` repo on GitHub.
+1. Fork the `cdp-scrapers` repo on GitHub.
 
 2. Clone your fork locally:
 
     ```bash
-    git clone git@github.com:{your_name_here}/cdp_scrapers.git
+    git clone git@github.com:{your_name_here}/cdp-scrapers.git
     ```
 
 3. Install the project in editable mode. (It is also recommended to work in a virtualenv or anaconda environment):
 
     ```bash
-    cd cdp_scrapers/
+    cd cdp-scrapers/
     pip install -e .[dev]
     ```
 

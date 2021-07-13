@@ -1,5 +1,5 @@
 Welcome to cdp-scrapers's documentation!
-======================================
+========================================
 
 .. toctree::
    :hidden:
@@ -10,7 +10,6 @@ Welcome to cdp-scrapers's documentation!
    installation
    Package modules <modules>
    contributing
-   math
 
 .. mdinclude:: ../README.md
 

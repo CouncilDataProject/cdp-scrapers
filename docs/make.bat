@@ -9,7 +9,7 @@ if "%SPHINXBUILD%" == "" (
 )
 set SOURCEDIR=.
 set BUILDDIR=_build
-set SPHINXPROJ=cdp_scrapers
+set SPHINXPROJ=cdp-scrapers
 
 if "%1" == "" goto help
 

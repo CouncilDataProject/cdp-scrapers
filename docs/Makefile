@@ -4,7 +4,7 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = python -msphinx
-SPHINXPROJ    = cdp_scrapers
+SPHINXPROJ    = cdp-scrapers
 SOURCEDIR     = .
 BUILDDIR      = _build
 

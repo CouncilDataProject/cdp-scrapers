@@ -12,7 +12,7 @@ To install cdp-scrapers, run this command in your terminal:
 
 .. code-block:: console
 
-    $ pip install cdp_scrapers
+    $ pip install cdp-scrapers
 
 This is the preferred method to install cdp-scrapers, as it will always install the most recent stable release.
 
@@ -32,13 +32,13 @@ You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone git://github.com/CouncilDataProject/cdp_scrapers
+    $ git clone git://github.com/CouncilDataProject/cdp-scrapers
 
 Or download the `tarball`_:
 
 .. code-block:: console
 
-    $ curl  -OL https://github.com/CouncilDataProject/cdp_scrapers/tarball/main
+    $ curl  -OL https://github.com/CouncilDataProject/cdp-scrapers/tarball/main
 
 Once you have a copy of the source, you can install it with:
 
@@ -47,5 +47,5 @@ Once you have a copy of the source, you can install it with:
     $ python setup.py install
 
 
-.. _Github repo: https://github.com/CouncilDataProject/cdp_scrapers
-.. _tarball: https://github.com/CouncilDataProject/cdp_scrapers/tarball/main
+.. _Github repo: https://github.com/CouncilDataProject/cdp-scrapers
+.. _tarball: https://github.com/CouncilDataProject/cdp-scrapers/tarball/main
