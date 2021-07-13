@@ -1,13 +1,13 @@
-cdp\_scrapers.bin package
-=========================
+cdp\_scrapers.instances package
+===============================
 
 Submodules
 ----------
 
-cdp\_scrapers.bin.my\_example module
+cdp\_scrapers.instances.empty module
 ------------------------------------
 
-.. automodule:: cdp_scrapers.bin.my_example
+.. automodule:: cdp_scrapers.instances.empty
    :members:
    :undoc-members:
    :show-inheritance:
@@ -15,7 +15,7 @@ cdp\_scrapers.bin.my\_example module
 Module contents
 ---------------
 
-.. automodule:: cdp_scrapers.bin
+.. automodule:: cdp_scrapers.instances
    :members:
    :undoc-members:
    :show-inheritance:

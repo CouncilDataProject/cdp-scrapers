@@ -7,15 +7,15 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   cdp_scrapers.bin
+   cdp_scrapers.instances
 
 Submodules
 ----------
 
-cdp\_scrapers.example module
-----------------------------
+cdp\_scrapers.legistar\_utils module
+------------------------------------
 
-.. automodule:: cdp_scrapers.example
+.. automodule:: cdp_scrapers.legistar_utils
    :members:
    :undoc-members:
    :show-inheritance:

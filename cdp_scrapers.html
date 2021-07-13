@@ -41,7 +41,7 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="cdp_scrapers.bin package" href="cdp_scrapers.bin.html" />
+    <link rel="next" title="cdp_scrapers.instances package" href="cdp_scrapers.instances.html" />
     <link rel="prev" title="cdp_scrapers" href="modules.html" /> 
 </head>
 
@@ -102,11 +102,11 @@
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">Package modules</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">cdp_scrapers package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.bin.html">cdp_scrapers.bin package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.instances.html">cdp_scrapers.instances package</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-cdp_scrapers.example">cdp_scrapers.example module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cdp_scrapers.legistar_utils">cdp_scrapers.legistar_utils module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-cdp_scrapers">Module contents</a></li>
 </ul>
 </li>
@@ -183,7 +183,7 @@
   
   <div class="rst-breadcrumbs-buttons" role="navigation" aria-label="breadcrumb navigation">
       
-        <a href="cdp_scrapers.bin.html" class="btn btn-neutral float-right" title="cdp_scrapers.bin package" accesskey="n">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cdp_scrapers.instances.html" class="btn btn-neutral float-right" title="cdp_scrapers.instances package" accesskey="n">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
       
       
         <a href="modules.html" class="btn btn-neutral float-left" title="cdp_scrapers" accesskey="p"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
@@ -201,10 +201,10 @@
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="cdp_scrapers.bin.html">cdp_scrapers.bin package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cdp_scrapers.bin.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cdp_scrapers.bin.html#module-cdp_scrapers.bin.my_example">cdp_scrapers.bin.my_example module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cdp_scrapers.bin.html#module-cdp_scrapers.bin">Module contents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cdp_scrapers.instances.html">cdp_scrapers.instances package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cdp_scrapers.instances.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cdp_scrapers.instances.html#module-cdp_scrapers.instances.empty">cdp_scrapers.instances.empty module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cdp_scrapers.instances.html#module-cdp_scrapers.instances">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -213,80 +213,33 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-cdp_scrapers.example">
-<span id="cdp-scrapers-example-module"></span><h2>cdp_scrapers.example module<a class="headerlink" href="#module-cdp_scrapers.example" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="cdp_scrapers.example.Example">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">cdp_scrapers.example.</span></span><span class="sig-name descname"><span class="pre">Example</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init_value</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cdp_scrapers/example.html#Example"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.example.Example" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>This is an example object. Use this example for ideas on how to write doc strings,
-use logging, construct objects. This is not an exhaustive example but a decent
-start.</p>
+<div class="section" id="module-cdp_scrapers.legistar_utils">
+<span id="cdp-scrapers-legistar-utils-module"></span><h2>cdp_scrapers.legistar_utils module<a class="headerlink" href="#module-cdp_scrapers.legistar_utils" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.get_legistar_events_for_timespan">
+<span class="sig-prename descclassname"><span class="pre">cdp_scrapers.legistar_utils.</span></span><span class="sig-name descname"><span class="pre">get_legistar_events_for_timespan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">begin</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime.datetime</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime.datetime</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#get_legistar_events_for_timespan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.get_legistar_events_for_timespan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all legistar events and each events minutes items, people, and votes, for a
+client for a given timespan.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>init_value</strong> (<em>int</em>) – An integer value to initialize the object with.</p>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="cdp_scrapers.example.Example.get_previous_value">
-<span class="sig-name descname"><span class="pre">get_previous_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/example.html#Example.get_previous_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.example.Example.get_previous_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the previous value.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><strong>previous_value</strong> – The previous value stored in the object.</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cdp_scrapers.example.Example.get_value">
-<span class="sig-name descname"><span class="pre">get_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/example.html#Example.get_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.example.Example.get_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the current value.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><strong>current_value</strong> – The current value stored in the object.</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cdp_scrapers.example.Example.update_value">
-<span class="sig-name descname"><span class="pre">update_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_value</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/example.html#Example.update_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.example.Example.update_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>Save old value and set new value.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>new_value</strong> (<em>int</em>) – The new value to assign to the object.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>client</strong> (<em>str</em>) – Which legistar client to target. Ex: “seattle”</p></li>
+<li><p><strong>begin</strong> (<em>Optional[datetime]</em>) – The timespan beginning datetime to query for events after.
+Default: UTC now - 1 day</p></li>
+<li><p><strong>end</strong> (<em>Optional[datetime]</em>) – The timespan end datetime to query for events before.
+Default: UTC now</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>old_value</strong> – The previous value stored in the object.</p>
+<dd class="field-even"><p><strong>events</strong> – All legistar events that occur between the datetimes provided for the client
+provided. Additionally, requests and attaches agenda items, minutes items, any
+attachments, called “EventItems”, requests votes for any of these “EventItems”,
+and requests person information for any vote.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>int</p>
+<dd class="field-odd"><p>List[Dict]</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="cdp_scrapers.example.Example.values">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">values</span></span><em class="property"><span class="pre">:</span> <span class="pre">Tuple[int]</span></em><a class="headerlink" href="#cdp_scrapers.example.Example.values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get both values stored in the object as a tuple of integers.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><strong>values</strong> – The current and old values stored in a tuple in (current_value, old_value)
-order.</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>Tuple[int]</p>
-</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 </div>
