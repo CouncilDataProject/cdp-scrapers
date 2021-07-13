@@ -65,7 +65,6 @@ setup(
     name="cdp-scrapers",
     packages=find_packages(exclude=["tests", "*.tests", "*.tests.*"]),
     python_requires=">=3.7",
-    test_suite="cdp_scrapers/tests",
     tests_require=test_requirements,
     extras_require=extra_requirements,
     url="https://github.com/CouncilDataProject/cdp-scrapers",
