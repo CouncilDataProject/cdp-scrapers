@@ -1,0 +1,29 @@
+cdp\_scrapers package
+=====================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   cdp_scrapers.bin
+
+Submodules
+----------
+
+cdp\_scrapers.example module
+----------------------------
+
+.. automodule:: cdp_scrapers.example
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: cdp_scrapers
+   :members:
+   :undoc-members:
+   :show-inheritance:

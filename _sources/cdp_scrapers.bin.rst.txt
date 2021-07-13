@@ -1,0 +1,21 @@
+cdp\_scrapers.bin package
+=========================
+
+Submodules
+----------
+
+cdp\_scrapers.bin.my\_example module
+------------------------------------
+
+.. automodule:: cdp_scrapers.bin.my_example
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: cdp_scrapers.bin
+   :members:
+   :undoc-members:
+   :show-inheritance:
