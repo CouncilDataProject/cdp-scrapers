@@ -4,6 +4,7 @@
 from typing import Dict, List
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
+from urllib.error import HTTPError
 import re
 import sys
 import datetime
@@ -16,9 +17,43 @@ from cdp_backend.pipeline.ingestion_models import (
     MinutesItem,
     Matter,
 )
-from cdp_scrapers.legistar_utils import get_legistar_events_for_timespan
+from cdp_scrapers.legistar_utils import(
+    get_legistar_events_for_timespan,
+    LEGISTAR_BASE
+)
 
 ###############################################################################
+
+
+# base class for scraper to convert legistar api data -> cdp ingestion model data
+# TODO: double-check unique class name in cdp
+class LegistarScraper:
+    def __init__(self, client: str):
+        self.client = client
+
+
+    def is_legistar_compatible(self) -> bool:
+        '''
+        return True if can get successful legistar api response
+        '''
+        client = self.client
+
+        # simplest check, if the GET request works, it is a legistar place
+        try:
+            resp = urlopen(f'{LEGISTAR_BASE}/bodies')
+            return (resp.status == 200)
+        except:
+            return False
+
+
+    # TODO: lol, better name???
+    def can_get_min_info(self) -> bool:
+        '''
+        return True if able to get minimum required data for EventIngestionModel
+        '''
+        # TODO: bring in functions below into this class
+        #       then call get_events() to check if ANY event in the past week has body name, time and video_uri
+        return False
 
 
 def get_event_minutes(legistar_ev_items: List[Dict]) -> List[EventMinutesItem]:
