@@ -67,6 +67,9 @@ class LegistarScraper:
         '''
         return False if never can get minimum required data for EventIngestionModel within check_days from today
         '''
+        # if not self.is_legistar_compatible():
+        #     return False
+
         now = datetime.datetime.utcnow()
         days = range(check_days)
 
@@ -250,12 +253,12 @@ class SeattleScraper(LegistarScraper):
 
             # not smart enough to make a cool one-time regex to get all the 'file's in 'sources'
             videos_start = video_json_blob.find('sources:')
-            sources_end = video_json_blob.find('],', videos_start)
+            videos_end = video_json_blob.find('],', videos_start)
             # as shown above, url will start with // so prepend https:
             video_uris = [ \
                 'https:' + i for i in re.findall(
                     r'file\:\s*\"([^\"]+)',
-                    video_json_blob[videos_start : sources_end],
+                    video_json_blob[videos_start : videos_end],
                 )
             ]
 
