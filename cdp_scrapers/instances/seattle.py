@@ -37,6 +37,9 @@ LEGISTAR_BODY_NAME     = 'EventBodyName'
 LEGISTAR_EV_ITEMS      = 'EventItems'
 LEGISTAR_EV_SITE_URL   = 'EventInSiteURL'
 
+CDP_VIDEO_URI   = 'video_uri'
+CDP_CAPTION_URI = 'caption_uri'
+
 
 # base class for scraper to convert legistar api data -> cdp ingestion model data
 # TODO: double-check unique class name in cdp to avoid confusion
@@ -59,7 +62,7 @@ class LegistarScraper:
             return False
 
 
-    # TODO: lol, better name???
+    # TODO: better name?
     def can_get_min_info(self) -> bool:
         '''
         return True if able to get minimum required data for EventIngestionModel
@@ -100,12 +103,18 @@ class LegistarScraper:
         '''
         parse web page at ev_site_url and return url for video and captions if found
         ev_site_url is EventInSiteURL
+
+        returned data is like
         [{'video_uri' : 'https://video.mp4', 'caption_uri' : 'https://caption.vtt'}, ...]
         '''
         return []
 
 
-    def get_events(self) -> List[EventIngestionModel]:
+    def get_events(self,
+        # for the past 2 days
+        begin_t: datetime.time = datetime.datetime.utcnow() - datetime.timedelta(days = 2),
+        end_t:   datetime.time = datetime.datetime.utcnow()
+    ) -> List[EventIngestionModel]:
         '''
         main getter to retrieve legistar data as cdp ingestion model items
         '''
@@ -113,19 +122,24 @@ class LegistarScraper:
 
         for legistar_ev in get_legistar_events_for_timespan(
             self.client_name,
-            # for the past 2 days
-            # will address duplicates later
-            begin = datetime.datetime.utcnow() - datetime.timedelta(days = 2),
-            end = datetime.datetime.utcnow(),
+            begin = begin_t,
+            end = end_t,
             # NOTE: use the range below to retrieve events with 1 containing video
             #begin = datetime.datetime(year = 2021, month = 7, day = 9),
             #end = datetime.datetime(year = 2021, month = 7, day = 10),
         ):
             try:
-                session_time = datetime.datetime.strptime(legistar_ev[LEGISTAR_SESSION_TIME], '%Y-%m-%dT%H:%M:%S.%f')
+                session_time = datetime.datetime.strptime(
+                    legistar_ev[LEGISTAR_SESSION_TIME],
+                    '%Y-%m-%dT%H:%M:%S.%f'
+                )
             except ValueError:
-                session_time = datetime.datetime.strptime(legistar_ev[LEGISTAR_SESSION_TIME], '%Y-%m-%dT%H:%M:%S')
+                session_time = datetime.datetime.strptime(
+                    legistar_ev[LEGISTAR_SESSION_TIME],
+                    '%Y-%m-%dT%H:%M:%S'
+                )
             except:
+                # TODO: in debug level should log why session time will be None
                 session_time = None
 
             sessions = []
@@ -136,8 +150,8 @@ class LegistarScraper:
                     Session(
                         session_datetime = session_time,
                         session_index = 0,
-                        video_uri = uri['video_uri'],
-                        caption_uri = uri['caption_uri'],
+                        video_uri = uri[CDP_VIDEO_URI],
+                        caption_uri = uri[CDP_CAPTION_URI],
                     )
                 )
             else:
@@ -166,7 +180,7 @@ class SeattleScraper(LegistarScraper):
 
 
     def get_event_video(self, ev_site_url: str) -> List[Dict]:
-        # broad try to simply return None if any statement below fails
+        # broad try to simply return empty list if any statement below fails
         try:
             # EventInSiteURL (= MeetingDetail.aspx) has a td tag with a certain id pattern containing url to video
             with urlopen(ev_site_url) as resp:
@@ -201,26 +215,35 @@ class SeattleScraper(LegistarScraper):
             # entire script tag text that has the video player setup call
             video_script_text = soup.find('script', text = re.compile(r'playerInstance\.setup')).string
             # playerSetup({...
+            #             ^
             player_arg_start = re.search(r'playerInstance\.setup\((\{)', video_script_text).start(1)
             # ...});
+            #     ^
+            # playerInstance... # more playerInstance code
             video_json_blob = video_script_text[
                 player_arg_start :
                 player_arg_start + re.search(r'\)\;\s*\n\s*playerInstance', video_script_text[player_arg_start:]).start(0)
             ]
 
             # not smart enough to make a cool one-time regex to get all the 'file's in 'sources'
-            sources_start = video_json_blob.find('sources:')
-            sources_end = video_json_blob.find('],', sources_start)
+            videos_start = video_json_blob.find('sources:')
+            sources_end = video_json_blob.find('],', videos_start)
             # as shown above, url will start with // so prepend https:
-            video_uris = ['https:' + i for i in re.findall(r'file\:\s+\"([^\"]+)',
-                video_json_blob[sources_start : sources_end],
-            )]
+            video_uris = [ \
+                'https:' + i for i in re.findall(
+                    r'file\:\s*\"([^\"]+)',
+                    video_json_blob[videos_start : sources_end],
+                )
+            ]
 
             captions_start = video_json_blob.find('tracks:')
             captions_end = video_json_blob.find('],', captions_start)
-            caption_uris = ['http://seattlechannel.org/' + i for i in re.findall(r'file\:\s+\"([^\"]+)',
-                video_json_blob[captions_start : captions_end],
-            )]
+            caption_uris = [ \
+                'https://www.seattlechannel.org/' + i for i in re.findall(
+                    r'file\:\s*\"([^\"]+)',
+                    video_json_blob[captions_start : captions_end],
+                )
+            ]
 
         except:
             return []
@@ -230,6 +253,6 @@ class SeattleScraper(LegistarScraper):
 
         for i in iter:
             # TODO: ok to assume # video_uris == # caption_uris on a meeting details web page on seattlechannel.org ?
-            list_uri.append({'video_uri' : video_uris[i], 'caption_uri' : caption_uris[i]})
+            list_uri.append({CDP_VIDEO_URI : video_uris[i], CDP_CAPTION_URI : caption_uris[i]})
 
         return list_uri
