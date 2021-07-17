@@ -63,12 +63,29 @@ class LegistarScraper:
 
 
     # TODO: better name?
-    def can_get_min_info(self) -> bool:
+    def can_get_min_info(self, check_days: int = 7) -> bool:
         '''
-        return True if able to get minimum required data for EventIngestionModel
+        return False if never can get minimum required data for EventIngestionModel within check_days from today
         '''
-        # TODO:  call get_events() to check if ANY event in the past week has body name, time and video_uri
-        return True
+        now = datetime.datetime.utcnow()
+        days = range(check_days)
+
+        for d in days:
+            # ev: EventIngestionModel
+            for cdp_ev in self.get_events(
+                begin_t = now - datetime.timedelta(days = d + 1),
+                end_t   = now - datetime.timedelta(days = d)
+            ):
+                try:
+                    if len(cdp_ev.body.name) > 0 and \
+                       cdp_ev.sessions[0].session_datetime is not None and \
+                       len(cdp_ev.sessions[0].video_uri) > 0:
+                        return True
+                except:
+                    pass
+
+        # no event in check_days had enough for minimal ingestion model item
+        return False
 
 
     def get_event_minutes(self, legistar_ev_items: List[Dict]) -> List[EventMinutesItem]:
@@ -99,7 +116,7 @@ class LegistarScraper:
         return minutes
 
 
-    def get_event_video(self, ev_site_url: str) -> List[Dict]:
+    def get_video_uris(self, ev_site_url: str) -> List[Dict]:
         '''
         parse web page at ev_site_url and return url for video and captions if found
         ev_site_url is EventInSiteURL
@@ -108,6 +125,19 @@ class LegistarScraper:
         [{'video_uri' : 'https://video.mp4', 'caption_uri' : 'https://caption.vtt'}, ...]
         '''
         return []
+
+
+    @staticmethod
+    def strp_legistar_time(t: str) -> datetime.datetime:
+        '''
+        helper func for strptime() on iso formatted legistar api time
+        '''
+        try:
+            # first try with msec resolution
+            return datetime.datetime.strptime(t, '%Y-%m-%dT%H:%M:%S.%f')
+        except ValueError:
+            # now just up to sec
+            return datetime.datetime.strptime(t, '%Y-%m-%dT%H:%M:%S')
 
 
     def get_events(self,
@@ -129,15 +159,7 @@ class LegistarScraper:
             #end = datetime.datetime(year = 2021, month = 7, day = 10),
         ):
             try:
-                session_time = datetime.datetime.strptime(
-                    legistar_ev[LEGISTAR_SESSION_TIME],
-                    '%Y-%m-%dT%H:%M:%S.%f'
-                )
-            except ValueError:
-                session_time = datetime.datetime.strptime(
-                    legistar_ev[LEGISTAR_SESSION_TIME],
-                    '%Y-%m-%dT%H:%M:%S'
-                )
+                session_time = self.strp_legistar_time(legistar_ev[LEGISTAR_SESSION_TIME])
             except:
                 # TODO: in debug level should log why session time will be None
                 session_time = None
@@ -145,7 +167,7 @@ class LegistarScraper:
             sessions = []
 
             # TODO: Session per video_uri/caption_uri ok?
-            for uri in self.get_event_video(legistar_ev[LEGISTAR_EV_SITE_URL]):
+            for uri in self.get_video_uris(legistar_ev[LEGISTAR_EV_SITE_URL]):
                 sessions.append(
                     Session(
                         session_datetime = session_time,
@@ -155,6 +177,7 @@ class LegistarScraper:
                     )
                 )
             else:
+                # found 0 videos
                 sessions.append(
                     Session(
                         session_datetime = session_time,
@@ -179,7 +202,7 @@ class SeattleScraper(LegistarScraper):
         super().__init__('seattle')
 
 
-    def get_event_video(self, ev_site_url: str) -> List[Dict]:
+    def get_video_uris(self, ev_site_url: str) -> List[Dict]:
         # broad try to simply return empty list if any statement below fails
         try:
             # EventInSiteURL (= MeetingDetail.aspx) has a td tag with a certain id pattern containing url to video
