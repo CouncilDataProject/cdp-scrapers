@@ -119,10 +119,9 @@ class LegistarScraper:
         return minutes
 
 
-    def get_video_uris(self, ev_site_url: str) -> List[Dict]:
+    def get_video_uris(self, legistar_ev: Dict) -> List[Dict]:
         '''
-        parse web page at ev_site_url and return url for video and captions if found
-        ev_site_url is EventInSiteURL
+        return url for videos and captions if found in data set from legistar api
 
         returned data is like
         [{'video_uri' : 'https://video.mp4', 'caption_uri' : 'https://caption.vtt'}, ...]
@@ -170,7 +169,7 @@ class LegistarScraper:
             sessions = []
 
             # TODO: Session per video_uri/caption_uri ok?
-            for uri in self.get_video_uris(legistar_ev[LEGISTAR_EV_SITE_URL]):
+            for uri in self.get_video_uris(legistar_ev):
                 sessions.append(
                     Session(
                         session_datetime = session_time,
@@ -205,11 +204,11 @@ class SeattleScraper(LegistarScraper):
         super().__init__('seattle')
 
 
-    def get_video_uris(self, ev_site_url: str) -> List[Dict]:
+    def get_video_uris(self, legistar_ev: Dict) -> List[Dict]:
         # broad try to simply return empty list if any statement below fails
         try:
             # EventInSiteURL (= MeetingDetail.aspx) has a td tag with a certain id pattern containing url to video
-            with urlopen(ev_site_url) as resp:
+            with urlopen(legistar_ev[LEGISTAR_EV_SITE_URL]) as resp:
                 soup = BeautifulSoup(resp.read(), 'html.parser')
                 # this gets us the url for the web PAGE containing the video
                 video_page_url = soup.find('a', id = re.compile(r'ct\S*_ContentPlaceHolder\S*_hypVideo'), class_ = 'videolink')['href']
