@@ -16,6 +16,7 @@ from cdp_backend.pipeline.ingestion_models import (
     EventMinutesItem,
     MinutesItem,
     Matter,
+    SupportingFile,
 )
 from cdp_scrapers.legistar_utils import(
     get_legistar_events_for_timespan,
@@ -25,17 +26,25 @@ from cdp_scrapers.legistar_utils import(
 ###############################################################################
 
 
-# e.g. EventItemEventId from legistar api -> MinutesItem.name
-LEGISTAR_MINUTE_NAME   = 'EventItemEventId'
-LEGISTAR_MATTER_TITLE  = 'EventItemTitle'
-LEGISTAR_MATTER_NAME   = 'EventItemMatterName'
-LEGISTAR_MATTER_TYPE   = 'EventItemMatterType'
-LEGISTAR_MATTER_STATUS = 'EventItemMatterStatus'
-LEGISTAR_SESSION_TIME  = 'EventAgendaLastPublishedUTC'
-LEGISTAR_BODY_NAME     = 'EventBodyName'
+# e.g. MinutesItem.name     =  EventItemEventId from legistar api
+LEGISTAR_MINUTE_NAME        = 'EventItemEventId'
+LEGISTAR_EV_MINUTE_DECISION = 'EventItemPassedFlagName'
+LEGISTAR_MATTER_EXT_ID      = 'EventItemMatterId'
+LEGISTAR_MATTER_TITLE       = 'EventItemTitle'
+LEGISTAR_MATTER_NAME        = 'EventItemMatterName'
+LEGISTAR_MATTER_TYPE        = 'EventItemMatterType'
+LEGISTAR_MATTER_STATUS      = 'EventItemMatterStatus'
+# Session.session_datetime is a combo of EventDate and EventTime
+LEGISTAR_SESSION_DATE       = 'EventDate'
+LEGISTAR_SESSION_TIME       = 'EventTime'
+LEGISTAR_BODY_NAME          = 'EventBodyName'
+LEGISTAR_FILE_EXT_ID        = 'MatterAttachmentId'
+LEGISTAR_FILE_NAME          = 'MatterAttachmentName'
+LEGISTAR_FILE_URI           = 'MatterAttachmentHyperlink'
 
-LEGISTAR_EV_ITEMS      = 'EventItems'
-LEGISTAR_EV_SITE_URL   = 'EventInSiteURL'
+LEGISTAR_EV_ITEMS           = 'EventItems'
+LEGISTAR_EV_SITE_URL        = 'EventInSiteURL'
+LEGISTAR_EV_ATTACHMENTS     = 'EventItemMatterAttachments'
 
 CDP_VIDEO_URI   = 'video_uri'
 CDP_CAPTION_URI = 'caption_uri'
@@ -91,6 +100,24 @@ class LegistarScraper:
         return False
 
 
+    def get_event_support_files(self, legistar_ev_attachments: List[Dict]) -> List[SupportingFile]:
+        '''
+        return SupportingFiles from legistar EventItemMatterAttachments
+        '''
+        files = []
+
+        for attachment in legistar_ev_attachments:
+            files.append(
+                SupportingFile(
+                    external_source_id = attachment[LEGISTAR_FILE_EXT_ID],
+                    name = attachment[LEGISTAR_FILE_NAME],
+                    uri = attachment[LEGISTAR_FILE_URI],
+                )
+            )
+
+        return files
+
+
     def get_event_minutes(self, legistar_ev_items: List[Dict]) -> List[EventMinutesItem]:
         '''
         return legistar 'EventItems' as EventMinutesItems
@@ -103,14 +130,16 @@ class LegistarScraper:
         for item in legistar_ev_items:
             minutes.append(
                 EventMinutesItem(
+                    decision = item[LEGISTAR_EV_MINUTE_DECISION],
                     # other better choice for name?
                     minutes_item = MinutesItem(name = item[LEGISTAR_MINUTE_NAME]),
+                    supporting_files = self.get_event_support_files(item[LEGISTAR_EV_ATTACHMENTS]),
 
                     matter = Matter(
+                        external_source_id = item[LEGISTAR_MATTER_EXT_ID],
                         name = item[LEGISTAR_MATTER_NAME],
                         matter_type = item[LEGISTAR_MATTER_TYPE],
                         title = item[LEGISTAR_MATTER_TITLE],
-                        # other better choice for result?
                         result_status = item[LEGISTAR_MATTER_STATUS],
                     )
                 )
@@ -130,22 +159,24 @@ class LegistarScraper:
 
 
     @staticmethod
-    def strp_legistar_time(t: str) -> datetime.datetime:
+    def to_datetime(ev_date: str, ev_time: str) -> datetime.datetime:
         '''
-        helper func for strptime() on iso formatted legistar api time
+        helper func combine legistar ev date and time into datetime
         '''
-        try:
-            # first try with msec resolution
-            return datetime.datetime.strptime(t, '%Y-%m-%dT%H:%M:%S.%f')
-        except ValueError:
-            # now just up to sec
-            return datetime.datetime.strptime(t, '%Y-%m-%dT%H:%M:%S')
+        # 2021-07-09T00:00:00
+        d = datetime.datetime.strptime(ev_date, '%Y-%m-%dT%H:%M:%S')
+        # 9:30 AM
+        t = datetime.datetime.strptime(ev_time, '%I:%M %p')
+        return datetime.datetime(
+            year = d.year, month = d.month, day = d.day,
+            hour = t.hour, minute = t.minute, second = t.second
+        )
 
 
     def get_events(self,
         # for the past 2 days
-        begin_t: datetime.time = datetime.datetime.utcnow() - datetime.timedelta(days = 2),
-        end_t:   datetime.time = datetime.datetime.utcnow()
+        begin: datetime.time = datetime.datetime.utcnow() - datetime.timedelta(days = 2),
+        end:   datetime.time = datetime.datetime.utcnow()
     ) -> List[EventIngestionModel]:
         '''
         main getter to retrieve legistar data as cdp ingestion model items
@@ -154,18 +185,13 @@ class LegistarScraper:
 
         for legistar_ev in get_legistar_events_for_timespan(
             self.client_name,
-            begin = begin_t,
-            end = end_t,
+            begin = begin,
+            end = end,
             # NOTE: use the range below to retrieve events with 1 containing video
             #begin = datetime.datetime(year = 2021, month = 7, day = 9),
             #end = datetime.datetime(year = 2021, month = 7, day = 10),
         ):
-            try:
-                session_time = self.strp_legistar_time(legistar_ev[LEGISTAR_SESSION_TIME])
-            except:
-                # TODO: in debug level should log why session time will be None
-                session_time = None
-
+            session_time = self.to_datetime(legistar_ev[LEGISTAR_SESSION_DATE], legistar_ev[LEGISTAR_SESSION_TIME])
             sessions = []
 
             # TODO: Session per video_uri/caption_uri ok?
@@ -173,7 +199,7 @@ class LegistarScraper:
                 sessions.append(
                     Session(
                         session_datetime = session_time,
-                        session_index = 0,
+                        session_index = len(sessions),
                         video_uri = uri[CDP_VIDEO_URI],
                         caption_uri = uri[CDP_CAPTION_URI],
                     )
