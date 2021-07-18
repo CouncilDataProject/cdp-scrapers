@@ -85,8 +85,8 @@ class LegistarScraper:
         for d in days:
             # ev: EventIngestionModel
             for cdp_ev in self.get_events(
-                begin_t = now - datetime.timedelta(days = d + 1),
-                end_t   = now - datetime.timedelta(days = d)
+                begin = now - datetime.timedelta(days = d + 1),
+                end   = now - datetime.timedelta(days = d)
             ):
                 try:
                     if len(cdp_ev.body.name) > 0 and \
