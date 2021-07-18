@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from ssl import get_protocol_name
 from typing import Dict, List
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
@@ -17,6 +18,8 @@ from cdp_backend.pipeline.ingestion_models import (
     MinutesItem,
     Matter,
     SupportingFile,
+    Person,
+    Vote,
 )
 from cdp_scrapers.legistar_utils import(
     get_legistar_events_for_timespan,
@@ -29,6 +32,7 @@ from cdp_scrapers.legistar_utils import(
 # e.g. MinutesItem.name     =  EventItemEventId from legistar api
 LEGISTAR_MINUTE_NAME        = 'EventItemEventId'
 LEGISTAR_EV_MINUTE_DECISION = 'EventItemPassedFlagName'
+# TODO: is it better to use uuids like EventItemMatterGuid for cdp *_ext_src_id?
 LEGISTAR_MATTER_EXT_ID      = 'EventItemMatterId'
 LEGISTAR_MATTER_TITLE       = 'EventItemTitle'
 LEGISTAR_MATTER_NAME        = 'EventItemMatterName'
@@ -41,10 +45,19 @@ LEGISTAR_BODY_NAME          = 'EventBodyName'
 LEGISTAR_FILE_EXT_ID        = 'MatterAttachmentId'
 LEGISTAR_FILE_NAME          = 'MatterAttachmentName'
 LEGISTAR_FILE_URI           = 'MatterAttachmentHyperlink'
+LEGISTAR_PERSON_EMAIL       = 'PersonEmail'
+LEGISTAR_PERSON_EXT_ID      = 'PersonId'
+LEGISTAR_PERSON_NAME        = 'PersonFullName'
+LEGISTAR_PERSON_PHONE       = 'PersonPhone'
+LEGISTAR_PERSON_WEBSITE     = 'PersonWWW'
+LEGISTAR_VOTE_DECISION      = 'VoteResult'
+LEGISTAR_VOTE_EXT_ID        = 'VoteId'
 
 LEGISTAR_EV_ITEMS           = 'EventItems'
 LEGISTAR_EV_SITE_URL        = 'EventInSiteURL'
 LEGISTAR_EV_ATTACHMENTS     = 'EventItemMatterAttachments'
+LEGISTAR_EV_VOTES           = 'EventItemVoteInfo'
+LEGISTAR_VOTE_PERSONS       = 'PersonInfo'
 
 CDP_VIDEO_URI   = 'video_uri'
 CDP_CAPTION_URI = 'caption_uri'
@@ -100,7 +113,35 @@ class LegistarScraper:
         return False
 
 
-    def get_event_support_files(self, legistar_ev_attachments: List[Dict]) -> List[SupportingFile]:
+    @staticmethod
+    def get_person(legistar_person: Dict) -> Person:
+        return Person(
+            email = legistar_person[LEGISTAR_PERSON_EMAIL],
+            external_source_id = legistar_person[LEGISTAR_PERSON_EXT_ID],
+            name = legistar_person[LEGISTAR_PERSON_NAME],
+            phone = legistar_person[LEGISTAR_PERSON_PHONE],
+            website = legistar_person[LEGISTAR_PERSON_WEBSITE],
+        )
+
+
+    @staticmethod
+    def get_votes(legistar_votes: List[Dict]) -> List[Vote]:
+        votes = []
+
+        for vote in legistar_votes:
+            votes.append(
+                Vote(
+                    decision = vote[LEGISTAR_VOTE_DECISION],
+                    external_source_id = vote[LEGISTAR_VOTE_EXT_ID],
+                    person = LegistarScraper.get_person(vote[LEGISTAR_VOTE_PERSONS]),
+                )
+            )
+
+        return votes
+
+
+    @staticmethod
+    def get_event_support_files(legistar_ev_attachments: List[Dict]) -> List[SupportingFile]:
         '''
         return SupportingFiles from legistar EventItemMatterAttachments
         '''
@@ -118,7 +159,22 @@ class LegistarScraper:
         return files
 
 
-    def get_event_minutes(self, legistar_ev_items: List[Dict]) -> List[EventMinutesItem]:
+    @staticmethod
+    def get_matter(legistar_ev: Dict) -> Matter:
+        '''
+        cdp Matter from parts of legistar api EventItem
+        '''
+        return Matter(
+            external_source_id = legistar_ev[LEGISTAR_MATTER_EXT_ID],
+            name = legistar_ev[LEGISTAR_MATTER_NAME],
+            matter_type = legistar_ev[LEGISTAR_MATTER_TYPE],
+            title = legistar_ev[LEGISTAR_MATTER_TITLE],
+            result_status = legistar_ev[LEGISTAR_MATTER_STATUS],
+        )
+
+
+    @staticmethod
+    def get_event_minutes(legistar_ev_items: List[Dict]) -> List[EventMinutesItem]:
         '''
         return legistar 'EventItems' as EventMinutesItems
         '''
@@ -133,33 +189,17 @@ class LegistarScraper:
                     decision = item[LEGISTAR_EV_MINUTE_DECISION],
                     # other better choice for name?
                     minutes_item = MinutesItem(name = item[LEGISTAR_MINUTE_NAME]),
-                    supporting_files = self.get_event_support_files(item[LEGISTAR_EV_ATTACHMENTS]),
-
-                    matter = Matter(
-                        external_source_id = item[LEGISTAR_MATTER_EXT_ID],
-                        name = item[LEGISTAR_MATTER_NAME],
-                        matter_type = item[LEGISTAR_MATTER_TYPE],
-                        title = item[LEGISTAR_MATTER_TITLE],
-                        result_status = item[LEGISTAR_MATTER_STATUS],
-                    )
+                    supporting_files = LegistarScraper.get_event_support_files(item[LEGISTAR_EV_ATTACHMENTS]),
+                    votes = LegistarScraper.get_votes(item[LEGISTAR_EV_VOTES]),
+                    matter = LegistarScraper.get_matter(item),
                 )
             )
 
         return minutes
 
 
-    def get_video_uris(self, legistar_ev: Dict) -> List[Dict]:
-        '''
-        return url for videos and captions if found in data set from legistar api
-
-        returned data is like
-        [{'video_uri' : 'https://video.mp4', 'caption_uri' : 'https://caption.vtt'}, ...]
-        '''
-        return []
-
-
     @staticmethod
-    def to_datetime(ev_date: str, ev_time: str) -> datetime.datetime:
+    def legistar_ev_date_time(ev_date: str, ev_time: str) -> datetime.datetime:
         '''
         helper func combine legistar ev date and time into datetime
         '''
@@ -191,7 +231,7 @@ class LegistarScraper:
             #begin = datetime.datetime(year = 2021, month = 7, day = 9),
             #end = datetime.datetime(year = 2021, month = 7, day = 10),
         ):
-            session_time = self.to_datetime(legistar_ev[LEGISTAR_SESSION_DATE], legistar_ev[LEGISTAR_SESSION_TIME])
+            session_time = self.legistar_ev_date_time(legistar_ev[LEGISTAR_SESSION_DATE], legistar_ev[LEGISTAR_SESSION_TIME])
             sessions = []
 
             # TODO: Session per video_uri/caption_uri ok?
@@ -223,6 +263,16 @@ class LegistarScraper:
             )
 
         return evs
+
+
+    def get_video_uris(self, legistar_ev: Dict) -> List[Dict]:
+        '''
+        return url for videos and captions if found in data set from legistar api
+
+        returned data is like
+        [{'video_uri' : 'https://video.mp4', 'caption_uri' : 'https://caption.vtt'}, ...]
+        '''
+        return []
 
 
 class SeattleScraper(LegistarScraper):
