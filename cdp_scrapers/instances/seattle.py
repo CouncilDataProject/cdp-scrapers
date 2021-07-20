@@ -228,18 +228,11 @@ class LegistarScraper:
                 legistar_ev[LEGISTAR_SESSION_DATE],
                 legistar_ev[LEGISTAR_SESSION_TIME]
             )
-            sessions = []
 
-            for uri in self.get_video_uris(legistar_ev):
-                sessions.append(
-                    Session(
-                        session_datetime=session_time,
-                        session_index=len(sessions),
-                        video_uri=uri[CDP_VIDEO_URI],
-                        caption_uri=uri[CDP_CAPTION_URI],
-                    )
-                )
-            else:
+            sessions = []
+            list_uri = self.get_video_uris(legistar_ev)
+
+            if len(list_uri) == 0:
                 # found 0 videos
                 sessions.append(
                     Session(
@@ -248,6 +241,16 @@ class LegistarScraper:
                         video_uri=None,
                     )
                 )
+            else:
+                for uri in list_uri:
+                    sessions.append(
+                        Session(
+                            session_datetime=session_time,
+                            session_index=len(sessions),
+                            video_uri=uri[CDP_VIDEO_URI],
+                            caption_uri=uri[CDP_CAPTION_URI],
+                        )
+                    )
 
             evs.append(
                 EventIngestionModel(
