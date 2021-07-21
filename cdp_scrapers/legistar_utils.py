@@ -307,8 +307,8 @@ class LegistarScraper:
     def get_events(
         self,
         # for the past 2 days
-        begin: datetime.time = datetime.utcnow() - timedelta(days=2),
-        end: datetime.time = datetime.utcnow()
+        begin: Optional[datetime.time] = datetime.utcnow() - timedelta(days=2),
+        end: Optional[datetime.time] = datetime.utcnow()
     ) -> List[EventIngestionModel]:
         '''
         main getter to retrieve legistar data as cdp ingestion model items
