@@ -23,7 +23,7 @@ from cdp_backend.pipeline.ingestion_models import (
     Vote,
 )
 
-from cdp_scrapers.legistar_utils import (
+from ..legistar_utils import (
     get_legistar_events_for_timespan,
 )
 
