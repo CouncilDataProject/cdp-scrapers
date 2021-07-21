@@ -165,6 +165,7 @@ class LegistarScraper:
     def __init__(self, client: str):
         self.client_name = client
 
+    @property
     def is_legistar_compatible(self) -> bool:
         '''
         return True if can get successful legistar api response
@@ -178,7 +179,7 @@ class LegistarScraper:
 
     # TODO: better name?
 
-    def can_get_min_info(self, check_days: int = 7) -> bool:
+    def check_for_cdp_min_ingestion(self, check_days: int = 7) -> bool:
         '''
         return False if never can get minimum required data for EventIngestionModel
         within check_days from today
