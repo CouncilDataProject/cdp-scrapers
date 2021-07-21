@@ -365,11 +365,10 @@ class LegistarScraper:
         return url for videos and captions if found in data set from legistar api
 
         returned data is like
-        [
-         {'video_uri' : 'https://video.mp4',
+        [{'video_uri' : 'https://video.mp4',
           'caption_uri' : 'https://caption.vtt'
          },
          ...
         ]
         '''
-        return []
+        raise NotImplementedError
