@@ -187,8 +187,9 @@ class LegistarScraper:
         return False if never can get minimum required data for EventIngestionModel
         within check_days from today
         '''
-        # if not self.is_legistar_compatible():
-        #     return False
+        # no point wasting time if the client isn't on legistar at all
+        if not self.is_legistar_compatible():
+            return False
 
         now = datetime.utcnow()
         days = range(check_days)
