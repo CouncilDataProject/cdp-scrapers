@@ -37,45 +37,43 @@ LEGISTAR_MATTER_BASE = LEGISTAR_BASE + "/Matters"
 LEGISTAR_PERSON_BASE = LEGISTAR_BASE + "/Persons"
 
 # e.g. MinutesItem.name =  EventItemEventId from legistar api
-LEGISTAR_MINUTE_NAME = 'EventItemEventId'
-LEGISTAR_EV_MINUTE_DECISION = 'EventItemPassedFlagName'
-LEGISTAR_PERSON_EMAIL = 'PersonEmail'
-LEGISTAR_PERSON_EXT_ID = 'PersonId'
-LEGISTAR_PERSON_NAME = 'PersonFullName'
-LEGISTAR_PERSON_PHONE = 'PersonPhone'
-LEGISTAR_PERSON_WEBSITE = 'PersonWWW'
-LEGISTAR_BODY_NAME = 'EventBodyName'
-LEGISTAR_VOTE_DECISION = 'VoteResult'
-LEGISTAR_VOTE_EXT_ID = 'VoteId'
-LEGISTAR_FILE_EXT_ID = 'MatterAttachmentId'
-LEGISTAR_FILE_NAME = 'MatterAttachmentName'
-LEGISTAR_FILE_URI = 'MatterAttachmentHyperlink'
-LEGISTAR_MATTER_EXT_ID = 'EventItemMatterId'
-LEGISTAR_MATTER_TITLE = 'EventItemTitle'
-LEGISTAR_MATTER_NAME = 'EventItemMatterName'
-LEGISTAR_MATTER_TYPE = 'EventItemMatterType'
-LEGISTAR_MATTER_STATUS = 'EventItemMatterStatus'
+LEGISTAR_MINUTE_NAME = "EventItemEventId"
+LEGISTAR_EV_MINUTE_DECISION = "EventItemPassedFlagName"
+LEGISTAR_PERSON_EMAIL = "PersonEmail"
+LEGISTAR_PERSON_EXT_ID = "PersonId"
+LEGISTAR_PERSON_NAME = "PersonFullName"
+LEGISTAR_PERSON_PHONE = "PersonPhone"
+LEGISTAR_PERSON_WEBSITE = "PersonWWW"
+LEGISTAR_BODY_NAME = "EventBodyName"
+LEGISTAR_VOTE_DECISION = "VoteResult"
+LEGISTAR_VOTE_EXT_ID = "VoteId"
+LEGISTAR_FILE_EXT_ID = "MatterAttachmentId"
+LEGISTAR_FILE_NAME = "MatterAttachmentName"
+LEGISTAR_FILE_URI = "MatterAttachmentHyperlink"
+LEGISTAR_MATTER_EXT_ID = "EventItemMatterId"
+LEGISTAR_MATTER_TITLE = "EventItemTitle"
+LEGISTAR_MATTER_NAME = "EventItemMatterName"
+LEGISTAR_MATTER_TYPE = "EventItemMatterType"
+LEGISTAR_MATTER_STATUS = "EventItemMatterStatus"
 # Session.session_datetime is a combo of EventDate and EventTime
 # TODO: this means same time for all Sessions in a NotImplementedError.
 #       some other legistar api data that can be used instead?
-LEGISTAR_SESSION_DATE = 'EventDate'
-LEGISTAR_SESSION_TIME = 'EventTime'
+LEGISTAR_SESSION_DATE = "EventDate"
+LEGISTAR_SESSION_TIME = "EventTime"
 
-LEGISTAR_EV_ITEMS = 'EventItems'
-LEGISTAR_EV_ATTACHMENTS = 'EventItemMatterAttachments'
-LEGISTAR_EV_VOTES = 'EventItemVoteInfo'
-LEGISTAR_VOTE_PERSONS = 'PersonInfo'
+LEGISTAR_EV_ITEMS = "EventItems"
+LEGISTAR_EV_ATTACHMENTS = "EventItemMatterAttachments"
+LEGISTAR_EV_VOTES = "EventItemVoteInfo"
+LEGISTAR_VOTE_PERSONS = "PersonInfo"
 
-CDP_VIDEO_URI = 'video_uri'
-CDP_CAPTION_URI = 'caption_uri'
+CDP_VIDEO_URI = "video_uri"
+CDP_CAPTION_URI = "caption_uri"
 
 ###############################################################################
 
 
 def get_legistar_events_for_timespan(
-    client: str,
-    begin: Optional[datetime] = None,
-    end: Optional[datetime] = None,
+    client: str, begin: Optional[datetime] = None, end: Optional[datetime] = None,
 ) -> List[Dict]:
     """
     Get all legistar events and each events minutes items, people, and votes, for a
@@ -116,13 +114,9 @@ def get_legistar_events_for_timespan(
         request_format.format(
             client=client,
             begin=filter_datetime_format.format(
-                op="ge",
-                dt=str(begin).replace(" ", "T"),
+                op="ge", dt=str(begin).replace(" ", "T"),
             ),
-            end=filter_datetime_format.format(
-                op="lt",
-                dt=str(end).replace(" ", "T"),
-            ),
+            end=filter_datetime_format.format(op="lt", dt=str(end).replace(" ", "T"),),
         )
     ).json()
 
@@ -142,8 +136,7 @@ def get_legistar_events_for_timespan(
             vote_request_format = LEGISTAR_VOTE_BASE + "/{event_item_id}/Votes"
             event_item["EventItemVoteInfo"] = requests.get(
                 vote_request_format.format(
-                    client=client,
-                    event_item_id=event_item["EventItemId"],
+                    client=client, event_item_id=event_item["EventItemId"],
                 )
             ).json()
 
@@ -152,8 +145,7 @@ def get_legistar_events_for_timespan(
                 person_request_format = LEGISTAR_PERSON_BASE + "/{person_id}"
                 vote_info["PersonInfo"] = requests.get(
                     person_request_format.format(
-                        client=client,
-                        person_id=vote_info["VotePersonId"],
+                        client=client, person_id=vote_info["VotePersonId"],
                     )
                 ).json()
 
@@ -170,23 +162,23 @@ class LegistarScraper:
 
     @property
     def is_legistar_compatible(self) -> bool:
-        '''
+        """
         return True if can get successful legistar api response
-        '''
+        """
         # simplest check, if the GET request works, it is a legistar place
         try:
-            resp = urlopen(f'http://webapi.legistar.com/v1/{self.client_name}/bodies')
-            return (resp.status == 200)
+            resp = urlopen(f"http://webapi.legistar.com/v1/{self.client_name}/bodies")
+            return resp.status == 200
         except URLError or HTTPError:
             return False
 
     # TODO: better name?
 
     def check_for_cdp_min_ingestion(self, check_days: int = 7) -> bool:
-        '''
+        """
         return False if never can get minimum required data for EventIngestionModel
         within check_days from today
-        '''
+        """
         # no point wasting time if the client isn't on legistar at all
         if not self.is_legistar_compatible():
             return False
@@ -197,13 +189,14 @@ class LegistarScraper:
         for d in days:
             # ev: EventIngestionModel
             for cdp_ev in self.get_events(
-                begin=now - timedelta(days=d + 1),
-                end=now - timedelta(days=d)
+                begin=now - timedelta(days=d + 1), end=now - timedelta(days=d)
             ):
                 try:
-                    if len(cdp_ev.body.name) > 0 and \
-                       cdp_ev.sessions[0].session_datetime is not None and \
-                       len(cdp_ev.sessions[0].video_uri) > 0:
+                    if (
+                        len(cdp_ev.body.name) > 0
+                        and cdp_ev.sessions[0].session_datetime is not None
+                        and len(cdp_ev.sessions[0].video_uri) > 0
+                    ):
                         return True
                 # catch None or empty list
                 except TypeError or IndexError:
@@ -239,11 +232,11 @@ class LegistarScraper:
 
     @staticmethod
     def get_event_support_files(
-        legistar_ev_attachments: List[Dict]
+        legistar_ev_attachments: List[Dict],
     ) -> List[SupportingFile]:
-        '''
+        """
         return SupportingFiles from legistar EventItemMatterAttachments
-        '''
+        """
         files = []
 
         for attachment in legistar_ev_attachments:
@@ -259,9 +252,9 @@ class LegistarScraper:
 
     @staticmethod
     def get_matter(legistar_ev: Dict) -> Matter:
-        '''
+        """
         cdp Matter from parts of legistar api EventItem
-        '''
+        """
         return Matter(
             external_source_id=legistar_ev[LEGISTAR_MATTER_EXT_ID],
             name=legistar_ev[LEGISTAR_MATTER_NAME],
@@ -272,9 +265,9 @@ class LegistarScraper:
 
     @staticmethod
     def get_event_minutes(legistar_ev_items: List[Dict]) -> List[EventMinutesItem]:
-        '''
+        """
         return legistar 'EventItems' as EventMinutesItems
-        '''
+        """
         minutes = []
 
         # EventMinutesItem object per member in EventItems
@@ -296,42 +289,43 @@ class LegistarScraper:
 
     @staticmethod
     def legistar_ev_date_time(ev_date: str, ev_time: str) -> datetime:
-        '''
+        """
         helper func combine legistar ev date and time into datetime
-        '''
+        """
         # 2021-07-09T00:00:00
-        d = datetime.strptime(ev_date, '%Y-%m-%dT%H:%M:%S')
+        d = datetime.strptime(ev_date, "%Y-%m-%dT%H:%M:%S")
         # 9:30 AM
-        t = datetime.strptime(ev_time, '%I:%M %p')
+        t = datetime.strptime(ev_time, "%I:%M %p")
         return datetime(
-            year=d.year, month=d.month, day=d.day,
-            hour=t.hour, minute=t.minute, second=t.second
+            year=d.year,
+            month=d.month,
+            day=d.day,
+            hour=t.hour,
+            minute=t.minute,
+            second=t.second,
         )
 
     def get_events(
         self,
         # for the past 2 days
         begin: Optional[datetime.time] = datetime.utcnow() - timedelta(days=2),
-        end: Optional[datetime.time] = datetime.utcnow()
+        end: Optional[datetime.time] = datetime.utcnow(),
     ) -> List[EventIngestionModel]:
-        '''
+        """
         main getter to retrieve legistar data as cdp ingestion model items
-        '''
+        """
         evs = []
 
         for legistar_ev in get_legistar_events_for_timespan(
-            self.client_name,
-            begin=begin,
-            end=end,
+            self.client_name, begin=begin, end=end,
         ):
             session_time = self.legistar_ev_date_time(
-                legistar_ev[LEGISTAR_SESSION_DATE],
-                legistar_ev[LEGISTAR_SESSION_TIME]
+                legistar_ev[LEGISTAR_SESSION_DATE], legistar_ev[LEGISTAR_SESSION_TIME]
             )
 
             sessions = []
             list_uri = self.get_video_uris(legistar_ev) or [
-                {CDP_VIDEO_URI : None, CDP_CAPTION_URI : None}
+                {CDP_VIDEO_URI: None, CDP_CAPTION_URI: None}
             ]
 
             for uri in list_uri:
@@ -357,7 +351,7 @@ class LegistarScraper:
         return evs
 
     def get_video_uris(self, legistar_ev: Dict) -> List[Dict]:
-        '''
+        """
         return url for videos and captions if found in data set from legistar api
 
         returned data is like
@@ -366,5 +360,5 @@ class LegistarScraper:
          },
          ...
         ]
-        '''
+        """
         raise NotImplementedError
