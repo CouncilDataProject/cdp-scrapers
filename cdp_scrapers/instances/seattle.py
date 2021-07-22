@@ -23,6 +23,7 @@ LEGISTAR_EV_SITE_URL = 'EventInSiteURL'
 ###############################################################################
 
 
+# TODO: add logging
 class SeattleScraper(LegistarScraper):
     def __init__(self):
         super().__init__('seattle')

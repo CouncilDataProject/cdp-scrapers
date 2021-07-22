@@ -56,6 +56,8 @@ LEGISTAR_MATTER_NAME = 'EventItemMatterName'
 LEGISTAR_MATTER_TYPE = 'EventItemMatterType'
 LEGISTAR_MATTER_STATUS = 'EventItemMatterStatus'
 # Session.session_datetime is a combo of EventDate and EventTime
+# TODO: this means same time for all Sessions in a NotImplementedError.
+#       some other legistar api data that can be used instead?
 LEGISTAR_SESSION_DATE = 'EventDate'
 LEGISTAR_SESSION_TIME = 'EventTime'
 
@@ -161,6 +163,7 @@ def get_legistar_events_for_timespan(
 
 # base class for scraper to convert legistar api data -> cdp ingestion model data
 # TODO: double-check unique class name in cdp to avoid confusion
+#       add logging
 class LegistarScraper:
     def __init__(self, client: str):
         self.client_name = client
