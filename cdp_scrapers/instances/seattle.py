@@ -103,7 +103,8 @@ class SeattleScraper(LegistarScraper):
         video_uris = [
             "https:" + i
             for i in re.findall(
-                r"file\:\s*\"([^\"]+)", video_json_blob[videos_start:videos_end],
+                r"file\:\s*\"([^\"]+)",
+                video_json_blob[videos_start:videos_end],
             )
         ]
 
@@ -112,7 +113,8 @@ class SeattleScraper(LegistarScraper):
         caption_uris = [
             "https://www.seattlechannel.org/" + i
             for i in re.findall(
-                r"file\:\s*\"([^\"]+)", video_json_blob[captions_start:captions_end],
+                r"file\:\s*\"([^\"]+)",
+                video_json_blob[captions_start:captions_end],
             )
         ]
 

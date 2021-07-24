@@ -73,7 +73,9 @@ CDP_CAPTION_URI = "caption_uri"
 
 
 def get_legistar_events_for_timespan(
-    client: str, begin: Optional[datetime] = None, end: Optional[datetime] = None,
+    client: str,
+    begin: Optional[datetime] = None,
+    end: Optional[datetime] = None,
 ) -> List[Dict]:
     """
     Get all legistar events and each events minutes items, people, and votes, for a
@@ -114,9 +116,13 @@ def get_legistar_events_for_timespan(
         request_format.format(
             client=client,
             begin=filter_datetime_format.format(
-                op="ge", dt=str(begin).replace(" ", "T"),
+                op="ge",
+                dt=str(begin).replace(" ", "T"),
             ),
-            end=filter_datetime_format.format(op="lt", dt=str(end).replace(" ", "T"),),
+            end=filter_datetime_format.format(
+                op="lt",
+                dt=str(end).replace(" ", "T"),
+            ),
         )
     ).json()
 
@@ -136,7 +142,8 @@ def get_legistar_events_for_timespan(
             vote_request_format = LEGISTAR_VOTE_BASE + "/{event_item_id}/Votes"
             event_item["EventItemVoteInfo"] = requests.get(
                 vote_request_format.format(
-                    client=client, event_item_id=event_item["EventItemId"],
+                    client=client,
+                    event_item_id=event_item["EventItemId"],
                 )
             ).json()
 
@@ -145,7 +152,8 @@ def get_legistar_events_for_timespan(
                 person_request_format = LEGISTAR_PERSON_BASE + "/{person_id}"
                 vote_info["PersonInfo"] = requests.get(
                     person_request_format.format(
-                        client=client, person_id=vote_info["VotePersonId"],
+                        client=client,
+                        person_id=vote_info["VotePersonId"],
                     )
                 ).json()
 
@@ -317,7 +325,9 @@ class LegistarScraper:
         evs = []
 
         for legistar_ev in get_legistar_events_for_timespan(
-            self.client_name, begin=begin, end=end,
+            self.client_name,
+            begin=begin,
+            end=end,
         ):
             session_time = self.legistar_ev_date_time(
                 legistar_ev[LEGISTAR_SESSION_DATE], legistar_ev[LEGISTAR_SESSION_TIME]
