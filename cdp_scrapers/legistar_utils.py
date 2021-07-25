@@ -161,17 +161,49 @@ def get_legistar_events_for_timespan(
     return response
 
 
-# base class for scraper to convert legistar api data -> cdp ingestion model data
-# TODO: double-check unique class name in cdp to avoid confusion
-#       add logging
+# TODO: add logging
 class LegistarScraper:
+    """
+    Base class for transforming Legistar API data to CDP IngestionModel
+    A given installation must define a derived class and implement get_video_uris()
+
+    Parameters
+    ----------
+    client: str
+        Legistar client name, e.g. "seattle" for Seattle
+
+    Attributes
+    ----------
+    client_name: str
+        Legistar client name
+
+    Methods
+    -------
+    is_legistar_compatible()
+        Check that Legistar API recognizes client name
+    check_for_cdp_min_ingestion(check_days=7)
+        Test if can obtain at least one minimally defined EventIngestionModel
+    get_events(
+        begin=datetime.utcnow() - timedelta(days=2),
+        end=datetime.utcnow()
+    )
+        Main get method that returns Legistar API data as List[EventIngestionModel]
+    get_video_uris(legistar_ev)
+        Must implement in class derived from LegistarScraper
+    """
+
     def __init__(self, client: str):
         self.client_name = client
 
     @property
     def is_legistar_compatible(self) -> bool:
         """
-        return True if can get successful legistar api response
+        Check that Legistar API recognizes client name
+
+        Returns
+        -------
+        bool
+            True if client_name is a valid Legistar client name
         """
         # simplest check, if the GET request works, it is a legistar place
         try:
@@ -180,12 +212,19 @@ class LegistarScraper:
         except URLError or HTTPError:
             return False
 
-    # TODO: better name?
-
     def check_for_cdp_min_ingestion(self, check_days: int = 7) -> bool:
         """
-        return False if never can get minimum required data for EventIngestionModel
-        within check_days from today
+        Test if can obtain at least one minimally defined EventIngestionModel
+
+        Parameters
+        ----------
+        check_days : int, default=7
+            Test duration is the past check_days days from now
+
+        Returns
+        -------
+        bool
+            True if got at least one minimally defined EventIngestionModel
         """
         # no point wasting time if the client isn't on legistar at all
         if not self.is_legistar_compatible():
@@ -215,6 +254,18 @@ class LegistarScraper:
 
     @staticmethod
     def get_person(legistar_person: Dict) -> Person:
+        """
+        Return CDP Person for Legistar Person
+
+        Parameters
+        ----------
+        legistar_person : Dict
+            Legistar API Person
+
+        Returns
+        -------
+        ingestion_models.Person
+        """
         return Person(
             email=legistar_person[LEGISTAR_PERSON_EMAIL],
             external_source_id=legistar_person[LEGISTAR_PERSON_EXT_ID],
@@ -225,6 +276,18 @@ class LegistarScraper:
 
     @staticmethod
     def get_votes(legistar_votes: List[Dict]) -> List[Vote]:
+        """
+        Return List[ingestion_models.Vote] for Legistar API Votes
+
+        Parameters
+        ----------
+        legistar_votes : List[Dict]
+            Legistar API Votes
+
+        Returns
+        -------
+        List[ingestion_models.Vote]
+        """
         votes = []
 
         for vote in legistar_votes:
@@ -243,7 +306,16 @@ class LegistarScraper:
         legistar_ev_attachments: List[Dict],
     ) -> List[SupportingFile]:
         """
-        return SupportingFiles from legistar EventItemMatterAttachments
+        Return List[ingestion_models.SupportingFile] for Legistar API MatterAttachments
+
+        Parameters
+        ----------
+        legistar_ev_attachments : List[Dict]
+            Legistar API MatterAttachments
+
+        Returns
+        -------
+        List[ingestion_models.SupportingFile]
         """
         files = []
 
@@ -261,7 +333,16 @@ class LegistarScraper:
     @staticmethod
     def get_matter(legistar_ev: Dict) -> Matter:
         """
-        cdp Matter from parts of legistar api EventItem
+        Return ingestion_models.Matter from Legistar API EventItem
+
+        Parameters
+        ----------
+        legistar_ev : Dict
+            Legistar API EventItem
+
+        Returns
+        -------
+        ingestion_models.Matter
         """
         return Matter(
             external_source_id=legistar_ev[LEGISTAR_MATTER_EXT_ID],
@@ -274,7 +355,16 @@ class LegistarScraper:
     @staticmethod
     def get_event_minutes(legistar_ev_items: List[Dict]) -> List[EventMinutesItem]:
         """
-        return legistar 'EventItems' as EventMinutesItems
+        Return List[ingestion_models.EventMinutesItem] for Legistar API EventItems
+
+        Parameters
+        ----------
+        legistar_ev_items : List[Dict]
+            Legistar API EventItems
+
+        Returns
+        -------
+        List[ingestion_models.EventMinutesItem]
         """
         minutes = []
 
@@ -298,7 +388,19 @@ class LegistarScraper:
     @staticmethod
     def legistar_ev_date_time(ev_date: str, ev_time: str) -> datetime:
         """
-        helper func combine legistar ev date and time into datetime
+        Return datetime from ev_date and ev_time
+
+        Parameters
+        ----------
+        ev_date : str
+            Formatted as "%Y-%m-%dT%H:%M:%S"
+        ev_time : str
+            Formatted as "%I:%M %p"
+
+        Returns
+        -------
+        datetime
+            date using ev_date and time using ev_time
         """
         # 2021-07-09T00:00:00
         d = datetime.strptime(ev_date, "%Y-%m-%dT%H:%M:%S")
@@ -316,11 +418,27 @@ class LegistarScraper:
     def get_events(
         self,
         # for the past 2 days
-        begin: Optional[datetime.time] = datetime.utcnow() - timedelta(days=2),
-        end: Optional[datetime.time] = datetime.utcnow(),
+        begin: Optional[datetime] = datetime.utcnow() - timedelta(days=2),
+        end: Optional[datetime] = datetime.utcnow(),
     ) -> List[EventIngestionModel]:
         """
-        main getter to retrieve legistar data as cdp ingestion model items
+        Call get_legistar_events_for_timespan to retrieve Legistar API data
+        and return as List[EventIngestionModel]
+
+        Parameters
+        ----------
+        begin : datetime, default=datetime.utcnow() - timedelta(days=2)
+            By default query the past 2 days
+        end : datetime, default=datetime.utcnow()
+
+        Returns
+        -------
+        List[ingestion_models.EventIngestionModel]
+            One instance of EventIngestionModel per Legistar API Event
+
+        See Also
+        --------
+        get_legistar_events_for_timespan
         """
         evs = []
 
@@ -362,13 +480,22 @@ class LegistarScraper:
 
     def get_video_uris(self, legistar_ev: Dict) -> List[Dict]:
         """
-        return url for videos and captions if found in data set from legistar api
+        Must implement in class derived from LegistarScraper
 
-        returned data is like
-        [{'video_uri' : 'https://video.mp4',
-          'caption_uri' : 'https://caption.vtt'
-         },
-         ...
-        ]
+        Parameters
+        ----------
+        legstar_ev : Dict
+            Legistar API Event
+
+        Returns
+        -------
+        List[Dict]
+            List of video and caption URI
+            [{"video_uri": ..., "caption_uri": ...}, ...]
+
+        Raises
+        ------
+        NotImplementedError
+            This base implementation does nothing
         """
         raise NotImplementedError
