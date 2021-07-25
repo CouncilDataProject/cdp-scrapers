@@ -38,6 +38,7 @@ LEGISTAR_PERSON_BASE = LEGISTAR_BASE + "/Persons"
 
 # e.g. MinutesItem.name =  EventItemEventId from legistar api
 LEGISTAR_MINUTE_NAME = "EventItemEventId"
+LEGISTAR_SESSION_VIDEO_URI = "EventVideoPath"
 LEGISTAR_EV_MINUTE_DECISION = "EventItemPassedFlagName"
 LEGISTAR_PERSON_EMAIL = "PersonEmail"
 LEGISTAR_PERSON_EXT_ID = "PersonId"
@@ -452,9 +453,19 @@ class LegistarScraper:
             )
 
             sessions = []
-            list_uri = self.get_video_uris(legistar_ev) or [
-                {CDP_VIDEO_URI: None, CDP_CAPTION_URI: None}
-            ]
+
+            # prefer video file path in legistar Event.EventVideoPath
+            if legistar_ev[LEGISTAR_SESSION_VIDEO_URI] is not None:
+                list_uri = [
+                    {
+                        CDP_VIDEO_URI: legistar_ev[LEGISTAR_SESSION_VIDEO_URI],
+                        CDP_CAPTION_URI: None,
+                    }
+                ]
+            else:
+                list_uri = self.get_video_uris(legistar_ev) or [
+                    {CDP_VIDEO_URI: None, CDP_CAPTION_URI: None}
+                ]
 
             for uri in list_uri:
                 sessions.append(
