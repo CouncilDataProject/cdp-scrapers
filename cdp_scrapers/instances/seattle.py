@@ -26,12 +26,29 @@ LEGISTAR_EV_SITE_URL = "EventInSiteURL"
 # TODO: add logging
 class SeattleScraper(LegistarScraper):
     def __init__(self):
+        """
+        Seattle-specific implementation of LegistarScraper
+        """
         super().__init__("seattle")
 
     def get_video_uris(self, legistar_ev: Dict) -> List[Dict]:
+        """
+        Return URLs for videos and captions parsed from seattlechannel.org web page
+
+        Parameters
+        ----------
+        legistar_ev : Dict
+            Data for one Legistar Event obtained from
+            ..legistar_utils.get_legistar_events_for_timespan()
+
+        Returns
+        -------
+        List[Dict]
+            List of video and caption URI
+            [{"video_uri": ..., "caption_uri": ...}, ...]
+        """
         try:
-            # EventInSiteURL (= MeetingDetail.aspx) has a td tag
-            # with a certain id pattern containing url to video
+            # a td tag with a certain id pattern containing url to video
             with urlopen(legistar_ev[LEGISTAR_EV_SITE_URL]) as resp:
                 soup = BeautifulSoup(resp.read(), "html.parser")
         except URLError or HTTPError:
