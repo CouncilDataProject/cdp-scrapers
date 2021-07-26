@@ -4,6 +4,7 @@
 from typing import Dict, List
 from bs4 import BeautifulSoup
 import re
+import logging
 from urllib.request import urlopen
 from urllib.error import (
     URLError,
@@ -15,6 +16,10 @@ from ..legistar_utils import (
     CDP_VIDEO_URI,
     CDP_CAPTION_URI,
 )
+
+###############################################################################
+
+log = logging.getLogger(__name__)
 
 ###############################################################################
 
@@ -52,6 +57,7 @@ class SeattleScraper(LegistarScraper):
             with urlopen(legistar_ev[LEGISTAR_EV_SITE_URL]) as resp:
                 soup = BeautifulSoup(resp.read(), "html.parser")
         except URLError or HTTPError:
+            log.debug(f"Failed to open {legistar_ev[LEGISTAR_EV_SITE_URL]}")
             return []
 
         try:
@@ -63,13 +69,17 @@ class SeattleScraper(LegistarScraper):
             )["href"]
         # catch if find() didn't find video web page url (no <a id=... href=.../>)
         except KeyError:
+            log.debug("No URL for video page on {legistar_ev[LEGISTAR_EV_SITE_URL]}")
             return []
+
+        log.debug(f"{legistar_ev[LEGISTAR_EV_SITE_URL]} -> {video_page_url}")
 
         try:
             with urlopen(video_page_url) as resp:
                 # now load the page to get the actual video url
                 soup = BeautifulSoup(resp.read(), "html.parser")
         except URLError or HTTPError:
+            log.error(f"Failed to open {video_page_url}")
             return []
 
         # <script>
@@ -145,4 +155,6 @@ class SeattleScraper(LegistarScraper):
                 {CDP_VIDEO_URI: video_uris[i], CDP_CAPTION_URI: caption_uris[i]}
             )
 
+        if len(list_uri) == 0:
+            log.debug(f"No video URI found on {video_page_url}")
         return list_uri
