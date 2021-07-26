@@ -228,28 +228,45 @@ class LegistarScraper:
             True if got at least one minimally defined EventIngestionModel
         """
         # no point wasting time if the client isn't on legistar at all
-        if not self.is_legistar_compatible():
+        if not self.is_legistar_compatible:
             return False
 
         now = datetime.utcnow()
         days = range(check_days)
 
         for d in days:
+            begin = now - timedelta(days=d + 1)
+            end = now - timedelta(days=d)
+            log.debug(
+                "Testing for minimal information "
+                f"from {begin.isoformat()} to {end.isoformat()}"
+            )
+
             # ev: EventIngestionModel
-            for cdp_ev in self.get_events(
-                begin=now - timedelta(days=d + 1), end=now - timedelta(days=d)
-            ):
+            for cdp_ev in self.get_events(begin=begin, end=end):
                 try:
                     if (
                         len(cdp_ev.body.name) > 0
                         and cdp_ev.sessions[0].session_datetime is not None
                         and len(cdp_ev.sessions[0].video_uri) > 0
                     ):
+                        session_time = cdp_ev.sessions[0].session_datetime
+                        log.debug(
+                            f"Got minimal EventIngestionModel for {self.client_name}: "
+                            f"body={cdp_ev.body.name}, "
+                            f"session={session_time.isoformat()}, "
+                            f"video={cdp_ev.sessions[0].video_uri}"
+                        )
                         return True
+
                 # catch None or empty list
                 except TypeError or IndexError:
                     pass
 
+        log.debug(
+            f"Failed to get minimal EventIngestionModel for {self.client_name} "
+            f"in the past {check_days} days from {now.isoformat()}"
+        )
         # no event in check_days had enough for minimal ingestion model item
         return False
 
@@ -491,7 +508,8 @@ class LegistarScraper:
 
     def get_video_uris(self, legistar_ev: Dict) -> List[Dict]:
         """
-        Must implement in class derived from LegistarScraper
+        Must implement in class derived from LegistarScraper.
+        If Legistar Event.EventVideoPath is used, return an empty list here.
 
         Parameters
         ----------
@@ -509,4 +527,8 @@ class LegistarScraper:
         NotImplementedError
             This base implementation does nothing
         """
+        log.critical(
+            "get_video_uris() is required because "
+            f"Legistar Event.EventVideoPath is not used by {self.client_name}"
+        )
         raise NotImplementedError
