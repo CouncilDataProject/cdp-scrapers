@@ -162,7 +162,6 @@ def get_legistar_events_for_timespan(
     return response
 
 
-# TODO: add logging
 class LegistarScraper:
     """
     Base class for transforming Legistar API data to CDP IngestionModel

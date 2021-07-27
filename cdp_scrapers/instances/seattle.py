@@ -28,7 +28,6 @@ LEGISTAR_EV_SITE_URL = "EventInSiteURL"
 ###############################################################################
 
 
-# TODO: add logging
 class SeattleScraper(LegistarScraper):
     def __init__(self):
         """
@@ -145,15 +144,24 @@ class SeattleScraper(LegistarScraper):
             )
         ]
 
-        iter = range(len(video_uris))
+        # use max count between videos and captions
+        # so we don't lose any (e.g. caption = None if < # videos)
+        iter = range(max(len(video_uris), len(caption_uris)))
         list_uri = []
 
         for i in iter:
-            # TODO: ok to assume # video_uris == # caption_uris
-            #       on a meeting details web page on seattlechannel.org ?
-            list_uri.append(
-                {CDP_VIDEO_URI: video_uris[i], CDP_CAPTION_URI: caption_uris[i]}
-            )
+            # just in case # videos != # captions
+            try:
+                video_uri = video_uris[i]
+            except IndexError:
+                video_uri = None
+
+            try:
+                caption_uri = caption_uris[i]
+            except IndexError:
+                caption_uri = None
+
+            list_uri.append({CDP_VIDEO_URI: video_uri, CDP_CAPTION_URI: caption_uri})
 
         if len(list_uri) == 0:
             log.debug(f"No video URI found on {video_page_url}")
