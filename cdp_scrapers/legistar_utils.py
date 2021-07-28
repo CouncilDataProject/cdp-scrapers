@@ -61,6 +61,7 @@ LEGISTAR_MATTER_STATUS = "EventItemMatterStatus"
 #       some other legistar api data that can be used instead?
 LEGISTAR_SESSION_DATE = "EventDate"
 LEGISTAR_SESSION_TIME = "EventTime"
+LEGISTAR_AGENDA_URI = "EventAgendaFile"
 
 LEGISTAR_EV_ITEMS = "EventItems"
 LEGISTAR_EV_ATTACHMENTS = "EventItemMatterAttachments"
@@ -495,6 +496,7 @@ class LegistarScraper:
 
             evs.append(
                 EventIngestionModel(
+                    agenda_uri=legistar_ev[LEGISTAR_AGENDA_URI],
                     body=Body(name=legistar_ev[LEGISTAR_BODY_NAME]),
                     sessions=sessions,
                     event_minutes_items=self.get_event_minutes(
