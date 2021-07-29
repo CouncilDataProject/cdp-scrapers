@@ -36,8 +36,7 @@ LEGISTAR_EVENT_BASE = LEGISTAR_BASE + "/Events"
 LEGISTAR_MATTER_BASE = LEGISTAR_BASE + "/Matters"
 LEGISTAR_PERSON_BASE = LEGISTAR_BASE + "/Persons"
 
-# e.g. MinutesItem.name =  EventItemEventId from legistar api
-LEGISTAR_MINUTE_NAME = "EventItemEventId"
+# e.g. Session.video_uri =  EventVideoPath from legistar api
 LEGISTAR_SESSION_VIDEO_URI = "EventVideoPath"
 LEGISTAR_EV_MINUTE_DECISION = "EventItemPassedFlagName"
 LEGISTAR_PERSON_EMAIL = "PersonEmail"
@@ -62,6 +61,11 @@ LEGISTAR_MATTER_STATUS = "EventItemMatterStatus"
 LEGISTAR_SESSION_DATE = "EventDate"
 LEGISTAR_SESSION_TIME = "EventTime"
 LEGISTAR_AGENDA_URI = "EventAgendaFile"
+LEGISTAR_MINUTES_URI = "EventMinutesFile"
+# MinutesItem: "An item referenced during a meeting.
+#     This can be a matter but it can be a presentation or budget file, etc."
+# So I think EventItemMatterFile is appropriate for MinutesItem.name
+LEGISTAR_MINUTE_ITEM_NAME = "EventItemMatterFile"
 
 LEGISTAR_EV_ITEMS = "EventItems"
 LEGISTAR_EV_ATTACHMENTS = "EventItemMatterAttachments"
@@ -388,11 +392,16 @@ class LegistarScraper:
 
         # EventMinutesItem object per member in EventItems
         for item in legistar_ev_items:
+            # try to instantiate MinutesItem
+            # but don't if the minimal name field is going to be None
+            minutes_item = MinutesItem(name=item[LEGISTAR_MINUTE_ITEM_NAME])
+            if minutes_item.name is None or len(minutes_item.name) == 0:
+                minutes_item = None
+
             minutes.append(
                 EventMinutesItem(
                     decision=item[LEGISTAR_EV_MINUTE_DECISION],
-                    # other better choice for name?
-                    minutes_item=MinutesItem(name=item[LEGISTAR_MINUTE_NAME]),
+                    minutes_item=minutes_item,
                     votes=LegistarScraper.get_votes(item[LEGISTAR_EV_VOTES]),
                     matter=LegistarScraper.get_matter(item),
                     supporting_files=LegistarScraper.get_event_support_files(
@@ -497,6 +506,7 @@ class LegistarScraper:
             evs.append(
                 EventIngestionModel(
                     agenda_uri=legistar_ev[LEGISTAR_AGENDA_URI],
+                    minutes_uri=legistar_ev[LEGISTAR_MINUTES_URI],
                     body=Body(name=legistar_ev[LEGISTAR_BODY_NAME]),
                     sessions=sessions,
                     event_minutes_items=self.get_event_minutes(
