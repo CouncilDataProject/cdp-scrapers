@@ -167,6 +167,24 @@ def get_legistar_events_for_timespan(
     return response
 
 
+def stripped(in_str):
+    """
+    Return leading and trailing whitespace removed if it is a string
+
+    Parameters
+    ----------
+    in_str: str
+
+    Returns
+    -------
+    str
+        in_str stripped if it is a string
+    """
+    if isinstance(in_str, str):
+        return in_str.strip()
+    return in_str
+
+
 class LegistarScraper:
     """
     Base class for transforming Legistar API data to CDP IngestionModel
@@ -289,11 +307,11 @@ class LegistarScraper:
         ingestion_models.Person
         """
         return Person(
-            email=legistar_person[LEGISTAR_PERSON_EMAIL],
+            email=stripped(legistar_person[LEGISTAR_PERSON_EMAIL]),
             external_source_id=legistar_person[LEGISTAR_PERSON_EXT_ID],
-            name=legistar_person[LEGISTAR_PERSON_NAME],
-            phone=legistar_person[LEGISTAR_PERSON_PHONE],
-            website=legistar_person[LEGISTAR_PERSON_WEBSITE],
+            name=stripped(legistar_person[LEGISTAR_PERSON_NAME]),
+            phone=stripped(legistar_person[LEGISTAR_PERSON_PHONE]),
+            website=stripped(legistar_person[LEGISTAR_PERSON_WEBSITE]),
         )
 
     @staticmethod
@@ -345,8 +363,8 @@ class LegistarScraper:
             files.append(
                 SupportingFile(
                     external_source_id=attachment[LEGISTAR_FILE_EXT_ID],
-                    name=attachment[LEGISTAR_FILE_NAME],
-                    uri=attachment[LEGISTAR_FILE_URI],
+                    name=stripped(attachment[LEGISTAR_FILE_NAME]),
+                    uri=stripped(attachment[LEGISTAR_FILE_URI]),
                 )
             )
 
@@ -368,10 +386,10 @@ class LegistarScraper:
         """
         return Matter(
             external_source_id=legistar_ev[LEGISTAR_MATTER_EXT_ID],
-            name=legistar_ev[LEGISTAR_MATTER_NAME],
-            matter_type=legistar_ev[LEGISTAR_MATTER_TYPE],
-            title=legistar_ev[LEGISTAR_MATTER_TITLE],
-            result_status=legistar_ev[LEGISTAR_MATTER_STATUS],
+            name=stripped(legistar_ev[LEGISTAR_MATTER_NAME]),
+            matter_type=stripped(legistar_ev[LEGISTAR_MATTER_TYPE]),
+            title=stripped(legistar_ev[LEGISTAR_MATTER_TITLE]),
+            result_status=stripped(legistar_ev[LEGISTAR_MATTER_STATUS]),
         )
 
     @staticmethod
@@ -394,13 +412,13 @@ class LegistarScraper:
         for item in legistar_ev_items:
             # try to instantiate MinutesItem
             # but don't if the minimal name field is going to be None
-            minutes_item = MinutesItem(name=item[LEGISTAR_MINUTE_ITEM_NAME])
+            minutes_item = MinutesItem(name=stripped(item[LEGISTAR_MINUTE_ITEM_NAME]))
             if minutes_item.name is None or len(minutes_item.name) == 0:
                 minutes_item = None
 
             minutes.append(
                 EventMinutesItem(
-                    decision=item[LEGISTAR_EV_MINUTE_DECISION],
+                    decision=stripped(item[LEGISTAR_EV_MINUTE_DECISION]),
                     minutes_item=minutes_item,
                     votes=LegistarScraper.get_votes(item[LEGISTAR_EV_VOTES]),
                     matter=LegistarScraper.get_matter(item),
@@ -484,7 +502,9 @@ class LegistarScraper:
             if legistar_ev[LEGISTAR_SESSION_VIDEO_URI] is not None:
                 list_uri = [
                     {
-                        CDP_VIDEO_URI: legistar_ev[LEGISTAR_SESSION_VIDEO_URI],
+                        CDP_VIDEO_URI: stripped(
+                            legistar_ev[LEGISTAR_SESSION_VIDEO_URI]
+                        ),
                         CDP_CAPTION_URI: None,
                     }
                 ]
@@ -505,9 +525,9 @@ class LegistarScraper:
 
             evs.append(
                 EventIngestionModel(
-                    agenda_uri=legistar_ev[LEGISTAR_AGENDA_URI],
-                    minutes_uri=legistar_ev[LEGISTAR_MINUTES_URI],
-                    body=Body(name=legistar_ev[LEGISTAR_BODY_NAME]),
+                    agenda_uri=stripped(legistar_ev[LEGISTAR_AGENDA_URI]),
+                    minutes_uri=stripped(legistar_ev[LEGISTAR_MINUTES_URI]),
+                    body=Body(name=stripped(legistar_ev[LEGISTAR_BODY_NAME])),
                     sessions=sessions,
                     event_minutes_items=self.get_event_minutes(
                         legistar_ev[LEGISTAR_EV_ITEMS]
