@@ -25,9 +25,7 @@ from cdp_backend.pipeline.ingestion_models import (
     Vote,
 )
 
-from cdp_backend.database.constants import (
-    MatterStatusDecision
-)
+from cdp_backend.database.constants import MatterStatusDecision
 
 ###############################################################################
 
@@ -72,30 +70,14 @@ LEGISTAR_MINUTE_EXT_ID = "EventItemId"
 # NOTE: just don't see any other field that is unique and short-ish
 #       that is appropriate for MinutesItem.name, a required field.
 #       LEGISTAR_MINUTE_ITEM_DESC tend to be VERY lengthy
-LEGISTAR_MINUTE_NAME = LEGISTAR_MINUTE_EXT_ID 
+LEGISTAR_MINUTE_NAME = LEGISTAR_MINUTE_EXT_ID
 
 # regex pattern used to decide constants.MatterStatusDecision
 # from arbitrary LEGISTAR_MATTER_STATUS string.
 # add to patterns as desired
-LEGISTAR_MATTER_ADOPTED = re.compile(
-    "approved"
-    "|confirmed"
-    "|passed"
-    "|adopted",
-    re.IGNORECASE
-)
-LEGISTAR_MATTER_IN_PROG = re.compile(
-    "heard"
-    "|ready"
-    "|filed",
-    re.IGNORECASE
-)
-LEGISTAR_MATTER_REJECTED = re.compile(
-    "rejected"
-    "|dropped"
-    "|held",
-    re.IGNORECASE
-)
+LEGISTAR_MATTER_ADOPTED = re.compile("approved|confirmed|passed|adopted", re.IGNORECASE)
+LEGISTAR_MATTER_IN_PROG = re.compile("heard|ready|filed", re.IGNORECASE)
+LEGISTAR_MATTER_REJECTED = re.compile("rejected|dropped|held", re.IGNORECASE)
 
 LEGISTAR_EV_ITEMS = "EventItems"
 LEGISTAR_EV_ATTACHMENTS = "EventItemMatterAttachments"
