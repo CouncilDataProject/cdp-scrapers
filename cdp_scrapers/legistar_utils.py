@@ -304,8 +304,7 @@ class LegistarScraper:
         # no event in check_days had enough for minimal ingestion model item
         return False
 
-    @staticmethod
-    def get_person(legistar_person: Dict) -> Person:
+    def get_person(self, legistar_person: Dict) -> Person:
         """
         Return CDP Person for Legistar Person
 
@@ -326,8 +325,7 @@ class LegistarScraper:
             website=stripped(legistar_person[LEGISTAR_PERSON_WEBSITE]),
         )
 
-    @staticmethod
-    def get_votes(legistar_votes: List[Dict]) -> List[Vote]:
+    def get_votes(self, legistar_votes: List[Dict]) -> List[Vote]:
         """
         Return List[Vote] for Legistar API Votes
 
@@ -347,14 +345,14 @@ class LegistarScraper:
                 Vote(
                     decision=vote[LEGISTAR_VOTE_DECISION],
                     external_source_id=vote[LEGISTAR_VOTE_EXT_ID],
-                    person=LegistarScraper.get_person(vote[LEGISTAR_VOTE_PERSONS]),
+                    person=self.get_person(vote[LEGISTAR_VOTE_PERSONS]),
                 )
             )
 
         return votes
 
-    @staticmethod
     def get_event_support_files(
+        self,
         legistar_ev_attachments: List[Dict],
     ) -> List[SupportingFile]:
         """
@@ -412,8 +410,7 @@ class LegistarScraper:
         # TODO: ALWAYS return IN_PROGRESS if status could not be determined at all?
         return None
 
-    @staticmethod
-    def get_matter(legistar_ev: Dict) -> Matter:
+    def get_matter(self, legistar_ev: Dict) -> Matter:
         """
         Return Matter from Legistar API EventItem
 
@@ -443,8 +440,7 @@ class LegistarScraper:
 
         return matter
 
-    @staticmethod
-    def get_event_minutes_item(legistar_ev_item: Dict) -> MinutesItem:
+    def get_event_minutes_item(self, legistar_ev_item: Dict) -> MinutesItem:
         """
         Return MinutesItem from parts of Legistar API EventItem
 
@@ -477,8 +473,9 @@ class LegistarScraper:
 
         return minutes_item
 
-    @staticmethod
-    def get_event_minutes(legistar_ev_items: List[Dict]) -> List[EventMinutesItem]:
+    def get_event_minutes(
+        self, legistar_ev_items: List[Dict]
+    ) -> List[EventMinutesItem]:
         """
         Return List[EventMinutesItem] for Legistar API EventItems
 
@@ -498,10 +495,10 @@ class LegistarScraper:
             minutes.append(
                 EventMinutesItem(
                     decision=stripped(item[LEGISTAR_EV_MINUTE_DECISION]),
-                    minutes_item=LegistarScraper.get_event_minutes_item(item),
-                    votes=LegistarScraper.get_votes(item[LEGISTAR_EV_VOTES]),
-                    matter=LegistarScraper.get_matter(item),
-                    supporting_files=LegistarScraper.get_event_support_files(
+                    minutes_item=self.get_event_minutes_item(item),
+                    votes=self.get_votes(item[LEGISTAR_EV_VOTES]),
+                    matter=self.get_matter(item),
+                    supporting_files=self.get_event_support_files(
                         item[LEGISTAR_EV_ATTACHMENTS]
                     ),
                 )
@@ -619,7 +616,7 @@ class LegistarScraper:
     def get_video_uris(self, legistar_ev: Dict) -> List[Dict]:
         """
         Must implement in class derived from LegistarScraper.
-        If Legistar Event.EventVideoPath is used, return an empty list here.
+        If Legistar Event.EventVideoPath is used, return an empty list in the override.
 
         Parameters
         ----------
