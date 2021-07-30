@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
+import re
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 from urllib.request import urlopen
@@ -22,6 +23,10 @@ from cdp_backend.pipeline.ingestion_models import (
     SupportingFile,
     Person,
     Vote,
+)
+
+from cdp_backend.database.constants import (
+    MatterStatusDecision
 )
 
 ###############################################################################
@@ -68,6 +73,29 @@ LEGISTAR_MINUTE_EXT_ID = "EventItemId"
 #       that is appropriate for MinutesItem.name, a required field.
 #       LEGISTAR_MINUTE_ITEM_DESC tend to be VERY lengthy
 LEGISTAR_MINUTE_NAME = LEGISTAR_MINUTE_EXT_ID 
+
+# regex pattern used to decide constants.MatterStatusDecision
+# from arbitrary LEGISTAR_MATTER_STATUS string.
+# add to patterns as desired
+LEGISTAR_MATTER_ADOPTED = re.compile(
+    "approved"
+    "|confirmed"
+    "|passed"
+    "|adopted",
+    re.IGNORECASE
+)
+LEGISTAR_MATTER_IN_PROG = re.compile(
+    "heard"
+    "|ready"
+    "|filed",
+    re.IGNORECASE
+)
+LEGISTAR_MATTER_REJECTED = re.compile(
+    "rejected"
+    "|dropped"
+    "|held",
+    re.IGNORECASE
+)
 
 LEGISTAR_EV_ITEMS = "EventItems"
 LEGISTAR_EV_ATTACHMENTS = "EventItemMatterAttachments"
@@ -373,6 +401,36 @@ class LegistarScraper:
         return files
 
     @staticmethod
+    def get_matter_status(legistar_matter_status: str) -> MatterStatusDecision:
+        """
+        Return appropriate MatterStatusDecision constant from EventItemMatterStatus
+
+        Parameters
+        ----------
+        legistar_matter_status : str
+            Legistar API EventItemMatterStatus
+
+        Returns
+        -------
+        constants.MatterStatusDecision
+            ADOPTED | IN_PROGRESS | REJECTED
+        """
+        if not legistar_matter_status:
+            return None
+
+        if LEGISTAR_MATTER_ADOPTED.search(legistar_matter_status) is not None:
+            return MatterStatusDecision.ADOPTED
+
+        if LEGISTAR_MATTER_IN_PROG.search(legistar_matter_status) is not None:
+            return MatterStatusDecision.IN_PROGRESS
+
+        if LEGISTAR_MATTER_REJECTED.search(legistar_matter_status) is not None:
+            return MatterStatusDecision.REJECTED
+
+        # TODO: ALWAYS return IN_PROGRESS if status could not be determined at all?
+        return None
+
+    @staticmethod
     def get_matter(legistar_ev: Dict) -> Matter:
         """
         Return ingestion_models.Matter from Legistar API EventItem
@@ -391,7 +449,9 @@ class LegistarScraper:
             name=stripped(legistar_ev[LEGISTAR_MATTER_NAME]),
             matter_type=stripped(legistar_ev[LEGISTAR_MATTER_TYPE]),
             title=stripped(legistar_ev[LEGISTAR_MATTER_TITLE]),
-            result_status=stripped(legistar_ev[LEGISTAR_MATTER_STATUS]),
+            result_status=LegistarScraper.get_matter_status(
+                legistar_ev[LEGISTAR_MATTER_STATUS]
+            ),
         )
 
         # Too often EventItemMatterName is not filled but EventItemMatterFile is,
