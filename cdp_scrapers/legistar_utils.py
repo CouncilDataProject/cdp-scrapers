@@ -189,7 +189,7 @@ def stripped(in_str):
 
     Returns
     -------
-    str
+    str or Any
         in_str stripped if it is a string
     """
     if isinstance(in_str, str):
@@ -316,7 +316,7 @@ class LegistarScraper:
 
         Returns
         -------
-        ingestion_models.Person
+        Person
         """
         return Person(
             email=stripped(legistar_person[LEGISTAR_PERSON_EMAIL]),
@@ -329,7 +329,7 @@ class LegistarScraper:
     @staticmethod
     def get_votes(legistar_votes: List[Dict]) -> List[Vote]:
         """
-        Return List[ingestion_models.Vote] for Legistar API Votes
+        Return List[Vote] for Legistar API Votes
 
         Parameters
         ----------
@@ -338,7 +338,7 @@ class LegistarScraper:
 
         Returns
         -------
-        List[ingestion_models.Vote]
+        List[Vote]
         """
         votes = []
 
@@ -358,7 +358,7 @@ class LegistarScraper:
         legistar_ev_attachments: List[Dict],
     ) -> List[SupportingFile]:
         """
-        Return List[ingestion_models.SupportingFile] for Legistar API MatterAttachments
+        Return List[SupportingFile] for Legistar API MatterAttachments
 
         Parameters
         ----------
@@ -367,7 +367,7 @@ class LegistarScraper:
 
         Returns
         -------
-        List[ingestion_models.SupportingFile]
+        List[SupportingFile]
         """
         files = []
 
@@ -415,7 +415,7 @@ class LegistarScraper:
     @staticmethod
     def get_matter(legistar_ev: Dict) -> Matter:
         """
-        Return ingestion_models.Matter from Legistar API EventItem
+        Return Matter from Legistar API EventItem
 
         Parameters
         ----------
@@ -424,7 +424,7 @@ class LegistarScraper:
 
         Returns
         -------
-        ingestion_models.Matter
+        Matter
         """
         matter = Matter(
             external_source_id=legistar_ev[LEGISTAR_MATTER_EXT_ID],
@@ -445,6 +445,19 @@ class LegistarScraper:
 
     @staticmethod
     def get_event_minutes_item(legistar_ev_item: Dict) -> MinutesItem:
+        """
+        Return MinutesItem from parts of Legistar API EventItem
+
+        Parameters
+        ----------
+        legistar_ev_item : Dict
+            Legistar API EventItem
+
+        Returns
+        -------
+        MinutesItem
+            None if could not get nonempty MinutesItem.name from EventItem
+        """
         minutes_item = MinutesItem(
             external_source_id=legistar_ev_item[LEGISTAR_MINUTE_EXT_ID],
             description=stripped(legistar_ev_item[LEGISTAR_MINUTE_ITEM_DESC]),
@@ -467,7 +480,7 @@ class LegistarScraper:
     @staticmethod
     def get_event_minutes(legistar_ev_items: List[Dict]) -> List[EventMinutesItem]:
         """
-        Return List[ingestion_models.EventMinutesItem] for Legistar API EventItems
+        Return List[EventMinutesItem] for Legistar API EventItems
 
         Parameters
         ----------
@@ -476,7 +489,7 @@ class LegistarScraper:
 
         Returns
         -------
-        List[ingestion_models.EventMinutesItem]
+        List[EventMinutesItem]
         """
         minutes = []
 
@@ -544,7 +557,7 @@ class LegistarScraper:
 
         Returns
         -------
-        List[ingestion_models.EventIngestionModel]
+        List[EventIngestionModel]
             One instance of EventIngestionModel per Legistar API Event
 
         See Also
