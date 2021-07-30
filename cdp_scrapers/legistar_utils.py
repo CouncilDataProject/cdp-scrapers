@@ -51,7 +51,7 @@ LEGISTAR_FILE_EXT_ID = "MatterAttachmentId"
 LEGISTAR_FILE_NAME = "MatterAttachmentName"
 LEGISTAR_FILE_URI = "MatterAttachmentHyperlink"
 LEGISTAR_MATTER_EXT_ID = "EventItemMatterId"
-LEGISTAR_MATTER_TITLE = "EventItemTitle"
+LEGISTAR_MATTER_TITLE = "EventItemMatterFile"
 LEGISTAR_MATTER_NAME = "EventItemMatterName"
 LEGISTAR_MATTER_TYPE = "EventItemMatterType"
 LEGISTAR_MATTER_STATUS = "EventItemMatterStatus"
@@ -62,10 +62,12 @@ LEGISTAR_SESSION_DATE = "EventDate"
 LEGISTAR_SESSION_TIME = "EventTime"
 LEGISTAR_AGENDA_URI = "EventAgendaFile"
 LEGISTAR_MINUTES_URI = "EventMinutesFile"
-# MinutesItem: "An item referenced during a meeting.
-#     This can be a matter but it can be a presentation or budget file, etc."
-# So I think EventItemMatterFile is appropriate for MinutesItem.name
-LEGISTAR_MINUTE_ITEM_NAME = "EventItemMatterFile"
+LEGISTAR_MINUTE_ITEM_DESC = "EventItemTitle"
+LEGISTAR_MINUTE_EXT_ID = "EventItemId"
+# NOTE: just don't see any other field that is unique and short-ish
+#       that is appropriate for MinutesItem.name, a required field.
+#       LEGISTAR_MINUTE_ITEM_DESC tend to be VERY lengthy
+LEGISTAR_MINUTE_NAME = LEGISTAR_MINUTE_EXT_ID 
 
 LEGISTAR_EV_ITEMS = "EventItems"
 LEGISTAR_EV_ATTACHMENTS = "EventItemMatterAttachments"
@@ -384,13 +386,41 @@ class LegistarScraper:
         -------
         ingestion_models.Matter
         """
-        return Matter(
+        matter = Matter(
             external_source_id=legistar_ev[LEGISTAR_MATTER_EXT_ID],
             name=stripped(legistar_ev[LEGISTAR_MATTER_NAME]),
             matter_type=stripped(legistar_ev[LEGISTAR_MATTER_TYPE]),
             title=stripped(legistar_ev[LEGISTAR_MATTER_TITLE]),
             result_status=stripped(legistar_ev[LEGISTAR_MATTER_STATUS]),
         )
+
+        # Too often EventItemMatterName is not filled but EventItemMatterFile is,
+        # but Matter.name is required for CDP
+        if not matter.name:
+            matter.name = matter.title
+
+        return matter
+
+    @staticmethod
+    def get_event_minutes_item(legistar_ev_item: Dict) -> MinutesItem:
+        minutes_item = MinutesItem(
+            external_source_id=legistar_ev_item[LEGISTAR_MINUTE_EXT_ID],
+            description=stripped(legistar_ev_item[LEGISTAR_MINUTE_ITEM_DESC]),
+            name=None,
+        )
+
+        # NOTE: for time being this is LEGISTAR_MINUTE_EXT_ID
+        name = legistar_ev_item[LEGISTAR_MINUTE_NAME]
+        if isinstance(name, int):
+            name = str(name)
+
+        minutes_item.name = stripped(name)
+
+        # no MinutesItem if no name
+        if not minutes_item.name:
+            minutes_item = None
+
+        return minutes_item
 
     @staticmethod
     def get_event_minutes(legistar_ev_items: List[Dict]) -> List[EventMinutesItem]:
@@ -410,16 +440,10 @@ class LegistarScraper:
 
         # EventMinutesItem object per member in EventItems
         for item in legistar_ev_items:
-            # try to instantiate MinutesItem
-            # but don't if the minimal name field is going to be None
-            minutes_item = MinutesItem(name=stripped(item[LEGISTAR_MINUTE_ITEM_NAME]))
-            if minutes_item.name is None or len(minutes_item.name) == 0:
-                minutes_item = None
-
             minutes.append(
                 EventMinutesItem(
                     decision=stripped(item[LEGISTAR_EV_MINUTE_DECISION]),
-                    minutes_item=minutes_item,
+                    minutes_item=LegistarScraper.get_event_minutes_item(item),
                     votes=LegistarScraper.get_votes(item[LEGISTAR_EV_VOTES]),
                     matter=LegistarScraper.get_matter(item),
                     supporting_files=LegistarScraper.get_event_support_files(
