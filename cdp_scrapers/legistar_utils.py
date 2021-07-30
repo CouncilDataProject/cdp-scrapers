@@ -76,8 +76,8 @@ LEGISTAR_MINUTE_NAME = LEGISTAR_MINUTE_EXT_ID
 # from arbitrary LEGISTAR_MATTER_STATUS string.
 # add to patterns as desired
 LEGISTAR_MATTER_ADOPTED = re.compile("approved|confirmed|passed|adopted", re.IGNORECASE)
-LEGISTAR_MATTER_IN_PROG = re.compile("heard|ready|filed", re.IGNORECASE)
-LEGISTAR_MATTER_REJECTED = re.compile("rejected|dropped|held", re.IGNORECASE)
+LEGISTAR_MATTER_IN_PROG = re.compile("heard|ready|filed|held", re.IGNORECASE)
+LEGISTAR_MATTER_REJECTED = re.compile("rejected|dropped", re.IGNORECASE)
 
 LEGISTAR_EV_ITEMS = "EventItems"
 LEGISTAR_EV_ATTACHMENTS = "EventItemMatterAttachments"
