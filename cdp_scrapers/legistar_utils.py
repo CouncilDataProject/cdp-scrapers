@@ -6,16 +6,14 @@ import re
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 from urllib.request import urlopen
-from urllib.error import (
-    URLError,
-    HTTPError,
-)
+from urllib.error import URLError, HTTPError
 
 import requests
 
 from cdp_backend.pipeline.ingestion_models import (
     EventIngestionModel,
     Body,
+    IngestionModel,
     Session,
     EventMinutesItem,
     MinutesItem,
@@ -85,6 +83,24 @@ LEGISTAR_VOTE_PERSONS = "PersonInfo"
 
 CDP_VIDEO_URI = "video_uri"
 CDP_CAPTION_URI = "caption_uri"
+
+# NOTE: if all the keys are None that item should be None
+MIN_INGESTION_KEYS = {
+    Session: ["external_source_id", "video_uri", "caption_uri"],
+    Person: ["name", "external_source_id"],
+    Vote: ["person"],
+    SupportingFile: ["external_source_id", "name", "uri"],
+    Matter: ["external_source_id", "name", "title"],
+    MinutesItem: ["description", "external_source_id", "name"],
+    EventMinutesItem: ["matter", "minutes_item"],
+    EventIngestionModel: [
+        "agenda_uri",
+        "body",
+        "event_minutes_items",
+        "minutes_uri",
+        "sessions",
+    ],
+}
 
 ###############################################################################
 
@@ -178,7 +194,7 @@ def get_legistar_events_for_timespan(
     return response
 
 
-def stripped(in_str):
+def stripped(in_str) -> str:
     """
     Return leading and trailing whitespace removed if it is a string
 
@@ -194,6 +210,29 @@ def stripped(in_str):
     if isinstance(in_str, str):
         return in_str.strip()
     return in_str
+
+
+def reduced_list(in_list: List) -> List:
+    """
+    Remove all None items from in_list
+    Return None if in_list is empty
+
+    Parameters
+    ----------
+    in_list : List
+
+    Returns
+    -------
+    List | None
+    """
+    for i in range(len(in_list) - 1, -1, -1):
+        if not in_list[i]:
+            del in_list[i]
+
+    if len(in_list) == 0:
+        in_list = None
+
+    return in_list
 
 
 class LegistarScraper:
@@ -358,25 +397,29 @@ class LegistarScraper:
 
             for uri in list_uri:
                 sessions.append(
-                    Session(
-                        session_datetime=session_time,
-                        session_index=len(sessions),
-                        video_uri=uri[CDP_VIDEO_URI],
-                        caption_uri=uri[CDP_CAPTION_URI],
+                    LegistarScraper.get_none_if_empty(
+                        Session(
+                            session_datetime=session_time,
+                            session_index=len(sessions),
+                            video_uri=uri[CDP_VIDEO_URI],
+                            caption_uri=uri[CDP_CAPTION_URI],
+                        )
                     )
                 )
 
-            evs.append(
+            ingested = LegistarScraper.get_none_if_empty(
                 EventIngestionModel(
                     agenda_uri=stripped(legistar_ev[LEGISTAR_AGENDA_URI]),
                     minutes_uri=stripped(legistar_ev[LEGISTAR_MINUTES_URI]),
                     body=Body(name=stripped(legistar_ev[LEGISTAR_BODY_NAME])),
-                    sessions=sessions,
+                    sessions=reduced_list(sessions),
                     event_minutes_items=self.get_event_minutes(
                         legistar_ev[LEGISTAR_EV_ITEMS]
                     ),
                 )
             )
+            if ingested:
+                evs.append(ingested)
 
         return evs
 
@@ -549,12 +592,14 @@ class LegistarScraper:
         -------
         Person
         """
-        return Person(
-            email=stripped(legistar_person[LEGISTAR_PERSON_EMAIL]),
-            external_source_id=legistar_person[LEGISTAR_PERSON_EXT_ID],
-            name=stripped(legistar_person[LEGISTAR_PERSON_NAME]),
-            phone=stripped(legistar_person[LEGISTAR_PERSON_PHONE]),
-            website=stripped(legistar_person[LEGISTAR_PERSON_WEBSITE]),
+        return LegistarScraper.get_none_if_empty(
+            Person(
+                email=stripped(legistar_person[LEGISTAR_PERSON_EMAIL]),
+                external_source_id=legistar_person[LEGISTAR_PERSON_EXT_ID],
+                name=stripped(legistar_person[LEGISTAR_PERSON_NAME]),
+                phone=stripped(legistar_person[LEGISTAR_PERSON_PHONE]),
+                website=stripped(legistar_person[LEGISTAR_PERSON_WEBSITE]),
+            )
         )
 
     def get_votes(self, legistar_votes: List[Dict]) -> List[Vote]:
@@ -574,14 +619,16 @@ class LegistarScraper:
 
         for vote in legistar_votes:
             votes.append(
-                Vote(
-                    decision=self.get_vote_decision(vote),
-                    external_source_id=vote[LEGISTAR_VOTE_EXT_ID],
-                    person=self.get_person(vote[LEGISTAR_VOTE_PERSONS]),
+                LegistarScraper.get_none_if_empty(
+                    Vote(
+                        decision=self.get_vote_decision(vote),
+                        external_source_id=vote[LEGISTAR_VOTE_EXT_ID],
+                        person=self.get_person(vote[LEGISTAR_VOTE_PERSONS]),
+                    )
                 )
             )
 
-        return votes
+        return reduced_list(votes)
 
     def get_event_support_files(
         self,
@@ -603,14 +650,16 @@ class LegistarScraper:
 
         for attachment in legistar_ev_attachments:
             files.append(
-                SupportingFile(
-                    external_source_id=attachment[LEGISTAR_FILE_EXT_ID],
-                    name=stripped(attachment[LEGISTAR_FILE_NAME]),
-                    uri=stripped(attachment[LEGISTAR_FILE_URI]),
+                LegistarScraper.get_none_if_empty(
+                    SupportingFile(
+                        external_source_id=attachment[LEGISTAR_FILE_EXT_ID],
+                        name=stripped(attachment[LEGISTAR_FILE_NAME]),
+                        uri=stripped(attachment[LEGISTAR_FILE_URI]),
+                    )
                 )
             )
 
-        return files
+        return reduced_list(files)
 
     def get_matter(self, legistar_ev: Dict) -> Matter:
         """
@@ -640,7 +689,7 @@ class LegistarScraper:
         if not matter.name:
             matter.name = matter.title
 
-        return matter
+        return LegistarScraper.get_none_if_empty(matter)
 
     def get_minutes_item(self, legistar_ev_item: Dict) -> MinutesItem:
         """
@@ -669,11 +718,7 @@ class LegistarScraper:
 
         minutes_item.name = stripped(name)
 
-        # no MinutesItem if no name
-        if not minutes_item.name:
-            minutes_item = None
-
-        return minutes_item
+        return LegistarScraper.get_none_if_empty(minutes_item)
 
     def get_event_minutes(
         self, legistar_ev_items: List[Dict]
@@ -695,20 +740,63 @@ class LegistarScraper:
         # EventMinutesItem object per member in EventItems
         for item in legistar_ev_items:
             minutes.append(
-                EventMinutesItem(
-                    decision=LegistarScraper.get_minutes_item_decision(
-                        item[LEGISTAR_EV_MINUTE_DECISION]
-                    ),
-                    minutes_item=self.get_minutes_item(item),
-                    votes=self.get_votes(item[LEGISTAR_EV_VOTES]),
-                    matter=self.get_matter(item),
-                    supporting_files=self.get_event_support_files(
-                        item[LEGISTAR_EV_ATTACHMENTS]
-                    ),
+                LegistarScraper.get_none_if_empty(
+                    EventMinutesItem(
+                        decision=LegistarScraper.get_minutes_item_decision(
+                            item[LEGISTAR_EV_MINUTE_DECISION]
+                        ),
+                        minutes_item=self.get_minutes_item(item),
+                        votes=self.get_votes(item[LEGISTAR_EV_VOTES]),
+                        matter=self.get_matter(item),
+                        supporting_files=self.get_event_support_files(
+                            item[LEGISTAR_EV_ATTACHMENTS]
+                        ),
+                    )
                 )
             )
 
-        return minutes
+        return reduced_list(minutes)
+
+    @staticmethod
+    def get_none_if_empty(model: IngestionModel) -> IngestionModel:
+        """
+        Check required keys in model, return None if all keys have no value.
+        i.e. If any required key has value, return as-is
+
+        Parameters
+        ----------
+        model :
+            Person, MinutesItem, etc.
+
+        Returns
+        -------
+        IngestionModel | None
+            None or model as-is
+
+        See Also
+        --------
+        MIN_INGESTION_KEYS
+            Required keys per IngestionModel class
+        """
+        try:
+            keys = MIN_INGESTION_KEYS[model.__class__]
+        except KeyError:
+            keys = None
+
+        if not keys:
+            print(model.__class__)
+            # no min keys defined
+            return model
+
+        for k in keys:
+            try:
+                if model.__dict__[k]:
+                    # some value for this key in this model
+                    return model
+            except KeyError:
+                pass
+
+        return None
 
     @staticmethod
     def legistar_ev_date_time(ev_date: str, ev_time: str) -> datetime:
