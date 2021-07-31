@@ -233,8 +233,8 @@ class LegistarScraper:
         Legistar client name
     MIN_INGESTION_KEYS: Dict[type, List[str]]
         keys per IngestionModel used to decide if the given model is empty
-    vote_<approve|reject|abstain>_pattern: Pattern
-        regex pattern to decide VoteDecision from Legistar VoteValueName
+    *_pattern: Pattern
+        regex patterns to decide CDP constant from Legistar information
 
     Methods
     -------
@@ -273,7 +273,7 @@ class LegistarScraper:
         }
 
         self.FILTERS = {
-            # i.e. MinutesItem deemed irrelevant (filtered out) 
+            # i.e. MinutesItem deemed irrelevant (filtered out)
             # if description contains this
             MinutesItem: [
                 "CALL TO ORDER",
@@ -301,6 +301,13 @@ class LegistarScraper:
         self.vote_approve_pattern = "approve|favor"
         self.vote_abstain_pattern = "abstain|refuse|refrain"
         self.vote_reject_pattern = "reject|oppose"
+
+        self.matter_adopted_pattern = "approved|confirmed|passed|adopted"
+        self.matter_in_progress_pattern = "heard|ready|filed|held"
+        self.matter_rejected_patten = "rejected|dropped"
+
+        self.decision_passed_pattern = "pass"
+        self.decision_failed_pattern = "not|fail"
 
     @property
     def is_legistar_compatible(self) -> bool:
@@ -408,7 +415,7 @@ class LegistarScraper:
             begin=begin,
             end=end,
         ):
-            session_time = self.legistar_ev_date_time(
+            session_time = self.date_time_to_datetime(
                 legistar_ev[LEGISTAR_SESSION_DATE], legistar_ev[LEGISTAR_SESSION_TIME]
             )
 
@@ -487,8 +494,7 @@ class LegistarScraper:
         )
         raise NotImplementedError
 
-    @staticmethod
-    def get_matter_status(legistar_matter_status: str) -> MatterStatusDecision:
+    def get_matter_status(self, legistar_matter_status: str) -> MatterStatusDecision:
         """
         Return appropriate MatterStatusDecision constant from EventItemMatterStatus
 
@@ -501,36 +507,44 @@ class LegistarScraper:
         -------
         MatterStatusDecision
             ADOPTED | IN_PROGRESS | REJECTED | None
+
+        See Also
+        --------
+        matter_<adopted|rejected|in_progress>_pattern
         """
         if not legistar_matter_status:
             return None
 
         if (
-            re.compile("approved|confirmed|passed|adopted", re.IGNORECASE).search(
-                legistar_matter_status
+            re.search(
+                self.matter_adopted_pattern, legistar_matter_status, re.IGNORECASE
             )
             is not None
         ):
             return MatterStatusDecision.ADOPTED
 
         if (
-            re.compile("heard|ready|filed|held", re.IGNORECASE).search(
-                legistar_matter_status
+            re.search(
+                self.matter_in_progress_pattern,
+                legistar_matter_status,
+                re.re.IGNORECASE,
             )
             is not None
         ):
             return MatterStatusDecision.IN_PROGRESS
 
         if (
-            re.compile("rejected|dropped", re.IGNORECASE).search(legistar_matter_status)
+            re.search(
+                self.matter_rejected_patten, legistar_matter_status, re.IGNORECASE
+            )
             is not None
         ):
             return MatterStatusDecision.REJECTED
 
         return None
 
-    @staticmethod
     def get_minutes_item_decision(
+        self,
         legistar_item_passed_name: str,
     ) -> EventMinutesItemDecision:
         """
@@ -546,18 +560,26 @@ class LegistarScraper:
         -------
         MatterStatusDecision
             PASSED | FAILED | None
+
+        See Also
+        --------
+        decision_<passed|failed>_pattern
         """
         if not legistar_item_passed_name:
             return None
 
         if (
-            re.compile("pass", re.IGNORECASE).search(legistar_item_passed_name)
+            re.search(
+                self.decision_passed_pattern, legistar_item_passed_name, re.IGNORECASE
+            )
             is not None
         ):
             return EventMinutesItemDecision.PASSED
 
         if (
-            re.compile("not|fail", re.IGNORECASE).search(legistar_item_passed_name)
+            re.search(
+                self.decision_failed_pattern, legistar_item_passed_name, re.IGNORECASE
+            )
             is not None
         ):
             return EventMinutesItemDecision.FAILED
@@ -577,11 +599,15 @@ class LegistarScraper:
         -------
         VoteDecision
             APPROVE | REJECT | ABSTAIN | None
+
+        See Also
+        --------
+        vote_<approve|abstain|reject>_pattern
         """
         if (
             not legistar_vote[LEGISTAR_VOTE_VAL_NAME]
             # don't want to make assumption about VoteValueId = 0 meaning here
-            # so treating as null only when None
+            # so treating VoteValueId as null only when None
             and legistar_vote[LEGISTAR_VOTE_VAL_ID] is None
         ):
             return None
@@ -594,7 +620,7 @@ class LegistarScraper:
             re.search(
                 self.vote_approve_pattern,
                 legistar_vote[LEGISTAR_VOTE_VAL_NAME],
-                re.IGNORECASE
+                re.IGNORECASE,
             )
             is not None
         ):
@@ -604,7 +630,7 @@ class LegistarScraper:
             re.search(
                 self.vote_abstain_pattern,
                 legistar_vote[LEGISTAR_VOTE_VAL_NAME],
-                re.IGNORECASE
+                re.IGNORECASE,
             )
             is not None
         ):
@@ -614,7 +640,7 @@ class LegistarScraper:
             re.search(
                 self.vote_reject_pattern,
                 legistar_vote[LEGISTAR_VOTE_VAL_NAME],
-                re.IGNORECASE
+                re.IGNORECASE,
             )
             is not None
         ):
@@ -722,9 +748,7 @@ class LegistarScraper:
             name=stripped(legistar_ev[LEGISTAR_MATTER_NAME]),
             matter_type=stripped(legistar_ev[LEGISTAR_MATTER_TYPE]),
             title=stripped(legistar_ev[LEGISTAR_MATTER_TITLE]),
-            result_status=LegistarScraper.get_matter_status(
-                legistar_ev[LEGISTAR_MATTER_STATUS]
-            ),
+            result_status=self.get_matter_status(legistar_ev[LEGISTAR_MATTER_STATUS]),
         )
 
         # Too often EventItemMatterName is not filled but EventItemMatterFile is,
@@ -786,7 +810,7 @@ class LegistarScraper:
                 self.get_none_if_empty(
                     self.filter_event_minutes(
                         EventMinutesItem(
-                            decision=LegistarScraper.get_minutes_item_decision(
+                            decision=self.get_minutes_item_decision(
                                 item[LEGISTAR_EV_MINUTE_DECISION]
                             ),
                             minutes_item=self.get_minutes_item(item),
@@ -890,7 +914,7 @@ class LegistarScraper:
         return None
 
     @staticmethod
-    def legistar_ev_date_time(ev_date: str, ev_time: str) -> datetime:
+    def date_time_to_datetime(ev_date: str, ev_time: str) -> datetime:
         """
         Return datetime from ev_date and ev_time
 
