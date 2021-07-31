@@ -527,7 +527,7 @@ class LegistarScraper:
             re.search(
                 self.matter_in_progress_pattern,
                 legistar_matter_status,
-                re.re.IGNORECASE,
+                re.IGNORECASE,
             )
             is not None
         ):
