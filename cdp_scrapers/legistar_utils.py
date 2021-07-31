@@ -784,7 +784,6 @@ class LegistarScraper:
             keys = None
 
         if not keys:
-            print(model.__class__)
             # no min keys defined
             return model
 
