@@ -25,7 +25,10 @@ from cdp_backend.pipeline.ingestion_models import (
     Vote,
 )
 
-from cdp_backend.database.constants import MatterStatusDecision
+from cdp_backend.database.constants import (
+    MatterStatusDecision,
+    VoteDecision,
+)
 
 ###############################################################################
 
@@ -71,6 +74,8 @@ LEGISTAR_MINUTE_EXT_ID = "EventItemId"
 #       that is appropriate for MinutesItem.name, a required field.
 #       LEGISTAR_MINUTE_ITEM_DESC tend to be VERY lengthy
 LEGISTAR_MINUTE_NAME = LEGISTAR_MINUTE_EXT_ID
+LEGISTAR_VOTE_VAL_ID = "VoteValueId"
+LEGISTAR_VOTE_VAL_NAME = "VoteValueName"
 
 # regex pattern used to decide constants.MatterStatusDecision
 # from arbitrary LEGISTAR_MATTER_STATUS string.
@@ -78,6 +83,12 @@ LEGISTAR_MINUTE_NAME = LEGISTAR_MINUTE_EXT_ID
 LEGISTAR_MATTER_ADOPTED = re.compile("approved|confirmed|passed|adopted", re.IGNORECASE)
 LEGISTAR_MATTER_IN_PROG = re.compile("heard|ready|filed|held", re.IGNORECASE)
 LEGISTAR_MATTER_REJECTED = re.compile("rejected|dropped", re.IGNORECASE)
+
+# NOTE: have only seen "in favor" actually used in Legistar API data
+#       guessing the words for abstrain and reject
+LEGISTAR_VOTE_APPROVE = re.compile("approve|favor", re.IGNORECASE)
+LEGISTAR_VOTE_ABSTAIN = re.compile("abstain|refuse|refrain", re.IGNORECASE)
+LEGISTAR_VOTE_REJECT = re.compile("reject|oppose", re.IGNORECASE)
 
 LEGISTAR_EV_ITEMS = "EventItems"
 LEGISTAR_EV_ATTACHMENTS = "EventItemMatterAttachments"
@@ -304,6 +315,81 @@ class LegistarScraper:
         # no event in check_days had enough for minimal ingestion model item
         return False
 
+    @staticmethod
+    def get_matter_status(legistar_matter_status: str) -> MatterStatusDecision:
+        """
+        Return appropriate MatterStatusDecision constant from EventItemMatterStatus
+
+        Parameters
+        ----------
+        legistar_matter_status : str
+            Legistar API EventItemMatterStatus
+
+        Returns
+        -------
+        MatterStatusDecision
+            ADOPTED | IN_PROGRESS | REJECTED | None
+        """
+        if not legistar_matter_status:
+            return None
+
+        if LEGISTAR_MATTER_ADOPTED.search(legistar_matter_status) is not None:
+            return MatterStatusDecision.ADOPTED
+
+        if LEGISTAR_MATTER_IN_PROG.search(legistar_matter_status) is not None:
+            return MatterStatusDecision.IN_PROGRESS
+
+        if LEGISTAR_MATTER_REJECTED.search(legistar_matter_status) is not None:
+            return MatterStatusDecision.REJECTED
+
+        return None
+
+    def get_vote_decision(self, legistar_vote: Dict) -> VoteDecision:
+        """
+        Return appropriate VoteDecision constant based on Legistar Vote
+
+        Parameters
+        ----------
+        legistar_vote : Dict
+            Legistar API Vote
+
+        Returns
+        -------
+        VoteDecision
+            APPROVE | REJECT | ABSTAIN | None
+        """
+        if (
+            not legistar_vote[LEGISTAR_VOTE_VAL_NAME]
+            # don't want to make assumption about VoteValueId = 0 meaning here
+            # so treating as null only when None
+            and legistar_vote[LEGISTAR_VOTE_VAL_ID] is None
+        ):
+            return None
+
+        # NOTE: The required integer VoteValueId = 16 seems to be "in favor".
+        #       But don't know what other values would be e.g. "opposed to", etc.
+        #       Therefore deciding VoteDecision based on the string VoteValueName.
+
+        if (
+            LEGISTAR_VOTE_APPROVE.search(legistar_vote[LEGISTAR_VOTE_VAL_NAME])
+            is not None
+        ):
+            return VoteDecision.APPROVE
+
+        if (
+            LEGISTAR_VOTE_ABSTAIN.search(legistar_vote[LEGISTAR_VOTE_VAL_NAME])
+            is not None
+        ):
+            return VoteDecision.ABSTAIN
+
+        if (
+            LEGISTAR_VOTE_REJECT.search(legistar_vote[LEGISTAR_VOTE_VAL_NAME])
+            is not None
+        ):
+            return VoteDecision.REJECT
+
+        return None
+
     def get_person(self, legistar_person: Dict) -> Person:
         """
         Return CDP Person for Legistar Person
@@ -343,7 +429,7 @@ class LegistarScraper:
         for vote in legistar_votes:
             votes.append(
                 Vote(
-                    decision=vote[LEGISTAR_VOTE_DECISION],
+                    decision=self.get_vote_decision(vote),
                     external_source_id=vote[LEGISTAR_VOTE_EXT_ID],
                     person=self.get_person(vote[LEGISTAR_VOTE_PERSONS]),
                 )
@@ -379,36 +465,6 @@ class LegistarScraper:
             )
 
         return files
-
-    @staticmethod
-    def get_matter_status(legistar_matter_status: str) -> MatterStatusDecision:
-        """
-        Return appropriate MatterStatusDecision constant from EventItemMatterStatus
-
-        Parameters
-        ----------
-        legistar_matter_status : str
-            Legistar API EventItemMatterStatus
-
-        Returns
-        -------
-        constants.MatterStatusDecision
-            ADOPTED | IN_PROGRESS | REJECTED
-        """
-        if not legistar_matter_status:
-            return None
-
-        if LEGISTAR_MATTER_ADOPTED.search(legistar_matter_status) is not None:
-            return MatterStatusDecision.ADOPTED
-
-        if LEGISTAR_MATTER_IN_PROG.search(legistar_matter_status) is not None:
-            return MatterStatusDecision.IN_PROGRESS
-
-        if LEGISTAR_MATTER_REJECTED.search(legistar_matter_status) is not None:
-            return MatterStatusDecision.REJECTED
-
-        # TODO: ALWAYS return IN_PROGRESS if status could not be determined at all?
-        return None
 
     def get_matter(self, legistar_ev: Dict) -> Matter:
         """
