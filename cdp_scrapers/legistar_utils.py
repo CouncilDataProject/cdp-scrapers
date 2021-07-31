@@ -26,6 +26,7 @@ from cdp_backend.pipeline.ingestion_models import (
 )
 
 from cdp_backend.database.constants import (
+    EventMinutesItemDecision,
     MatterStatusDecision,
     VoteDecision,
 )
@@ -89,6 +90,10 @@ LEGISTAR_MATTER_REJECTED = re.compile("rejected|dropped", re.IGNORECASE)
 LEGISTAR_VOTE_APPROVE = re.compile("approve|favor", re.IGNORECASE)
 LEGISTAR_VOTE_ABSTAIN = re.compile("abstain|refuse|refrain", re.IGNORECASE)
 LEGISTAR_VOTE_REJECT = re.compile("reject|oppose", re.IGNORECASE)
+
+# EventItemPassedFlagName -> EventMinutesItemDecision
+LEGISTAR_ITEM_PASSED = re.compile("pass", re.IGNORECASE)
+LEGISTAR_ITEM_FAILED = re.compile("not|fail", re.IGNORECASE)
 
 LEGISTAR_EV_ITEMS = "EventItems"
 LEGISTAR_EV_ATTACHMENTS = "EventItemMatterAttachments"
@@ -344,6 +349,35 @@ class LegistarScraper:
 
         return None
 
+    @staticmethod
+    def get_minutes_item_decision(
+        legistar_item_passed_name: str,
+    ) -> EventMinutesItemDecision:
+        """
+        Return appropriate EventMinutesItemDecision constant
+            from EventItemPassedFlagName
+
+        Parameters
+        ----------
+        legistar_item_passed_name : str
+            Legistar API EventItemPassedFlagName
+
+        Returns
+        -------
+        MatterStatusDecision
+            PASSED | FAILED | None
+        """
+        if not legistar_item_passed_name:
+            return None
+
+        if LEGISTAR_ITEM_PASSED.search(legistar_item_passed_name) is not None:
+            return EventMinutesItemDecision.PASSED
+
+        if LEGISTAR_ITEM_FAILED.search(legistar_item_passed_name) is not None:
+            return EventMinutesItemDecision.FAILED
+
+        return None
+
     def get_vote_decision(self, legistar_vote: Dict) -> VoteDecision:
         """
         Return appropriate VoteDecision constant based on Legistar Vote
@@ -496,7 +530,7 @@ class LegistarScraper:
 
         return matter
 
-    def get_event_minutes_item(self, legistar_ev_item: Dict) -> MinutesItem:
+    def get_minutes_item(self, legistar_ev_item: Dict) -> MinutesItem:
         """
         Return MinutesItem from parts of Legistar API EventItem
 
@@ -550,8 +584,10 @@ class LegistarScraper:
         for item in legistar_ev_items:
             minutes.append(
                 EventMinutesItem(
-                    decision=stripped(item[LEGISTAR_EV_MINUTE_DECISION]),
-                    minutes_item=self.get_event_minutes_item(item),
+                    decision=LegistarScraper.get_minutes_item_decision(
+                        item[LEGISTAR_EV_MINUTE_DECISION]
+                    ),
+                    minutes_item=self.get_minutes_item(item),
                     votes=self.get_votes(item[LEGISTAR_EV_VOTES]),
                     matter=self.get_matter(item),
                     supporting_files=self.get_event_support_files(
