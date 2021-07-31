@@ -84,24 +84,6 @@ LEGISTAR_VOTE_PERSONS = "PersonInfo"
 CDP_VIDEO_URI = "video_uri"
 CDP_CAPTION_URI = "caption_uri"
 
-# NOTE: if all the keys are None that item should be None
-MIN_INGESTION_KEYS = {
-    Session: ["external_source_id", "video_uri", "caption_uri"],
-    Person: ["name", "external_source_id"],
-    Vote: ["person"],
-    SupportingFile: ["external_source_id", "name", "uri"],
-    Matter: ["external_source_id", "name", "title"],
-    MinutesItem: ["description", "external_source_id", "name"],
-    EventMinutesItem: ["matter", "minutes_item"],
-    EventIngestionModel: [
-        "agenda_uri",
-        "body",
-        "event_minutes_items",
-        "minutes_uri",
-        "sessions",
-    ],
-}
-
 ###############################################################################
 
 
@@ -249,6 +231,8 @@ class LegistarScraper:
     ----------
     client_name: str
         Legistar client name
+    MIN_INGESTION_KEYS: Dict[type, List[str]]
+        keys per IngestionModel used to decide if the given model is empty
 
     Methods
     -------
@@ -267,6 +251,48 @@ class LegistarScraper:
 
     def __init__(self, client: str):
         self.client_name = client
+
+        # NOTE: if all the keys are None that item should be None
+        self.MIN_INGESTION_KEYS = {
+            Session: ["external_source_id", "video_uri", "caption_uri"],
+            Person: ["name", "external_source_id"],
+            Vote: ["person"],
+            SupportingFile: ["external_source_id", "name", "uri"],
+            Matter: ["external_source_id", "name", "title"],
+            MinutesItem: ["description"],
+            EventMinutesItem: ["matter", "minutes_item"],
+            EventIngestionModel: [
+                "agenda_uri",
+                "body",
+                "event_minutes_items",
+                "minutes_uri",
+                "sessions",
+            ],
+        }
+
+        self.FILTERS = {
+            # e.g. MinutesItem deemed irrelevant if description contains this
+            MinutesItem: [
+                "CALL TO ORDER",
+                "ROLL CALL",
+                "APPROVAL OF THE JOURNAL",
+                "REFERRAL CALENDAR",
+                "APPROVAL OF THE AGENDA",
+                "This meeting also constitutes a meeting of the City Council",
+                "In-person attendance is currently prohibited",
+                "Times listed are estimated",
+                "Items of Business",
+                "PUBLIC COMMENT",
+                "PAYMENT OF BILLS",
+                "COMMITTEE REPORTS",
+                "OTHER BUSINESS",
+                "ADJOURNMENT",
+                "has been cancelled",
+                "PRESENTATIONS",
+                "ADOPTION OF OTHER RESOLUTIONS",
+                "Deputy City Clerk",
+            ]
+        }
 
     @property
     def is_legistar_compatible(self) -> bool:
@@ -397,7 +423,7 @@ class LegistarScraper:
 
             for uri in list_uri:
                 sessions.append(
-                    LegistarScraper.get_none_if_empty(
+                    self.get_none_if_empty(
                         Session(
                             session_datetime=session_time,
                             session_index=len(sessions),
@@ -407,7 +433,7 @@ class LegistarScraper:
                     )
                 )
 
-            ingested = LegistarScraper.get_none_if_empty(
+            ingested = self.get_none_if_empty(
                 EventIngestionModel(
                     agenda_uri=stripped(legistar_ev[LEGISTAR_AGENDA_URI]),
                     minutes_uri=stripped(legistar_ev[LEGISTAR_MINUTES_URI]),
@@ -418,9 +444,12 @@ class LegistarScraper:
                     ),
                 )
             )
+            # let's not include None in the returned list
             if ingested:
                 evs.append(ingested)
 
+        # TODO: better to return None if evs == [] ?
+        # return reduced_list(evs)
         return evs
 
     def get_video_uris(self, legistar_ev: Dict) -> List[Dict]:
@@ -592,7 +621,7 @@ class LegistarScraper:
         -------
         Person
         """
-        return LegistarScraper.get_none_if_empty(
+        return self.get_none_if_empty(
             Person(
                 email=stripped(legistar_person[LEGISTAR_PERSON_EMAIL]),
                 external_source_id=legistar_person[LEGISTAR_PERSON_EXT_ID],
@@ -619,7 +648,7 @@ class LegistarScraper:
 
         for vote in legistar_votes:
             votes.append(
-                LegistarScraper.get_none_if_empty(
+                self.get_none_if_empty(
                     Vote(
                         decision=self.get_vote_decision(vote),
                         external_source_id=vote[LEGISTAR_VOTE_EXT_ID],
@@ -650,7 +679,7 @@ class LegistarScraper:
 
         for attachment in legistar_ev_attachments:
             files.append(
-                LegistarScraper.get_none_if_empty(
+                self.get_none_if_empty(
                     SupportingFile(
                         external_source_id=attachment[LEGISTAR_FILE_EXT_ID],
                         name=stripped(attachment[LEGISTAR_FILE_NAME]),
@@ -689,7 +718,7 @@ class LegistarScraper:
         if not matter.name:
             matter.name = matter.title
 
-        return LegistarScraper.get_none_if_empty(matter)
+        return self.get_none_if_empty(matter)
 
     def get_minutes_item(self, legistar_ev_item: Dict) -> MinutesItem:
         """
@@ -718,7 +747,7 @@ class LegistarScraper:
 
         minutes_item.name = stripped(name)
 
-        return LegistarScraper.get_none_if_empty(minutes_item)
+        return self.get_none_if_empty(minutes_item)
 
     def get_event_minutes(
         self, legistar_ev_items: List[Dict]
@@ -740,25 +769,70 @@ class LegistarScraper:
         # EventMinutesItem object per member in EventItems
         for item in legistar_ev_items:
             minutes.append(
-                LegistarScraper.get_none_if_empty(
-                    EventMinutesItem(
-                        decision=LegistarScraper.get_minutes_item_decision(
-                            item[LEGISTAR_EV_MINUTE_DECISION]
-                        ),
-                        minutes_item=self.get_minutes_item(item),
-                        votes=self.get_votes(item[LEGISTAR_EV_VOTES]),
-                        matter=self.get_matter(item),
-                        supporting_files=self.get_event_support_files(
-                            item[LEGISTAR_EV_ATTACHMENTS]
-                        ),
+                self.get_none_if_empty(
+                    self.filter_event_minutes(
+                        EventMinutesItem(
+                            decision=LegistarScraper.get_minutes_item_decision(
+                                item[LEGISTAR_EV_MINUTE_DECISION]
+                            ),
+                            minutes_item=self.get_minutes_item(item),
+                            votes=self.get_votes(item[LEGISTAR_EV_VOTES]),
+                            matter=self.get_matter(item),
+                            supporting_files=self.get_event_support_files(
+                                item[LEGISTAR_EV_ATTACHMENTS]
+                            ),
+                        )
                     )
                 )
             )
 
         return reduced_list(minutes)
 
-    @staticmethod
-    def get_none_if_empty(model: IngestionModel) -> IngestionModel:
+    def filter_event_minutes(
+        self, ev_minutes_item: EventMinutesItem
+    ) -> EventMinutesItem:
+        """
+        ev_minutes_item.minutes_item = None
+        if ev_minutes_item.minutes_item.description is not important
+        and ev_minutes_item is otherwise empty
+
+        Parameters
+        ----------
+        ev_minutes_item : EventMinutesItem
+
+        Returns
+        -------
+        EventMinutesItem
+            ev_minutes_item.minutes_item may be modified to None
+
+        See Also
+        --------
+        FILTERS
+        """
+        if (
+            not ev_minutes_item.minutes_item
+            or not ev_minutes_item.minutes_item.description
+        ):
+            return ev_minutes_item
+
+        # do not even check MinutesItem.description if we have any of this
+        if (
+            ev_minutes_item.supporting_files
+            or ev_minutes_item.votes
+            or ev_minutes_item.matter
+        ):
+            return ev_minutes_item
+
+        for filter in self.FILTERS[MinutesItem]:
+            # e.g. contains MinutesItem is "call to order"
+            # in this otherwise empty EventMinutesItem?
+            if filter.lower() in ev_minutes_item.minutes_item.description.lower():
+                ev_minutes_item.minutes_item = None
+                break
+
+        return ev_minutes_item
+
+    def get_none_if_empty(self, model: IngestionModel) -> IngestionModel:
         """
         Check required keys in model, return None if all keys have no value.
         i.e. If any required key has value, return as-is
@@ -779,12 +853,16 @@ class LegistarScraper:
             Required keys per IngestionModel class
         """
         try:
-            keys = MIN_INGESTION_KEYS[model.__class__]
+            keys = self.MIN_INGESTION_KEYS[model.__class__]
         except KeyError:
             keys = None
 
         if not keys:
             # no min keys defined
+            log.debug(
+                f"Consider defining minimum required keys for {model.__class__}"
+                " in MIN_INGESTION_KEYS to filter out empty instances"
+            )
             return model
 
         for k in keys:
