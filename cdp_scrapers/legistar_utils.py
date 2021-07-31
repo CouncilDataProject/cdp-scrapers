@@ -419,8 +419,6 @@ class LegistarScraper:
                 legistar_ev[LEGISTAR_SESSION_DATE], legistar_ev[LEGISTAR_SESSION_TIME]
             )
 
-            sessions = []
-
             # prefer video file path in legistar Event.EventVideoPath
             if legistar_ev[LEGISTAR_SESSION_VIDEO_URI] is not None:
                 list_uri = [
@@ -436,8 +434,9 @@ class LegistarScraper:
                     {CDP_VIDEO_URI: None, CDP_CAPTION_URI: None}
                 ]
 
-            for uri in list_uri:
-                sessions.append(
+            sessions = []
+            sessions = reduced_list(
+                [
                     self.get_none_if_empty(
                         Session(
                             session_datetime=session_time,
@@ -446,14 +445,17 @@ class LegistarScraper:
                             caption_uri=uri[CDP_CAPTION_URI],
                         )
                     )
-                )
+                    # Session per video
+                    for uri in list_uri
+                ]
+            )
 
             ingested = self.get_none_if_empty(
                 EventIngestionModel(
                     agenda_uri=stripped(legistar_ev[LEGISTAR_AGENDA_URI]),
                     minutes_uri=stripped(legistar_ev[LEGISTAR_MINUTES_URI]),
                     body=Body(name=stripped(legistar_ev[LEGISTAR_BODY_NAME])),
-                    sessions=reduced_list(sessions),
+                    sessions=sessions,
                     event_minutes_items=self.get_event_minutes(
                         legistar_ev[LEGISTAR_EV_ITEMS]
                     ),
@@ -659,7 +661,7 @@ class LegistarScraper:
 
         Returns
         -------
-        Person
+        Person | None
         """
         return self.get_none_if_empty(
             Person(
@@ -682,12 +684,10 @@ class LegistarScraper:
 
         Returns
         -------
-        List[Vote]
+        List[Vote] | None
         """
-        votes = []
-
-        for vote in legistar_votes:
-            votes.append(
+        return reduced_list(
+            [
                 self.get_none_if_empty(
                     Vote(
                         decision=self.get_vote_decision(vote),
@@ -695,9 +695,9 @@ class LegistarScraper:
                         person=self.get_person(vote[LEGISTAR_VOTE_PERSONS]),
                     )
                 )
-            )
-
-        return reduced_list(votes)
+                for vote in legistar_votes
+            ]
+        )
 
     def get_event_support_files(
         self,
@@ -713,12 +713,10 @@ class LegistarScraper:
 
         Returns
         -------
-        List[SupportingFile]
+        List[SupportingFile] | None
         """
-        files = []
-
-        for attachment in legistar_ev_attachments:
-            files.append(
+        return reduced_list(
+            [
                 self.get_none_if_empty(
                     SupportingFile(
                         external_source_id=attachment[LEGISTAR_FILE_EXT_ID],
@@ -726,9 +724,9 @@ class LegistarScraper:
                         uri=stripped(attachment[LEGISTAR_FILE_URI]),
                     )
                 )
-            )
-
-        return reduced_list(files)
+                for attachment in legistar_ev_attachments
+            ]
+        )
 
     def get_matter(self, legistar_ev: Dict) -> Matter:
         """
@@ -741,22 +739,22 @@ class LegistarScraper:
 
         Returns
         -------
-        Matter
+        Matter | None
         """
-        matter = Matter(
-            external_source_id=legistar_ev[LEGISTAR_MATTER_EXT_ID],
-            name=stripped(legistar_ev[LEGISTAR_MATTER_NAME]),
-            matter_type=stripped(legistar_ev[LEGISTAR_MATTER_TYPE]),
-            title=stripped(legistar_ev[LEGISTAR_MATTER_TITLE]),
-            result_status=self.get_matter_status(legistar_ev[LEGISTAR_MATTER_STATUS]),
+        return self.get_none_if_empty(
+            Matter(
+                external_source_id=legistar_ev[LEGISTAR_MATTER_EXT_ID],
+                # Too often EventItemMatterName is not filled
+                # but EventItemMatterFile is
+                name=stripped(legistar_ev[LEGISTAR_MATTER_NAME])
+                or stripped(legistar_ev[LEGISTAR_MATTER_TITLE]),
+                matter_type=stripped(legistar_ev[LEGISTAR_MATTER_TYPE]),
+                title=stripped(legistar_ev[LEGISTAR_MATTER_TITLE]),
+                result_status=self.get_matter_status(
+                    legistar_ev[LEGISTAR_MATTER_STATUS]
+                ),
+            )
         )
-
-        # Too often EventItemMatterName is not filled but EventItemMatterFile is,
-        # but Matter.name is required for CDP
-        if not matter.name:
-            matter.name = matter.title
-
-        return self.get_none_if_empty(matter)
 
     def get_minutes_item(self, legistar_ev_item: Dict) -> MinutesItem:
         """
@@ -769,7 +767,7 @@ class LegistarScraper:
 
         Returns
         -------
-        MinutesItem
+        MinutesItem | None
             None if could not get nonempty MinutesItem.name from EventItem
         """
         minutes_item = MinutesItem(
@@ -800,13 +798,10 @@ class LegistarScraper:
 
         Returns
         -------
-        List[EventMinutesItem]
+        List[EventMinutesItem] | None
         """
-        minutes = []
-
-        # EventMinutesItem object per member in EventItems
-        for item in legistar_ev_items:
-            minutes.append(
+        return reduced_list(
+            [
                 self.get_none_if_empty(
                     self.filter_event_minutes(
                         EventMinutesItem(
@@ -822,9 +817,10 @@ class LegistarScraper:
                         )
                     )
                 )
-            )
-
-        return reduced_list(minutes)
+                # EventMinutesItem object per member in EventItems
+                for item in legistar_ev_items
+            ]
+        )
 
     def filter_event_minutes(
         self, ev_minutes_item: EventMinutesItem
