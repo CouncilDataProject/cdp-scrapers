@@ -233,6 +233,8 @@ class LegistarScraper:
         Legistar client name
     MIN_INGESTION_KEYS: Dict[type, List[str]]
         keys per IngestionModel used to decide if the given model is empty
+    vote_<approve|reject|abstain>_pattern: Pattern
+        regex pattern to decide VoteDecision from Legistar VoteValueName
 
     Methods
     -------
@@ -271,7 +273,8 @@ class LegistarScraper:
         }
 
         self.FILTERS = {
-            # e.g. MinutesItem deemed irrelevant if description contains this
+            # i.e. MinutesItem deemed irrelevant (filtered out) 
+            # if description contains this
             MinutesItem: [
                 "CALL TO ORDER",
                 "ROLL CALL",
@@ -293,6 +296,11 @@ class LegistarScraper:
                 "Deputy City Clerk",
             ]
         }
+
+        # e.g. for VoteDecision.APPROVE
+        self.vote_approve_pattern = "approve|favor"
+        self.vote_abstain_pattern = "abstain|refuse|refrain"
+        self.vote_reject_pattern = "reject|oppose"
 
     @property
     def is_legistar_compatible(self) -> bool:
@@ -583,24 +591,30 @@ class LegistarScraper:
         #       Therefore deciding VoteDecision based on the string VoteValueName.
 
         if (
-            re.compile("approve|favor", re.IGNORECASE).search(
-                legistar_vote[LEGISTAR_VOTE_VAL_NAME]
+            re.search(
+                self.vote_approve_pattern,
+                legistar_vote[LEGISTAR_VOTE_VAL_NAME],
+                re.IGNORECASE
             )
             is not None
         ):
             return VoteDecision.APPROVE
 
         if (
-            re.compile("abstain|refuse|refrain", re.IGNORECASE).search(
-                legistar_vote[LEGISTAR_VOTE_VAL_NAME]
+            re.search(
+                self.vote_abstain_pattern,
+                legistar_vote[LEGISTAR_VOTE_VAL_NAME],
+                re.IGNORECASE
             )
             is not None
         ):
             return VoteDecision.ABSTAIN
 
         if (
-            re.compile("reject|oppose", re.IGNORECASE).search(
-                legistar_vote[LEGISTAR_VOTE_VAL_NAME]
+            re.search(
+                self.vote_reject_pattern,
+                legistar_vote[LEGISTAR_VOTE_VAL_NAME],
+                re.IGNORECASE
             )
             is not None
         ):
