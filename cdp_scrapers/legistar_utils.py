@@ -78,23 +78,6 @@ LEGISTAR_MINUTE_NAME = LEGISTAR_MINUTE_EXT_ID
 LEGISTAR_VOTE_VAL_ID = "VoteValueId"
 LEGISTAR_VOTE_VAL_NAME = "VoteValueName"
 
-# regex pattern used to decide constants.MatterStatusDecision
-# from arbitrary LEGISTAR_MATTER_STATUS string.
-# add to patterns as desired
-LEGISTAR_MATTER_ADOPTED = re.compile("approved|confirmed|passed|adopted", re.IGNORECASE)
-LEGISTAR_MATTER_IN_PROG = re.compile("heard|ready|filed|held", re.IGNORECASE)
-LEGISTAR_MATTER_REJECTED = re.compile("rejected|dropped", re.IGNORECASE)
-
-# NOTE: have only seen "in favor" actually used in Legistar API data
-#       guessing the words for abstrain and reject
-LEGISTAR_VOTE_APPROVE = re.compile("approve|favor", re.IGNORECASE)
-LEGISTAR_VOTE_ABSTAIN = re.compile("abstain|refuse|refrain", re.IGNORECASE)
-LEGISTAR_VOTE_REJECT = re.compile("reject|oppose", re.IGNORECASE)
-
-# EventItemPassedFlagName -> EventMinutesItemDecision
-LEGISTAR_ITEM_PASSED = re.compile("pass", re.IGNORECASE)
-LEGISTAR_ITEM_FAILED = re.compile("not|fail", re.IGNORECASE)
-
 LEGISTAR_EV_ITEMS = "EventItems"
 LEGISTAR_EV_ATTACHMENTS = "EventItemMatterAttachments"
 LEGISTAR_EV_VOTES = "EventItemVoteInfo"
@@ -320,6 +303,110 @@ class LegistarScraper:
         # no event in check_days had enough for minimal ingestion model item
         return False
 
+    def get_events(
+        self,
+        # for the past 2 days
+        begin: Optional[datetime] = datetime.utcnow() - timedelta(days=2),
+        end: Optional[datetime] = datetime.utcnow(),
+    ) -> List[EventIngestionModel]:
+        """
+        Call get_legistar_events_for_timespan to retrieve Legistar API data
+        and return as List[EventIngestionModel]
+
+        Parameters
+        ----------
+        begin : datetime, default=datetime.utcnow() - timedelta(days=2)
+            By default query the past 2 days
+        end : datetime, default=datetime.utcnow()
+
+        Returns
+        -------
+        List[EventIngestionModel]
+            One instance of EventIngestionModel per Legistar API Event
+
+        See Also
+        --------
+        get_legistar_events_for_timespan
+        """
+        evs = []
+
+        for legistar_ev in get_legistar_events_for_timespan(
+            self.client_name,
+            begin=begin,
+            end=end,
+        ):
+            session_time = self.legistar_ev_date_time(
+                legistar_ev[LEGISTAR_SESSION_DATE], legistar_ev[LEGISTAR_SESSION_TIME]
+            )
+
+            sessions = []
+
+            # prefer video file path in legistar Event.EventVideoPath
+            if legistar_ev[LEGISTAR_SESSION_VIDEO_URI] is not None:
+                list_uri = [
+                    {
+                        CDP_VIDEO_URI: stripped(
+                            legistar_ev[LEGISTAR_SESSION_VIDEO_URI]
+                        ),
+                        CDP_CAPTION_URI: None,
+                    }
+                ]
+            else:
+                list_uri = self.get_video_uris(legistar_ev) or [
+                    {CDP_VIDEO_URI: None, CDP_CAPTION_URI: None}
+                ]
+
+            for uri in list_uri:
+                sessions.append(
+                    Session(
+                        session_datetime=session_time,
+                        session_index=len(sessions),
+                        video_uri=uri[CDP_VIDEO_URI],
+                        caption_uri=uri[CDP_CAPTION_URI],
+                    )
+                )
+
+            evs.append(
+                EventIngestionModel(
+                    agenda_uri=stripped(legistar_ev[LEGISTAR_AGENDA_URI]),
+                    minutes_uri=stripped(legistar_ev[LEGISTAR_MINUTES_URI]),
+                    body=Body(name=stripped(legistar_ev[LEGISTAR_BODY_NAME])),
+                    sessions=sessions,
+                    event_minutes_items=self.get_event_minutes(
+                        legistar_ev[LEGISTAR_EV_ITEMS]
+                    ),
+                )
+            )
+
+        return evs
+
+    def get_video_uris(self, legistar_ev: Dict) -> List[Dict]:
+        """
+        Must implement in class derived from LegistarScraper.
+        If Legistar Event.EventVideoPath is used, return an empty list in the override.
+
+        Parameters
+        ----------
+        legstar_ev : Dict
+            Legistar API Event
+
+        Returns
+        -------
+        List[Dict]
+            List of video and caption URI
+            [{"video_uri": ..., "caption_uri": ...}, ...]
+
+        Raises
+        ------
+        NotImplementedError
+            This base implementation does nothing
+        """
+        log.critical(
+            "get_video_uris() is required because "
+            f"Legistar Event.EventVideoPath is not used by {self.client_name}"
+        )
+        raise NotImplementedError
+
     @staticmethod
     def get_matter_status(legistar_matter_status: str) -> MatterStatusDecision:
         """
@@ -338,13 +425,26 @@ class LegistarScraper:
         if not legistar_matter_status:
             return None
 
-        if LEGISTAR_MATTER_ADOPTED.search(legistar_matter_status) is not None:
+        if (
+            re.compile("approved|confirmed|passed|adopted", re.IGNORECASE).search(
+                legistar_matter_status
+            )
+            is not None
+        ):
             return MatterStatusDecision.ADOPTED
 
-        if LEGISTAR_MATTER_IN_PROG.search(legistar_matter_status) is not None:
+        if (
+            re.compile("heard|ready|filed|held", re.IGNORECASE).search(
+                legistar_matter_status
+            )
+            is not None
+        ):
             return MatterStatusDecision.IN_PROGRESS
 
-        if LEGISTAR_MATTER_REJECTED.search(legistar_matter_status) is not None:
+        if (
+            re.compile("rejected|dropped", re.IGNORECASE).search(legistar_matter_status)
+            is not None
+        ):
             return MatterStatusDecision.REJECTED
 
         return None
@@ -370,10 +470,16 @@ class LegistarScraper:
         if not legistar_item_passed_name:
             return None
 
-        if LEGISTAR_ITEM_PASSED.search(legistar_item_passed_name) is not None:
+        if (
+            re.compile("pass", re.IGNORECASE).search(legistar_item_passed_name)
+            is not None
+        ):
             return EventMinutesItemDecision.PASSED
 
-        if LEGISTAR_ITEM_FAILED.search(legistar_item_passed_name) is not None:
+        if (
+            re.compile("not|fail", re.IGNORECASE).search(legistar_item_passed_name)
+            is not None
+        ):
             return EventMinutesItemDecision.FAILED
 
         return None
@@ -405,19 +511,25 @@ class LegistarScraper:
         #       Therefore deciding VoteDecision based on the string VoteValueName.
 
         if (
-            LEGISTAR_VOTE_APPROVE.search(legistar_vote[LEGISTAR_VOTE_VAL_NAME])
+            re.compile("approve|favor", re.IGNORECASE).search(
+                legistar_vote[LEGISTAR_VOTE_VAL_NAME]
+            )
             is not None
         ):
             return VoteDecision.APPROVE
 
         if (
-            LEGISTAR_VOTE_ABSTAIN.search(legistar_vote[LEGISTAR_VOTE_VAL_NAME])
+            re.compile("abstain|refuse|refrain", re.IGNORECASE).search(
+                legistar_vote[LEGISTAR_VOTE_VAL_NAME]
+            )
             is not None
         ):
             return VoteDecision.ABSTAIN
 
         if (
-            LEGISTAR_VOTE_REJECT.search(legistar_vote[LEGISTAR_VOTE_VAL_NAME])
+            re.compile("reject|oppose", re.IGNORECASE).search(
+                legistar_vote[LEGISTAR_VOTE_VAL_NAME]
+            )
             is not None
         ):
             return VoteDecision.REJECT
@@ -627,107 +739,3 @@ class LegistarScraper:
             minute=t.minute,
             second=t.second,
         )
-
-    def get_events(
-        self,
-        # for the past 2 days
-        begin: Optional[datetime] = datetime.utcnow() - timedelta(days=2),
-        end: Optional[datetime] = datetime.utcnow(),
-    ) -> List[EventIngestionModel]:
-        """
-        Call get_legistar_events_for_timespan to retrieve Legistar API data
-        and return as List[EventIngestionModel]
-
-        Parameters
-        ----------
-        begin : datetime, default=datetime.utcnow() - timedelta(days=2)
-            By default query the past 2 days
-        end : datetime, default=datetime.utcnow()
-
-        Returns
-        -------
-        List[EventIngestionModel]
-            One instance of EventIngestionModel per Legistar API Event
-
-        See Also
-        --------
-        get_legistar_events_for_timespan
-        """
-        evs = []
-
-        for legistar_ev in get_legistar_events_for_timespan(
-            self.client_name,
-            begin=begin,
-            end=end,
-        ):
-            session_time = self.legistar_ev_date_time(
-                legistar_ev[LEGISTAR_SESSION_DATE], legistar_ev[LEGISTAR_SESSION_TIME]
-            )
-
-            sessions = []
-
-            # prefer video file path in legistar Event.EventVideoPath
-            if legistar_ev[LEGISTAR_SESSION_VIDEO_URI] is not None:
-                list_uri = [
-                    {
-                        CDP_VIDEO_URI: stripped(
-                            legistar_ev[LEGISTAR_SESSION_VIDEO_URI]
-                        ),
-                        CDP_CAPTION_URI: None,
-                    }
-                ]
-            else:
-                list_uri = self.get_video_uris(legistar_ev) or [
-                    {CDP_VIDEO_URI: None, CDP_CAPTION_URI: None}
-                ]
-
-            for uri in list_uri:
-                sessions.append(
-                    Session(
-                        session_datetime=session_time,
-                        session_index=len(sessions),
-                        video_uri=uri[CDP_VIDEO_URI],
-                        caption_uri=uri[CDP_CAPTION_URI],
-                    )
-                )
-
-            evs.append(
-                EventIngestionModel(
-                    agenda_uri=stripped(legistar_ev[LEGISTAR_AGENDA_URI]),
-                    minutes_uri=stripped(legistar_ev[LEGISTAR_MINUTES_URI]),
-                    body=Body(name=stripped(legistar_ev[LEGISTAR_BODY_NAME])),
-                    sessions=sessions,
-                    event_minutes_items=self.get_event_minutes(
-                        legistar_ev[LEGISTAR_EV_ITEMS]
-                    ),
-                )
-            )
-
-        return evs
-
-    def get_video_uris(self, legistar_ev: Dict) -> List[Dict]:
-        """
-        Must implement in class derived from LegistarScraper.
-        If Legistar Event.EventVideoPath is used, return an empty list in the override.
-
-        Parameters
-        ----------
-        legstar_ev : Dict
-            Legistar API Event
-
-        Returns
-        -------
-        List[Dict]
-            List of video and caption URI
-            [{"video_uri": ..., "caption_uri": ...}, ...]
-
-        Raises
-        ------
-        NotImplementedError
-            This base implementation does nothing
-        """
-        log.critical(
-            "get_video_uris() is required because "
-            f"Legistar Event.EventVideoPath is not used by {self.client_name}"
-        )
-        raise NotImplementedError
