@@ -44,11 +44,14 @@ LEGISTAR_PERSON_BASE = LEGISTAR_BASE + "/Persons"
 # e.g. Session.video_uri =  EventVideoPath from legistar api
 LEGISTAR_SESSION_VIDEO_URI = "EventVideoPath"
 LEGISTAR_EV_MINUTE_DECISION = "EventItemPassedFlagName"
+# NOTE: EventItemAgendaSequence is also a candidate for this
+LEGISTAR_EV_INDEX = "EventItemMinutesSequence"
 LEGISTAR_PERSON_EMAIL = "PersonEmail"
 LEGISTAR_PERSON_EXT_ID = "PersonId"
 LEGISTAR_PERSON_NAME = "PersonFullName"
 LEGISTAR_PERSON_PHONE = "PersonPhone"
 LEGISTAR_PERSON_WEBSITE = "PersonWWW"
+LEGISTAR_PERSON_ACTIVE = "PersonActiveFlag"
 LEGISTAR_BODY_NAME = "EventBodyName"
 LEGISTAR_VOTE_DECISION = "VoteResult"
 LEGISTAR_VOTE_EXT_ID = "VoteId"
@@ -60,6 +63,8 @@ LEGISTAR_MATTER_TITLE = "EventItemMatterFile"
 LEGISTAR_MATTER_NAME = "EventItemMatterName"
 LEGISTAR_MATTER_TYPE = "EventItemMatterType"
 LEGISTAR_MATTER_STATUS = "EventItemMatterStatus"
+# NOTE: this may not be present
+LEGISTAR_MATTER_SPONSOR = "EventItemMatterRequester"
 # Session.session_datetime is a combo of EventDate and EventTime
 # TODO: this means same time for all Sessions in a NotImplementedError.
 #       some other legistar api data that can be used instead?
@@ -670,6 +675,8 @@ class LegistarScraper:
                 name=stripped(legistar_person[LEGISTAR_PERSON_NAME]),
                 phone=stripped(legistar_person[LEGISTAR_PERSON_PHONE]),
                 website=stripped(legistar_person[LEGISTAR_PERSON_WEBSITE]),
+                # any nonzero will be True
+                is_active=legistar_person[LEGISTAR_PERSON_ACTIVE],
             )
         )
 
@@ -741,6 +748,18 @@ class LegistarScraper:
         -------
         Matter | None
         """
+        try:
+            sponsors = reduced_list(
+                [
+                    self.get_none_if_empty(
+                        # at least try. this info isn't always filled
+                        Person(name=legistar_ev[LEGISTAR_MATTER_SPONSOR])
+                    )
+                ]
+            )
+        except KeyError:
+            sponsors = None
+
         return self.get_none_if_empty(
             Matter(
                 external_source_id=legistar_ev[LEGISTAR_MATTER_EXT_ID],
@@ -749,6 +768,7 @@ class LegistarScraper:
                 name=stripped(legistar_ev[LEGISTAR_MATTER_NAME])
                 or stripped(legistar_ev[LEGISTAR_MATTER_TITLE]),
                 matter_type=stripped(legistar_ev[LEGISTAR_MATTER_TYPE]),
+                sponsors=sponsors,
                 title=stripped(legistar_ev[LEGISTAR_MATTER_TITLE]),
                 result_status=self.get_matter_status(
                     legistar_ev[LEGISTAR_MATTER_STATUS]
@@ -805,12 +825,13 @@ class LegistarScraper:
                 self.get_none_if_empty(
                     self.filter_event_minutes(
                         EventMinutesItem(
-                            decision=self.get_minutes_item_decision(
-                                item[LEGISTAR_EV_MINUTE_DECISION]
-                            ),
+                            index=item[LEGISTAR_EV_INDEX],
                             minutes_item=self.get_minutes_item(item),
                             votes=self.get_votes(item[LEGISTAR_EV_VOTES]),
                             matter=self.get_matter(item),
+                            decision=self.get_minutes_item_decision(
+                                item[LEGISTAR_EV_MINUTE_DECISION]
+                            ),
                             supporting_files=self.get_event_support_files(
                                 item[LEGISTAR_EV_ATTACHMENTS]
                             ),
@@ -858,7 +879,7 @@ class LegistarScraper:
             return ev_minutes_item
 
         for filter in self.FILTERS[MinutesItem]:
-            # e.g. contains MinutesItem is "call to order"
+            # e.g. minutes_item is MinutesItem(description="...call to order...")
             # in this otherwise empty EventMinutesItem?
             if filter.lower() in ev_minutes_item.minutes_item.description.lower():
                 ev_minutes_item.minutes_item = None
