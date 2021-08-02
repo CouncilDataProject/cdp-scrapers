@@ -6,9 +6,6 @@
 
 There are 2 levels of filter we want to apply on the above example.
 
-1. Unimportant minutes_item
-A minutes item is "an item referenced during a meeting"# Notes on writing LegistarScrapers
-
 ## Filtering
 
 `EventMinutesItem(minutes_item=MinutesItem(name="123", description="This meeting 
