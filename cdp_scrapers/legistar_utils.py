@@ -41,6 +41,11 @@ LEGISTAR_EVENT_BASE = LEGISTAR_BASE + "/Events"
 LEGISTAR_MATTER_BASE = LEGISTAR_BASE + "/Matters"
 LEGISTAR_PERSON_BASE = LEGISTAR_BASE + "/Persons"
 
+# TODO: make these member attributes in LegistarScraper
+#       so that instances can use different Legistar keys
+#       more easily. i.e. modify one of these in __init__()
+#       As opposed to overriding a method that uses these.
+
 # e.g. Session.video_uri =  EventVideoPath from legistar api
 LEGISTAR_SESSION_VIDEO_URI = "EventVideoPath"
 LEGISTAR_EV_MINUTE_DECISION = "EventItemPassedFlagName"
@@ -238,6 +243,9 @@ class LegistarScraper:
         Legistar client name
     MIN_INGESTION_KEYS: Dict[type, List[str]]
         keys per IngestionModel used to decide if the given model is empty
+    FILTERS: Dict[type, List[str]]
+        string list per IngestionModel to treat certain fields
+        e.g. MinutesItem.description as None
     *_pattern: Pattern
         regex patterns to decide CDP constant from Legistar information
 
@@ -254,6 +262,10 @@ class LegistarScraper:
         Main get method that returns Legistar API data as List[EventIngestionModel]
     get_video_uris(legistar_ev)
         Must implement in class derived from LegistarScraper
+
+    See Also
+    --------
+    instances.SeattleScraper
     """
 
     def __init__(self, client: str):
