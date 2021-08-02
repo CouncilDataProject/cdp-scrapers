@@ -2,12 +2,6 @@
 
 ## Filtering
 
-`EventMinutesItem(minutes_item=None, index=None, matter=Matter(name=None, matter_type=None, title='This meeting also constitutes a meeting of the City Council, provided that the meeting shall be conducted as a committee meeting under the Council Rules and Procedures, and Council action shall be limited to committee business.', result_status=None, sponsors=None, external_source_id=None), supporting_files=[], decision=None, votes=[])`
-
-There are 2 levels of filter we want to apply on the above example.
-
-## Filtering
-
 `EventMinutesItem(minutes_item=MinutesItem(name="123", description="This meeting 
 also constitutes a meeting of the City Council, provided ...", external_source_id
 =123), index=None, matter=None, result_status=None, sponsors=None, 
