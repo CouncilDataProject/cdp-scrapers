@@ -289,6 +289,31 @@ class LegistarScraper:
             ],
         }
 
+        self.FILTERS = {
+            # i.e. MinutesItem deemed irrelevant (filtered out)
+            # if description contains this
+            MinutesItem: [
+                "CALL TO ORDER",
+                "ROLL CALL",
+                "APPROVAL OF THE JOURNAL",
+                "REFERRAL CALENDAR",
+                "APPROVAL OF THE AGENDA",
+                "This meeting also constitutes a meeting of the City Council",
+                "In-person attendance is currently prohibited",
+                "Times listed are estimated",
+                "Items of Business",
+                "PUBLIC COMMENT",
+                "PAYMENT OF BILLS",
+                "COMMITTEE REPORTS",
+                "OTHER BUSINESS",
+                "ADJOURNMENT",
+                "has been cancelled",
+                "PRESENTATIONS",
+                "ADOPTION OF OTHER RESOLUTIONS",
+                "Deputy City Clerk",
+            ]
+        }
+
         # e.g. for VoteDecision.APPROVE
         self.vote_approve_pattern = "approve|favor"
         self.vote_abstain_pattern = "abstain|refuse|refrain"
@@ -810,23 +835,69 @@ class LegistarScraper:
         return reduced_list(
             [
                 self.get_none_if_empty(
-                    EventMinutesItem(
-                        index=item[LEGISTAR_EV_INDEX],
-                        minutes_item=self.get_minutes_item(item),
-                        votes=self.get_votes(item[LEGISTAR_EV_VOTES]),
-                        matter=self.get_matter(item),
-                        decision=self.get_minutes_item_decision(
-                            item[LEGISTAR_EV_MINUTE_DECISION]
-                        ),
-                        supporting_files=self.get_event_support_files(
-                            item[LEGISTAR_EV_ATTACHMENTS]
-                        ),
+                    self.filter_event_minutes(
+                        EventMinutesItem(
+                            index=item[LEGISTAR_EV_INDEX],
+                            minutes_item=self.get_minutes_item(item),
+                            votes=self.get_votes(item[LEGISTAR_EV_VOTES]),
+                            matter=self.get_matter(item),
+                            decision=self.get_minutes_item_decision(
+                                item[LEGISTAR_EV_MINUTE_DECISION]
+                            ),
+                            supporting_files=self.get_event_support_files(
+                                item[LEGISTAR_EV_ATTACHMENTS]
+                            ),
+                        )
                     )
                 )
                 # EventMinutesItem object per member in EventItems
                 for item in legistar_ev_items
             ]
         )
+
+    def filter_event_minutes(
+        self, ev_minutes_item: EventMinutesItem
+    ) -> EventMinutesItem:
+        """
+        ev_minutes_item.minutes_item = None
+        if ev_minutes_item.minutes_item.description is not important
+        and ev_minutes_item is otherwise empty
+
+        Parameters
+        ----------
+        ev_minutes_item : EventMinutesItem
+
+        Returns
+        -------
+        EventMinutesItem
+            ev_minutes_item.minutes_item may be modified to None
+
+        See Also
+        --------
+        FILTERS
+        """
+        if (
+            not ev_minutes_item.minutes_item
+            or not ev_minutes_item.minutes_item.description
+        ):
+            return ev_minutes_item
+
+        # do not even check MinutesItem.description if we have any of this
+        if (
+            ev_minutes_item.supporting_files
+            or ev_minutes_item.votes
+            or ev_minutes_item.matter
+        ):
+            return ev_minutes_item
+
+        for filter in self.FILTERS[MinutesItem]:
+            # e.g. minutes_item is MinutesItem(description="...call to order...")
+            # in this otherwise empty EventMinutesItem?
+            if filter.lower() in ev_minutes_item.minutes_item.description.lower():
+                ev_minutes_item.minutes_item = None
+                break
+
+        return ev_minutes_item
 
     def get_none_if_empty(self, model: IngestionModel) -> IngestionModel:
         """
