@@ -73,7 +73,8 @@ votes = reducsed_list(
                         email=...,
                         ...
                     )
-                )
+                ),
+                ...
             )
         )
         for vote in legistar_votes # Legistar "EventItemVoteInfo"
