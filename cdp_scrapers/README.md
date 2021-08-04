@@ -2,20 +2,17 @@
 
 ## Filtering
 
+1. Unimportant `EventMinutesItem`
+
+
 `EventMinutesItem(minutes_item=MinutesItem(name="123", description="This meeting 
-also constitutes a meeting of the City Council, provided ...", external_source_id
-=123), index=None, matter=None, result_status=None, sponsors=None, 
-external_source_id=None), supporting_files=[], decision=None, votes=[])`
+also constitutes a meeting of the City Council, provided ...", ...), ...)`
 
-There are 2 levels of filtering we want to apply on the above example.
-
-1. Unimportant minutes_item
-
-MinutesItem.description comes from Legistar EventItem.EventItemTitle. Legistar 
+`minutes_item.description` comes from Legistar EventItem["EventItemTitle"]. Legistar 
 EventItems wil often contain unimportant information, as shown above, that we 
 want to exclude from ingesting into CDP. The `IGNORED_MINUTE_ITEMS` attribute in 
 `LegistarScraper` 
-defies a `List[str]` per `IngestionModel` class that we want to filter out. 
+defies a `List[str]` that we want to filter out. 
 `IGNORED_MINUTE_ITEMS` is used in `filter_event_minutes()`, case-insensitively.
 
 In your LegistarScraper-derived class' `__init__()`, overwrite or append to 
@@ -29,42 +26,63 @@ class MyScraper(LegistarScraper):
         self.IGNORED_MINUTE_ITEMS[MinutesItem].append("This meeting also constitutes a meeting")
 ```
 
-With that filter in place, this `MinutesItem.description` becomes `None`.
+With that filter in place, this entire `EventMinutesItem` becomes `None`.
 
 2. Empty models
 
-If `description` is set to `None`, the example `MinutesItem` is like
+Consider another example such as
 
-`MinutesItem(name="123", description=None, external_source_id=123)`
+`EventMinutesItem(decision=None, matter=None, minutes_item=None, supporting_files=[], ...)`
 
 which means nothing. `MIN_INGESTION_KEYS` is the LegistarScraper attribute used 
-to return `None` for such "empty" models. Like `IGNORED_MINUTE_ITEMS`, it defines a `List[str]` 
+to return `None` for such "empty" models. Like `IGNORED_MINUTE_ITEMS` it defines a `List[str]`, 
 per `IngestionModel` class. Here, each string in the `List[str]` is a key in the 
 corresponding model. For example, the base `LegistarScraper` class defines
 
 ```
 self.MIN_INGESTION_KEYS = {
     ...
-    MinutesItem: ["description"],
+    EventMinutesItem: ["matter", "minutes_item"],
     ...
 }
 ```
 
 `get_none_if_empty(self, model)` will test if any key in 
-`self.MIN_INGESTION_KEYS[model.__class__]` in `model` has a nonempty value like 
+`self.MIN_INGESTION_KEYS[model.__class__]` in `model` has a nonempty value; 
 `if model.__dict__[key]: ...`.
 
-For example, we have just `"description"` listed for `MinutesItem`. The test will 
-fail because `model.__dict__["description"] is None`. `get_none_if_empty()` will 
-therefore return `None`, instead of the argument `model` as-is.
+For example, because `matter` and `minutes_item` are both `None` in the above 
+`EventMinutesItem`, `get_none_if_empty()` will return `None`, instead of the 
+given `EventMinutesItem` instance as-is.
 
-This works recursively. i.e. `get_none_if_empty()` is called on the parent 
-`EventMinutesItem`, which now contains a bunch of `None` for its fields like 
-`minutes_item`, `matter`, etc. The base definition of `self.MIN_INGESTION_KEYS[EventMinutesItem]` is `["matter", "minutes_item"]`. Since this `EventMinutesItem` has None for its `matter` and `minutes_item`, 
-`get_none_if_empty()` returne `None` for this `EventMinutesItem`, and the main 
-`get_events()` excludes it from the returned `List[EventMinutesItem]`.
+This filtering is applied bottom-up. e.g.
+```
+# this is not exactly how the code is written
+# but a representation of the call path
 
-Modify `MIN_INGESTION_KEYS` in your `__init()__` like `IGNORED_MINUTE_ITEMS` as desired.
+# reduced_list() simply removes None from the list
+votes = reducsed_list(
+    [
+        # return None if this Vote is empty
+        get_none_if_empty(
+            Vote(
+                # return None if this Person is empty,
+                # instead of Person(email=None, ...)
+                person=get_none_if_empty(
+                    Person(
+                        email=...,
+                        ...
+                    )
+                )
+            )
+        )
+        for vote in legistar_votes # Legistar "EventItemVoteInfo"
+    ]
+)
+```
+
+Modify `MIN_INGESTION_KEYS` in your `__init()__` like `IGNORED_MINUTE_ITEMS` to 
+adjust to how your municipality provides information through Legistar.
 
 ## Legistar -> CDP Ingestion
 
@@ -96,7 +114,7 @@ The "big" scraping that an instance will probably have to provide is
 `get_video_uris()`. The base class will try to use Legistar "EventVideoPath" but 
 it is likely that information is not filled. In these situations Legistar might 
 point to some external resource, such as a web page hosted somewhere else, that 
-does have URI for the given event. See `SeattleScraper.get_video_uris()`
+does have video URI for the given event. See `SeattleScraper.get_video_uris()`
 
 TODO: upload notebook to demonstrate how we arrived at `SeattleScraper.
 get_video_uris()` from Legistar EventItem.
