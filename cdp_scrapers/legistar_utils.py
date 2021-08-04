@@ -317,7 +317,7 @@ class LegistarScraper:
         self.vote_nonvoting_pattern = "nv|(?:non.*voting)"
 
         self.matter_adopted_pattern = "approved|confirmed|passed|adopted"
-        self.matter_in_progress_pattern = "heard|ready|filed|held"
+        self.matter_in_progress_pattern = r"heard|ready|filed|held|(?:in\s*committee)"
         self.matter_rejected_patten = "rejected|dropped"
 
         self.decision_passed_pattern = "pass"
