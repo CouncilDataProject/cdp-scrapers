@@ -77,12 +77,8 @@ LEGISTAR_SESSION_DATE = "EventDate"
 LEGISTAR_SESSION_TIME = "EventTime"
 LEGISTAR_AGENDA_URI = "EventAgendaFile"
 LEGISTAR_MINUTES_URI = "EventMinutesFile"
-LEGISTAR_MINUTE_ITEM_DESC = "EventItemTitle"
 LEGISTAR_MINUTE_EXT_ID = "EventItemId"
-# NOTE: just don't see any other field that is unique and short-ish
-#       that is appropriate for MinutesItem.name, a required field.
-#       LEGISTAR_MINUTE_ITEM_DESC tend to be VERY lengthy
-LEGISTAR_MINUTE_NAME = LEGISTAR_MINUTE_EXT_ID
+LEGISTAR_MINUTE_NAME = "EventItemTitle"
 LEGISTAR_VOTE_VAL_ID = "VoteValueId"
 LEGISTAR_VOTE_VAL_NAME = "VoteValueName"
 
@@ -244,7 +240,7 @@ class LegistarScraper:
     MIN_INGESTION_KEYS: Dict[type, List[str]]
         Keys per IngestionModel used to decide if the given model is empty
     IGNORED_MINUTE_ITEMS: List[str]
-        Treat EventMinutesItem as None if minutes_item.description
+        Treat EventMinutesItem as None if minutes_item.name
         containts one of these strings
     *_pattern: Pattern
         regex patterns to decide CDP constant from Legistar information
@@ -280,7 +276,7 @@ class LegistarScraper:
             Vote: ["person"],
             SupportingFile: ["external_source_id", "name", "uri"],
             Matter: ["external_source_id", "name", "title"],
-            MinutesItem: ["description"],
+            MinutesItem: ["name"],
             EventMinutesItem: ["matter", "minutes_item"],
             EventIngestionModel: [
                 "agenda_uri",
@@ -832,20 +828,13 @@ class LegistarScraper:
         MinutesItem | None
             None if could not get nonempty MinutesItem.name from EventItem
         """
-        minutes_item = MinutesItem(
-            external_source_id=legistar_ev_item[LEGISTAR_MINUTE_EXT_ID],
-            description=stripped(legistar_ev_item[LEGISTAR_MINUTE_ITEM_DESC]),
-            name=None,
+
+        return self.get_none_if_empty(
+            MinutesItem(
+                external_source_id=legistar_ev_item[LEGISTAR_MINUTE_EXT_ID],
+                name=stripped(legistar_ev_item[LEGISTAR_MINUTE_NAME]),
+            )
         )
-
-        # NOTE: for time being this is LEGISTAR_MINUTE_EXT_ID
-        name = legistar_ev_item[LEGISTAR_MINUTE_NAME]
-        if isinstance(name, int):
-            name = str(name)
-
-        minutes_item.name = stripped(name)
-
-        return self.get_none_if_empty(minutes_item)
 
     def get_event_minutes(
         self, legistar_ev_items: List[Dict]
@@ -891,7 +880,7 @@ class LegistarScraper:
         self, ev_minutes_item: EventMinutesItem
     ) -> EventMinutesItem:
         """
-        Return None if minutes_item.description contains unimportant text
+        Return None if minutes_item.name contains unimportant text
         that we want to ignore
 
         Parameters
@@ -906,14 +895,11 @@ class LegistarScraper:
         --------
         IGNORED_MINUTE_ITEMS
         """
-        if (
-            not ev_minutes_item.minutes_item
-            or not ev_minutes_item.minutes_item.description
-        ):
+        if not ev_minutes_item.minutes_item or not ev_minutes_item.minutes_item.name:
             return ev_minutes_item
 
         for filter in self.IGNORED_MINUTE_ITEMS:
-            if filter.lower() in ev_minutes_item.minutes_item.description.lower():
+            if filter.lower() in ev_minutes_item.minutes_item.name.lower():
                 return None
 
         return ev_minutes_item

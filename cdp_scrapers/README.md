@@ -5,10 +5,10 @@
 1. Unimportant `EventMinutesItem`
 
 
-`EventMinutesItem(minutes_item=MinutesItem(name="123", description="This meeting 
+`EventMinutesItem(minutes_item=MinutesItem(name="This meeting 
 also constitutes a meeting of the City Council, provided ...", ...), ...)`
 
-`minutes_item.description` comes from Legistar EventItem["EventItemTitle"]. Legistar 
+`minutes_item.name` comes from Legistar EventItem["EventItemTitle"]. Legistar 
 EventItems wil often contain unimportant information, as shown above, that we 
 want to exclude from ingesting into CDP. The `IGNORED_MINUTE_ITEMS` attribute in 
 `LegistarScraper` 
