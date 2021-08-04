@@ -242,10 +242,10 @@ class LegistarScraper:
     client_name: str
         Legistar client name
     MIN_INGESTION_KEYS: Dict[type, List[str]]
-        keys per IngestionModel used to decide if the given model is empty
-    FILTERS: Dict[type, List[str]]
-        string list per IngestionModel to treat certain fields
-        e.g. MinutesItem.description as None
+        Keys per IngestionModel used to decide if the given model is empty
+    IGNORED_MINUTE_ITEMS: List[str]
+        Treat EventMinutesItem as None if minutes_item.description
+        containts one of these strings
     *_pattern: Pattern
         regex patterns to decide CDP constant from Legistar information
 
@@ -262,6 +262,7 @@ class LegistarScraper:
         Main get method that returns Legistar API data as List[EventIngestionModel]
     get_video_uris(legistar_ev)
         Must implement in class derived from LegistarScraper
+        if EventVideoPath in Legistar data set is empty
 
     See Also
     --------
@@ -271,7 +272,8 @@ class LegistarScraper:
     def __init__(self, client: str):
         self.client_name = client
 
-        # NOTE: if all the keys are None that item should be None
+        # a model should be all listed keys here have None for value
+        # e.g. 
         self.MIN_INGESTION_KEYS = {
             Session: ["external_source_id", "video_uri", "caption_uri"],
             Person: ["name", "external_source_id"],
@@ -289,30 +291,26 @@ class LegistarScraper:
             ],
         }
 
-        self.FILTERS = {
-            # i.e. MinutesItem deemed irrelevant (filtered out)
-            # if description contains this
-            MinutesItem: [
-                "CALL TO ORDER",
-                "ROLL CALL",
-                "APPROVAL OF THE JOURNAL",
-                "REFERRAL CALENDAR",
-                "APPROVAL OF THE AGENDA",
-                "This meeting also constitutes a meeting of the City Council",
-                "In-person attendance is currently prohibited",
-                "Times listed are estimated",
-                "Items of Business",
-                "PUBLIC COMMENT",
-                "PAYMENT OF BILLS",
-                "COMMITTEE REPORTS",
-                "OTHER BUSINESS",
-                "ADJOURNMENT",
-                "has been cancelled",
-                "PRESENTATIONS",
-                "ADOPTION OF OTHER RESOLUTIONS",
-                "Deputy City Clerk",
-            ]
-        }
+        self.IGNORED_MINUTE_ITEMS = [
+            "This meeting also constitutes a meeting of the City Council",
+            "In-person attendance is currently prohibited",
+            "Times listed are estimated",
+            "has been cancelled",
+            "Deputy City Clerk",
+            # "CALL TO ORDER",
+            # "ROLL CALL",
+            # "APPROVAL OF THE JOURNAL",
+            # "REFERRAL CALENDAR",
+            # "APPROVAL OF THE AGENDA",
+            # "Items of Business",
+            # "PUBLIC COMMENT",
+            # "PAYMENT OF BILLS",
+            # "COMMITTEE REPORTS",
+            # "OTHER BUSINESS",
+            # "ADJOURNMENT",
+            # "PRESENTATIONS",
+            # "ADOPTION OF OTHER RESOLUTIONS",
+        ]
 
         # e.g. for VoteDecision.APPROVE
         self.vote_approve_pattern = "approve|favor"
@@ -835,6 +833,8 @@ class LegistarScraper:
         return reduced_list(
             [
                 self.get_none_if_empty(
+                    # if minutes_item contains unimportant data that we want to drop,
+                    # just make the entire EventMinutesItem = None
                     self.filter_event_minutes(
                         EventMinutesItem(
                             index=item[LEGISTAR_EV_INDEX],
@@ -859,9 +859,8 @@ class LegistarScraper:
         self, ev_minutes_item: EventMinutesItem
     ) -> EventMinutesItem:
         """
-        ev_minutes_item.minutes_item = None
-        if ev_minutes_item.minutes_item.description is not important
-        and ev_minutes_item is otherwise empty
+        Return None if minutes_item.description contains unimportant text
+        that we want to ignore
 
         Parameters
         ----------
@@ -869,12 +868,11 @@ class LegistarScraper:
 
         Returns
         -------
-        EventMinutesItem
-            ev_minutes_item.minutes_item may be modified to None
+        EventMinutesItem | None
 
         See Also
         --------
-        FILTERS
+        IGNORED_MINUTE_ITEMS
         """
         if (
             not ev_minutes_item.minutes_item
@@ -882,20 +880,9 @@ class LegistarScraper:
         ):
             return ev_minutes_item
 
-        # do not even check MinutesItem.description if we have any of this
-        if (
-            ev_minutes_item.supporting_files
-            or ev_minutes_item.votes
-            or ev_minutes_item.matter
-        ):
-            return ev_minutes_item
-
-        for filter in self.FILTERS[MinutesItem]:
-            # e.g. minutes_item is MinutesItem(description="...call to order...")
-            # in this otherwise empty EventMinutesItem?
+        for filter in self.IGNORED_MINUTE_ITEMS:
             if filter.lower() in ev_minutes_item.minutes_item.description.lower():
-                ev_minutes_item.minutes_item = None
-                break
+                return None
 
         return ev_minutes_item
 
@@ -926,10 +913,6 @@ class LegistarScraper:
 
         if not keys:
             # no min keys defined
-            log.debug(
-                f"Consider defining minimum required keys for {model.__class__}"
-                " in MIN_INGESTION_KEYS to filter out empty instances"
-            )
             return model
 
         for k in keys:

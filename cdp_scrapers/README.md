@@ -13,32 +13,32 @@ There are 2 levels of filtering we want to apply on the above example.
 
 MinutesItem.description comes from Legistar EventItem.EventItemTitle. Legistar 
 EventItems wil often contain unimportant information, as shown above, that we 
-want to exclude from ingesting into CDP. The `FILTERS` attribute in 
+want to exclude from ingesting into CDP. The `IGNORED_MINUTE_ITEMS` attribute in 
 `LegistarScraper` 
 defies a `List[str]` per `IngestionModel` class that we want to filter out. 
-`FILTERS` is used in `filter_event_minutes()`, case-insensitively.
+`IGNORED_MINUTE_ITEMS` is used in `filter_event_minutes()`, case-insensitively.
 
 In your LegistarScraper-derived class' `__init__()`, overwrite or append to 
-`self.FILTERS`. e.g.
+`self.IGNORED_MINUTE_ITEMS`. e.g.
 
 ```
 class MyScraper(LegistarScraper):
     def __init__(self):
         super().__init__("my_city")
 
-        self.FILTERS[MinutesItem].append("This meeting also constitutes a meeting")
+        self.IGNORED_MINUTE_ITEMS[MinutesItem].append("This meeting also constitutes a meeting")
 ```
 
 With that filter in place, this `MinutesItem.description` becomes `None`.
 
 2. Empty models
 
-After `description` is set to `None`, the example `MinutesItem` is like
+If `description` is set to `None`, the example `MinutesItem` is like
 
 `MinutesItem(name="123", description=None, external_source_id=123)`
 
 which means nothing. `MIN_INGESTION_KEYS` is the LegistarScraper attribute used 
-to return `None` for such "empty" models. Like `FILTERS`, it defines a `List[str]` 
+to return `None` for such "empty" models. Like `IGNORED_MINUTE_ITEMS`, it defines a `List[str]` 
 per `IngestionModel` class. Here, each string in the `List[str]` is a key in the 
 corresponding model. For example, the base `LegistarScraper` class defines
 
@@ -64,7 +64,7 @@ This works recursively. i.e. `get_none_if_empty()` is called on the parent
 `get_none_if_empty()` returne `None` for this `EventMinutesItem`, and the main 
 `get_events()` excludes it from the returned `List[EventMinutesItem]`.
 
-Modify `MIN_INGESTION_KEYS` in your `__init()__` like `FILTERS` as desired.
+Modify `MIN_INGESTION_KEYS` in your `__init()__` like `IGNORED_MINUTE_ITEMS` as desired.
 
 ## Legistar -> CDP Ingestion
 
