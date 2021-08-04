@@ -272,8 +272,8 @@ class LegistarScraper:
     def __init__(self, client: str):
         self.client_name = client
 
-        # a model should be all listed keys here have None for value
-        # e.g. 
+        # e.g. If a given EventMinutesItem has None for both matter and minutes_items,
+        # return None, instead of EventMinutesItem(matter=None, minutes_item=None, ...)
         self.MIN_INGESTION_KEYS = {
             Session: ["external_source_id", "video_uri", "caption_uri"],
             Person: ["name", "external_source_id"],
@@ -316,6 +316,9 @@ class LegistarScraper:
         self.vote_approve_pattern = "approve|favor"
         self.vote_abstain_pattern = "abstain|refuse|refrain"
         self.vote_reject_pattern = "reject|oppose"
+        # TODO: need to debug these using real examples
+        self.vote_absent_pattern = "absent"
+        self.vote_nonvoting_pattern = "nv|(?:non.*voting)"
 
         self.matter_adopted_pattern = "approved|confirmed|passed|adopted"
         self.matter_in_progress_pattern = "heard|ready|filed|held"
@@ -614,8 +617,7 @@ class LegistarScraper:
 
         Returns
         -------
-        VoteDecision
-            APPROVE | REJECT | ABSTAIN | None
+        VoteDecision | None
 
         See Also
         --------
@@ -633,6 +635,8 @@ class LegistarScraper:
         #       But don't know what other values would be e.g. "opposed to", etc.
         #       Therefore deciding VoteDecision based on the string VoteValueName.
 
+        decision = None
+
         if (
             re.search(
                 self.vote_approve_pattern,
@@ -641,19 +645,8 @@ class LegistarScraper:
             )
             is not None
         ):
-            return VoteDecision.APPROVE
-
-        if (
-            re.search(
-                self.vote_abstain_pattern,
-                legistar_vote[LEGISTAR_VOTE_VAL_NAME],
-                re.IGNORECASE,
-            )
-            is not None
-        ):
-            return VoteDecision.ABSTAIN
-
-        if (
+            decision = VoteDecision.APPROVE
+        elif (
             re.search(
                 self.vote_reject_pattern,
                 legistar_vote[LEGISTAR_VOTE_VAL_NAME],
@@ -661,9 +654,45 @@ class LegistarScraper:
             )
             is not None
         ):
-            return VoteDecision.REJECT
+            decision = VoteDecision.REJECT
 
-        return None
+        nonvoting = re.search(
+            self.vote_nonvoting_pattern,
+            legistar_vote[LEGISTAR_VOTE_VAL_NAME],
+            re.IGNORECASE,
+        ) is not None
+
+        # determine qualifer like absent, abstain
+        if (
+            re.search(
+                self.vote_absent_pattern,
+                legistar_vote[LEGISTAR_VOTE_VAL_NAME],
+                re.IGNORECASE,
+            )
+            is not None
+        ):
+            if decision == VoteDecision.APPROVE:
+                return VoteDecision.ABSENT_APPROVE
+            elif decision == VoteDecision.REJECT:
+                return VoteDecision.ABSENT_REJECT
+            elif nonvoting:
+                return VoteDecision.ABSENT_NON_VOTING
+        elif (
+            re.search(
+                self.vote_abstain_pattern,
+                legistar_vote[LEGISTAR_VOTE_VAL_NAME],
+                re.IGNORECASE,
+            )
+            is not None
+        ):
+            if decision == VoteDecision.APPROVE:
+                return VoteDecision.ABSTAIN_APPROVE
+            elif decision == VoteDecision.REJECT:
+                return VoteDecision.ABSTAIN_REJECT
+            elif nonvoting:
+                return VoteDecision.ABSTAIN_NON_VOTING
+
+        return decision
 
     def get_person(self, legistar_person: Dict) -> Person:
         """
