@@ -656,11 +656,14 @@ class LegistarScraper:
         ):
             decision = VoteDecision.REJECT
 
-        nonvoting = re.search(
-            self.vote_nonvoting_pattern,
-            legistar_vote[LEGISTAR_VOTE_VAL_NAME],
-            re.IGNORECASE,
-        ) is not None
+        nonvoting = (
+            re.search(
+                self.vote_nonvoting_pattern,
+                legistar_vote[LEGISTAR_VOTE_VAL_NAME],
+                re.IGNORECASE,
+            )
+            is not None
+        )
 
         # determine qualifer like absent, abstain
         if (
