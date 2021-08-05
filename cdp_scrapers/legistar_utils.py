@@ -182,13 +182,13 @@ def get_legistar_events_for_timespan(
     return response
 
 
-def stripped(in_str) -> str:
+def stripped(in_str: str) -> str:
     """
     Return leading and trailing whitespace removed if it is a string
 
     Parameters
     ----------
-    in_str: str
+    in_str : str
 
     Returns
     -------
@@ -203,7 +203,6 @@ def stripped(in_str) -> str:
 def reduced_list(in_list: List) -> List:
     """
     Remove all None items from in_list
-    Return None if in_list is empty
 
     Parameters
     ----------
@@ -211,16 +210,9 @@ def reduced_list(in_list: List) -> List:
 
     Returns
     -------
-    List | None
+    List
     """
-    for i in range(len(in_list) - 1, -1, -1):
-        if not in_list[i]:
-            del in_list[i]
-
-    if len(in_list) == 0:
-        in_list = None
-
-    return in_list
+    return [item for item in in_list if item is not None]
 
 
 class LegistarScraper:
