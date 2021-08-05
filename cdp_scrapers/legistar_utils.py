@@ -71,7 +71,7 @@ LEGISTAR_MATTER_STATUS = "EventItemMatterStatus"
 # NOTE: this may not be present
 LEGISTAR_MATTER_SPONSOR = "EventItemMatterRequester"
 # Session.session_datetime is a combo of EventDate and EventTime
-# TODO: this means same time for all Sessions in a NotImplementedError.
+# TODO: this means same time for all Sessions in a EventIngestionModel.
 #       some other legistar api data that can be used instead?
 LEGISTAR_SESSION_DATE = "EventDate"
 LEGISTAR_SESSION_TIME = "EventTime"
@@ -329,7 +329,7 @@ class LegistarScraper:
         bool
             True if client_name is a valid Legistar client name
         """
-        # simplest check, if the GET request works, it is a legistar place
+        # simplest check, if the GET request works, it is a legistar municipality
         try:
             resp = urlopen(f"http://webapi.legistar.com/v1/{self.client_name}/bodies")
             return resp.status == 200
@@ -556,6 +556,11 @@ class LegistarScraper:
             is not None
         ):
             return MatterStatusDecision.REJECTED
+
+        log.debug(
+            "not able to decide MatterStatusDecision from "
+            f"{legistar_matter_status}. consider updating matter_*_pattern"
+        )
 
         return None
 
@@ -853,27 +858,73 @@ class LegistarScraper:
         return reduced_list(
             [
                 self.get_none_if_empty(
-                    # if minutes_item contains unimportant data that we want to drop,
-                    # just make the entire EventMinutesItem = None
-                    self.filter_event_minutes(
-                        EventMinutesItem(
-                            index=item[LEGISTAR_EV_INDEX],
-                            minutes_item=self.get_minutes_item(item),
-                            votes=self.get_votes(item[LEGISTAR_EV_VOTES]),
-                            matter=self.get_matter(item),
-                            decision=self.get_minutes_item_decision(
-                                item[LEGISTAR_EV_MINUTE_DECISION]
-                            ),
-                            supporting_files=self.get_event_support_files(
-                                item[LEGISTAR_EV_ATTACHMENTS]
-                            ),
-                        )
+                    self.fix_event_minutes(
+                        # if minutes_item contains unimportant data,
+                        # just make the entire EventMinutesItem = None
+                        self.filter_event_minutes(
+                            EventMinutesItem(
+                                index=item[LEGISTAR_EV_INDEX],
+                                minutes_item=self.get_minutes_item(item),
+                                votes=self.get_votes(item[LEGISTAR_EV_VOTES]),
+                                matter=self.get_matter(item),
+                                decision=self.get_minutes_item_decision(
+                                    item[LEGISTAR_EV_MINUTE_DECISION]
+                                ),
+                                supporting_files=self.get_event_support_files(
+                                    item[LEGISTAR_EV_ATTACHMENTS]
+                                ),
+                            )
+                        ),
+                        item
                     )
                 )
                 # EventMinutesItem object per member in EventItems
                 for item in legistar_ev_items
             ]
         )
+
+    def fix_event_minutes(
+        self, ev_minutes_item: EventMinutesItem, legistar_ev_item: Dict
+    ) -> EventMinutesItem:
+        """
+        Inspect the MinutesItem and Matter in ev_minutes_item.
+        - Move some fields between them to make the information more meaningful.
+        - Enforce matter.result_status when appropriate.
+
+        Parameters
+        ----------
+        ev_minutes_item : EventMinutesItem
+        legistar_ev_item : Dict
+            Legistar EventItem
+
+        Returns
+        -------
+        EventMinutesItem
+            parts of minutes_item and matter could be modified
+        """
+        if not ev_minutes_item:
+            return ev_minutes_item
+
+        if ev_minutes_item.minutes_item and ev_minutes_item.matter:
+            # we have both matter and minutes_item
+            # - make minutes_item.name the more concise text e.g. "CB 11111"
+            # - make minutes_item.description the more descriptive lengthy text
+            #   e.g. "AN ORDINANCE related to the..."
+            # - make matter.title the same descriptive lengthy text
+            ev_minutes_item.minutes_item.description = ev_minutes_item.minutes_item.name
+            ev_minutes_item.minutes_item.name = ev_minutes_item.matter.name
+            ev_minutes_item.matter.title = ev_minutes_item.minutes_item.description
+
+        if ev_minutes_item.matter and not ev_minutes_item.matter.result_status:
+            if ev_minutes_item.votes and legistar_ev_item[LEGISTAR_MATTER_STATUS]:
+                # means did not find matter_*_pattern in Legistar EventItemMatterStatus
+                # default to in progress (as opposed to adopted or rejected)
+                # NOTE: if our matter_*_patterns ARE "complete",
+                #       this clause would hit only because the info from Legistar
+                #       is incomplete or malformed
+                ev_minutes_item.matter.result_status = MatterStatusDecision.IN_PROGRESS
+
+        return ev_minutes_item
 
     def filter_event_minutes(
         self, ev_minutes_item: EventMinutesItem
