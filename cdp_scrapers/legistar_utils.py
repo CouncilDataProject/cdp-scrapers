@@ -875,7 +875,7 @@ class LegistarScraper:
                                 ),
                             )
                         ),
-                        item
+                        item,
                     )
                 )
                 # EventMinutesItem object per member in EventItems
