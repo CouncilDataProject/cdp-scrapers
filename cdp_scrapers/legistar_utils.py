@@ -268,6 +268,10 @@ class LegistarScraper:
     def __init__(self, client: str):
         self.client_name = client
 
+        # TODO: Long term it would be great to write a function to get the
+        #       required attrs of an ingestion model based off of typing so that
+        #       this can be programmitically generated instead of manually maintained
+
         # e.g. If a given EventMinutesItem has None for both matter and minutes_items,
         # return None, instead of EventMinutesItem(matter=None, minutes_item=None, ...)
         self.MIN_INGESTION_KEYS = {
@@ -935,10 +939,10 @@ class LegistarScraper:
 
         for k in keys:
             try:
-                if model.__dict__[k]:
+                if getattr(model, k):
                     # some value for this key in this model
                     return model
-            except KeyError:
+            except AttributeError:
                 pass
 
         return None
