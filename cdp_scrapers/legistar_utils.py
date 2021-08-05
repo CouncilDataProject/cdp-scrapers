@@ -713,8 +713,7 @@ class LegistarScraper:
                 name=stripped(legistar_person[LEGISTAR_PERSON_NAME]),
                 phone=stripped(legistar_person[LEGISTAR_PERSON_PHONE]),
                 website=stripped(legistar_person[LEGISTAR_PERSON_WEBSITE]),
-                # any nonzero will be True
-                is_active=legistar_person[LEGISTAR_PERSON_ACTIVE],
+                is_active=bool(legistar_person[LEGISTAR_PERSON_ACTIVE]),
             )
         )
 
