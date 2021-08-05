@@ -418,7 +418,7 @@ class LegistarScraper:
         --------
         get_legistar_events_for_timespan
         """
-        evs = []
+        ingestion_models = []
 
         for legistar_ev in get_legistar_events_for_timespan(
             self.client_name,
@@ -460,24 +460,21 @@ class LegistarScraper:
                 ]
             )
 
-            ingested = self.get_none_if_empty(
-                EventIngestionModel(
-                    agenda_uri=stripped(legistar_ev[LEGISTAR_AGENDA_URI]),
-                    minutes_uri=stripped(legistar_ev[LEGISTAR_MINUTES_URI]),
-                    body=Body(name=stripped(legistar_ev[LEGISTAR_BODY_NAME])),
-                    sessions=sessions,
-                    event_minutes_items=self.get_event_minutes(
-                        legistar_ev[LEGISTAR_EV_ITEMS]
-                    ),
+            ingestion_models.append(
+                self.get_none_if_empty(
+                    EventIngestionModel(
+                        agenda_uri=stripped(legistar_ev[LEGISTAR_AGENDA_URI]),
+                        minutes_uri=stripped(legistar_ev[LEGISTAR_MINUTES_URI]),
+                        body=Body(name=stripped(legistar_ev[LEGISTAR_BODY_NAME])),
+                        sessions=sessions,
+                        event_minutes_items=self.get_event_minutes(
+                            legistar_ev[LEGISTAR_EV_ITEMS]
+                        ),
+                    )
                 )
             )
-            # let's not include None in the returned list
-            if ingested:
-                evs.append(ingested)
 
-        # TODO: better to return None if evs == [] ?
-        # return reduced_list(evs)
-        return evs
+        return reduced_list(ingestion_models)
 
     def get_video_uris(self, legistar_ev: Dict) -> List[Dict]:
         """
