@@ -395,19 +395,21 @@ class LegistarScraper:
 
     def get_events(
         self,
-        # for the past 2 days
-        begin: Optional[datetime] = datetime.utcnow() - timedelta(days=2),
-        end: Optional[datetime] = datetime.utcnow(),
+        begin: Optional[datetime] = None,
+        end: Optional[datetime] = None,
     ) -> List[EventIngestionModel]:
         """
-        Call get_legistar_events_for_timespan to retrieve Legistar API data
+        Calls get_legistar_events_for_timespan to retrieve Legistar API data
         and return as List[EventIngestionModel]
 
         Parameters
         ----------
-        begin : datetime, default=datetime.utcnow() - timedelta(days=2)
-            By default query the past 2 days
-        end : datetime, default=datetime.utcnow()
+        begin : datetime, optional
+            The timespan beginning datetime to query for events after.
+            Default is 2 days from UTC now
+        end : datetime, optional
+            The timespan end datetime to query for events before.
+            Default is UTC now
 
         Returns
         -------
@@ -418,6 +420,11 @@ class LegistarScraper:
         --------
         get_legistar_events_for_timespan
         """
+        if begin is None:
+            begin = datetime.utcnow() - timedelta(days=2)
+        if end is None:
+            end = datetime.utcnow()
+
         ingestion_models = []
 
         for legistar_ev in get_legistar_events_for_timespan(
