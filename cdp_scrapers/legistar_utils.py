@@ -260,29 +260,6 @@ class LegistarScraper:
     def __init__(self, client: str):
         self.client_name = client
 
-        # TODO: Long term it would be great to write a function to get the
-        #       required attrs of an ingestion model based off of typing so that
-        #       this can be programmitically generated instead of manually maintained
-
-        # e.g. If a given EventMinutesItem has None for both matter and minutes_items,
-        # return None, instead of EventMinutesItem(matter=None, minutes_item=None, ...)
-        self.MIN_INGESTION_KEYS = {
-            Session: ["external_source_id", "video_uri", "caption_uri"],
-            Person: ["name", "external_source_id"],
-            Vote: ["person"],
-            SupportingFile: ["external_source_id", "name", "uri"],
-            Matter: ["external_source_id", "name", "title"],
-            MinutesItem: ["name"],
-            EventMinutesItem: ["matter", "minutes_item"],
-            EventIngestionModel: [
-                "agenda_uri",
-                "body",
-                "event_minutes_items",
-                "minutes_uri",
-                "sessions",
-            ],
-        }
-
         self.IGNORED_MINUTE_ITEMS = [
             "This meeting also constitutes a meeting of the City Council",
             "In-person attendance is currently prohibited",
@@ -956,8 +933,8 @@ class LegistarScraper:
 
     def get_none_if_empty(self, model: IngestionModel) -> IngestionModel:
         """
-        Check required keys in model, return None if all keys have no value.
-        i.e. If any required key has value, return as-is
+        Check required keys in model, return None if any such key has no value.
+        i.e. If all required keys have valid value, return as-is
 
         Parameters
         ----------
@@ -968,30 +945,91 @@ class LegistarScraper:
         -------
         IngestionModel | None
             None or model as-is
-
-        See Also
-        --------
-        MIN_INGESTION_KEYS
-            Required keys per IngestionModel class
         """
         try:
-            keys = self.MIN_INGESTION_KEYS[model.__class__]
+            min_keys = self.min_ingestion_keys[model.__class__]
+        except AttributeError:
+            # first time using min_ingestion_keys
+            self.min_ingestion_keys = {}
+            min_keys = None
         except KeyError:
-            keys = None
+            # first time checking model.__class__
+            min_keys = None
 
-        if not keys:
-            # no min keys defined
+        if min_keys is None:
+            min_keys = self.get_required_attrs(model)
+            # cache so we don't do expensive dynamic checking
+            # again for this IngestionModel
+            self.min_ingestion_keys[model.__class__] = min_keys
+
+        if not min_keys:
+            # no required keys for this model
+            # this probably never happens
             return model
 
-        for k in keys:
+        for key in min_keys:
             try:
-                if getattr(model, k):
-                    # some value for this key in this model
-                    return model
-            except AttributeError:
-                pass
+                val = getattr(model, key)
 
-        return None
+                # int of 0 is not "empty"
+                if not val and not isinstance(val, int):
+                    # empty value for this key in momdel
+                    return None
+            except AttributeError:
+                return None
+
+        # nonempty value for all required keys in model
+        return model
+
+    def get_required_attrs(self, model: IngestionModel) -> List[str]:
+        """
+        Return list of keys required in model as specified
+        in IngestionModel class definition
+
+        Parameters
+        ----------
+        model : IngestionModel
+            Person, MinutesItem, etc.
+
+        Returns
+        -------
+        List[str]
+            List of keys (attributes) in model without default value in class definition
+        """
+        try:
+            # create an empty one to have python tell us what keys are required
+            model.__class__()
+            # all attrs in model have default values
+            return []
+        except TypeError as e:
+            # e.g. __init__() missing 3 required positional arguments:
+            # 'session_datetime', 'video_uri', and 'session_index'
+            match = re.search(
+                r"missing (?P<num_keys>\d+) required.+argument(?:s)?\:\s*(?P<keys>.+)",
+                str(e),
+            )
+
+        if not match:
+            log.debug(f"not able to get required attributes for {model.__class__}")
+            return []
+
+        num_keys = int(match.group("num_keys"))
+
+        # 'session_datetime', 'video_uri', and 'session_index'
+        # -> ["session_datetime", "video_uri", "session_index"]
+
+        # SHOULD be able to do this more elegantly using re.split()
+        # but couldn't quite get the pattern right
+        keys = re.sub(
+            r"(\s*,\s*and\s*)|(\s*and\s*)|(\s*,\s*)",
+            ",",
+            match.group("keys").strip().replace("'", ""),
+        ).split(",")
+
+        if num_keys != len(keys):
+            log.debug(f"{model.__class__} has {num_keys} required keys but got {keys}")
+
+        return keys
 
     @staticmethod
     def date_time_to_datetime(ev_date: str, ev_time: str) -> datetime:
