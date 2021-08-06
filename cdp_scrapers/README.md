@@ -1,4 +1,4 @@
-# Notes on writing LegistarScrapers
+# Notes on `LegistarScraper`s
 
 ## Filtering
 
@@ -34,24 +34,13 @@ Consider another example such as
 
 `EventMinutesItem(decision=None, matter=None, minutes_item=None, supporting_files=[], ...)`
 
-which means nothing. `MIN_INGESTION_KEYS` is the LegistarScraper attribute used 
-to return `None` for such "empty" models. Like `IGNORED_MINUTE_ITEMS` it defines a `List[str]`, 
-per `IngestionModel` class. Here, each string in the `List[str]` is a key in the 
-corresponding model. For example, the base `LegistarScraper` class defines
+which means nothing. `get_required_attrs()` returns attributes in a given 
+`IngestionModel` without default values as defined in the respective `class` 
+definitions. As this is "expensive" dynamic checking, the string lists are cached 
+in `min_ingestion_keys`. i.e. `get_required_attrs()` is called just once per 
+`IngestionModel` type.
 
-```
-self.MIN_INGESTION_KEYS = {
-    ...
-    EventMinutesItem: ["matter", "minutes_item"],
-    ...
-}
-```
-
-`get_none_if_empty(self, model)` will test if any key in 
-`self.MIN_INGESTION_KEYS[model.__class__]` in `model` has a nonempty value; 
-`if model.__dict__[key]: ...`.
-
-For example, because `matter` and `minutes_item` are both `None` in the above 
+For example, because `minutes_item` is `None` in the above 
 `EventMinutesItem`, `get_none_if_empty()` will return `None`, instead of the 
 given `EventMinutesItem` instance as-is.
 
@@ -61,7 +50,7 @@ This filtering is applied bottom-up. e.g.
 # but a representation of the call path
 
 # reduced_list() simply removes None from the list
-votes = reducsed_list(
+votes = reduced_list(
     [
         # return None if this Vote is empty
         get_none_if_empty(
@@ -81,9 +70,6 @@ votes = reducsed_list(
     ]
 )
 ```
-
-Modify `MIN_INGESTION_KEYS` in your `__init()__` like `IGNORED_MINUTE_ITEMS` to 
-adjust to how your municipality provides information through Legistar.
 
 ## Legistar -> CDP Ingestion
 
@@ -117,9 +103,10 @@ it is likely that information is not filled. In these situations Legistar might
 point to some external resource, such as a web page hosted somewhere else, that 
 does have video URI for the given event. See `SeattleScraper.get_video_uris()`
 
-TODO: upload notebook to demonstrate how we arrived at `SeattleScraper.
-get_video_uris()` from Legistar EventItem.
+TODO: upload notebook to demonstrate how we arrived at `SeattleScraper.get_video_uris()` 
+from Legistar EventItem.
 
 ## Minor notes
 
-- `strip()` string fields
+- `strip()` string fields to prevent passing values with garbage 
+leading/trailing whitespace characters.
