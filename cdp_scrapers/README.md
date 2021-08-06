@@ -103,8 +103,9 @@ it is likely that information is not filled. In these situations Legistar might
 point to some external resource, such as a web page hosted somewhere else, that 
 does have video URI for the given event. See `SeattleScraper.get_video_uris()`
 
-TODO: upload notebook to demonstrate how we arrived at `SeattleScraper.get_video_uris()` 
-from Legistar EventItem.
+See SeattleScraperGetVideoUris.ipynb for a walkthrough of how the method was 
+implemented for Seattle. Keep in mind your implementation will most likely vary 
+from this example.
 
 ## Minor notes
 

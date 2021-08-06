@@ -948,7 +948,7 @@ class LegistarScraper:
 
                 # int of 0 is not "empty"
                 if not val and not isinstance(val, int):
-                    # empty value for this key in momdel
+                    # empty value for this key in model
                     return None
             except AttributeError:
                 return None
