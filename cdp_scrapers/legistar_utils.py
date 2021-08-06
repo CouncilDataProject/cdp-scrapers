@@ -225,33 +225,6 @@ class LegistarScraper:
     client: str
         Legistar client name, e.g. "seattle" for Seattle
 
-    Attributes
-    ----------
-    client_name: str
-        Legistar client name
-    MIN_INGESTION_KEYS: Dict[type, List[str]]
-        Keys per IngestionModel used to decide if the given model is empty
-    IGNORED_MINUTE_ITEMS: List[str]
-        Treat EventMinutesItem as None if minutes_item.name
-        containts one of these strings
-    *_pattern: Pattern
-        regex patterns to decide CDP constant from Legistar information
-
-    Methods
-    -------
-    is_legistar_compatible()
-        Check that Legistar API recognizes client name
-    check_for_cdp_min_ingestion(check_days=7)
-        Test if can obtain at least one minimally defined EventIngestionModel
-    get_events(
-        begin=datetime.utcnow() - timedelta(days=2),
-        end=datetime.utcnow()
-    )
-        Main get method that returns Legistar API data as List[EventIngestionModel]
-    get_video_uris(legistar_ev)
-        Must implement in class derived from LegistarScraper
-        if EventVideoPath in Legistar data set is empty
-
     See Also
     --------
     instances.SeattleScraper
@@ -260,6 +233,7 @@ class LegistarScraper:
     def __init__(self, client: str):
         self.client_name = client
 
+        # EventMinutesItem is ignored from ingestion if minutes_item contains this
         self.IGNORED_MINUTE_ITEMS = [
             "This meeting also constitutes a meeting of the City Council",
             "In-person attendance is currently prohibited",
@@ -281,7 +255,8 @@ class LegistarScraper:
             # "ADOPTION OF OTHER RESOLUTIONS",
         ]
 
-        # e.g. for VoteDecision.APPROVE
+        # regex patterns used to infer cdp_backend.database.constants
+        # from Legistar string fields
         self.vote_approve_pattern = "approve|favor"
         self.vote_abstain_pattern = "abstain|refuse|refrain"
         self.vote_reject_pattern = "reject|oppose"
