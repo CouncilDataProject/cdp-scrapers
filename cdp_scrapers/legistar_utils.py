@@ -182,22 +182,22 @@ def get_legistar_events_for_timespan(
     return response
 
 
-def stripped(in_str: str) -> str:
+def stripped(input_str: str) -> str:
     """
     Return leading and trailing whitespace removed if it is a string
 
     Parameters
     ----------
-    in_str : str
+    input_str : str
 
     Returns
     -------
-    str or Any
-        in_str stripped if it is a string
+    str
+        input_str stripped if it is a string
     """
-    if isinstance(in_str, str):
-        return in_str.strip()
-    return in_str
+    if isinstance(input_str, str):
+        return input_str.strip()
+    return input_str
 
 
 def reduced_list(input_list: List[Any], collapse: bool = True) -> List:
@@ -238,10 +238,10 @@ class LegistarScraper:
     """
 
     def __init__(self, client: str):
-        self.client_name = client
+        self.client_name: str = client
 
         # EventMinutesItem is ignored from ingestion if minutes_item contains this
-        self.IGNORED_MINUTE_ITEMS = [
+        self.IGNORED_MINUTE_ITEMS: List[str] = [
             "This meeting also constitutes a meeting of the City Council",
             "In-person attendance is currently prohibited",
             "Times listed are estimated",
@@ -264,19 +264,21 @@ class LegistarScraper:
 
         # regex patterns used to infer cdp_backend.database.constants
         # from Legistar string fields
-        self.vote_approve_pattern = "approve|favor"
-        self.vote_abstain_pattern = "abstain|refuse|refrain"
-        self.vote_reject_pattern = "reject|oppose"
+        self.vote_approve_pattern: str = "approve|favor"
+        self.vote_abstain_pattern: str = "abstain|refuse|refrain"
+        self.vote_reject_pattern: str = "reject|oppose"
         # TODO: need to debug these using real examples
-        self.vote_absent_pattern = "absent"
-        self.vote_nonvoting_pattern = "nv|(?:non.*voting)"
+        self.vote_absent_pattern: str = "absent"
+        self.vote_nonvoting_pattern: str = "nv|(?:non.*voting)"
 
-        self.matter_adopted_pattern = "approved|confirmed|passed|adopted"
-        self.matter_in_progress_pattern = r"heard|ready|filed|held|(?:in\s*committee)"
-        self.matter_rejected_patten = "rejected|dropped"
+        self.matter_adopted_pattern: str = "approved|confirmed|passed|adopted"
+        self.matter_in_progress_pattern: str = (
+            r"heard|ready|filed|held|(?:in\s*committee)"
+        )
+        self.matter_rejected_patten: str = "rejected|dropped"
 
-        self.decision_passed_pattern = "pass"
-        self.decision_failed_pattern = "not|fail"
+        self.decision_passed_pattern: str = "pass"
+        self.decision_failed_pattern: str = "not|fail"
 
     @property
     def is_legistar_compatible(self) -> bool:
@@ -373,7 +375,7 @@ class LegistarScraper:
         Returns
         -------
         List[EventIngestionModel]
-            One instance of EventIngestionModel per Legistar API Event
+            One instance of EventIngestionModel per Legistar Event
 
         See Also
         --------
@@ -396,7 +398,7 @@ class LegistarScraper:
             )
 
             # prefer video file path in legistar Event.EventVideoPath
-            if legistar_ev[LEGISTAR_SESSION_VIDEO_URI] is not None:
+            if legistar_ev[LEGISTAR_SESSION_VIDEO_URI]:
                 list_uri = [
                     {
                         CDP_VIDEO_URI: stripped(
@@ -487,7 +489,7 @@ class LegistarScraper:
 
         See Also
         --------
-        matter_<adopted|rejected|in_progress>_pattern
+        matter_*_pattern
         """
         if not legistar_matter_status:
             return None
@@ -545,7 +547,7 @@ class LegistarScraper:
 
         See Also
         --------
-        decision_<passed|failed>_pattern
+        decision_*_pattern
         """
         if not legistar_item_passed_name:
             return None
@@ -583,7 +585,7 @@ class LegistarScraper:
 
         See Also
         --------
-        vote_<approve|abstain|reject>_pattern
+        vote_*_pattern
         """
         if (
             not legistar_vote[LEGISTAR_VOTE_VAL_NAME]
@@ -876,9 +878,11 @@ class LegistarScraper:
             ev_minutes_item.minutes_item.name = ev_minutes_item.matter.name
             ev_minutes_item.matter.title = ev_minutes_item.minutes_item.description
 
+        # matter.result_status is allowed to be null
+        # only when no votes or Legistar EventItemMatterStatus is null
         if ev_minutes_item.matter and not ev_minutes_item.matter.result_status:
             if ev_minutes_item.votes and legistar_ev_item[LEGISTAR_MATTER_STATUS]:
-                # means did not find matter_*_pattern in Legistar EventItemMatterStatus
+                # means did not find matter_*_pattern in Legistar EventItemMatterStatus.
                 # default to in progress (as opposed to adopted or rejected)
                 # NOTE: if our matter_*_patterns ARE "complete",
                 #       this clause would hit only because the info from Legistar
@@ -955,7 +959,9 @@ class LegistarScraper:
             try:
                 val = getattr(model, key)
 
-                # int of 0 is not "empty"
+                # "if not" test to catch all None and None-like values
+                # e.g. empty string, empty list, ...
+                # but int(0) is not "empty"
                 if not val and not isinstance(val, int):
                     # empty value for this key in model
                     return None
@@ -1005,6 +1011,11 @@ class LegistarScraper:
         # SHOULD be able to do this more elegantly using re.split()
         # but couldn't quite get the pattern right
         keys = re.sub(
+            # TypeError uses
+            # , and
+            # and
+            # ,
+            # as delimiters for attribute names
             r"(\s*,\s*and\s*)|(\s*and\s*)|(\s*,\s*)",
             ",",
             match.group("keys").strip().replace("'", ""),
