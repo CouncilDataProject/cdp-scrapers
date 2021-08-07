@@ -4,7 +4,7 @@
 import logging
 import re
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 from urllib.request import urlopen
 from urllib.error import URLError, HTTPError
 
@@ -200,19 +200,26 @@ def stripped(in_str: str) -> str:
     return in_str
 
 
-def reduced_list(in_list: List) -> List:
+def reduced_list(input_list: List[Any], collapse: bool = True) -> List:
     """
-    Remove all None items from in_list
+    Remove all None items from input_list.
 
     Parameters
     ----------
-    in_list : List
+    input_list : List[Any]
+        Input list from which to filter out items that are None
+    collapse : bool, default = True
+        If True, return None in place of an empty list
 
     Returns
     -------
-    List
+    List | None
     """
-    return [item for item in in_list if item is not None]
+    filtered = [item for item in input_list if item is not None]
+    if collapse and len(filtered) == 0:
+        filtered = None
+
+    return filtered
 
 
 class LegistarScraper:
@@ -433,7 +440,9 @@ class LegistarScraper:
                 )
             )
 
-        return reduced_list(ingestion_models)
+        # easier for calling pipeline to handle an empty list rather than None
+        # so request reduced_list() to give me [], not None
+        return reduced_list(ingestion_models, collapse=True)
 
     def get_video_uris(self, legistar_ev: Dict) -> List[Dict]:
         """
