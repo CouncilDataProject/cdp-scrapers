@@ -12,6 +12,14 @@ cdp\_scrapers.instances.empty module
    :undoc-members:
    :show-inheritance:
 
+cdp\_scrapers.instances.seattle module
+--------------------------------------
+
+.. automodule:: cdp_scrapers.instances.seattle
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 
