@@ -7,14 +7,14 @@ Scratchpad for scraper development and general utilities.
 
 ---
 
-## CouncilDataProject
+## Council Data Project
 
 Council Data Project is an open-source project dedicated to providing journalists,
 activists, researchers, and all members of each community we serve with the tools they
 need to stay informed and hold their Council Members accountable.
 
-For more information about CouncilDataProject, please visit
-[our website](https://councildataproject.github.io/).
+For more information about Council Data Project, please visit
+[our website](https://councildataproject.org/).
 
 ## About
 
@@ -65,12 +65,10 @@ events = get_events()
 
 ## Documentation
 
-For full package documentation please visit [CouncilDataProject.github.io/cdp-scrapers](https://CouncilDataProject.github.io/cdp-scrapers).
+For full package documentation please visit [councildataproject.org/cdp-scrapers](https://councildataproject.org/cdp-scrapers).
 
 ## Development
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for information related to developing the code.
 
-
 **MIT license**
-
