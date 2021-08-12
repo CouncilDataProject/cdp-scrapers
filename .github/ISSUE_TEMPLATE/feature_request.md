@@ -1,6 +1,6 @@
 ---
 name: Feature Request
-about: Suggest a feature for cdp-backend
+about: Suggest a feature for cdp-scrapers
 labels: enhancement
 ---
 
