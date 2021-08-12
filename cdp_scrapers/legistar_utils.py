@@ -72,7 +72,7 @@ LEGISTAR_MATTER_STATUS = "EventItemMatterStatus"
 LEGISTAR_MATTER_SPONSOR = "EventItemMatterRequester"
 # Session.session_datetime is a combo of EventDate and EventTime
 # TODO: this means same time for all Sessions in a EventIngestionModel.
-#       some other legistar api data that can be used instead?
+#       some other legistar api data that can be used instead
 LEGISTAR_SESSION_DATE = "EventDate"
 LEGISTAR_SESSION_TIME = "EventTime"
 LEGISTAR_AGENDA_URI = "EventAgendaFile"
@@ -126,11 +126,10 @@ def get_legistar_events_for_timespan(
         begin = datetime.utcnow() - timedelta(days=1)
     if end is None:
         end = datetime.utcnow()
-
     # The unformatted request parts
     filter_datetime_format = "EventDate+{op}+datetime%27{dt}%27"
     request_format = LEGISTAR_EVENT_BASE + "?$filter={begin}+and+{end}"
-
+   
     # Get response from formatted request
     log.debug(f"Querying Legistar for events between: {begin} - {end}")
     response = requests.get(
@@ -146,7 +145,7 @@ def get_legistar_events_for_timespan(
             ),
         )
     ).json()
-
+   
     # Get all event items for each event
     item_request_format = (
         LEGISTAR_EVENT_BASE
@@ -382,17 +381,18 @@ class LegistarScraper:
         get_legistar_events_for_timespan
         """
         if begin is None:
-            begin = datetime.utcnow() - timedelta(days=2)
+            begin = datetime.utcnow() - timedelta(days=18)
         if end is None:
             end = datetime.utcnow()
 
         ingestion_models = []
-
+       
         for legistar_ev in get_legistar_events_for_timespan(
             self.client_name,
             begin=begin,
             end=end,
         ):
+            
             session_time = self.date_time_to_datetime(
                 legistar_ev[LEGISTAR_SESSION_DATE], legistar_ev[LEGISTAR_SESSION_TIME]
             )
@@ -1046,12 +1046,20 @@ class LegistarScraper:
         # 2021-07-09T00:00:00
         d = datetime.strptime(ev_date, "%Y-%m-%dT%H:%M:%S")
         # 9:30 AM
-        t = datetime.strptime(ev_time, "%I:%M %p")
-        return datetime(
-            year=d.year,
-            month=d.month,
-            day=d.day,
-            hour=t.hour,
-            minute=t.minute,
-            second=t.second,
-        )
+        # for kingCounty, some events have ev_time =None
+        if ev_time is not None :
+            t = datetime.strptime(ev_time, "%I:%M %p")
+            return datetime(
+                year=d.year,
+                month=d.month,
+                day=d.day,
+                hour=t.hour,
+                minute=t.minute,
+                second=t.second,
+            )
+        else :
+                return datetime(
+                year=d.year,
+                month=d.month,
+                day=d.day
+            )
