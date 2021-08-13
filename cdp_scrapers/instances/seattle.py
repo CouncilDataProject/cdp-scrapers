@@ -166,3 +166,7 @@ class SeattleScraper(LegistarScraper):
         if len(list_uri) == 0:
             log.debug(f"No video URI found on {video_page_url}")
         return list_uri
+
+    def get_time_zone(self) -> str:
+        # return "America/Los_Angeles"
+        return self.find_time_zone()

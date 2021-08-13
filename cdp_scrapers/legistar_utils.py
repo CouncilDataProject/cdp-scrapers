@@ -29,6 +29,12 @@ from cdp_backend.database.constants import (
     VoteDecision,
 )
 
+from pytz import (
+    utc,
+    timezone,
+    country_timezones,
+)
+
 ###############################################################################
 
 log = logging.getLogger(__name__)
@@ -280,6 +286,8 @@ class LegistarScraper:
         self.decision_passed_pattern: str = "pass"
         self.decision_failed_pattern: str = "not|fail"
 
+        self.time_zone: timezone = timezone(self.get_time_zone())
+
     @property
     def is_legistar_compatible(self) -> bool:
         """
@@ -393,8 +401,11 @@ class LegistarScraper:
             begin=begin,
             end=end,
         ):
-            session_time = self.date_time_to_datetime(
-                legistar_ev[LEGISTAR_SESSION_DATE], legistar_ev[LEGISTAR_SESSION_TIME]
+            session_time = self.as_local_time(
+                self.date_time_to_datetime(
+                    legistar_ev[LEGISTAR_SESSION_DATE],
+                    legistar_ev[LEGISTAR_SESSION_TIME],
+                )
             )
 
             # prefer video file path in legistar Event.EventVideoPath
@@ -470,6 +481,13 @@ class LegistarScraper:
         log.critical(
             "get_video_uris() is required because "
             f"Legistar Event.EventVideoPath is not used by {self.client_name}"
+        )
+        raise NotImplementedError
+
+    def get_time_zone(self) -> str:
+        log.error(
+            "time zone name e.g. America/New_York "
+            "required for proper event timestamping"
         )
         raise NotImplementedError
 
@@ -1025,6 +1043,33 @@ class LegistarScraper:
             log.debug(f"{model.__class__} has {num_keys} required keys but got {keys}")
 
         return keys
+
+    def find_time_zone(self) -> str:
+        utc_now = utc.localize(datetime.utcnow())
+        local_now = datetime.now()
+
+        for zone_name in country_timezones("us"):
+            zone = timezone(zone_name)
+            # if this is my time zone
+            # utc_now as local time should be VERY close to local_now
+            if (
+                abs(
+                    (
+                        utc_now.astimezone(zone) - zone.localize(local_now)
+                    ).total_seconds()
+                )
+                < 5
+            ):
+                return zone_name
+
+        return None
+
+    def as_local_time(self, local_time: datetime) -> datetime:
+        try:
+            return self.time_zone.localize(local_time)
+        except AttributeError:
+            # time_zone or local_time is None
+            return local_time
 
     @staticmethod
     def date_time_to_datetime(ev_date: str, ev_time: str) -> datetime:
