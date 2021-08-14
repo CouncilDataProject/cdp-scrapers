@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from datetime import datetime
 from typing import Dict, List
 from bs4 import BeautifulSoup
 import re
@@ -16,6 +17,8 @@ from ..legistar_utils import (
     CDP_VIDEO_URI,
     CDP_CAPTION_URI,
 )
+
+from cdp_backend.pipeline.ingestion_models import EventIngestionModel
 
 ###############################################################################
 
@@ -166,3 +169,9 @@ class SeattleScraper(LegistarScraper):
         if len(list_uri) == 0:
             log.debug(f"No video URI found on {video_page_url}")
         return list_uri
+
+def get_seattle_events(from_dt: datetime, to_dt: datetime) -> List[EventIngestionModel]:
+    """
+    Implimentation of seattle scrapper to provide to a cookiecutter or for testing.
+    """
+    return SeattleScraper().get_events(begin=from_dt, end=to_dt)
