@@ -12,6 +12,7 @@ from cdp_backend.pipeline.ingestion_models import EventIngestionModel
 def get_events(
     from_dt: datetime,
     to_dt: datetime,
+    **kwargs,
 ) -> List[EventIngestionModel]:
     """
     Get all events for the provided timespan.
@@ -22,7 +23,7 @@ def get_events(
         Datetime to start event gather from.
     to_dt: datetime
         Datetime to end event gather at.
-    
+
     Returns
     -------
     events: List[EventIngestionModel]

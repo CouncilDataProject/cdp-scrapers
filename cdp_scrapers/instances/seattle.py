@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-from typing import Dict, List
+from typing import Any, Dict, List
 from bs4 import BeautifulSoup
 import re
 import logging
@@ -170,7 +170,12 @@ class SeattleScraper(LegistarScraper):
             log.debug(f"No video URI found on {video_page_url}")
         return list_uri
 
-def get_seattle_events(from_dt: datetime, to_dt: datetime) -> List[EventIngestionModel]:
+
+def get_seattle_events(
+    from_dt: datetime,
+    to_dt: datetime,
+    **kwargs: Any,
+) -> List[EventIngestionModel]:
     """
     Implimentation of seattle scrapper to provide to a cookiecutter or for testing.
     """
