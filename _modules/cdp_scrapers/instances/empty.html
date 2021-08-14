@@ -186,6 +186,7 @@
 <span></span><span class="ch">#!/usr/bin/env python</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
 
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
 
 <span class="kn">from</span> <span class="nn">cdp_backend.pipeline.ingestion_models</span> <span class="kn">import</span> <span class="n">EventIngestionModel</span>
@@ -193,12 +194,34 @@
 <span class="c1">###############################################################################</span>
 
 
-<div class="viewcode-block" id="get_events"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.empty.get_events">[docs]</a><span class="k">def</span> <span class="nf">get_events</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
+<div class="viewcode-block" id="get_events"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.empty.get_events">[docs]</a><span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span>
+    <span class="n">from_dt</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span>
+    <span class="n">to_dt</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    An empty get_events function to be used as a template for new development.</span>
+<span class="sd">    Get all events for the provided timespan.</span>
 
-<span class="sd">    Feel free to copy-paste this file.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    from_dt: datetime</span>
+<span class="sd">        Datetime to start event gather from.</span>
+<span class="sd">    to_dt: datetime</span>
+<span class="sd">        Datetime to end event gather at.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    events: List[EventIngestionModel]</span>
+<span class="sd">        All events gathered that occured in the provided time range.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    As the implimenter of the get_events function, you can choose to ignore the from_dt</span>
+<span class="sd">    and to_dt parameters. However, they are useful for manually kicking off pipelines</span>
+<span class="sd">    from GitHub Actions UI.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Your implementation here</span>
     <span class="k">return</span> <span class="p">[]</span></div>
 </pre></div>
 
