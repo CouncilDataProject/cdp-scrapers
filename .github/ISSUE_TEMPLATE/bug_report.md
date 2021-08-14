@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Create a report to help us improve cdp-backend
+about: Create a report to help us improve cdp-scrapers
 labels: bug
 ---
 
