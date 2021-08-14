@@ -168,5 +168,14 @@ class SeattleScraper(LegistarScraper):
         return list_uri
 
     def get_time_zone(self) -> str:
-        # return "America/Los_Angeles"
-        return self.find_time_zone()
+        """
+        Return US Pacific time zone name.
+        Can call find_time_zone() to find dynamically.
+
+        Returns
+        -------
+        time zone name : str
+            "US/Pacific"
+        """
+        return "US/Pacific"
+        # return self.find_time_zone()

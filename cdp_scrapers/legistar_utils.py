@@ -286,6 +286,7 @@ class LegistarScraper:
         self.decision_passed_pattern: str = "pass"
         self.decision_failed_pattern: str = "not|fail"
 
+        # e.g. pytz.timezone("US/Pacific")
         self.time_zone: timezone = timezone(self.get_time_zone())
 
     @property
@@ -401,6 +402,9 @@ class LegistarScraper:
             begin=begin,
             end=end,
         ):
+            # better to return time as local time with time zone info,
+            # rather than as utc time.
+            # this way the calling pipeline can find out what is the local zone.
             session_time = self.as_local_time(
                 self.date_time_to_datetime(
                     legistar_ev[LEGISTAR_SESSION_DATE],
@@ -485,8 +489,23 @@ class LegistarScraper:
         raise NotImplementedError
 
     def get_time_zone(self) -> str:
+        """
+        Return time zone name for CDP instance.
+        To use dynamically determined time zone,
+        use find_time_zone().
+
+        Returns
+        -------
+        time zone name : str
+            i.e. "US/Pacific" | "America/Los_Angeles" | ...
+
+        See Also
+        --------
+        SeattleScraper.get_time_zone()
+
+        """
         log.error(
-            "time zone name e.g. America/New_York "
+            "time zone name e.g. US/Pacific "
             "required for proper event timestamping"
         )
         raise NotImplementedError
@@ -1045,6 +1064,13 @@ class LegistarScraper:
         return keys
 
     def find_time_zone(self) -> str:
+        """
+        Return name for a US time zone matching UTC offset calculated from OS clock
+
+        Returns
+        -------
+        time zone name : str
+        """
         utc_now = utc.localize(datetime.utcnow())
         local_now = datetime.now()
 
@@ -1065,10 +1091,25 @@ class LegistarScraper:
         return None
 
     def as_local_time(self, local_time: datetime) -> datetime:
+        """
+        Return input datetime with time zone information.
+        This allows for nonambiguous conversions to other zones including UTC.
+
+        Parameters
+        ----------
+        local_time : datetime
+
+        Returns
+        -------
+        local_time : datetime
+            The date and time attributes (year, month, day, hour, ...) remain unchanged.
+            tzinfo is now provided.
+        """
         try:
             return self.time_zone.localize(local_time)
-        except AttributeError:
-            # time_zone or local_time is None
+        except (AttributeError, ValueError):
+            # AttributeError: time_zone or local_time is None
+            # ValueError: local_time is not navie (has time zone info)
             return local_time
 
     @staticmethod
