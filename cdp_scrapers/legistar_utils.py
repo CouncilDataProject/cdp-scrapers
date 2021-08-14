@@ -505,8 +505,7 @@ class LegistarScraper:
 
         """
         log.error(
-            "time zone name e.g. US/Pacific "
-            "required for proper event timestamping"
+            "time zone name e.g. US/Pacific " "required for proper event timestamping"
         )
         raise NotImplementedError
 
