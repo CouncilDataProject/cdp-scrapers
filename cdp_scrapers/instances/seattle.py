@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from typing import Dict, List
+from datetime import datetime
+from typing import Any, Dict, List
 from bs4 import BeautifulSoup
 import re
 import logging
@@ -16,6 +17,8 @@ from ..legistar_utils import (
     CDP_VIDEO_URI,
     CDP_CAPTION_URI,
 )
+
+from cdp_backend.pipeline.ingestion_models import EventIngestionModel
 
 ###############################################################################
 
@@ -179,3 +182,14 @@ class SeattleScraper(LegistarScraper):
         """
         return "US/Pacific"
         # return self.find_time_zone()
+
+
+def get_events(
+    from_dt: datetime,
+    to_dt: datetime,
+    **kwargs: Any,
+) -> List[EventIngestionModel]:
+    """
+    Implimentation of the Seattle Scrapper to provide to a cookiecutter or for testing.
+    """
+    return SeattleScraper().get_events(begin=from_dt, end=to_dt)
