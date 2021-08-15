@@ -170,6 +170,18 @@ class SeattleScraper(LegistarScraper):
             log.debug(f"No video URI found on {video_page_url}")
         return list_uri
 
+    def get_time_zone(self) -> str:
+        """
+        Return US Pacific time zone name.
+        Can call find_time_zone() to find dynamically.
+
+        Returns
+        -------
+        time zone name : str
+            "US/Pacific"
+        """
+        return "US/Pacific"
+
 
 def get_events(
     from_dt: datetime,
