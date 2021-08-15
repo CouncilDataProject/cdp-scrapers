@@ -86,7 +86,7 @@ LEGISTAR_EV_ITEMS = "EventItems"
 LEGISTAR_EV_ATTACHMENTS = "EventItemMatterAttachments"
 LEGISTAR_EV_VOTES = "EventItemVoteInfo"
 LEGISTAR_VOTE_PERSONS = "PersonInfo"
-
+LEGISTAR_EV_SITE_URL = "EventInSiteURL"
 CDP_VIDEO_URI = "video_uri"
 CDP_CAPTION_URI = "caption_uri"
 
@@ -129,7 +129,7 @@ def get_legistar_events_for_timespan(
     # The unformatted request parts
     filter_datetime_format = "EventDate+{op}+datetime%27{dt}%27"
     request_format = LEGISTAR_EVENT_BASE + "?$filter={begin}+and+{end}"
-   
+
     # Get response from formatted request
     log.debug(f"Querying Legistar for events between: {begin} - {end}")
     response = requests.get(
@@ -145,7 +145,6 @@ def get_legistar_events_for_timespan(
             ),
         )
     ).json()
-   
     # Get all event items for each event
     item_request_format = (
         LEGISTAR_EVENT_BASE
@@ -166,7 +165,6 @@ def get_legistar_events_for_timespan(
                     event_item_id=event_item["EventItemId"],
                 )
             ).json()
-
             # Get person information
             for vote_info in event_item["EventItemVoteInfo"]:
                 person_request_format = LEGISTAR_PERSON_BASE + "/{person_id}"
@@ -381,22 +379,21 @@ class LegistarScraper:
         get_legistar_events_for_timespan
         """
         if begin is None:
-            begin = datetime.utcnow() - timedelta(days=18)
+            begin = datetime.utcnow() - timedelta(days=2)
         if end is None:
             end = datetime.utcnow()
 
         ingestion_models = []
-       
+
         for legistar_ev in get_legistar_events_for_timespan(
             self.client_name,
             begin=begin,
             end=end,
         ):
-            
+
             session_time = self.date_time_to_datetime(
                 legistar_ev[LEGISTAR_SESSION_DATE], legistar_ev[LEGISTAR_SESSION_TIME]
             )
-
             # prefer video file path in legistar Event.EventVideoPath
             if legistar_ev[LEGISTAR_SESSION_VIDEO_URI]:
                 list_uri = [
@@ -427,7 +424,6 @@ class LegistarScraper:
                     for uri in list_uri
                 ]
             )
-
             ingestion_models.append(
                 self.get_none_if_empty(
                     EventIngestionModel(
@@ -1046,8 +1042,8 @@ class LegistarScraper:
         # 2021-07-09T00:00:00
         d = datetime.strptime(ev_date, "%Y-%m-%dT%H:%M:%S")
         # 9:30 AM
-        # for kingCounty, some events have ev_time =None
-        if ev_time is not None :
+        # some events may have ev_time =None
+        if ev_time is not None:
             t = datetime.strptime(ev_time, "%I:%M %p")
             return datetime(
                 year=d.year,
@@ -1057,9 +1053,12 @@ class LegistarScraper:
                 minute=t.minute,
                 second=t.second,
             )
-        else :
-                return datetime(
+        else:
+            return datetime(
                 year=d.year,
                 month=d.month,
-                day=d.day
+                day=d.day,
+                hour=0,
+                minute=0,
+                second=0,
             )

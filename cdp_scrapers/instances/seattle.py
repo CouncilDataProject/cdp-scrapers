@@ -15,15 +15,12 @@ from ..legistar_utils import (
     LegistarScraper,
     CDP_VIDEO_URI,
     CDP_CAPTION_URI,
+    LEGISTAR_EV_SITE_URL,
 )
 
 ###############################################################################
 
 log = logging.getLogger(__name__)
-
-###############################################################################
-
-LEGISTAR_EV_SITE_URL = "EventInSiteURL"
 
 ###############################################################################
 
