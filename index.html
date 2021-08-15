@@ -117,6 +117,11 @@
 </ul>
 </li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Core Components:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cdp_scrapers.instances.empty.get_events.html">cdp_scrapers.instances.empty.get_events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cdp_scrapers.legistar_utils.LegistarScraper.html">cdp_scrapers.legistar_utils.LegistarScraper</a></li>
+</ul>
 
             
           
@@ -221,32 +226,44 @@ event scraper functions.</p>
 <div class="section" id="legistar">
 <h3>Legistar<a class="headerlink" href="#legistar" title="Permalink to this headline">¶</a></h3>
 <p>General Legistar utility functions.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cdp_scrapers.legistar_utils</span> <span class="kn">import</span> <span class="n">get_legistar_events_for_timespan</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cdp_scrapers.legistar_utils</span> <span class="kn">import</span> <span class="n">get_legistar_events_for_timespan</span><span class="p">,</span> <span class="n">LegistarScraper</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
 
 <span class="c1"># Get all events (and minutes item and voting details)</span>
 <span class="c1"># for a provided timespan for a legistar client</span>
 <span class="c1"># Returns List[Dict]</span>
-<span class="n">events</span> <span class="o">=</span> <span class="n">get_legistar_events_for_timespan</span><span class="p">(</span>
+<span class="n">seattle_legistar_events</span> <span class="o">=</span> <span class="n">get_legistar_events_for_timespan</span><span class="p">(</span>
     <span class="n">client</span><span class="o">=</span><span class="s2">&quot;seattle&quot;</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2021</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span>
     <span class="n">end</span><span class="o">=</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2021</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">14</span><span class="p">),</span>
 <span class="p">)</span>
 
-<span class="c1"># Futher processing</span>
-<span class="c1"># ...</span>
+<span class="c1"># Or parse and convert to CDP EventIngestionModel</span>
+<span class="n">seattle_scraper</span> <span class="o">=</span> <span class="n">LegistarScraper</span><span class="p">(</span><span class="s2">&quot;seattle&quot;</span><span class="p">)</span>
+<span class="n">seattle_cdp_parsed_events</span> <span class="o">=</span> <span class="n">seattle_scraper</span><span class="o">.</span><span class="n">get_events</span><span class="p">(</span>
+    <span class="n">begin</span><span class="o">=</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2021</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span>
+    <span class="n">end</span><span class="o">=</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2021</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">14</span><span class="p">),</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="scrapers">
 <h3>Scrapers<a class="headerlink" href="#scrapers" title="Permalink to this headline">¶</a></h3>
 <p>In-progress or completed scrapers.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cdp_scrapers.instances.seattle</span> <span class="kn">import</span> <span class="n">get_events</span>
-
-<span class="c1"># This is an in-progress or completed scraper</span>
-<span class="c1"># Returns List[cdp_backend.pipeline.ingestion_models.EventIngestionModel]</span>
-<span class="n">events</span> <span class="o">=</span> <span class="n">get_events</span><span class="p">()</span>
-</pre></div>
+<ul class="simple">
+<li><p><a class="reference external" href="https://councildataproject.org/cdp-scrapers/cdp_scrapers.instances.html#module-cdp_scrapers.instances.seattle">cdp_scrapers.instances.seattle.get_events</a></p></li>
+</ul>
+<p>If you would like to deploy a CDP instance or would like to use this library as
+a method for retrieving formatted legislative data, please feel free to contribute
+a new custom municipality scraper!</p>
+<div class="section" id="custom-scrapers">
+<h4>Custom Scrapers<a class="headerlink" href="#custom-scrapers" title="Permalink to this headline">¶</a></h4>
+<p>If it isn’t possible to use our generalized Legistar tooling to write your scraper,
+we welcome the addition of custom scrapers, however please see our documentation
+on the
+<a class="reference external" href="https://councildataproject.org/cdp-backend/ingestion_models.html">minimum data required for CDP event ingestion</a>.</p>
+<p>From there, begin with our
+<a class="reference external" href="https://councildataproject.org/cdp-scrapers/_modules/cdp_scrapers/instances/empty.html#get_events">empty custom scraper function template</a> and fill in your scraper.</p>
 </div>
 </div>
 </div>
@@ -261,9 +278,26 @@ event scraper functions.</p>
 </div>
 <div class="section" id="development">
 <h2>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h2>
-<p>See <a class="reference external" href="CONTRIBUTING.md">CONTRIBUTING.md</a> for information related to developing the code.</p>
+<p>Refer to <a class="reference external" href="CONTRIBUTING.md">CONTRIBUTING.md</a> for information related to developing the code.</p>
 <p><strong>MIT license</strong></p>
 </div>
+</div>
+<div class="section" id="specific-doc-pages">
+<h1>Specific Doc Pages<a class="headerlink" href="#specific-doc-pages" title="Permalink to this headline">¶</a></h1>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="cdp_scrapers.instances.empty.get_events.html#cdp_scrapers.instances.empty.get_events" title="cdp_scrapers.instances.empty.get_events"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdp_scrapers.instances.empty.get_events</span></code></a>(…)</p></td>
+<td><p>Get all events for the provided timespan.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="cdp_scrapers.legistar_utils.LegistarScraper.html#cdp_scrapers.legistar_utils.LegistarScraper" title="cdp_scrapers.legistar_utils.LegistarScraper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdp_scrapers.legistar_utils.LegistarScraper</span></code></a>(client)</p></td>
+<td><p>Base class for transforming Legistar API data to CDP IngestionModel.</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section" id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>

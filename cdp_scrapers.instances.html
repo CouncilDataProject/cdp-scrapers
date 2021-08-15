@@ -118,6 +118,11 @@
 </ul>
 </li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Core Components:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cdp_scrapers.instances.empty.get_events.html">cdp_scrapers.instances.empty.get_events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cdp_scrapers.legistar_utils.LegistarScraper.html">cdp_scrapers.legistar_utils.LegistarScraper</a></li>
+</ul>
 
             
           
@@ -234,7 +239,7 @@ from GitHub Actions UI.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="cdp_scrapers.instances.seattle.SeattleScraper">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">cdp_scrapers.instances.seattle.</span></span><span class="sig-name descname"><span class="pre">SeattleScraper</span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/seattle.html#SeattleScraper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.seattle.SeattleScraper" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper" title="cdp_scrapers.legistar_utils.LegistarScraper"><code class="xref py py-class docutils literal notranslate"><span class="pre">cdp_scrapers.legistar_utils.LegistarScraper</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="cdp_scrapers.legistar_utils.LegistarScraper.html#cdp_scrapers.legistar_utils.LegistarScraper" title="cdp_scrapers.legistar_utils.LegistarScraper"><code class="xref py py-class docutils literal notranslate"><span class="pre">cdp_scrapers.legistar_utils.LegistarScraper</span></code></a></p>
 <p>Seattle-specific implementation of LegistarScraper</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.instances.seattle.SeattleScraper.get_video_uris">
@@ -258,9 +263,9 @@ from GitHub Actions UI.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="cdp_scrapers.instances.seattle.get_seattle_events">
-<span class="sig-prename descclassname"><span class="pre">cdp_scrapers.instances.seattle.</span></span><span class="sig-name descname"><span class="pre">get_seattle_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">from_dt</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">datetime.datetime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_dt</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">datetime.datetime</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.EventIngestionModel</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/seattle.html#get_seattle_events"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.seattle.get_seattle_events" title="Permalink to this definition">¶</a></dt>
-<dd><p>Implimentation of seattle scrapper to provide to a cookiecutter or for testing.</p>
+<dt class="sig sig-object py" id="cdp_scrapers.instances.seattle.get_events">
+<span class="sig-prename descclassname"><span class="pre">cdp_scrapers.instances.seattle.</span></span><span class="sig-name descname"><span class="pre">get_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">from_dt</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">datetime.datetime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_dt</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">datetime.datetime</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.EventIngestionModel</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/seattle.html#get_events"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.seattle.get_events" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implimentation of the Seattle Scrapper to provide to a cookiecutter or for testing.</p>
 </dd></dl>
 
 </div>

@@ -1,0 +1,45 @@
+﻿cdp\_scrapers.legistar\_utils.LegistarScraper
+=============================================
+
+.. currentmodule:: cdp_scrapers.legistar_utils
+
+.. autoclass:: LegistarScraper
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~LegistarScraper.__init__
+      ~LegistarScraper.check_for_cdp_min_ingestion
+      ~LegistarScraper.date_time_to_datetime
+      ~LegistarScraper.filter_event_minutes
+      ~LegistarScraper.fix_event_minutes
+      ~LegistarScraper.get_event_minutes
+      ~LegistarScraper.get_event_support_files
+      ~LegistarScraper.get_events
+      ~LegistarScraper.get_matter
+      ~LegistarScraper.get_matter_status
+      ~LegistarScraper.get_minutes_item
+      ~LegistarScraper.get_minutes_item_decision
+      ~LegistarScraper.get_none_if_empty
+      ~LegistarScraper.get_person
+      ~LegistarScraper.get_required_attrs
+      ~LegistarScraper.get_video_uris
+      ~LegistarScraper.get_vote_decision
+      ~LegistarScraper.get_votes
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~LegistarScraper.is_legistar_compatible
+   
+   

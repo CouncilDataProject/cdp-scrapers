@@ -116,6 +116,11 @@
 </ul>
 </li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Core Components:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cdp_scrapers.instances.empty.get_events.html">cdp_scrapers.instances.empty.get_events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cdp_scrapers.legistar_utils.LegistarScraper.html">cdp_scrapers.legistar_utils.LegistarScraper</a></li>
+</ul>
 
             
           
@@ -356,13 +361,13 @@
         <span class="k">return</span> <span class="n">list_uri</span></div></div>
 
 
-<div class="viewcode-block" id="get_seattle_events"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.get_seattle_events">[docs]</a><span class="k">def</span> <span class="nf">get_seattle_events</span><span class="p">(</span>
+<div class="viewcode-block" id="get_events"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.get_events">[docs]</a><span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span>
     <span class="n">from_dt</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span>
     <span class="n">to_dt</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Implimentation of seattle scrapper to provide to a cookiecutter or for testing.</span>
+<span class="sd">    Implimentation of the Seattle Scrapper to provide to a cookiecutter or for testing.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">SeattleScraper</span><span class="p">()</span><span class="o">.</span><span class="n">get_events</span><span class="p">(</span><span class="n">begin</span><span class="o">=</span><span class="n">from_dt</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">to_dt</span><span class="p">)</span></div>
 </pre></div>

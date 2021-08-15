@@ -116,6 +116,11 @@
 </ul>
 </li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Core Components:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cdp_scrapers.instances.empty.get_events.html">cdp_scrapers.instances.empty.get_events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cdp_scrapers.legistar_utils.LegistarScraper.html">cdp_scrapers.legistar_utils.LegistarScraper</a></li>
+</ul>
 
             
           
@@ -407,10 +412,11 @@
     <span class="k">return</span> <span class="n">filtered</span></div>
 
 
-<div class="viewcode-block" id="LegistarScraper"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper">[docs]</a><span class="k">class</span> <span class="nc">LegistarScraper</span><span class="p">:</span>
+<div class="viewcode-block" id="LegistarScraper"><a class="viewcode-back" href="../../cdp_scrapers.legistar_utils.LegistarScraper.html#cdp_scrapers.legistar_utils.LegistarScraper">[docs]</a><span class="k">class</span> <span class="nc">LegistarScraper</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Base class for transforming Legistar API data to CDP IngestionModel</span>
-<span class="sd">    A given installation must define a derived class and implement get_video_uris()</span>
+<span class="sd">    Base class for transforming Legistar API data to CDP IngestionModel.</span>
+
+<span class="sd">    A given installation must define a derived class and implement get_video_uris().</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -419,10 +425,10 @@
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
-<span class="sd">    instances.SeattleScraper</span>
+<span class="sd">    cdp_scrapers.instances.seattle.SeattleScraper</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<div class="viewcode-block" id="LegistarScraper.__init__"><a class="viewcode-back" href="../../cdp_scrapers.legistar_utils.LegistarScraper.html#cdp_scrapers.legistar_utils.LegistarScraper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">client_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">client</span>
 
         <span class="c1"># EventMinutesItem is ignored from ingestion if minutes_item contains this</span>
@@ -463,7 +469,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">matter_rejected_patten</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rejected|dropped&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">decision_passed_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;pass&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">decision_failed_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;not|fail&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decision_failed_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;not|fail&quot;</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_legistar_compatible</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>

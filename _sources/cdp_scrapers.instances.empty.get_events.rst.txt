@@ -1,0 +1,6 @@
+﻿cdp\_scrapers.instances.empty.get\_events
+=========================================
+
+.. currentmodule:: cdp_scrapers.instances.empty
+
+.. autofunction:: get_events
