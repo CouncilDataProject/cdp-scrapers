@@ -224,8 +224,9 @@ def reduced_list(input_list: List[Any], collapse: bool = True) -> List:
 
 class LegistarScraper:
     """
-    Base class for transforming Legistar API data to CDP IngestionModel
-    A given installation must define a derived class and implement get_video_uris()
+    Base class for transforming Legistar API data to CDP IngestionModel.
+
+    A given installation must define a derived class and implement get_video_uris().
 
     Parameters
     ----------
@@ -234,7 +235,7 @@ class LegistarScraper:
 
     See Also
     --------
-    instances.SeattleScraper
+    cdp_scrapers.instances.seattle.SeattleScraper
     """
 
     def __init__(self, client: str):
