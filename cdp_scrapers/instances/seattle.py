@@ -171,12 +171,12 @@ class SeattleScraper(LegistarScraper):
         return list_uri
 
 
-def get_seattle_events(
+def get_events(
     from_dt: datetime,
     to_dt: datetime,
     **kwargs: Any,
 ) -> List[EventIngestionModel]:
     """
-    Implimentation of seattle scrapper to provide to a cookiecutter or for testing.
+    Implimentation of the Seattle Scrapper to provide to a cookiecutter or for testing.
     """
     return SeattleScraper().get_events(begin=from_dt, end=to_dt)

@@ -30,33 +30,45 @@ event scraper functions.
 General Legistar utility functions.
 
 ```python
-from cdp_scrapers.legistar_utils import get_legistar_events_for_timespan
+from cdp_scrapers.legistar_utils import get_legistar_events_for_timespan, LegistarScraper
 from datetime import datetime
 
 # Get all events (and minutes item and voting details)
 # for a provided timespan for a legistar client
 # Returns List[Dict]
-events = get_legistar_events_for_timespan(
+seattle_legistar_events = get_legistar_events_for_timespan(
     client="seattle",
     start=datetime(2021, 7, 12),
     end=datetime(2021, 7, 14),
 )
 
-# Futher processing
-# ...
+# Or parse and convert to CDP EventIngestionModel
+seattle_scraper = LegistarScraper("seattle")
+seattle_cdp_parsed_events = seattle_scraper.get_events(
+    begin=datetime(2021, 7, 12),
+    end=datetime(2021, 7, 14),
+)
 ```
 
 ### Scrapers
 
 In-progress or completed scrapers.
 
-```python
-from cdp_scrapers.instances.seattle import get_events
+-   [cdp_scrapers.instances.seattle.get_events](https://councildataproject.org/cdp-scrapers/cdp_scrapers.instances.html#module-cdp_scrapers.instances.seattle)
 
-# This is an in-progress or completed scraper
-# Returns List[cdp_backend.pipeline.ingestion_models.EventIngestionModel]
-events = get_events()
-```
+If you would like to deploy a CDP instance or would like to use this library as
+a method for retrieving formatted legislative data, please feel free to contribute
+a new custom municipality scraper!
+
+#### Custom Scrapers
+
+If it isn't possible to use our generalized Legistar tooling to write your scraper,
+we welcome the addition of custom scrapers, however please see our documentation
+on the
+[minimum data required for CDP event ingestion](https://councildataproject.org/cdp-backend/ingestion_models.html).
+
+From there, begin with our
+[empty custom scraper function template](https://councildataproject.org/cdp-scrapers/_modules/cdp_scrapers/instances/empty.html#get_events) and fill in your scraper.
 
 ## Installation
 
@@ -69,6 +81,6 @@ For full package documentation please visit [councildataproject.org/cdp-scrapers
 
 ## Development
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for information related to developing the code.
+Refer to [CONTRIBUTING.md](CONTRIBUTING.md) for information related to developing the code.
 
 **MIT license**

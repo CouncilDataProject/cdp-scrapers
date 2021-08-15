@@ -13,6 +13,16 @@ Welcome to cdp-scrapers's documentation!
 
 .. mdinclude:: ../README.md
 
+Specific Doc Pages
+==================
+
+.. autosummary::
+   :toctree:
+   :caption: Core Components:
+
+   cdp_scrapers.instances.empty.get_events
+   cdp_scrapers.legistar_utils.LegistarScraper
+
 Indices and tables
 ==================
 * :ref:`genindex`
