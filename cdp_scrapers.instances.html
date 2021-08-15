@@ -242,6 +242,21 @@ from GitHub Actions UI.</p>
 <dd><p>Bases: <a class="reference internal" href="cdp_scrapers.legistar_utils.LegistarScraper.html#cdp_scrapers.legistar_utils.LegistarScraper" title="cdp_scrapers.legistar_utils.LegistarScraper"><code class="xref py py-class docutils literal notranslate"><span class="pre">cdp_scrapers.legistar_utils.LegistarScraper</span></code></a></p>
 <p>Seattle-specific implementation of LegistarScraper</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="cdp_scrapers.instances.seattle.SeattleScraper.get_time_zone">
+<span class="sig-name descname"><span class="pre">get_time_zone</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/seattle.html#SeattleScraper.get_time_zone"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.seattle.SeattleScraper.get_time_zone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return US Pacific time zone name.
+Can call find_time_zone() to find dynamically.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>time zone name</strong> – “US/Pacific”</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.instances.seattle.SeattleScraper.get_video_uris">
 <span class="sig-name descname"><span class="pre">get_video_uris</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">legistar_ev</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/seattle.html#SeattleScraper.get_video_uris"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.seattle.SeattleScraper.get_video_uris" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return URLs for videos and captions parsed from seattlechannel.org web page</p>

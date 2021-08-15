@@ -358,7 +358,19 @@
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_uri</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No video URI found on </span><span class="si">{</span><span class="n">video_page_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">list_uri</span></div></div>
+        <span class="k">return</span> <span class="n">list_uri</span></div>
+
+<div class="viewcode-block" id="SeattleScraper.get_time_zone"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.SeattleScraper.get_time_zone">[docs]</a>    <span class="k">def</span> <span class="nf">get_time_zone</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return US Pacific time zone name.</span>
+<span class="sd">        Can call find_time_zone() to find dynamically.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        time zone name : str</span>
+<span class="sd">            &quot;US/Pacific&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;US/Pacific&quot;</span></div></div>
 
 
 <div class="viewcode-block" id="get_events"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.get_events">[docs]</a><span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span>

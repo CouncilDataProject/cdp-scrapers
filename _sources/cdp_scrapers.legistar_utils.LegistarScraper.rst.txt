@@ -14,9 +14,11 @@
    .. autosummary::
    
       ~LegistarScraper.__init__
+      ~LegistarScraper.as_local_time
       ~LegistarScraper.check_for_cdp_min_ingestion
       ~LegistarScraper.date_time_to_datetime
       ~LegistarScraper.filter_event_minutes
+      ~LegistarScraper.find_time_zone
       ~LegistarScraper.fix_event_minutes
       ~LegistarScraper.get_event_minutes
       ~LegistarScraper.get_event_support_files
@@ -28,6 +30,7 @@
       ~LegistarScraper.get_none_if_empty
       ~LegistarScraper.get_person
       ~LegistarScraper.get_required_attrs
+      ~LegistarScraper.get_time_zone
       ~LegistarScraper.get_video_uris
       ~LegistarScraper.get_vote_decision
       ~LegistarScraper.get_votes

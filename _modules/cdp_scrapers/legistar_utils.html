@@ -219,6 +219,12 @@
     <span class="n">VoteDecision</span><span class="p">,</span>
 <span class="p">)</span>
 
+<span class="kn">from</span> <span class="nn">pytz</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">utc</span><span class="p">,</span>
+    <span class="n">timezone</span><span class="p">,</span>
+    <span class="n">country_timezones</span><span class="p">,</span>
+<span class="p">)</span>
+
 <span class="c1">###############################################################################</span>
 
 <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -469,7 +475,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">matter_rejected_patten</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rejected|dropped&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">decision_passed_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;pass&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">decision_failed_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;not|fail&quot;</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decision_failed_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;not|fail&quot;</span>
+
+        <span class="c1"># e.g. pytz.timezone(&quot;US/Pacific&quot;)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_zone</span><span class="p">:</span> <span class="n">timezone</span> <span class="o">=</span> <span class="n">timezone</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_time_zone</span><span class="p">())</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_legistar_compatible</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -584,8 +593,14 @@
             <span class="n">begin</span><span class="o">=</span><span class="n">begin</span><span class="p">,</span>
             <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span>
         <span class="p">):</span>
-            <span class="n">session_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">date_time_to_datetime</span><span class="p">(</span>
-                <span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_SESSION_DATE</span><span class="p">],</span> <span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_SESSION_TIME</span><span class="p">]</span>
+            <span class="c1"># better to return time as local time with time zone info,</span>
+            <span class="c1"># rather than as utc time.</span>
+            <span class="c1"># this way the calling pipeline can find out what is the local zone.</span>
+            <span class="n">session_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_local_time</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">date_time_to_datetime</span><span class="p">(</span>
+                    <span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_SESSION_DATE</span><span class="p">],</span>
+                    <span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_SESSION_TIME</span><span class="p">],</span>
+                <span class="p">)</span>
             <span class="p">)</span>
 
             <span class="c1"># prefer video file path in legistar Event.EventVideoPath</span>
@@ -661,6 +676,27 @@
         <span class="n">log</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span>
             <span class="s2">&quot;get_video_uris() is required because &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;Legistar Event.EventVideoPath is not used by </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">client_name</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="LegistarScraper.get_time_zone"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_time_zone">[docs]</a>    <span class="k">def</span> <span class="nf">get_time_zone</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return time zone name for CDP instance.</span>
+<span class="sd">        To use dynamically determined time zone,</span>
+<span class="sd">        use find_time_zone().</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        time zone name : str</span>
+<span class="sd">            i.e. &quot;US/Pacific&quot; | &quot;America/Los_Angeles&quot; | ...</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        SeattleScraper.get_time_zone()</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+            <span class="s2">&quot;time zone name e.g. US/Pacific &quot;</span> <span class="s2">&quot;required for proper event timestamping&quot;</span>
         <span class="p">)</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
@@ -1216,6 +1252,55 @@
             <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s2"> has </span><span class="si">{</span><span class="n">num_keys</span><span class="si">}</span><span class="s2"> required keys but got </span><span class="si">{</span><span class="n">keys</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">keys</span></div>
+
+<div class="viewcode-block" id="LegistarScraper.find_time_zone"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.find_time_zone">[docs]</a>    <span class="k">def</span> <span class="nf">find_time_zone</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return name for a US time zone matching UTC offset calculated from OS clock</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        time zone name : str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">utc_now</span> <span class="o">=</span> <span class="n">utc</span><span class="o">.</span><span class="n">localize</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">())</span>
+        <span class="n">local_now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">zone_name</span> <span class="ow">in</span> <span class="n">country_timezones</span><span class="p">(</span><span class="s2">&quot;us&quot;</span><span class="p">):</span>
+            <span class="n">zone</span> <span class="o">=</span> <span class="n">timezone</span><span class="p">(</span><span class="n">zone_name</span><span class="p">)</span>
+            <span class="c1"># if this is my time zone</span>
+            <span class="c1"># utc_now as local time should be VERY close to local_now</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="nb">abs</span><span class="p">(</span>
+                    <span class="p">(</span>
+                        <span class="n">utc_now</span><span class="o">.</span><span class="n">astimezone</span><span class="p">(</span><span class="n">zone</span><span class="p">)</span> <span class="o">-</span> <span class="n">zone</span><span class="o">.</span><span class="n">localize</span><span class="p">(</span><span class="n">local_now</span><span class="p">)</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+                <span class="p">)</span>
+                <span class="o">&lt;</span> <span class="mi">5</span>
+            <span class="p">):</span>
+                <span class="k">return</span> <span class="n">zone_name</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="LegistarScraper.as_local_time"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.as_local_time">[docs]</a>    <span class="k">def</span> <span class="nf">as_local_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_time</span><span class="p">:</span> <span class="n">datetime</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return input datetime with time zone information.</span>
+<span class="sd">        This allows for nonambiguous conversions to other zones including UTC.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        local_time : datetime</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        local_time : datetime</span>
+<span class="sd">            The date and time attributes (year, month, day, hour, ...) remain unchanged.</span>
+<span class="sd">            tzinfo is now provided.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_zone</span><span class="o">.</span><span class="n">localize</span><span class="p">(</span><span class="n">local_time</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+            <span class="c1"># AttributeError: time_zone or local_time is None</span>
+            <span class="c1"># ValueError: local_time is not navie (has time zone info)</span>
+            <span class="k">return</span> <span class="n">local_time</span></div>
 
 <div class="viewcode-block" id="LegistarScraper.date_time_to_datetime"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.date_time_to_datetime">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">date_time_to_datetime</span><span class="p">(</span><span class="n">ev_date</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ev_time</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="p">:</span>
