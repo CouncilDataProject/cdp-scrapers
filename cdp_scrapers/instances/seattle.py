@@ -181,7 +181,6 @@ class SeattleScraper(LegistarScraper):
             "US/Pacific"
         """
         return "US/Pacific"
-        # return self.find_time_zone()
 
 
 def get_events(
