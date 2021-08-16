@@ -460,7 +460,7 @@ class LegistarScraper:
 
         # easier for calling pipeline to handle an empty list rather than None
         # so request reduced_list() to give me [], not None
-        return reduced_list(ingestion_models, collapse=True)
+        return reduced_list(ingestion_models, collapse=False)
 
     def get_video_uris(self, legistar_ev: Dict) -> List[Dict]:
         """
