@@ -210,7 +210,7 @@ def str_simplified(input_str: str) -> str:
     # unify newline to \n
     input_str = re.sub(r"[\r\n\f]+", r"\n", input_str)
     # multiple spaces and tabs to 1 space
-    input_str = re.sub(r"([ \t\v])+", " ", input_str)
+    input_str = re.sub(r"[ \t\v]+", " ", input_str)
 
     return input_str
 
