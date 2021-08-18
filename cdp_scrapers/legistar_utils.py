@@ -720,12 +720,17 @@ class LegistarScraper:
         -------
         Person | None
         """
+        phone = str_simplified(legistar_person[LEGISTAR_PERSON_PHONE])
+        if phone:
+            # (123)456... -> 123-456...
+            phone = phone.replace("(", "").replace(")", "-")
+
         return self.get_none_if_empty(
             Person(
                 email=str_simplified(legistar_person[LEGISTAR_PERSON_EMAIL]),
                 external_source_id=legistar_person[LEGISTAR_PERSON_EXT_ID],
                 name=str_simplified(legistar_person[LEGISTAR_PERSON_NAME]),
-                phone=str_simplified(legistar_person[LEGISTAR_PERSON_PHONE]),
+                phone=phone,
                 website=str_simplified(legistar_person[LEGISTAR_PERSON_WEBSITE]),
                 is_active=bool(legistar_person[LEGISTAR_PERSON_ACTIVE]),
             )
