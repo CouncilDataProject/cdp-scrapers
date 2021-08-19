@@ -431,7 +431,8 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Base class for transforming Legistar API data to CDP IngestionModel.</span>
 
-<span class="sd">    A given installation must define a derived class and implement get_video_uris().</span>
+<span class="sd">    A given installation must define a derived class and implement get_video_uris()</span>
+<span class="sd">    and get_time_zone() functions.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -697,15 +698,21 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        time zone name : str</span>
-<span class="sd">            i.e. &quot;US/Pacific&quot; | &quot;America/Los_Angeles&quot; | ...</span>
+<span class="sd">            i.e. &quot;America/Los_Angeles&quot; | &quot;America/New_York&quot; ...</span>
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
 <span class="sd">        SeattleScraper.get_time_zone()</span>
 
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        List of Timezones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones</span>
+<span class="sd">        Please only use &quot;Canonical&quot; timezones.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-            <span class="s2">&quot;time zone name e.g. US/Pacific &quot;</span> <span class="s2">&quot;required for proper event timestamping&quot;</span>
+            <span class="s2">&quot;Time zone name required for proper event timestamping. &quot;</span>
+            <span class="s2">&quot;e.g. America/Los_Angeles&quot;</span>
         <span class="p">)</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
