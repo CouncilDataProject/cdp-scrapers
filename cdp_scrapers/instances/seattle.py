@@ -172,15 +172,15 @@ class SeattleScraper(LegistarScraper):
 
     def get_time_zone(self) -> str:
         """
-        Return US Pacific time zone name.
+        Return America Los Angeles (old: US/Pacific) time zone name.
         Can call find_time_zone() to find dynamically.
 
         Returns
         -------
         time zone name : str
-            "US/Pacific"
+            "America/Los_Angeles"
         """
-        return "US/Pacific"
+        return "America/Los_Angeles"
 
 
 def get_events(

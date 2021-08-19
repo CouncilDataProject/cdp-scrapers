@@ -241,7 +241,8 @@ class LegistarScraper:
     """
     Base class for transforming Legistar API data to CDP IngestionModel.
 
-    A given installation must define a derived class and implement get_video_uris().
+    A given installation must define a derived class and implement get_video_uris()
+    and get_time_zone() functions.
 
     Parameters
     ----------
@@ -507,15 +508,21 @@ class LegistarScraper:
         Returns
         -------
         time zone name : str
-            i.e. "US/Pacific" | "America/Los_Angeles" | ...
+            i.e. "America/Los_Angeles" | "America/New_York" ...
 
         See Also
         --------
         SeattleScraper.get_time_zone()
 
+        Notes
+        -----
+        List of Timezones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+        Please only use "Canonical" timezones.
+
         """
         log.error(
-            "time zone name e.g. US/Pacific " "required for proper event timestamping"
+            "Time zone name required for proper event timestamping. "
+            "e.g. America/Los_Angeles"
         )
         raise NotImplementedError
 
