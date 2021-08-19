@@ -244,6 +244,10 @@ class LegistarScraper:
             "Times listed are estimated",
             "has been cancelled",
             "Deputy City Clerk",
+            "Paste the following link into the address bar of your web browser",
+            "HOW TO WATCH",
+            "page break",
+            "PUBLIC NOTICE",
             # "CALL TO ORDER",
             # "ROLL CALL",
             # "APPROVAL OF THE JOURNAL",
@@ -261,9 +265,9 @@ class LegistarScraper:
 
         # regex patterns used to infer cdp_backend.database.constants
         # from Legistar string fields
-        self.vote_approve_pattern: str = "approve|favor"
+        self.vote_approve_pattern: str = "approve|favor|yes"
         self.vote_abstain_pattern: str = "abstain|refuse|refrain"
-        self.vote_reject_pattern: str = "reject|oppose"
+        self.vote_reject_pattern: str = "reject|oppose|no"
         # TODO: need to debug these using real examples
         self.vote_absent_pattern: str = "absent"
         self.vote_nonvoting_pattern: str = "nv|(?:non.*voting)"
@@ -379,7 +383,7 @@ class LegistarScraper:
         get_legistar_events_for_timespan
         """
         if begin is None:
-            begin = datetime.utcnow() - timedelta(days=2)
+            begin = datetime.utcnow() - timedelta(days=40)
         if end is None:
             end = datetime.utcnow()
 
@@ -390,7 +394,6 @@ class LegistarScraper:
             begin=begin,
             end=end,
         ):
-
             session_time = self.date_time_to_datetime(
                 legistar_ev[LEGISTAR_SESSION_DATE], legistar_ev[LEGISTAR_SESSION_TIME]
             )
@@ -675,7 +678,9 @@ class LegistarScraper:
                 email=stripped(legistar_person[LEGISTAR_PERSON_EMAIL]),
                 external_source_id=legistar_person[LEGISTAR_PERSON_EXT_ID],
                 name=stripped(legistar_person[LEGISTAR_PERSON_NAME]),
-                phone=stripped(legistar_person[LEGISTAR_PERSON_PHONE]),
+                phone=stripped(legistar_person[LEGISTAR_PERSON_PHONE])
+                .replace("(", "")
+                .replace(")", "-"),
                 website=stripped(legistar_person[LEGISTAR_PERSON_WEBSITE]),
                 is_active=bool(legistar_person[LEGISTAR_PERSON_ACTIVE]),
             )
@@ -863,7 +868,7 @@ class LegistarScraper:
         """
         if not ev_minutes_item:
             return ev_minutes_item
-
+        rx = re.compile(r"\W+\s+")
         if ev_minutes_item.minutes_item and ev_minutes_item.matter:
             # we have both matter and minutes_item
             # - make minutes_item.name the more concise text e.g. "CB 11111"
@@ -871,12 +876,30 @@ class LegistarScraper:
             #   e.g. "AN ORDINANCE related to the..."
             # - make matter.title the same descriptive lengthy text
             ev_minutes_item.minutes_item.description = ev_minutes_item.minutes_item.name
+            ev_minutes_item.minutes_item.description = rx.sub(
+                " ", str(ev_minutes_item.minutes_item.description)
+            ).strip()
             ev_minutes_item.minutes_item.name = ev_minutes_item.matter.name
+            ev_minutes_item.minutes_item.name = rx.sub(
+                " ", str(ev_minutes_item.minutes_item.name)
+            ).strip()
             ev_minutes_item.matter.title = ev_minutes_item.minutes_item.description
-
+            ev_minutes_item.matter.title = rx.sub(
+                " ", str(ev_minutes_item.matter.title)
+            ).strip()
         # matter.result_status is allowed to be null
         # only when no votes or Legistar EventItemMatterStatus is null
+        ev_minutes_item.minutes_item.description = rx.sub(
+            " ", str(ev_minutes_item.minutes_item.description)
+        ).strip()
+        ev_minutes_item.minutes_item.name = rx.sub(
+            " ", str(ev_minutes_item.minutes_item.name)
+        ).strip()
+
         if ev_minutes_item.matter and not ev_minutes_item.matter.result_status:
+            ev_minutes_item.matter.title = rx.sub(
+                " ", str(ev_minutes_item.matter.title)
+            ).strip()
             if ev_minutes_item.votes and legistar_ev_item[LEGISTAR_MATTER_STATUS]:
                 # means did not find matter_*_pattern in Legistar EventItemMatterStatus.
                 # default to in progress (as opposed to adopted or rejected)
@@ -908,11 +931,10 @@ class LegistarScraper:
         """
         if not ev_minutes_item.minutes_item or not ev_minutes_item.minutes_item.name:
             return ev_minutes_item
-
         for filter in self.IGNORED_MINUTE_ITEMS:
-            if filter.lower() in ev_minutes_item.minutes_item.name.lower():
+            filterPattern = re.compile(filter.lower())
+            if filterPattern.search(ev_minutes_item.minutes_item.name.lower()):
                 return None
-
         return ev_minutes_item
 
     def get_none_if_empty(self, model: IngestionModel) -> IngestionModel:
