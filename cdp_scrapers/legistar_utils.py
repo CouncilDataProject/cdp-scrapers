@@ -383,7 +383,7 @@ class LegistarScraper:
         get_legistar_events_for_timespan
         """
         if begin is None:
-            begin = datetime.utcnow() - timedelta(days=40)
+            begin = datetime.utcnow() - timedelta(days=2)
         if end is None:
             end = datetime.utcnow()
 
@@ -678,9 +678,7 @@ class LegistarScraper:
                 email=stripped(legistar_person[LEGISTAR_PERSON_EMAIL]),
                 external_source_id=legistar_person[LEGISTAR_PERSON_EXT_ID],
                 name=stripped(legistar_person[LEGISTAR_PERSON_NAME]),
-                phone=stripped(legistar_person[LEGISTAR_PERSON_PHONE])
-                .replace("(", "")
-                .replace(")", "-"),
+                phone=stripped(legistar_person[LEGISTAR_PERSON_PHONE]),
                 website=stripped(legistar_person[LEGISTAR_PERSON_WEBSITE]),
                 is_active=bool(legistar_person[LEGISTAR_PERSON_ACTIVE]),
             )
@@ -868,7 +866,6 @@ class LegistarScraper:
         """
         if not ev_minutes_item:
             return ev_minutes_item
-        rx = re.compile(r"\W+\s+")
         if ev_minutes_item.minutes_item and ev_minutes_item.matter:
             # we have both matter and minutes_item
             # - make minutes_item.name the more concise text e.g. "CB 11111"
@@ -876,30 +873,11 @@ class LegistarScraper:
             #   e.g. "AN ORDINANCE related to the..."
             # - make matter.title the same descriptive lengthy text
             ev_minutes_item.minutes_item.description = ev_minutes_item.minutes_item.name
-            ev_minutes_item.minutes_item.description = rx.sub(
-                " ", str(ev_minutes_item.minutes_item.description)
-            ).strip()
             ev_minutes_item.minutes_item.name = ev_minutes_item.matter.name
-            ev_minutes_item.minutes_item.name = rx.sub(
-                " ", str(ev_minutes_item.minutes_item.name)
-            ).strip()
             ev_minutes_item.matter.title = ev_minutes_item.minutes_item.description
-            ev_minutes_item.matter.title = rx.sub(
-                " ", str(ev_minutes_item.matter.title)
-            ).strip()
         # matter.result_status is allowed to be null
         # only when no votes or Legistar EventItemMatterStatus is null
-        ev_minutes_item.minutes_item.description = rx.sub(
-            " ", str(ev_minutes_item.minutes_item.description)
-        ).strip()
-        ev_minutes_item.minutes_item.name = rx.sub(
-            " ", str(ev_minutes_item.minutes_item.name)
-        ).strip()
-
         if ev_minutes_item.matter and not ev_minutes_item.matter.result_status:
-            ev_minutes_item.matter.title = rx.sub(
-                " ", str(ev_minutes_item.matter.title)
-            ).strip()
             if ev_minutes_item.votes and legistar_ev_item[LEGISTAR_MATTER_STATUS]:
                 # means did not find matter_*_pattern in Legistar EventItemMatterStatus.
                 # default to in progress (as opposed to adopted or rejected)
