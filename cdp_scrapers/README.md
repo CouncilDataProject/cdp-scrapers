@@ -1,12 +1,19 @@
-# Notes on `LegistarScraper`s
+# Notes on `LegistarScraper`
 
 ## Filtering
 
-1. Unimportant `EventMinutesItem`
+- Unimportant `EventMinutesItem`
 
 
-`EventMinutesItem(minutes_item=MinutesItem(name="This meeting 
-also constitutes a meeting of the City Council, provided ...", ...), ...)`
+```python
+EventMinutesItem(
+    minutes_item=MinutesItem(
+        name="This meeting also constitutes a meeting of the City Council, provided ...",
+        ...
+    ),
+    ...
+)
+```
 
 `minutes_item.name` comes from Legistar EventItem["EventItemTitle"]. Legistar 
 EventItems wil often contain unimportant information, as shown above, that we 
@@ -15,10 +22,10 @@ want to exclude from ingesting into CDP. The `IGNORED_MINUTE_ITEMS` attribute in
 defies a `List[str]` that we want to filter out. 
 `IGNORED_MINUTE_ITEMS` is used in `filter_event_minutes()`, case-insensitively.
 
-In your LegistarScraper-derived class' `__init__()`, overwrite or append to 
+In `__init__()` of your class derived from LegistarScraper, overwrite or append to 
 `self.IGNORED_MINUTE_ITEMS`. e.g.
 
-```
+```python
 class MyScraper(LegistarScraper):
     def __init__(self):
         super().__init__("my_city")
@@ -28,11 +35,13 @@ class MyScraper(LegistarScraper):
 
 With that filter in place, this entire `EventMinutesItem` becomes `None`.
 
-2. Empty models
+- Empty models
 
 Consider another example such as
 
-`EventMinutesItem(decision=None, matter=None, minutes_item=None, supporting_files=[], ...)`
+```python
+EventMinutesItem(decision=None, matter=None, minutes_item=None, supporting_files=[], ...)
+```
 
 which means nothing. `get_required_attrs()` returns attributes in a given 
 `IngestionModel` without default values as defined in the respective `class` 
@@ -45,7 +54,8 @@ For example, because `minutes_item` is `None` in the above
 given `EventMinutesItem` instance as-is.
 
 This filtering is applied bottom-up. e.g.
-```
+
+```python
 # this is not exactly how the code is written
 # but a representation of the call path
 
@@ -73,27 +83,38 @@ votes = reduced_list(
 
 ## Legistar -> CDP Ingestion
 
-Some collection of notes from development phase on what Legistar API fields to 
-use for what `IngestionModel` fields.
+Here are some notes on what Legistar API fields to use for `IngestionModel` fields.
 
-- For example "Public Comment" isn't a matter, its a minutes item. Minutes items 
+- "Public Comment" isn't a matter, it is a minutes item. Minutes items 
 are: "something that happened or was discussed during the meeting" while matters 
 are usually the "things that were discussed" which is why minutes can link to 
 matters. "Approval of Agenda" is a minutes item and links to the Matter "Agenda 
-for 2021-07-28" for example.
+for 2021-07-28", for example.
 
 ## Instance-specific scraping
 
 Base `LegistarScraper` was written such that ideally, an installation needs to 
-define a derived class with just `__init__()` defined where Legistar client name 
-is provided by calling `super().__init__("my_city")`, as in the above example.
+define a derived class with just a couple of methods implemented.
+
+```python
+class MyMunicipalityScraper(LegistarScraper):
+    def __init__(self):
+        """
+        municipality-specific implementation of LegistarScraper
+        """
+        super().__init__("municipality_legistar_id")
+
+    def get_time_zone(self) -> str:
+        return "America/Los_Angeles"
+```
 
 You can override and implement your own methods as necessary. For example, the base
 implementation for `get_event_support_files()` uses "MatterAttachmentId", 
 "MatterAttachmentName", "MatterAttachmentHyperlink" from Legistar for 
-`external_source_id`, `name`, `uri` for `SupportingFile`, respectively. You can 
-define and implement `get_event_support_files()` in your LegistarScraper-derived 
-class to use a completely different mapping for `SupportingFile`.
+`SupportingFile.external_source_id`, `SupportingFile.name`, `SupportingFile.uri`, 
+respectively. You can define and implement `get_event_support_files()` in your 
+`LegistarScraper`-derived class to use a completely different mapping for 
+`SupportingFile`.
 
 ### Scraping for `Session.video_uri`
 
@@ -101,13 +122,9 @@ The "big" scraping that an instance will probably have to provide is
 `get_video_uris()`. The base class will try to use Legistar "EventVideoPath" but 
 it is likely that information is not filled. In these situations Legistar might 
 point to some external resource, such as a web page hosted somewhere else, that 
-does have video URI for the given event. See `SeattleScraper.get_video_uris()`
+does have URI for the video from the given event. See `SeattleScraper.get_video_uris()`
 
-See SeattleScraperGetVideoUris.ipynb for a walkthrough of how the method was 
-implemented for Seattle. Keep in mind your implementation will most likely vary 
-from this example.
+### Other notes
 
-## Minor notes
-
-- `strip()` string fields to prevent passing values with garbage 
-leading/trailing whitespace characters.
+- Recommend calling `legistar_utils.str_simplified()` on string fields to remove 
+leading/trailing whitespace and simplify consecutive whitespace.
