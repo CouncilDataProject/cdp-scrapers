@@ -29,6 +29,12 @@ from cdp_backend.database.constants import (
     VoteDecision,
 )
 
+from pytz import (
+    utc,
+    timezone,
+    country_timezones,
+)
+
 ###############################################################################
 
 log = logging.getLogger(__name__)
@@ -223,6 +229,7 @@ class LegistarScraper:
     """
     Base class for transforming Legistar API data to CDP IngestionModel
     A given installation must define a derived class and implement get_video_uris()
+    and get_time_zone() functions.
 
     Parameters
     ----------
@@ -280,6 +287,9 @@ class LegistarScraper:
 
         self.decision_passed_pattern: str = "pass"
         self.decision_failed_pattern: str = "not|fail"
+
+        # e.g. pytz.timezone("US/Pacific")
+        self.time_zone: timezone = timezone(self.get_time_zone())
 
     @property
     def is_legistar_compatible(self) -> bool:
@@ -469,6 +479,30 @@ class LegistarScraper:
         log.critical(
             "get_video_uris() is required because "
             f"Legistar Event.EventVideoPath is not used by {self.client_name}"
+        )
+        raise NotImplementedError
+
+    def get_time_zone(self) -> str:
+
+        """
+        Return time zone name for CDP instance.
+        To use dynamically determined time zone,
+        use find_time_zone().
+        Returns
+        -------
+        time zone name : str
+            i.e. "America/Los_Angeles" | "America/New_York" ...
+        See Also
+        --------
+        SeattleScraper.get_time_zone()
+        Notes
+        -----
+        List of Timezones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+        Please only use "Canonical" timezones.
+        """
+        log.error(
+            "Time zone name required for proper event timestamping. "
+            "e.g. America/Los_Angeles"
         )
         raise NotImplementedError
 
@@ -910,8 +944,7 @@ class LegistarScraper:
         if not ev_minutes_item.minutes_item or not ev_minutes_item.minutes_item.name:
             return ev_minutes_item
         for filter in self.IGNORED_MINUTE_ITEMS:
-            filterPattern = re.compile(filter.lower())
-            if filterPattern.search(ev_minutes_item.minutes_item.name.lower()):
+            if re.search(filter, ev_minutes_item.minutes_item.name, re.IGNORECASE):
                 return None
         return ev_minutes_item
 
@@ -1021,6 +1054,52 @@ class LegistarScraper:
             log.debug(f"{model.__class__} has {num_keys} required keys but got {keys}")
 
         return keys
+
+    def find_time_zone(self) -> str:
+        """
+        Return name for a US time zone matching UTC offset calculated from OS clock
+        Returns
+        -------
+        time zone name : str
+        """
+        utc_now = utc.localize(datetime.utcnow())
+        local_now = datetime.now()
+
+        for zone_name in country_timezones("us"):
+            zone = timezone(zone_name)
+            # if this is my time zone
+            # utc_now as local time should be VERY close to local_now
+            if (
+                abs(
+                    (
+                        utc_now.astimezone(zone) - zone.localize(local_now)
+                    ).total_seconds()
+                )
+                < 5
+            ):
+                return zone_name
+
+        return None
+
+    def as_local_time(self, local_time: datetime) -> datetime:
+        """
+        Return input datetime with time zone information.
+        This allows for nonambiguous conversions to other zones including UTC.
+        Parameters
+        ----------
+        local_time : datetime
+        Returns
+        -------
+        local_time : datetime
+            The date and time attributes (year, month, day, hour, ...) remain unchanged.
+            tzinfo is now provided.
+        """
+        try:
+            return self.time_zone.localize(local_time)
+        except (AttributeError, ValueError):
+            # AttributeError: time_zone or local_time is None
+            # ValueError: local_time is not navie (has time zone info)
+            return local_time
 
     @staticmethod
     def date_time_to_datetime(ev_date: str, ev_time: str) -> datetime:

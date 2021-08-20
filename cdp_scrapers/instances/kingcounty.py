@@ -120,3 +120,15 @@ class KingCountyScraper(LegistarScraper):
         if len(list_uri) == 0:
             log.debug(f"No video URI found on {video_page_url}")
         return list_uri
+
+    def get_time_zone(self) -> str:
+
+        """
+        Return America Los Angeles (old: US/Pacific) time zone name.
+        Can call find_time_zone() to find dynamically.
+        Returns
+        -------
+        time zone name : str
+            "America/Los_Angeles"
+        """
+        return "America/Los_Angeles"
