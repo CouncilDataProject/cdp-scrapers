@@ -177,14 +177,3 @@ class SeattleScraper(LegistarScraper):
         if len(list_uri) == 0:
             log.debug(f"No video URI found on {video_page_url}")
         return list_uri
-
-
-def get_events(
-    from_dt: datetime,
-    to_dt: datetime,
-    **kwargs: Any,
-) -> List[EventIngestionModel]:
-    """
-    Implimentation of the Seattle Scrapper to provide to a cookiecutter or for testing.
-    """
-    return SeattleScraper().get_events(begin=from_dt, end=to_dt)
