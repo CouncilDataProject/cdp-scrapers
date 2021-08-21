@@ -199,22 +199,65 @@
 <h1>cdp_scrapers.legistar_utils.LegistarScraper<a class="headerlink" href="#cdp-scrapers-legistar-utils-legistarscraper" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">cdp_scrapers.legistar_utils.</span></span><span class="sig-name descname"><span class="pre">LegistarScraper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">cdp_scrapers.legistar_utils.</span></span><span class="sig-name descname"><span class="pre">LegistarScraper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timezone</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_minutes_item_patterns</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_approve_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'approve|favor|yes'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_abstain_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'abstain|refuse|refrain'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_reject_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'reject|oppose|no'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_absent_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'absent'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_nonvoting_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'nv|(?:non.*voting)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matter_adopted_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'approved|confirmed|passed|adopted'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matter_in_progress_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'heard|ready|filed|held|(?:in\\s*committee)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matter_rejected_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'rejected|dropped'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minutes_item_decision_passed_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'pass'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minutes_item_decision_failed_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'not|fail'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper" title="Permalink to this definition">¶</a></dt>
 <dd><p>Base class for transforming Legistar API data to CDP IngestionModel.</p>
-<p>A given installation must define a derived class and implement get_video_uris()
-and get_time_zone() functions.</p>
+<p>If get_events() naively fails and raises an error, a given installation must define
+a derived class and implement the get_video_uris() function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>client</strong> (<em>str</em>) – Legistar client name, e.g. “seattle” for Seattle</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>client</strong> (<em>str</em>) – Legistar client name, e.g. “seattle” for Seattle, “kingcounty” for King County.</p></li>
+<li><p><strong>timezone</strong> (<em>str</em>) – The timezone for the target client.
+i.e. “America/Los_Angeles” or “America/New_York”
+See <a class="reference external" href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones">https://en.wikipedia.org/wiki/List_of_tz_database_time_zones</a> for canonical
+timezones.</p></li>
+<li><p><strong>ignore_minutes_item_patterns</strong> (<em>List[str]</em>) – A list of string patterns or substrings to act as a minutes item filter.
+Any item in the provided list will be compiled as a regex string and any
+minute’s item that contains the compiled pattern will be filtered out of the
+produced CDP minutes item list.
+Default: [] (do not filter any minutes items)</p></li>
+<li><p><strong>vote_approve_pattern</strong> (<em>str</em>) – Regex pattern used to convert Legistar instance’s votes in approval value to CDP
+constant value.
+Default: “approve|favor|yes”</p></li>
+<li><p><strong>vote_abstain_pattern</strong> (<em>str</em>) – Regex pattern used to convert Legistar instance’s abstension value to CDP
+constant value. Note, this is a pure abstension, not an “approval by
+abstention” or “rejection by abstension” value. Those should be places in
+vote_approve_pattern and vote_reject_pattern respectively.
+Default: “abstain|refuse|refrain”</p></li>
+<li><p><strong>vote_reject_pattern</strong> (<em>str</em>) – Regex pattern used to convert Legistar instance’s votes in rejection value to
+CDP constant value.
+Default: “reject|oppose|no”</p></li>
+<li><p><strong>vote_absent_pattern</strong> (<em>str</em>) – Regex pattern used to convert Legistar instance’s excused absense value to CDP
+constant value.
+Default: “absent”</p></li>
+<li><p><strong>vote_nonvoting_pattern</strong> (<em>str</em>) – Regex pattern used to convert Legistar instance’s non-voting value to CDP
+constant value.
+Default: “nv|(?:non.*voting)”</p></li>
+<li><p><strong>matter_adopted_pattern</strong> (<em>str</em>) – Regex pattern used to convert Legistar instance’s matter was adopted to CDP
+constant value.
+Default: “approved|confirmed|passed|adopted”</p></li>
+<li><p><strong>matter_in_progess_pattern</strong> (<em>str</em>) – Regex pattern used to convert Legistar instance’s matter is in-progress to
+CDP constant value.
+Default: “heard|ready|filed|held|(?:ins*committee)”</p></li>
+<li><p><strong>matter_rejected_pattern</strong> (<em>str</em>) – Regex pattern used to convert Legistar instance’s matter was rejected to CDP
+constant value.
+Default: “rejected|dropped”</p></li>
+<li><p><strong>minutes_item_decision_passed_pattern</strong> (<em>str</em>) – Regex pattern used to convert Legistar instance’s minutes item passage to CDP
+constant value.
+Default: “pass”</p></li>
+<li><p><strong>minutes_item_decision_failed_pattern</strong> (<em>str</em>) – Regex pattern used to convert Legistar instance’s minutes item failure to CDP
+constant value.
+Default: “not|fail”</p></li>
+</ul>
 </dd>
 </dl>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.SeattleScraper" title="cdp_scrapers.instances.seattle.SeattleScraper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdp_scrapers.instances.seattle.SeattleScraper</span></code></a></p>
+<p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_video_uris" title="cdp_scrapers.legistar_utils.LegistarScraper.get_video_uris"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdp_scrapers.legistar_utils.LegistarScraper.get_video_uris</span></code></a>, <a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.SeattleScraper" title="cdp_scrapers.instances.seattle.SeattleScraper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdp_scrapers.instances.seattle.SeattleScraper</span></code></a></p>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.__init__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timezone</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_minutes_item_patterns</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_approve_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'approve|favor|yes'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_abstain_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'abstain|refuse|refrain'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_reject_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'reject|oppose|no'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_absent_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'absent'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_nonvoting_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'nv|(?:non.*voting)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matter_adopted_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'approved|confirmed|passed|adopted'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matter_in_progress_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'heard|ready|filed|held|(?:in\\s*committee)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matter_rejected_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'rejected|dropped'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minutes_item_decision_passed_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'pass'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minutes_item_decision_failed_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'not|fail'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.__init__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>
@@ -224,68 +267,65 @@ and get_time_zone() functions.</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cdp_scrapers.legistar_utils.LegistarScraper.__init__" title="cdp_scrapers.legistar_utils.LegistarScraper.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(client)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cdp_scrapers.legistar_utils.LegistarScraper.__init__" title="cdp_scrapers.legistar_utils.LegistarScraper.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(client, timezone[, …])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.as_local_time" title="cdp_scrapers.legistar_utils.LegistarScraper.as_local_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">as_local_time</span></code></a>(local_time)</p></td>
-<td><p>Return input datetime with time zone information.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.check_for_cdp_min_ingestion" title="cdp_scrapers.legistar_utils.LegistarScraper.check_for_cdp_min_ingestion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_for_cdp_min_ingestion</span></code></a>([check_days])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.check_for_cdp_min_ingestion" title="cdp_scrapers.legistar_utils.LegistarScraper.check_for_cdp_min_ingestion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_for_cdp_min_ingestion</span></code></a>([check_days])</p></td>
 <td><p>Test if can obtain at least one minimally defined EventIngestionModel</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.date_time_to_datetime" title="cdp_scrapers.legistar_utils.LegistarScraper.date_time_to_datetime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">date_time_to_datetime</span></code></a>(ev_date, ev_time)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.date_and_time_to_datetime" title="cdp_scrapers.legistar_utils.LegistarScraper.date_and_time_to_datetime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">date_and_time_to_datetime</span></code></a>(ev_date, ev_time)</p></td>
 <td><p>Return datetime from ev_date and ev_time</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.filter_event_minutes" title="cdp_scrapers.legistar_utils.LegistarScraper.filter_event_minutes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_event_minutes</span></code></a>(ev_minutes_item)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.filter_event_minutes" title="cdp_scrapers.legistar_utils.LegistarScraper.filter_event_minutes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_event_minutes</span></code></a>(ev_minutes_item)</p></td>
 <td><p>Return None if minutes_item.name contains unimportant text that we want to ignore</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.find_time_zone" title="cdp_scrapers.legistar_utils.LegistarScraper.find_time_zone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_time_zone</span></code></a>()</p></td>
-<td><p>Return name for a US time zone matching UTC offset calculated from OS clock :returns: <strong>time zone name</strong> :rtype: str</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.find_time_zone" title="cdp_scrapers.legistar_utils.LegistarScraper.find_time_zone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_time_zone</span></code></a>()</p></td>
+<td><p>Return name for a US time zone matching UTC offset calculated from OS clock.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.fix_event_minutes" title="cdp_scrapers.legistar_utils.LegistarScraper.fix_event_minutes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fix_event_minutes</span></code></a>(ev_minutes_item, …)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.fix_event_minutes" title="cdp_scrapers.legistar_utils.LegistarScraper.fix_event_minutes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fix_event_minutes</span></code></a>(ev_minutes_item, …)</p></td>
 <td><p>Inspect the MinutesItem and Matter in ev_minutes_item.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_event_minutes" title="cdp_scrapers.legistar_utils.LegistarScraper.get_event_minutes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_event_minutes</span></code></a>(legistar_ev_items)</p></td>
-<td><p>Return List[EventMinutesItem] for Legistar API EventItems</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_event_minutes" title="cdp_scrapers.legistar_utils.LegistarScraper.get_event_minutes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_event_minutes</span></code></a>(legistar_ev_items)</p></td>
+<td><p>Return List[EventMinutesItem] for Legistar API EventItems.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_event_support_files" title="cdp_scrapers.legistar_utils.LegistarScraper.get_event_support_files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_event_support_files</span></code></a>(legistar_ev_attachments)</p></td>
-<td><p>Return List[SupportingFile] for Legistar API MatterAttachments</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_event_supporting_files" title="cdp_scrapers.legistar_utils.LegistarScraper.get_event_supporting_files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_event_supporting_files</span></code></a>(…)</p></td>
+<td><p>Return List[SupportingFile] for Legistar API MatterAttachments.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_events" title="cdp_scrapers.legistar_utils.LegistarScraper.get_events"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_events</span></code></a>([begin, end])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_events" title="cdp_scrapers.legistar_utils.LegistarScraper.get_events"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_events</span></code></a>([begin, end])</p></td>
 <td><p>Calls get_legistar_events_for_timespan to retrieve Legistar API data and return as List[EventIngestionModel]</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_matter" title="cdp_scrapers.legistar_utils.LegistarScraper.get_matter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_matter</span></code></a>(legistar_ev)</p></td>
-<td><p>Return Matter from Legistar API EventItem</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_matter" title="cdp_scrapers.legistar_utils.LegistarScraper.get_matter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_matter</span></code></a>(legistar_ev)</p></td>
+<td><p>Return Matter from Legistar API EventItem.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_matter_status" title="cdp_scrapers.legistar_utils.LegistarScraper.get_matter_status"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_matter_status</span></code></a>(legistar_matter_status)</p></td>
-<td><p>Return appropriate MatterStatusDecision constant from EventItemMatterStatus</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_matter_status" title="cdp_scrapers.legistar_utils.LegistarScraper.get_matter_status"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_matter_status</span></code></a>(legistar_matter_status)</p></td>
+<td><p>Return appropriate MatterStatusDecision constant from EventItemMatterStatus.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_minutes_item" title="cdp_scrapers.legistar_utils.LegistarScraper.get_minutes_item"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_minutes_item</span></code></a>(legistar_ev_item)</p></td>
-<td><p>Return MinutesItem from parts of Legistar API EventItem</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_minutes_item" title="cdp_scrapers.legistar_utils.LegistarScraper.get_minutes_item"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_minutes_item</span></code></a>(legistar_ev_item)</p></td>
+<td><p>Return MinutesItem from parts of Legistar API EventItem.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_minutes_item_decision" title="cdp_scrapers.legistar_utils.LegistarScraper.get_minutes_item_decision"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_minutes_item_decision</span></code></a>(…)</p></td>
-<td><p>Return appropriate EventMinutesItemDecision constant</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_minutes_item_decision" title="cdp_scrapers.legistar_utils.LegistarScraper.get_minutes_item_decision"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_minutes_item_decision</span></code></a>(…)</p></td>
+<td><p>Return appropriate EventMinutesItemDecision constant from EventItemPassedFlagName.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_none_if_empty" title="cdp_scrapers.legistar_utils.LegistarScraper.get_none_if_empty"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_none_if_empty</span></code></a>(model)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_none_if_empty" title="cdp_scrapers.legistar_utils.LegistarScraper.get_none_if_empty"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_none_if_empty</span></code></a>(model)</p></td>
 <td><p>Check required keys in model, return None if any such key has no value.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_person" title="cdp_scrapers.legistar_utils.LegistarScraper.get_person"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_person</span></code></a>(legistar_person)</p></td>
-<td><p>Return CDP Person for Legistar Person</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_person" title="cdp_scrapers.legistar_utils.LegistarScraper.get_person"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_person</span></code></a>(legistar_person)</p></td>
+<td><p>Return CDP Person for Legistar Person.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_required_attrs" title="cdp_scrapers.legistar_utils.LegistarScraper.get_required_attrs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_required_attrs</span></code></a>(model)</p></td>
-<td><p>Return list of keys required in model as specified in IngestionModel class definition</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_time_zone" title="cdp_scrapers.legistar_utils.LegistarScraper.get_time_zone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_time_zone</span></code></a>()</p></td>
-<td><p>Return time zone name for CDP instance.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_required_attrs" title="cdp_scrapers.legistar_utils.LegistarScraper.get_required_attrs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_required_attrs</span></code></a>(model)</p></td>
+<td><p>Return list of keys required in model as specified in IngestionModel class definition.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_video_uris" title="cdp_scrapers.legistar_utils.LegistarScraper.get_video_uris"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_video_uris</span></code></a>(legistar_ev)</p></td>
 <td><p>Must implement in class derived from LegistarScraper.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_vote_decision" title="cdp_scrapers.legistar_utils.LegistarScraper.get_vote_decision"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_vote_decision</span></code></a>(legistar_vote)</p></td>
-<td><p>Return appropriate VoteDecision constant based on Legistar Vote</p></td>
+<td><p>Return appropriate VoteDecision constant based on Legistar Vote.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_votes" title="cdp_scrapers.legistar_utils.LegistarScraper.get_votes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_votes</span></code></a>(legistar_votes)</p></td>
-<td><p>Return List[Vote] for Legistar API Votes</p></td>
+<td><p>Return List[Vote] for Legistar API Votes.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.localize_datetime" title="cdp_scrapers.legistar_utils.LegistarScraper.localize_datetime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">localize_datetime</span></code></a>(local_time)</p></td>
+<td><p>Return input datetime with time zone information.</p></td>
 </tr>
 </tbody>
 </table>
@@ -297,7 +337,7 @@ and get_time_zone() functions.</p>
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.is_legistar_compatible" title="cdp_scrapers.legistar_utils.LegistarScraper.is_legistar_compatible"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_legistar_compatible</span></code></a></p></td>
-<td><p>Check that Legistar API recognizes client name</p></td>
+<td><p>Check that Legistar API recognizes client name.</p></td>
 </tr>
 </tbody>
 </table>

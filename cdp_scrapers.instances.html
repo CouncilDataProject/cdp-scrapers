@@ -240,15 +240,11 @@ from GitHub Actions UI.</p>
 <dt class="sig sig-object py" id="cdp_scrapers.instances.kingcounty.KingCountyScraper">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">cdp_scrapers.instances.kingcounty.</span></span><span class="sig-name descname"><span class="pre">KingCountyScraper</span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/kingcounty.html#KingCountyScraper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.kingcounty.KingCountyScraper" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="cdp_scrapers.legistar_utils.LegistarScraper.html#cdp_scrapers.legistar_utils.LegistarScraper" title="cdp_scrapers.legistar_utils.LegistarScraper"><code class="xref py py-class docutils literal notranslate"><span class="pre">cdp_scrapers.legistar_utils.LegistarScraper</span></code></a></p>
-<p>kingcounty-specific implementation of LegistarScraper</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="cdp_scrapers.instances.kingcounty.KingCountyScraper.get_time_zone">
-<span class="sig-name descname"><span class="pre">get_time_zone</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/kingcounty.html#KingCountyScraper.get_time_zone"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.kingcounty.KingCountyScraper.get_time_zone" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return America Los Angeles (old: US/Pacific) time zone name.
-Can call find_time_zone() to find dynamically.
-:returns: <strong>time zone name</strong> – “America/Los_Angeles”
-:rtype: str</p>
-</dd></dl>
+<p>King County specific implementation of LegistarScraper.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cdp_scrapers.instances.kingcounty.KingCountyScraper.PYTHON_MUNICIPALITY_SLUG">
+<span class="sig-name descname"><span class="pre">PYTHON_MUNICIPALITY_SLUG</span></span><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><em class="property"> <span class="pre">=</span> <span class="pre">'king_county'</span></em><a class="headerlink" href="#cdp_scrapers.instances.kingcounty.KingCountyScraper.PYTHON_MUNICIPALITY_SLUG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.instances.kingcounty.KingCountyScraper.get_video_uris">
@@ -256,17 +252,19 @@ Can call find_time_zone() to find dynamically.
 <dd><p>Return URLs for videos and captions parsed from kingcounty.gov web page</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>legistar_ev</strong> (<em>Dict</em>) – Data for one Legistar Event obtained from
-..legistar_utils.get_legistar_events_for_timespan()</p>
+<dd class="field-odd"><p><strong>legistar_ev</strong> (<em>Dict</em>) – Data for one Legistar Event.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>List of video and caption URI
-[{“video_uri”: …, “caption_uri”: …}, …]</p>
+<dd class="field-even"><p><strong>video_and_caption_uris</strong> – List of Dict containing video and caption URI for each session found.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>List[Dict]</p>
 </dd>
 </dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.get_legistar_events_for_timespan" title="cdp_scrapers.legistar_utils.get_legistar_events_for_timespan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdp_scrapers.legistar_utils.get_legistar_events_for_timespan</span></code></a></p>
+</div>
 </dd></dl>
 
 </dd></dl>
@@ -278,21 +276,11 @@ Can call find_time_zone() to find dynamically.
 <dt class="sig sig-object py" id="cdp_scrapers.instances.seattle.SeattleScraper">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">cdp_scrapers.instances.seattle.</span></span><span class="sig-name descname"><span class="pre">SeattleScraper</span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/seattle.html#SeattleScraper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.seattle.SeattleScraper" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="cdp_scrapers.legistar_utils.LegistarScraper.html#cdp_scrapers.legistar_utils.LegistarScraper" title="cdp_scrapers.legistar_utils.LegistarScraper"><code class="xref py py-class docutils literal notranslate"><span class="pre">cdp_scrapers.legistar_utils.LegistarScraper</span></code></a></p>
-<p>Seattle-specific implementation of LegistarScraper</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="cdp_scrapers.instances.seattle.SeattleScraper.get_time_zone">
-<span class="sig-name descname"><span class="pre">get_time_zone</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/seattle.html#SeattleScraper.get_time_zone"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.seattle.SeattleScraper.get_time_zone" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return America Los Angeles (old: US/Pacific) time zone name.
-Can call find_time_zone() to find dynamically.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><strong>time zone name</strong> – “America/Los_Angeles”</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
+<p>Seattle specific implementation of LegistarScraper.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cdp_scrapers.instances.seattle.SeattleScraper.PYTHON_MUNICIPALITY_SLUG">
+<span class="sig-name descname"><span class="pre">PYTHON_MUNICIPALITY_SLUG</span></span><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><em class="property"> <span class="pre">=</span> <span class="pre">'seattle'</span></em><a class="headerlink" href="#cdp_scrapers.instances.seattle.SeattleScraper.PYTHON_MUNICIPALITY_SLUG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.instances.seattle.SeattleScraper.get_video_uris">
@@ -300,31 +288,47 @@ Can call find_time_zone() to find dynamically.</p>
 <dd><p>Return URLs for videos and captions parsed from seattlechannel.org web page</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>legistar_ev</strong> (<em>Dict</em>) – Data for one Legistar Event obtained from
-..legistar_utils.get_legistar_events_for_timespan()</p>
+<dd class="field-odd"><p><strong>legistar_ev</strong> (<em>Dict</em>) – Data for one Legistar Event.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>List of video and caption URI
-[{“video_uri”: …, “caption_uri”: …}, …]</p>
+<dd class="field-even"><p><strong>video_and_caption_uris</strong> – List of Dict containing video and caption URI for each session found.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>List[Dict]</p>
 </dd>
 </dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.get_legistar_events_for_timespan" title="cdp_scrapers.legistar_utils.get_legistar_events_for_timespan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdp_scrapers.legistar_utils.get_legistar_events_for_timespan</span></code></a></p>
+</div>
 </dd></dl>
 
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="cdp_scrapers.instances.seattle.get_events">
-<span class="sig-prename descclassname"><span class="pre">cdp_scrapers.instances.seattle.</span></span><span class="sig-name descname"><span class="pre">get_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">from_dt</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">datetime.datetime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_dt</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">datetime.datetime</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.EventIngestionModel</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/seattle.html#get_events"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.seattle.get_events" title="Permalink to this definition">¶</a></dt>
-<dd><p>Implimentation of the Seattle Scrapper to provide to a cookiecutter or for testing.</p>
 </dd></dl>
 
 </div>
 <div class="section" id="module-cdp_scrapers.instances">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-cdp_scrapers.instances" title="Permalink to this headline">¶</a></h2>
 <p>Individual scratchpad and maybe up-to-date CDP instance scrapers.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="cdp_scrapers.instances.func">
+<span class="sig-prename descclassname"><span class="pre">cdp_scrapers.instances.</span></span><span class="sig-name descname"><span class="pre">func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">from_dt:</span> <span class="pre">datetime.datetime</span></em>, <em class="sig-param"><span class="pre">to_dt:</span> <span class="pre">datetime.datetime</span></em>, <em class="sig-param"><span class="pre">*</span></em>, <em class="sig-param"><span class="pre">legistar_scraper:</span> <span class="pre">Type[cdp_scrapers.legistar_utils.LegistarScraper]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'cdp_scrapers.instances.seattle.SeattleScraper'&gt;</span></em>, <em class="sig-param"><span class="pre">**kwargs:</span> <span class="pre">Any</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.EventIngestionModel</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#cdp_scrapers.instances.func" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cdp_scrapers.instances.get_king_county_events">
+<span class="sig-prename descclassname"><span class="pre">cdp_scrapers.instances.</span></span><span class="sig-name descname"><span class="pre">get_king_county_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">from_dt:</span> <span class="pre">datetime.datetime</span></em>, <em class="sig-param"><span class="pre">to_dt:</span> <span class="pre">datetime.datetime</span></em>, <em class="sig-param"><span class="pre">*</span></em>, <em class="sig-param"><span class="pre">legistar_scraper:</span> <span class="pre">Type[cdp_scrapers.legistar_utils.LegistarScraper]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'cdp_scrapers.instances.kingcounty.KingCountyScraper'&gt;</span></em>, <em class="sig-param"><span class="pre">**kwargs:</span> <span class="pre">Any</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.EventIngestionModel</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#cdp_scrapers.instances.get_king_county_events" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cdp_scrapers.instances.get_seattle_events">
+<span class="sig-prename descclassname"><span class="pre">cdp_scrapers.instances.</span></span><span class="sig-name descname"><span class="pre">get_seattle_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">from_dt:</span> <span class="pre">datetime.datetime</span></em>, <em class="sig-param"><span class="pre">to_dt:</span> <span class="pre">datetime.datetime</span></em>, <em class="sig-param"><span class="pre">*</span></em>, <em class="sig-param"><span class="pre">legistar_scraper:</span> <span class="pre">Type[cdp_scrapers.legistar_utils.LegistarScraper]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'cdp_scrapers.instances.seattle.SeattleScraper'&gt;</span></em>, <em class="sig-param"><span class="pre">**kwargs:</span> <span class="pre">Any</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.EventIngestionModel</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#cdp_scrapers.instances.get_seattle_events" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cdp_scrapers.instances.scraper_get_events">
+<span class="sig-prename descclassname"><span class="pre">cdp_scrapers.instances.</span></span><span class="sig-name descname"><span class="pre">scraper_get_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">from_dt:</span> <span class="pre">datetime.datetime</span></em>, <em class="sig-param"><span class="pre">to_dt:</span> <span class="pre">datetime.datetime</span></em>, <em class="sig-param"><span class="pre">*</span></em>, <em class="sig-param"><span class="pre">legistar_scraper:</span> <span class="pre">Type[cdp_scrapers.legistar_utils.LegistarScraper]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'cdp_scrapers.instances.seattle.SeattleScraper'&gt;</span></em>, <em class="sig-param"><span class="pre">**kwargs:</span> <span class="pre">Any</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.EventIngestionModel</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#cdp_scrapers.instances.scraper_get_events" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 </div>
 

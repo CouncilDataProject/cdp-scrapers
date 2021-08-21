@@ -194,36 +194,29 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">urllib.error</span> <span class="kn">import</span> <span class="n">HTTPError</span><span class="p">,</span> <span class="n">URLError</span>
 <span class="kn">from</span> <span class="nn">urllib.request</span> <span class="kn">import</span> <span class="n">urlopen</span>
-<span class="kn">from</span> <span class="nn">urllib.error</span> <span class="kn">import</span> <span class="n">URLError</span><span class="p">,</span> <span class="n">HTTPError</span>
 
 <span class="kn">import</span> <span class="nn">requests</span>
-
-<span class="kn">from</span> <span class="nn">cdp_backend.pipeline.ingestion_models</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">EventIngestionModel</span><span class="p">,</span>
-    <span class="n">Body</span><span class="p">,</span>
-    <span class="n">IngestionModel</span><span class="p">,</span>
-    <span class="n">Session</span><span class="p">,</span>
-    <span class="n">EventMinutesItem</span><span class="p">,</span>
-    <span class="n">MinutesItem</span><span class="p">,</span>
-    <span class="n">Matter</span><span class="p">,</span>
-    <span class="n">SupportingFile</span><span class="p">,</span>
-    <span class="n">Person</span><span class="p">,</span>
-    <span class="n">Vote</span><span class="p">,</span>
-<span class="p">)</span>
-
 <span class="kn">from</span> <span class="nn">cdp_backend.database.constants</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">EventMinutesItemDecision</span><span class="p">,</span>
     <span class="n">MatterStatusDecision</span><span class="p">,</span>
     <span class="n">VoteDecision</span><span class="p">,</span>
 <span class="p">)</span>
-
-<span class="kn">from</span> <span class="nn">pytz</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">utc</span><span class="p">,</span>
-    <span class="n">timezone</span><span class="p">,</span>
-    <span class="n">country_timezones</span><span class="p">,</span>
+<span class="kn">from</span> <span class="nn">cdp_backend.pipeline.ingestion_models</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Body</span><span class="p">,</span>
+    <span class="n">EventIngestionModel</span><span class="p">,</span>
+    <span class="n">EventMinutesItem</span><span class="p">,</span>
+    <span class="n">IngestionModel</span><span class="p">,</span>
+    <span class="n">Matter</span><span class="p">,</span>
+    <span class="n">MinutesItem</span><span class="p">,</span>
+    <span class="n">Person</span><span class="p">,</span>
+    <span class="n">Session</span><span class="p">,</span>
+    <span class="n">SupportingFile</span><span class="p">,</span>
+    <span class="n">Vote</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">pytz</span> <span class="kn">import</span> <span class="n">country_timezones</span><span class="p">,</span> <span class="n">timezone</span><span class="p">,</span> <span class="n">utc</span>
 
 <span class="c1">###############################################################################</span>
 
@@ -322,6 +315,7 @@
         <span class="n">begin</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">end</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">end</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+
     <span class="c1"># The unformatted request parts</span>
     <span class="n">filter_datetime_format</span> <span class="o">=</span> <span class="s2">&quot;EventDate+</span><span class="si">{op}</span><span class="s2">+datetime%27</span><span class="si">{dt}</span><span class="s2">%27&quot;</span>
     <span class="n">request_format</span> <span class="o">=</span> <span class="n">LEGISTAR_EVENT_BASE</span> <span class="o">+</span> <span class="s2">&quot;?$filter=</span><span class="si">{begin}</span><span class="s2">+and+</span><span class="si">{end}</span><span class="s2">&quot;</span>
@@ -341,6 +335,7 @@
             <span class="p">),</span>
         <span class="p">)</span>
     <span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
     <span class="c1"># Get all event items for each event</span>
     <span class="n">item_request_format</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">LEGISTAR_EVENT_BASE</span>
@@ -361,6 +356,7 @@
                     <span class="n">event_item_id</span><span class="o">=</span><span class="n">event_item</span><span class="p">[</span><span class="s2">&quot;EventItemId&quot;</span><span class="p">],</span>
                 <span class="p">)</span>
             <span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
             <span class="c1"># Get person information</span>
             <span class="k">for</span> <span class="n">vote_info</span> <span class="ow">in</span> <span class="n">event_item</span><span class="p">[</span><span class="s2">&quot;EventItemVoteInfo&quot;</span><span class="p">]:</span>
                 <span class="n">person_request_format</span> <span class="o">=</span> <span class="n">LEGISTAR_PERSON_BASE</span> <span class="o">+</span> <span class="s2">&quot;/</span><span class="si">{person_id}</span><span class="s2">&quot;</span>
@@ -377,17 +373,16 @@
 
 <div class="viewcode-block" id="str_simplified"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.str_simplified">[docs]</a><span class="k">def</span> <span class="nf">str_simplified</span><span class="p">(</span><span class="n">input_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Remove leading/trailing whitespaces,</span>
-<span class="sd">    simplify multiple whitespaces,</span>
-<span class="sd">    unify newline characters</span>
+<span class="sd">    Remove leading and trailing whitespaces, simplify multiple whitespaces, unify</span>
+<span class="sd">    newline characters.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    input_str : str</span>
+<span class="sd">    input_str: str</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    str</span>
+<span class="sd">    cleaned: str</span>
 <span class="sd">        input_str stripped if it is a string</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_str</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -402,20 +397,22 @@
     <span class="k">return</span> <span class="n">input_str</span></div>
 
 
-<div class="viewcode-block" id="reduced_list"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.reduced_list">[docs]</a><span class="k">def</span> <span class="nf">reduced_list</span><span class="p">(</span><span class="n">input_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">collapse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+<div class="viewcode-block" id="reduced_list"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.reduced_list">[docs]</a><span class="k">def</span> <span class="nf">reduced_list</span><span class="p">(</span><span class="n">input_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">collapse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Remove all None items from input_list.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    input_list : List[Any]</span>
+<span class="sd">    input_list: List[Any]</span>
 <span class="sd">        Input list from which to filter out items that are None</span>
-<span class="sd">    collapse : bool, default = True</span>
+<span class="sd">    collapse: bool, default = True</span>
 <span class="sd">        If True, return None in place of an empty list</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    List | None</span>
+<span class="sd">    reduced_list: Optional[List]</span>
+<span class="sd">        All items in the original list except for None values.</span>
+<span class="sd">        None if all items were None and collapse is True.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">filtered</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">input_list</span> <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">collapse</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">filtered</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -428,308 +425,241 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Base class for transforming Legistar API data to CDP IngestionModel.</span>
 
-<span class="sd">    A given installation must define a derived class and implement get_video_uris()</span>
-<span class="sd">    and get_time_zone() functions.</span>
+<span class="sd">    If get_events() naively fails and raises an error, a given installation must define</span>
+<span class="sd">    a derived class and implement the get_video_uris() function.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    client: str</span>
-<span class="sd">        Legistar client name, e.g. &quot;seattle&quot; for Seattle</span>
+<span class="sd">        Legistar client name, e.g. &quot;seattle&quot; for Seattle, &quot;kingcounty&quot; for King County.</span>
+<span class="sd">    timezone: str</span>
+<span class="sd">        The timezone for the target client.</span>
+<span class="sd">        i.e. &quot;America/Los_Angeles&quot; or &quot;America/New_York&quot;</span>
+<span class="sd">        See https://en.wikipedia.org/wiki/List_of_tz_database_time_zones for canonical</span>
+<span class="sd">        timezones.</span>
+<span class="sd">    ignore_minutes_item_patterns: List[str]</span>
+<span class="sd">        A list of string patterns or substrings to act as a minutes item filter.</span>
+<span class="sd">        Any item in the provided list will be compiled as a regex string and any</span>
+<span class="sd">        minute&#39;s item that contains the compiled pattern will be filtered out of the</span>
+<span class="sd">        produced CDP minutes item list.</span>
+<span class="sd">        Default: [] (do not filter any minutes items)</span>
+<span class="sd">    vote_approve_pattern: str</span>
+<span class="sd">        Regex pattern used to convert Legistar instance&#39;s votes in approval value to CDP</span>
+<span class="sd">        constant value.</span>
+<span class="sd">        Default: &quot;approve|favor|yes&quot;</span>
+<span class="sd">    vote_abstain_pattern: str</span>
+<span class="sd">        Regex pattern used to convert Legistar instance&#39;s abstension value to CDP</span>
+<span class="sd">        constant value. Note, this is a pure abstension, not an &quot;approval by</span>
+<span class="sd">        abstention&quot; or &quot;rejection by abstension&quot; value. Those should be places in</span>
+<span class="sd">        vote_approve_pattern and vote_reject_pattern respectively.</span>
+<span class="sd">        Default: &quot;abstain|refuse|refrain&quot;</span>
+<span class="sd">    vote_reject_pattern: str</span>
+<span class="sd">        Regex pattern used to convert Legistar instance&#39;s votes in rejection value to</span>
+<span class="sd">        CDP constant value.</span>
+<span class="sd">        Default: &quot;reject|oppose|no&quot;</span>
+<span class="sd">    vote_absent_pattern: str</span>
+<span class="sd">        Regex pattern used to convert Legistar instance&#39;s excused absense value to CDP</span>
+<span class="sd">        constant value.</span>
+<span class="sd">        Default: &quot;absent&quot;</span>
+<span class="sd">    vote_nonvoting_pattern: str</span>
+<span class="sd">        Regex pattern used to convert Legistar instance&#39;s non-voting value to CDP</span>
+<span class="sd">        constant value.</span>
+<span class="sd">        Default: &quot;nv|(?:non.*voting)&quot;</span>
+<span class="sd">    matter_adopted_pattern: str</span>
+<span class="sd">        Regex pattern used to convert Legistar instance&#39;s matter was adopted to CDP</span>
+<span class="sd">        constant value.</span>
+<span class="sd">        Default: &quot;approved|confirmed|passed|adopted&quot;</span>
+<span class="sd">    matter_in_progess_pattern: str</span>
+<span class="sd">        Regex pattern used to convert Legistar instance&#39;s matter is in-progress to</span>
+<span class="sd">        CDP constant value.</span>
+<span class="sd">        Default: &quot;heard|ready|filed|held|(?:in\s*committee)&quot;</span>
+<span class="sd">    matter_rejected_pattern: str</span>
+<span class="sd">        Regex pattern used to convert Legistar instance&#39;s matter was rejected to CDP</span>
+<span class="sd">        constant value.</span>
+<span class="sd">        Default: &quot;rejected|dropped&quot;</span>
+<span class="sd">    minutes_item_decision_passed_pattern: str</span>
+<span class="sd">        Regex pattern used to convert Legistar instance&#39;s minutes item passage to CDP</span>
+<span class="sd">        constant value.</span>
+<span class="sd">        Default: &quot;pass&quot;</span>
+<span class="sd">    minutes_item_decision_failed_pattern: str</span>
+<span class="sd">        Regex pattern used to convert Legistar instance&#39;s minutes item failure to CDP</span>
+<span class="sd">        constant value.</span>
+<span class="sd">        Default: &quot;not|fail&quot;</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
+<span class="sd">    cdp_scrapers.legistar_utils.LegistarScraper.get_video_uris</span>
 <span class="sd">    cdp_scrapers.instances.seattle.SeattleScraper</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: W605</span>
 
-<div class="viewcode-block" id="LegistarScraper.__init__"><a class="viewcode-back" href="../../cdp_scrapers.legistar_utils.LegistarScraper.html#cdp_scrapers.legistar_utils.LegistarScraper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<div class="viewcode-block" id="LegistarScraper.__init__"><a class="viewcode-back" href="../../cdp_scrapers.legistar_utils.LegistarScraper.html#cdp_scrapers.legistar_utils.LegistarScraper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">client</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">timezone</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">ignore_minutes_item_patterns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span>
+        <span class="n">vote_approve_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;approve|favor|yes&quot;</span><span class="p">,</span>
+        <span class="n">vote_abstain_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;abstain|refuse|refrain&quot;</span><span class="p">,</span>
+        <span class="n">vote_reject_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;reject|oppose|no&quot;</span><span class="p">,</span>
+        <span class="n">vote_absent_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;absent&quot;</span><span class="p">,</span>
+        <span class="n">vote_nonvoting_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;nv|(?:non.*voting)&quot;</span><span class="p">,</span>
+        <span class="n">matter_adopted_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;approved|confirmed|passed|adopted&quot;</span><span class="p">,</span>
+        <span class="n">matter_in_progress_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;heard|ready|filed|held|(?:in\s*committee)&quot;</span><span class="p">,</span>
+        <span class="n">matter_rejected_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;rejected|dropped&quot;</span><span class="p">,</span>
+        <span class="n">minutes_item_decision_passed_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;pass&quot;</span><span class="p">,</span>
+        <span class="n">minutes_item_decision_failed_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;not|fail&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">client_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">client</span>
-
-        <span class="c1"># EventMinutesItem is ignored from ingestion if minutes_item contains this</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">IGNORED_MINUTE_ITEMS</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s2">&quot;This meeting also constitutes a meeting of the City Council&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;In-person attendance is currently prohibited&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Times listed are estimated&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;has been cancelled&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Deputy City Clerk&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Paste the following link into the address bar of your web browser&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;HOW TO WATCH&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;page break&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;PUBLIC NOTICE&quot;</span><span class="p">,</span>
-            <span class="c1"># &quot;CALL TO ORDER&quot;,</span>
-            <span class="c1"># &quot;ROLL CALL&quot;,</span>
-            <span class="c1"># &quot;APPROVAL OF THE JOURNAL&quot;,</span>
-            <span class="c1"># &quot;REFERRAL CALENDAR&quot;,</span>
-            <span class="c1"># &quot;APPROVAL OF THE AGENDA&quot;,</span>
-            <span class="c1"># &quot;Items of Business&quot;,</span>
-            <span class="c1"># &quot;PUBLIC COMMENT&quot;,</span>
-            <span class="c1"># &quot;PAYMENT OF BILLS&quot;,</span>
-            <span class="c1"># &quot;COMMITTEE REPORTS&quot;,</span>
-            <span class="c1"># &quot;OTHER BUSINESS&quot;,</span>
-            <span class="c1"># &quot;ADJOURNMENT&quot;,</span>
-            <span class="c1"># &quot;PRESENTATIONS&quot;,</span>
-            <span class="c1"># &quot;ADOPTION OF OTHER RESOLUTIONS&quot;,</span>
-        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timezone</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">timezone</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ignore_minutes_item_patterns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">ignore_minutes_item_patterns</span>
 
         <span class="c1"># regex patterns used to infer cdp_backend.database.constants</span>
         <span class="c1"># from Legistar string fields</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">vote_approve_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;approve|favor|yes&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">vote_abstain_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;abstain|refuse|refrain&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">vote_reject_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;reject|oppose|no&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vote_approve_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">vote_approve_pattern</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vote_abstain_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">vote_abstain_pattern</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vote_reject_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">vote_reject_pattern</span>
         <span class="c1"># TODO: need to debug these using real examples</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">vote_absent_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;absent&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">vote_nonvoting_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;nv|(?:non.*voting)&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vote_absent_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">vote_absent_pattern</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vote_nonvoting_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">vote_nonvoting_pattern</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">matter_adopted_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;approved|confirmed|passed|adopted&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">matter_in_progress_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">r</span><span class="s2">&quot;heard|ready|filed|held|(?:in\s*committee)&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matter_adopted_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">matter_adopted_pattern</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matter_in_progress_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">matter_in_progress_pattern</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matter_rejected_patten</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">matter_rejected_pattern</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">minutes_item_decision_passed_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">minutes_item_decision_passed_pattern</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">matter_rejected_patten</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rejected|dropped&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">minutes_item_decision_failed_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">minutes_item_decision_failed_pattern</span>
+        <span class="p">)</span></div>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">decision_passed_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;pass&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">decision_failed_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;not|fail&quot;</span>
-
-        <span class="c1"># e.g. pytz.timezone(&quot;US/Pacific&quot;)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">time_zone</span><span class="p">:</span> <span class="n">timezone</span> <span class="o">=</span> <span class="n">timezone</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_time_zone</span><span class="p">())</span></div>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">is_legistar_compatible</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<div class="viewcode-block" id="LegistarScraper.get_required_attrs"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_required_attrs">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_required_attrs</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">IngestionModel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Check that Legistar API recognizes client name</span>
+<span class="sd">        Return list of keys required in model as specified in IngestionModel class</span>
+<span class="sd">        definition.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        model: IngestionModel</span>
+<span class="sd">            Person, MinutesItem, etc.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        bool</span>
-<span class="sd">            True if client_name is a valid Legistar client name</span>
+<span class="sd">        attr_keys: List[str]</span>
+<span class="sd">            List of keys (attributes) in model without default value in class</span>
+<span class="sd">            definition.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># simplest check, if the GET request works, it is a legistar municipality</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">resp</span> <span class="o">=</span> <span class="n">urlopen</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;http://webapi.legistar.com/v1/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">client_name</span><span class="si">}</span><span class="s2">/bodies&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">resp</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">200</span>
-        <span class="k">except</span> <span class="n">URLError</span> <span class="ow">or</span> <span class="n">HTTPError</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">False</span>
-
-<div class="viewcode-block" id="LegistarScraper.check_for_cdp_min_ingestion"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.check_for_cdp_min_ingestion">[docs]</a>    <span class="k">def</span> <span class="nf">check_for_cdp_min_ingestion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">check_days</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">7</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Test if can obtain at least one minimally defined EventIngestionModel</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        check_days : int, default=7</span>
-<span class="sd">            Test duration is the past check_days days from now</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        bool</span>
-<span class="sd">            True if got at least one minimally defined EventIngestionModel</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># no point wasting time if the client isn&#39;t on legistar at all</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_legistar_compatible</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">False</span>
-
-        <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
-        <span class="n">days</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">check_days</span><span class="p">)</span>
-
-        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">days</span><span class="p">:</span>
-            <span class="n">begin</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">d</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="n">end</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
-            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                <span class="s2">&quot;Testing for minimal information &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;from </span><span class="si">{</span><span class="n">begin</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">end</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="c1"># create an empty one to have python tell us what keys are required</span>
+            <span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="p">()</span>
+            <span class="c1"># all attrs in model have default values</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># e.g. __init__() missing 3 required positional arguments:</span>
+            <span class="c1"># &#39;session_datetime&#39;, &#39;video_uri&#39;, and &#39;session_index&#39;</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+                <span class="sa">r</span><span class="s2">&quot;missing (?P&lt;num_keys&gt;\d+) required.+argument(?:s)?\:\s*(?P&lt;keys&gt;.+)&quot;</span><span class="p">,</span>
+                <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
             <span class="p">)</span>
 
-            <span class="c1"># ev: EventIngestionModel</span>
-            <span class="k">for</span> <span class="n">cdp_ev</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_events</span><span class="p">(</span><span class="n">begin</span><span class="o">=</span><span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">):</span>
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="p">(</span>
-                        <span class="nb">len</span><span class="p">(</span><span class="n">cdp_ev</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
-                        <span class="ow">and</span> <span class="n">cdp_ev</span><span class="o">.</span><span class="n">sessions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">session_datetime</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-                        <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">cdp_ev</span><span class="o">.</span><span class="n">sessions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">video_uri</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
-                    <span class="p">):</span>
-                        <span class="n">session_time</span> <span class="o">=</span> <span class="n">cdp_ev</span><span class="o">.</span><span class="n">sessions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">session_datetime</span>
-                        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                            <span class="sa">f</span><span class="s2">&quot;Got minimal EventIngestionModel for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">client_name</span><span class="si">}</span><span class="s2">: &quot;</span>
-                            <span class="sa">f</span><span class="s2">&quot;body=</span><span class="si">{</span><span class="n">cdp_ev</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, &quot;</span>
-                            <span class="sa">f</span><span class="s2">&quot;session=</span><span class="si">{</span><span class="n">session_time</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s2">, &quot;</span>
-                            <span class="sa">f</span><span class="s2">&quot;video=</span><span class="si">{</span><span class="n">cdp_ev</span><span class="o">.</span><span class="n">sessions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">video_uri</span><span class="si">}</span><span class="s2">&quot;</span>
-                        <span class="p">)</span>
-                        <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;not able to get required attributes for </span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">[]</span>
 
-                <span class="c1"># catch None or empty list</span>
-                <span class="k">except</span> <span class="ne">TypeError</span> <span class="ow">or</span> <span class="ne">IndexError</span><span class="p">:</span>
-                    <span class="k">pass</span>
+        <span class="n">num_keys</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;num_keys&quot;</span><span class="p">))</span>
 
-        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Failed to get minimal EventIngestionModel for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">client_name</span><span class="si">}</span><span class="s2"> &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;in the past </span><span class="si">{</span><span class="n">check_days</span><span class="si">}</span><span class="s2"> days from </span><span class="si">{</span><span class="n">now</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
-        <span class="c1"># no event in check_days had enough for minimal ingestion model item</span>
-        <span class="k">return</span> <span class="kc">False</span></div>
+        <span class="c1"># &#39;session_datetime&#39;, &#39;video_uri&#39;, and &#39;session_index&#39;</span>
+        <span class="c1"># -&gt; [&quot;session_datetime&quot;, &quot;video_uri&quot;, &quot;session_index&quot;]</span>
 
-<div class="viewcode-block" id="LegistarScraper.get_events"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_events">[docs]</a>    <span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">begin</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">end</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
+        <span class="c1"># SHOULD be able to do this more elegantly using re.split()</span>
+        <span class="c1"># but couldn&#39;t quite get the pattern right</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+            <span class="c1"># TypeError uses</span>
+            <span class="c1"># , and</span>
+            <span class="c1"># and</span>
+            <span class="c1"># ,</span>
+            <span class="c1"># as delimiters for attribute names</span>
+            <span class="sa">r</span><span class="s2">&quot;(\s*,\s*and\s*)|(\s*and\s*)|(\s*,\s*)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;,&quot;</span><span class="p">,</span>
+            <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;keys&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">num_keys</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">keys</span><span class="p">):</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s2"> has </span><span class="si">{</span><span class="n">num_keys</span><span class="si">}</span><span class="s2"> required keys but got </span><span class="si">{</span><span class="n">keys</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">keys</span></div>
+
+<div class="viewcode-block" id="LegistarScraper.get_none_if_empty"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_none_if_empty">[docs]</a>    <span class="k">def</span> <span class="nf">get_none_if_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">IngestionModel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">IngestionModel</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Calls get_legistar_events_for_timespan to retrieve Legistar API data</span>
-<span class="sd">        and return as List[EventIngestionModel]</span>
+<span class="sd">        Check required keys in model, return None if any such key has no value.</span>
+<span class="sd">        i.e. If all required keys have valid value, return as-is.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        begin : datetime, optional</span>
-<span class="sd">            The timespan beginning datetime to query for events after.</span>
-<span class="sd">            Default is 2 days from UTC now</span>
-<span class="sd">        end : datetime, optional</span>
-<span class="sd">            The timespan end datetime to query for events before.</span>
-<span class="sd">            Default is UTC now</span>
+<span class="sd">        model: IngestionModel</span>
+<span class="sd">            Person, MinutesItem, etc.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        List[EventIngestionModel]</span>
-<span class="sd">            One instance of EventIngestionModel per Legistar Event</span>
+<span class="sd">        model: Optional[IngestionModel]</span>
+<span class="sd">            None or model as-is</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">min_keys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_ingestion_keys</span><span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="c1"># first time using min_ingestion_keys</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">min_ingestion_keys</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">min_keys</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="c1"># first time checking model.__class__</span>
+            <span class="n">min_keys</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">min_keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">min_keys</span> <span class="o">=</span> <span class="n">LegistarScraper</span><span class="o">.</span><span class="n">get_required_attrs</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+            <span class="c1"># cache so we don&#39;t do expensive dynamic checking</span>
+            <span class="c1"># again for this IngestionModel</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">min_ingestion_keys</span><span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="p">]</span> <span class="o">=</span> <span class="n">min_keys</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">min_keys</span><span class="p">:</span>
+            <span class="c1"># no required keys for this model</span>
+            <span class="c1"># this probably never happens</span>
+            <span class="k">return</span> <span class="n">model</span>
+
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">min_keys</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+
+                <span class="c1"># &quot;if not&quot; test to catch all None and None-like values</span>
+                <span class="c1"># e.g. empty string, empty list, ...</span>
+                <span class="c1"># but int(0) is not &quot;empty&quot;</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">val</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                    <span class="c1"># empty value for this key in model</span>
+                    <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># nonempty value for all required keys in model</span>
+        <span class="k">return</span> <span class="n">model</span></div>
+
+<div class="viewcode-block" id="LegistarScraper.get_matter_status"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_matter_status">[docs]</a>    <span class="k">def</span> <span class="nf">get_matter_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_matter_status</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return appropriate MatterStatusDecision constant from EventItemMatterStatus.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        legistar_matter_status: str</span>
+<span class="sd">            Legistar API EventItemMatterStatus.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        matter_status: Optional[str]</span>
+<span class="sd">            A constant from CDP allowed matter status decisions.</span>
+<span class="sd">            None if missing information or if matter status decision parameter patterns</span>
+<span class="sd">            are not inclusive to the Legistar matter status value.</span>
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
-<span class="sd">        get_legistar_events_for_timespan</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">begin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">begin</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">end</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">end</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
-
-        <span class="n">ingestion_models</span> <span class="o">=</span> <span class="p">[]</span>
-
-        <span class="k">for</span> <span class="n">legistar_ev</span> <span class="ow">in</span> <span class="n">get_legistar_events_for_timespan</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">client_name</span><span class="p">,</span>
-            <span class="n">begin</span><span class="o">=</span><span class="n">begin</span><span class="p">,</span>
-            <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span>
-        <span class="p">):</span>
-            <span class="c1"># better to return time as local time with time zone info,</span>
-            <span class="c1"># rather than as utc time.</span>
-            <span class="c1"># this way the calling pipeline can find out what is the local zone.</span>
-            <span class="n">session_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_local_time</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">date_time_to_datetime</span><span class="p">(</span>
-                    <span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_SESSION_DATE</span><span class="p">],</span>
-                    <span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_SESSION_TIME</span><span class="p">],</span>
-                <span class="p">)</span>
-            <span class="p">)</span>
-            <span class="c1"># prefer video file path in legistar Event.EventVideoPath</span>
-            <span class="k">if</span> <span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_SESSION_VIDEO_URI</span><span class="p">]:</span>
-                <span class="n">list_uri</span> <span class="o">=</span> <span class="p">[</span>
-                    <span class="p">{</span>
-                        <span class="n">CDP_VIDEO_URI</span><span class="p">:</span> <span class="n">str_simplified</span><span class="p">(</span>
-                            <span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_SESSION_VIDEO_URI</span><span class="p">]</span>
-                        <span class="p">),</span>
-                        <span class="n">CDP_CAPTION_URI</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-                    <span class="p">}</span>
-                <span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">list_uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_video_uris</span><span class="p">(</span><span class="n">legistar_ev</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[</span>
-                    <span class="p">{</span><span class="n">CDP_VIDEO_URI</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="n">CDP_CAPTION_URI</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
-                <span class="p">]</span>
-
-            <span class="n">sessions</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">sessions</span> <span class="o">=</span> <span class="n">reduced_list</span><span class="p">(</span>
-                <span class="p">[</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>
-                        <span class="n">Session</span><span class="p">(</span>
-                            <span class="n">session_datetime</span><span class="o">=</span><span class="n">session_time</span><span class="p">,</span>
-                            <span class="n">session_index</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">sessions</span><span class="p">),</span>
-                            <span class="n">video_uri</span><span class="o">=</span><span class="n">uri</span><span class="p">[</span><span class="n">CDP_VIDEO_URI</span><span class="p">],</span>
-                            <span class="n">caption_uri</span><span class="o">=</span><span class="n">uri</span><span class="p">[</span><span class="n">CDP_CAPTION_URI</span><span class="p">],</span>
-                        <span class="p">)</span>
-                    <span class="p">)</span>
-                    <span class="c1"># Session per video</span>
-                    <span class="k">for</span> <span class="n">uri</span> <span class="ow">in</span> <span class="n">list_uri</span>
-                <span class="p">]</span>
-            <span class="p">)</span>
-            <span class="n">ingestion_models</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>
-                    <span class="n">EventIngestionModel</span><span class="p">(</span>
-                        <span class="n">agenda_uri</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_AGENDA_URI</span><span class="p">]),</span>
-                        <span class="n">minutes_uri</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_MINUTES_URI</span><span class="p">]),</span>
-                        <span class="n">body</span><span class="o">=</span><span class="n">Body</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_BODY_NAME</span><span class="p">])),</span>
-                        <span class="n">sessions</span><span class="o">=</span><span class="n">sessions</span><span class="p">,</span>
-                        <span class="n">event_minutes_items</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event_minutes</span><span class="p">(</span>
-                            <span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_EV_ITEMS</span><span class="p">]</span>
-                        <span class="p">),</span>
-                    <span class="p">)</span>
-                <span class="p">)</span>
-            <span class="p">)</span>
-
-        <span class="c1"># easier for calling pipeline to handle an empty list rather than None</span>
-        <span class="c1"># so request reduced_list() to give me [], not None</span>
-        <span class="k">return</span> <span class="n">reduced_list</span><span class="p">(</span><span class="n">ingestion_models</span><span class="p">,</span> <span class="n">collapse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="LegistarScraper.get_video_uris"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_video_uris">[docs]</a>    <span class="k">def</span> <span class="nf">get_video_uris</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_ev</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Must implement in class derived from LegistarScraper.</span>
-<span class="sd">        If Legistar Event.EventVideoPath is used, return an empty list in the override.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        legstar_ev : Dict</span>
-<span class="sd">            Legistar API Event</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        List[Dict]</span>
-<span class="sd">            List of video and caption URI</span>
-<span class="sd">            [{&quot;video_uri&quot;: ..., &quot;caption_uri&quot;: ...}, ...]</span>
-
-<span class="sd">        Raises</span>
-<span class="sd">        ------</span>
-<span class="sd">        NotImplementedError</span>
-<span class="sd">            This base implementation does nothing</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">log</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span>
-            <span class="s2">&quot;get_video_uris() is required because &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;Legistar Event.EventVideoPath is not used by </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">client_name</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
-
-<div class="viewcode-block" id="LegistarScraper.get_time_zone"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_time_zone">[docs]</a>    <span class="k">def</span> <span class="nf">get_time_zone</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return time zone name for CDP instance.</span>
-<span class="sd">        To use dynamically determined time zone,</span>
-<span class="sd">        use find_time_zone().</span>
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        time zone name : str</span>
-<span class="sd">            i.e. &quot;America/Los_Angeles&quot; | &quot;America/New_York&quot; ...</span>
-
-<span class="sd">        See Also</span>
-<span class="sd">        --------</span>
-<span class="sd">        SeattleScraper.get_time_zone()</span>
-
-<span class="sd">        Notes</span>
-<span class="sd">        -----</span>
-<span class="sd">        List of Timezones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones</span>
-<span class="sd">        Please only use &quot;Canonical&quot; timezones.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-            <span class="s2">&quot;Time zone name required for proper event timestamping. &quot;</span>
-            <span class="s2">&quot;e.g. America/Los_Angeles&quot;</span>
-        <span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
-
-<div class="viewcode-block" id="LegistarScraper.get_matter_status"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_matter_status">[docs]</a>    <span class="k">def</span> <span class="nf">get_matter_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_matter_status</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MatterStatusDecision</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return appropriate MatterStatusDecision constant from EventItemMatterStatus</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        legistar_matter_status : str</span>
-<span class="sd">            Legistar API EventItemMatterStatus</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        MatterStatusDecision</span>
-<span class="sd">            ADOPTED | IN_PROGRESS | REJECTED | None</span>
-
-<span class="sd">        See Also</span>
-<span class="sd">        --------</span>
-<span class="sd">        matter_*_pattern</span>
+<span class="sd">        cdp_backend.database.constants.MatterStatusDecision</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">legistar_matter_status</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
@@ -770,31 +700,35 @@
 <div class="viewcode-block" id="LegistarScraper.get_minutes_item_decision"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_minutes_item_decision">[docs]</a>    <span class="k">def</span> <span class="nf">get_minutes_item_decision</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">legistar_item_passed_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EventMinutesItemDecision</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return appropriate EventMinutesItemDecision constant</span>
-<span class="sd">            from EventItemPassedFlagName</span>
+<span class="sd">        Return appropriate EventMinutesItemDecision constant from</span>
+<span class="sd">        EventItemPassedFlagName.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        legistar_item_passed_name : str</span>
+<span class="sd">        legistar_item_passed_name: str</span>
 <span class="sd">            Legistar API EventItemPassedFlagName</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        MatterStatusDecision</span>
-<span class="sd">            PASSED | FAILED | None</span>
+<span class="sd">        emi_decision: Optional[str]</span>
+<span class="sd">            A constant from CDP allowed minutes item decisions.</span>
+<span class="sd">            None if missing information or if minutes item decision parameter</span>
+<span class="sd">            patterns are no inclusive of the Legistar minutes item decision value.</span>
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
-<span class="sd">        decision_*_pattern</span>
+<span class="sd">        cdp_backend.database.constants.EventMinutesItemDecision</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">legistar_item_passed_name</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="p">(</span>
             <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">decision_passed_pattern</span><span class="p">,</span> <span class="n">legistar_item_passed_name</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">minutes_item_decision_passed_pattern</span><span class="p">,</span>
+                <span class="n">legistar_item_passed_name</span><span class="p">,</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="p">):</span>
@@ -802,7 +736,9 @@
 
         <span class="k">if</span> <span class="p">(</span>
             <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">decision_failed_pattern</span><span class="p">,</span> <span class="n">legistar_item_passed_name</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">minutes_item_decision_failed_pattern</span><span class="p">,</span>
+                <span class="n">legistar_item_passed_name</span><span class="p">,</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="p">):</span>
@@ -810,22 +746,25 @@
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="LegistarScraper.get_vote_decision"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_vote_decision">[docs]</a>    <span class="k">def</span> <span class="nf">get_vote_decision</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_vote</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">VoteDecision</span><span class="p">:</span>
+<div class="viewcode-block" id="LegistarScraper.get_vote_decision"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_vote_decision">[docs]</a>    <span class="k">def</span> <span class="nf">get_vote_decision</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_vote</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return appropriate VoteDecision constant based on Legistar Vote</span>
+<span class="sd">        Return appropriate VoteDecision constant based on Legistar Vote.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        legistar_vote : Dict</span>
+<span class="sd">        legistar_vote: Dict</span>
 <span class="sd">            Legistar API Vote</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        VoteDecision | None</span>
+<span class="sd">        vote_decision: Optional[str]</span>
+<span class="sd">            A constant from CDP allowed vote decisions.</span>
+<span class="sd">            None if missing vote information or if vote decision parameter patterns are</span>
+<span class="sd">            not inclusive of the Legistar vote value.</span>
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
-<span class="sd">        vote_*_pattern</span>
+<span class="sd">        cdp_backend.database.constants.VoteDecision</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span>
             <span class="ow">not</span> <span class="n">legistar_vote</span><span class="p">[</span><span class="n">LEGISTAR_VOTE_VAL_NAME</span><span class="p">]</span>
@@ -901,18 +840,20 @@
 
         <span class="k">return</span> <span class="n">decision</span></div>
 
-<div class="viewcode-block" id="LegistarScraper.get_person"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_person">[docs]</a>    <span class="k">def</span> <span class="nf">get_person</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_person</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Person</span><span class="p">:</span>
+<div class="viewcode-block" id="LegistarScraper.get_person"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_person">[docs]</a>    <span class="k">def</span> <span class="nf">get_person</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_person</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Person</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return CDP Person for Legistar Person</span>
+<span class="sd">        Return CDP Person for Legistar Person.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        legistar_person : Dict</span>
+<span class="sd">        legistar_person: Dict</span>
 <span class="sd">            Legistar API Person</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        Person | None</span>
+<span class="sd">        person: Optional[Person]</span>
+<span class="sd">            The Legistar Person converted to a CDP person ingestion model.</span>
+<span class="sd">            None if missing information.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>
             <span class="n">Person</span><span class="p">(</span>
@@ -925,18 +866,20 @@
             <span class="p">)</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="LegistarScraper.get_votes"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_votes">[docs]</a>    <span class="k">def</span> <span class="nf">get_votes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_votes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Vote</span><span class="p">]:</span>
+<div class="viewcode-block" id="LegistarScraper.get_votes"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_votes">[docs]</a>    <span class="k">def</span> <span class="nf">get_votes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_votes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Vote</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return List[Vote] for Legistar API Votes</span>
+<span class="sd">        Return List[Vote] for Legistar API Votes.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        legistar_votes : List[Dict]</span>
-<span class="sd">            Legistar API Votes</span>
+<span class="sd">        legistar_votes: List[Dict]</span>
+<span class="sd">            Legistar votes as CDP Vote ingestion models.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        List[Vote] | None</span>
+<span class="sd">        votes: Optional[List[Vote]]</span>
+<span class="sd">            List of votes if any were provided.</span>
+<span class="sd">            None if empty list or missing information.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">reduced_list</span><span class="p">(</span>
             <span class="p">[</span>
@@ -951,21 +894,23 @@
             <span class="p">]</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="LegistarScraper.get_event_support_files"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_event_support_files">[docs]</a>    <span class="k">def</span> <span class="nf">get_event_support_files</span><span class="p">(</span>
+<div class="viewcode-block" id="LegistarScraper.get_event_supporting_files"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_event_supporting_files">[docs]</a>    <span class="k">def</span> <span class="nf">get_event_supporting_files</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">legistar_ev_attachments</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">],</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">SupportingFile</span><span class="p">]:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">SupportingFile</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return List[SupportingFile] for Legistar API MatterAttachments</span>
+<span class="sd">        Return List[SupportingFile] for Legistar API MatterAttachments.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        legistar_ev_attachments : List[Dict]</span>
+<span class="sd">        legistar_ev_attachments: List[Dict]</span>
 <span class="sd">            Legistar API MatterAttachments</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        List[SupportingFile] | None</span>
+<span class="sd">        files: Optional[List[SupportingFile]]</span>
+<span class="sd">            List of supporting files if provided.</span>
+<span class="sd">            None if empty list or missing information.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">reduced_list</span><span class="p">(</span>
             <span class="p">[</span>
@@ -980,18 +925,20 @@
             <span class="p">]</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="LegistarScraper.get_matter"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_matter">[docs]</a>    <span class="k">def</span> <span class="nf">get_matter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_ev</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Matter</span><span class="p">:</span>
+<div class="viewcode-block" id="LegistarScraper.get_matter"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_matter">[docs]</a>    <span class="k">def</span> <span class="nf">get_matter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_ev</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Matter</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return Matter from Legistar API EventItem</span>
+<span class="sd">        Return Matter from Legistar API EventItem.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        legistar_ev : Dict</span>
+<span class="sd">        legistar_ev: Dict</span>
 <span class="sd">            Legistar API EventItem</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        Matter | None</span>
+<span class="sd">        matter: Optional[Matter]</span>
+<span class="sd">            List of converted Legistar matter details to CDP matter objects.</span>
+<span class="sd">            None if missing information.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">sponsors</span> <span class="o">=</span> <span class="n">reduced_list</span><span class="p">(</span>
@@ -1021,19 +968,19 @@
             <span class="p">)</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="LegistarScraper.get_minutes_item"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_minutes_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_minutes_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_ev_item</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MinutesItem</span><span class="p">:</span>
+<div class="viewcode-block" id="LegistarScraper.get_minutes_item"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_minutes_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_minutes_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_ev_item</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">MinutesItem</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return MinutesItem from parts of Legistar API EventItem</span>
+<span class="sd">        Return MinutesItem from parts of Legistar API EventItem.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        legistar_ev_item : Dict</span>
+<span class="sd">        legistar_ev_item: Dict</span>
 <span class="sd">            Legistar API EventItem</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        MinutesItem | None</span>
-<span class="sd">            None if could not get nonempty MinutesItem.name from EventItem</span>
+<span class="sd">        minutes_item: Optional[MinutesItem]</span>
+<span class="sd">            None if could not get nonempty MinutesItem.name from EventItem.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>
@@ -1043,52 +990,9 @@
             <span class="p">)</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="LegistarScraper.get_event_minutes"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_event_minutes">[docs]</a>    <span class="k">def</span> <span class="nf">get_event_minutes</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">legistar_ev_items</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">EventMinutesItem</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return List[EventMinutesItem] for Legistar API EventItems</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        legistar_ev_items : List[Dict]</span>
-<span class="sd">            Legistar API EventItems</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        List[EventMinutesItem] | None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">reduced_list</span><span class="p">(</span>
-            <span class="p">[</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">fix_event_minutes</span><span class="p">(</span>
-                        <span class="c1"># if minutes_item contains unimportant data,</span>
-                        <span class="c1"># just make the entire EventMinutesItem = None</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">filter_event_minutes</span><span class="p">(</span>
-                            <span class="n">EventMinutesItem</span><span class="p">(</span>
-                                <span class="n">index</span><span class="o">=</span><span class="n">item</span><span class="p">[</span><span class="n">LEGISTAR_EV_INDEX</span><span class="p">],</span>
-                                <span class="n">minutes_item</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_minutes_item</span><span class="p">(</span><span class="n">item</span><span class="p">),</span>
-                                <span class="n">votes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_votes</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="n">LEGISTAR_EV_VOTES</span><span class="p">]),</span>
-                                <span class="n">matter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_matter</span><span class="p">(</span><span class="n">item</span><span class="p">),</span>
-                                <span class="n">decision</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_minutes_item_decision</span><span class="p">(</span>
-                                    <span class="n">item</span><span class="p">[</span><span class="n">LEGISTAR_EV_MINUTE_DECISION</span><span class="p">]</span>
-                                <span class="p">),</span>
-                                <span class="n">supporting_files</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event_support_files</span><span class="p">(</span>
-                                    <span class="n">item</span><span class="p">[</span><span class="n">LEGISTAR_EV_ATTACHMENTS</span><span class="p">]</span>
-                                <span class="p">),</span>
-                            <span class="p">)</span>
-                        <span class="p">),</span>
-                        <span class="n">item</span><span class="p">,</span>
-                    <span class="p">)</span>
-                <span class="p">)</span>
-                <span class="c1"># EventMinutesItem object per member in EventItems</span>
-                <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">legistar_ev_items</span>
-            <span class="p">]</span>
-        <span class="p">)</span></div>
-
 <div class="viewcode-block" id="LegistarScraper.fix_event_minutes"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.fix_event_minutes">[docs]</a>    <span class="k">def</span> <span class="nf">fix_event_minutes</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">ev_minutes_item</span><span class="p">:</span> <span class="n">EventMinutesItem</span><span class="p">,</span> <span class="n">legistar_ev_item</span><span class="p">:</span> <span class="n">Dict</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EventMinutesItem</span><span class="p">:</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">ev_minutes_item</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EventMinutesItem</span><span class="p">],</span> <span class="n">legistar_ev_item</span><span class="p">:</span> <span class="n">Dict</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EventMinutesItem</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Inspect the MinutesItem and Matter in ev_minutes_item.</span>
 <span class="sd">        - Move some fields between them to make the information more meaningful.</span>
@@ -1096,14 +1000,18 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        ev_minutes_item : EventMinutesItem</span>
-<span class="sd">        legistar_ev_item : Dict</span>
-<span class="sd">            Legistar EventItem</span>
+<span class="sd">        ev_minutes_item: Optional[EventMinutesItem]</span>
+<span class="sd">            The specific event minutes item to clean.</span>
+<span class="sd">            Or None if running this function in a loop with multiple event minutes</span>
+<span class="sd">            items and you don&#39;t want to clean / the emi was filtered out.</span>
+<span class="sd">        legistar_ev_item: Dict</span>
+<span class="sd">            The original Legistar EventItem.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        EventMinutesItem</span>
-<span class="sd">            parts of minutes_item and matter could be modified</span>
+<span class="sd">        cleaned_emi: Optional[EventMinutesItem]</span>
+<span class="sd">            The cleaned event minutes item. This can clean both the event minutes item</span>
+<span class="sd">            and the attached matter information.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">ev_minutes_item</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">ev_minutes_item</span>
@@ -1131,143 +1039,75 @@
 
 <div class="viewcode-block" id="LegistarScraper.filter_event_minutes"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.filter_event_minutes">[docs]</a>    <span class="k">def</span> <span class="nf">filter_event_minutes</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">ev_minutes_item</span><span class="p">:</span> <span class="n">EventMinutesItem</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EventMinutesItem</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EventMinutesItem</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return None if minutes_item.name contains unimportant text</span>
 <span class="sd">        that we want to ignore</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        ev_minutes_item : EventMinutesItem</span>
+<span class="sd">        ev_minutes_item: EventMinutesItem</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        EventMinutesItem | None</span>
-
-<span class="sd">        See Also</span>
-<span class="sd">        --------</span>
-<span class="sd">        IGNORED_MINUTE_ITEMS</span>
+<span class="sd">        filtered_event_minutes_items: Optional[EventMinutesItem]</span>
+<span class="sd">            The allowed minutes item or None is filtered out.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">ev_minutes_item</span><span class="o">.</span><span class="n">minutes_item</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">ev_minutes_item</span><span class="o">.</span><span class="n">minutes_item</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">ev_minutes_item</span>
-        <span class="k">for</span> <span class="nb">filter</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">IGNORED_MINUTE_ITEMS</span><span class="p">:</span>
+        <span class="k">for</span> <span class="nb">filter</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_minutes_item_patterns</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="nb">filter</span><span class="p">,</span> <span class="n">ev_minutes_item</span><span class="o">.</span><span class="n">minutes_item</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">):</span>
                 <span class="k">return</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="n">ev_minutes_item</span></div>
 
-<div class="viewcode-block" id="LegistarScraper.get_none_if_empty"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_none_if_empty">[docs]</a>    <span class="k">def</span> <span class="nf">get_none_if_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">IngestionModel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IngestionModel</span><span class="p">:</span>
+<div class="viewcode-block" id="LegistarScraper.get_event_minutes"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_event_minutes">[docs]</a>    <span class="k">def</span> <span class="nf">get_event_minutes</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">legistar_ev_items</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">EventMinutesItem</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Check required keys in model, return None if any such key has no value.</span>
-<span class="sd">        i.e. If all required keys have valid value, return as-is</span>
+<span class="sd">        Return List[EventMinutesItem] for Legistar API EventItems.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        model :</span>
-<span class="sd">            Person, MinutesItem, etc.</span>
+<span class="sd">        legistar_ev_items: List[Dict]</span>
+<span class="sd">            Legistar API EventItems</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        IngestionModel | None</span>
-<span class="sd">            None or model as-is</span>
+<span class="sd">        event_minutes_items: Optional[List[EventMinutesItem]]</span>
+<span class="sd">            Filtered set of event minutes items.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">min_keys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_ingestion_keys</span><span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="p">]</span>
-        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-            <span class="c1"># first time using min_ingestion_keys</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">min_ingestion_keys</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="n">min_keys</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="c1"># first time checking model.__class__</span>
-            <span class="n">min_keys</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">reduced_list</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">fix_event_minutes</span><span class="p">(</span>
+                        <span class="c1"># if minutes_item contains unimportant data,</span>
+                        <span class="c1"># just make the entire EventMinutesItem = None</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">filter_event_minutes</span><span class="p">(</span>
+                            <span class="n">EventMinutesItem</span><span class="p">(</span>
+                                <span class="n">index</span><span class="o">=</span><span class="n">item</span><span class="p">[</span><span class="n">LEGISTAR_EV_INDEX</span><span class="p">],</span>
+                                <span class="n">minutes_item</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_minutes_item</span><span class="p">(</span><span class="n">item</span><span class="p">),</span>
+                                <span class="n">votes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_votes</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="n">LEGISTAR_EV_VOTES</span><span class="p">]),</span>
+                                <span class="n">matter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_matter</span><span class="p">(</span><span class="n">item</span><span class="p">),</span>
+                                <span class="n">decision</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_minutes_item_decision</span><span class="p">(</span>
+                                    <span class="n">item</span><span class="p">[</span><span class="n">LEGISTAR_EV_MINUTE_DECISION</span><span class="p">]</span>
+                                <span class="p">),</span>
+                                <span class="n">supporting_files</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event_supporting_files</span><span class="p">(</span>
+                                    <span class="n">item</span><span class="p">[</span><span class="n">LEGISTAR_EV_ATTACHMENTS</span><span class="p">]</span>
+                                <span class="p">),</span>
+                            <span class="p">)</span>
+                        <span class="p">),</span>
+                        <span class="n">item</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="c1"># EventMinutesItem object per member in EventItems</span>
+                <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">legistar_ev_items</span>
+            <span class="p">]</span>
+        <span class="p">)</span></div>
 
-        <span class="k">if</span> <span class="n">min_keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">min_keys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_required_attrs</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-            <span class="c1"># cache so we don&#39;t do expensive dynamic checking</span>
-            <span class="c1"># again for this IngestionModel</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">min_ingestion_keys</span><span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="p">]</span> <span class="o">=</span> <span class="n">min_keys</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">min_keys</span><span class="p">:</span>
-            <span class="c1"># no required keys for this model</span>
-            <span class="c1"># this probably never happens</span>
-            <span class="k">return</span> <span class="n">model</span>
-
-        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">min_keys</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">val</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
-
-                <span class="c1"># &quot;if not&quot; test to catch all None and None-like values</span>
-                <span class="c1"># e.g. empty string, empty list, ...</span>
-                <span class="c1"># but int(0) is not &quot;empty&quot;</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">val</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-                    <span class="c1"># empty value for this key in model</span>
-                    <span class="k">return</span> <span class="kc">None</span>
-            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">None</span>
-
-        <span class="c1"># nonempty value for all required keys in model</span>
-        <span class="k">return</span> <span class="n">model</span></div>
-
-<div class="viewcode-block" id="LegistarScraper.get_required_attrs"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_required_attrs">[docs]</a>    <span class="k">def</span> <span class="nf">get_required_attrs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">IngestionModel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="LegistarScraper.find_time_zone"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.find_time_zone">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">find_time_zone</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return list of keys required in model as specified</span>
-<span class="sd">        in IngestionModel class definition</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        model : IngestionModel</span>
-<span class="sd">            Person, MinutesItem, etc.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        List[str]</span>
-<span class="sd">            List of keys (attributes) in model without default value in class definition</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="c1"># create an empty one to have python tell us what keys are required</span>
-            <span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="p">()</span>
-            <span class="c1"># all attrs in model have default values</span>
-            <span class="k">return</span> <span class="p">[]</span>
-        <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="c1"># e.g. __init__() missing 3 required positional arguments:</span>
-            <span class="c1"># &#39;session_datetime&#39;, &#39;video_uri&#39;, and &#39;session_index&#39;</span>
-            <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
-                <span class="sa">r</span><span class="s2">&quot;missing (?P&lt;num_keys&gt;\d+) required.+argument(?:s)?\:\s*(?P&lt;keys&gt;.+)&quot;</span><span class="p">,</span>
-                <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
-            <span class="p">)</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
-            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;not able to get required attributes for </span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="p">[]</span>
-
-        <span class="n">num_keys</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;num_keys&quot;</span><span class="p">))</span>
-
-        <span class="c1"># &#39;session_datetime&#39;, &#39;video_uri&#39;, and &#39;session_index&#39;</span>
-        <span class="c1"># -&gt; [&quot;session_datetime&quot;, &quot;video_uri&quot;, &quot;session_index&quot;]</span>
-
-        <span class="c1"># SHOULD be able to do this more elegantly using re.split()</span>
-        <span class="c1"># but couldn&#39;t quite get the pattern right</span>
-        <span class="n">keys</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
-            <span class="c1"># TypeError uses</span>
-            <span class="c1"># , and</span>
-            <span class="c1"># and</span>
-            <span class="c1"># ,</span>
-            <span class="c1"># as delimiters for attribute names</span>
-            <span class="sa">r</span><span class="s2">&quot;(\s*,\s*and\s*)|(\s*and\s*)|(\s*,\s*)&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;,&quot;</span><span class="p">,</span>
-            <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;keys&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">num_keys</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">keys</span><span class="p">):</span>
-            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s2"> has </span><span class="si">{</span><span class="n">num_keys</span><span class="si">}</span><span class="s2"> required keys but got </span><span class="si">{</span><span class="n">keys</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">keys</span></div>
-
-<div class="viewcode-block" id="LegistarScraper.find_time_zone"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.find_time_zone">[docs]</a>    <span class="k">def</span> <span class="nf">find_time_zone</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return name for a US time zone matching UTC offset calculated from OS clock</span>
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        time zone name : str</span>
+<span class="sd">        Return name for a US time zone matching UTC offset calculated from OS clock.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">utc_now</span> <span class="o">=</span> <span class="n">utc</span><span class="o">.</span><span class="n">localize</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">())</span>
         <span class="n">local_now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
@@ -1288,37 +1128,41 @@
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="LegistarScraper.as_local_time"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.as_local_time">[docs]</a>    <span class="k">def</span> <span class="nf">as_local_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_time</span><span class="p">:</span> <span class="n">datetime</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="p">:</span>
+<div class="viewcode-block" id="LegistarScraper.localize_datetime"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.localize_datetime">[docs]</a>    <span class="k">def</span> <span class="nf">localize_datetime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_time</span><span class="p">:</span> <span class="n">datetime</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return input datetime with time zone information.</span>
 <span class="sd">        This allows for nonambiguous conversions to other zones including UTC.</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        local_time : datetime</span>
+<span class="sd">        local_time: datetime</span>
+<span class="sd">            The datetime to attached timezone information to.</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        local_time : datetime</span>
+<span class="sd">        local_time: datetime</span>
 <span class="sd">            The date and time attributes (year, month, day, hour, ...) remain unchanged.</span>
 <span class="sd">            tzinfo is now provided.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_zone</span><span class="o">.</span><span class="n">localize</span><span class="p">(</span><span class="n">local_time</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">timezone</span><span class="o">.</span><span class="n">localize</span><span class="p">(</span><span class="n">local_time</span><span class="p">)</span>
         <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
             <span class="c1"># AttributeError: time_zone or local_time is None</span>
             <span class="c1"># ValueError: local_time is not navie (has time zone info)</span>
             <span class="k">return</span> <span class="n">local_time</span></div>
 
-<div class="viewcode-block" id="LegistarScraper.date_time_to_datetime"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.date_time_to_datetime">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">date_time_to_datetime</span><span class="p">(</span><span class="n">ev_date</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ev_time</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="p">:</span>
+<div class="viewcode-block" id="LegistarScraper.date_and_time_to_datetime"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.date_and_time_to_datetime">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">date_and_time_to_datetime</span><span class="p">(</span><span class="n">ev_date</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ev_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return datetime from ev_date and ev_time</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        ev_date : str</span>
+<span class="sd">        ev_date: str</span>
 <span class="sd">            Formatted as &quot;%Y-%m-%dT%H:%M:%S&quot;</span>
-<span class="sd">        ev_time : str</span>
+<span class="sd">        ev_time: Optional[str]</span>
 <span class="sd">            Formatted as &quot;%I:%M %p&quot;</span>
+<span class="sd">            Or None and do not attach time to date.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1347,7 +1191,207 @@
                 <span class="n">hour</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                 <span class="n">minute</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                 <span class="n">second</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-            <span class="p">)</span></div></div>
+            <span class="p">)</span></div>
+
+<div class="viewcode-block" id="LegistarScraper.get_video_uris"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_video_uris">[docs]</a>    <span class="k">def</span> <span class="nf">get_video_uris</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_ev</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Must implement in class derived from LegistarScraper.</span>
+<span class="sd">        If Legistar Event.EventVideoPath is used, return an empty list in the override.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        legistar_ev: Dict</span>
+<span class="sd">            Data for one Legistar Event.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        video_and_caption_uris: List[Dict]</span>
+<span class="sd">            List of Dict containing video and caption URI for each session found.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        NotImplementedError</span>
+<span class="sd">            This base implementation does nothing</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        cdp_scrapers.legistar_utils.get_legistar_events_for_timespan</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span>
+            <span class="s2">&quot;get_video_uris() is required because &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Legistar Event.EventVideoPath is not used by </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">client_name</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="LegistarScraper.get_events"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_events">[docs]</a>    <span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">begin</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">end</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calls get_legistar_events_for_timespan to retrieve Legistar API data</span>
+<span class="sd">        and return as List[EventIngestionModel]</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        begin: datetime, optional</span>
+<span class="sd">            The timespan beginning datetime to query for events after.</span>
+<span class="sd">            Default is 2 days from UTC now</span>
+<span class="sd">        end: datetime, optional</span>
+<span class="sd">            The timespan end datetime to query for events before.</span>
+<span class="sd">            Default is UTC now</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        events: List[EventIngestionModel]</span>
+<span class="sd">            One instance of EventIngestionModel per Legistar Event</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        get_legistar_events_for_timespan</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">begin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">begin</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">end</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+
+        <span class="n">ingestion_models</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">legistar_ev</span> <span class="ow">in</span> <span class="n">get_legistar_events_for_timespan</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">client_name</span><span class="p">,</span>
+            <span class="n">begin</span><span class="o">=</span><span class="n">begin</span><span class="p">,</span>
+            <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span>
+        <span class="p">):</span>
+            <span class="c1"># better to return time as local time with time zone info,</span>
+            <span class="c1"># rather than as utc time.</span>
+            <span class="c1"># this way the calling pipeline can find out what is the local zone.</span>
+            <span class="n">session_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">localize_datetime</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">date_and_time_to_datetime</span><span class="p">(</span>
+                    <span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_SESSION_DATE</span><span class="p">],</span>
+                    <span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_SESSION_TIME</span><span class="p">],</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="c1"># prefer video file path in legistar Event.EventVideoPath</span>
+            <span class="k">if</span> <span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_SESSION_VIDEO_URI</span><span class="p">]:</span>
+                <span class="n">list_uri</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="p">{</span>
+                        <span class="n">CDP_VIDEO_URI</span><span class="p">:</span> <span class="n">str_simplified</span><span class="p">(</span>
+                            <span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_SESSION_VIDEO_URI</span><span class="p">]</span>
+                        <span class="p">),</span>
+                        <span class="n">CDP_CAPTION_URI</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="p">}</span>
+                <span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">list_uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_video_uris</span><span class="p">(</span><span class="n">legistar_ev</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[</span>
+                    <span class="p">{</span><span class="n">CDP_VIDEO_URI</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="n">CDP_CAPTION_URI</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
+                <span class="p">]</span>
+
+            <span class="n">sessions</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">sessions</span> <span class="o">=</span> <span class="n">reduced_list</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>
+                        <span class="n">Session</span><span class="p">(</span>
+                            <span class="n">session_datetime</span><span class="o">=</span><span class="n">session_time</span><span class="p">,</span>
+                            <span class="n">session_index</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">sessions</span><span class="p">),</span>
+                            <span class="n">video_uri</span><span class="o">=</span><span class="n">uri</span><span class="p">[</span><span class="n">CDP_VIDEO_URI</span><span class="p">],</span>
+                            <span class="n">caption_uri</span><span class="o">=</span><span class="n">uri</span><span class="p">[</span><span class="n">CDP_CAPTION_URI</span><span class="p">],</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="c1"># Session per video</span>
+                    <span class="k">for</span> <span class="n">uri</span> <span class="ow">in</span> <span class="n">list_uri</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">ingestion_models</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>
+                    <span class="n">EventIngestionModel</span><span class="p">(</span>
+                        <span class="n">agenda_uri</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_AGENDA_URI</span><span class="p">]),</span>
+                        <span class="n">minutes_uri</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_MINUTES_URI</span><span class="p">]),</span>
+                        <span class="n">body</span><span class="o">=</span><span class="n">Body</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_BODY_NAME</span><span class="p">])),</span>
+                        <span class="n">sessions</span><span class="o">=</span><span class="n">sessions</span><span class="p">,</span>
+                        <span class="n">event_minutes_items</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event_minutes</span><span class="p">(</span>
+                            <span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_EV_ITEMS</span><span class="p">]</span>
+                        <span class="p">),</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="c1"># easier for calling pipeline to handle an empty list rather than None</span>
+        <span class="c1"># so request reduced_list() to give me [], not None</span>
+        <span class="k">return</span> <span class="n">reduced_list</span><span class="p">(</span><span class="n">ingestion_models</span><span class="p">,</span> <span class="n">collapse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_legistar_compatible</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check that Legistar API recognizes client name.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        compatible: bool</span>
+<span class="sd">            True if client_name is a valid Legistar client name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># simplest check, if the GET request works, it is a legistar municipality</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">resp</span> <span class="o">=</span> <span class="n">urlopen</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;http://webapi.legistar.com/v1/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">client_name</span><span class="si">}</span><span class="s2">/bodies&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">resp</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">200</span>
+        <span class="k">except</span> <span class="n">URLError</span> <span class="ow">or</span> <span class="n">HTTPError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="LegistarScraper.check_for_cdp_min_ingestion"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.check_for_cdp_min_ingestion">[docs]</a>    <span class="k">def</span> <span class="nf">check_for_cdp_min_ingestion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">check_days</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">7</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Test if can obtain at least one minimally defined EventIngestionModel</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        check_days: int, default=7</span>
+<span class="sd">            Test duration is the past check_days days from now</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        minimum_ingestion_data_available: bool</span>
+<span class="sd">            True if got at least one minimally defined EventIngestionModel</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># no point wasting time if the client isn&#39;t on legistar at all</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_legistar_compatible</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+        <span class="n">days</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">check_days</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">days</span><span class="p">:</span>
+            <span class="n">begin</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">d</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="s2">&quot;Testing for minimal information &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;from </span><span class="si">{</span><span class="n">begin</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">end</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+            <span class="c1"># ev: EventIngestionModel</span>
+            <span class="k">for</span> <span class="n">cdp_ev</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_events</span><span class="p">(</span><span class="n">begin</span><span class="o">=</span><span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="p">(</span>
+                        <span class="nb">len</span><span class="p">(</span><span class="n">cdp_ev</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+                        <span class="ow">and</span> <span class="n">cdp_ev</span><span class="o">.</span><span class="n">sessions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">session_datetime</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                        <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">cdp_ev</span><span class="o">.</span><span class="n">sessions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">video_uri</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+                    <span class="p">):</span>
+                        <span class="n">session_time</span> <span class="o">=</span> <span class="n">cdp_ev</span><span class="o">.</span><span class="n">sessions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">session_datetime</span>
+                        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Got minimal EventIngestionModel for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">client_name</span><span class="si">}</span><span class="s2">: &quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;body=</span><span class="si">{</span><span class="n">cdp_ev</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, &quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;session=</span><span class="si">{</span><span class="n">session_time</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s2">, &quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;video=</span><span class="si">{</span><span class="n">cdp_ev</span><span class="o">.</span><span class="n">sessions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">video_uri</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">)</span>
+                        <span class="k">return</span> <span class="kc">True</span>
+
+                <span class="c1"># catch None or empty list</span>
+                <span class="k">except</span> <span class="ne">TypeError</span> <span class="ow">or</span> <span class="ne">IndexError</span><span class="p">:</span>
+                    <span class="k">pass</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Failed to get minimal EventIngestionModel for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">client_name</span><span class="si">}</span><span class="s2"> &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;in the past </span><span class="si">{</span><span class="n">check_days</span><span class="si">}</span><span class="s2"> days from </span><span class="si">{</span><span class="n">now</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="c1"># no event in check_days had enough for minimal ingestion model item</span>
+        <span class="k">return</span> <span class="kc">False</span></div></div>
 </pre></div>
 
            </div>

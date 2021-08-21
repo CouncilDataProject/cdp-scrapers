@@ -224,37 +224,63 @@
 <span id="cdp-scrapers-legistar-utils-module"></span><h2>cdp_scrapers.legistar_utils module<a class="headerlink" href="#module-cdp_scrapers.legistar_utils" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">cdp_scrapers.legistar_utils.</span></span><span class="sig-name descname"><span class="pre">LegistarScraper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">cdp_scrapers.legistar_utils.</span></span><span class="sig-name descname"><span class="pre">LegistarScraper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timezone</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_minutes_item_patterns</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_approve_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'approve|favor|yes'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_abstain_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'abstain|refuse|refrain'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_reject_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'reject|oppose|no'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_absent_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'absent'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_nonvoting_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'nv|(?:non.*voting)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matter_adopted_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'approved|confirmed|passed|adopted'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matter_in_progress_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'heard|ready|filed|held|(?:in\\s*committee)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matter_rejected_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'rejected|dropped'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minutes_item_decision_passed_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'pass'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minutes_item_decision_failed_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'not|fail'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Base class for transforming Legistar API data to CDP IngestionModel.</p>
-<p>A given installation must define a derived class and implement get_video_uris()
-and get_time_zone() functions.</p>
+<p>If get_events() naively fails and raises an error, a given installation must define
+a derived class and implement the get_video_uris() function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>client</strong> (<em>str</em>) – Legistar client name, e.g. “seattle” for Seattle</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>client</strong> (<em>str</em>) – Legistar client name, e.g. “seattle” for Seattle, “kingcounty” for King County.</p></li>
+<li><p><strong>timezone</strong> (<em>str</em>) – The timezone for the target client.
+i.e. “America/Los_Angeles” or “America/New_York”
+See <a class="reference external" href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones">https://en.wikipedia.org/wiki/List_of_tz_database_time_zones</a> for canonical
+timezones.</p></li>
+<li><p><strong>ignore_minutes_item_patterns</strong> (<em>List[str]</em>) – A list of string patterns or substrings to act as a minutes item filter.
+Any item in the provided list will be compiled as a regex string and any
+minute’s item that contains the compiled pattern will be filtered out of the
+produced CDP minutes item list.
+Default: [] (do not filter any minutes items)</p></li>
+<li><p><strong>vote_approve_pattern</strong> (<em>str</em>) – Regex pattern used to convert Legistar instance’s votes in approval value to CDP
+constant value.
+Default: “approve|favor|yes”</p></li>
+<li><p><strong>vote_abstain_pattern</strong> (<em>str</em>) – Regex pattern used to convert Legistar instance’s abstension value to CDP
+constant value. Note, this is a pure abstension, not an “approval by
+abstention” or “rejection by abstension” value. Those should be places in
+vote_approve_pattern and vote_reject_pattern respectively.
+Default: “abstain|refuse|refrain”</p></li>
+<li><p><strong>vote_reject_pattern</strong> (<em>str</em>) – Regex pattern used to convert Legistar instance’s votes in rejection value to
+CDP constant value.
+Default: “reject|oppose|no”</p></li>
+<li><p><strong>vote_absent_pattern</strong> (<em>str</em>) – Regex pattern used to convert Legistar instance’s excused absense value to CDP
+constant value.
+Default: “absent”</p></li>
+<li><p><strong>vote_nonvoting_pattern</strong> (<em>str</em>) – Regex pattern used to convert Legistar instance’s non-voting value to CDP
+constant value.
+Default: “nv|(?:non.*voting)”</p></li>
+<li><p><strong>matter_adopted_pattern</strong> (<em>str</em>) – Regex pattern used to convert Legistar instance’s matter was adopted to CDP
+constant value.
+Default: “approved|confirmed|passed|adopted”</p></li>
+<li><p><strong>matter_in_progess_pattern</strong> (<em>str</em>) – Regex pattern used to convert Legistar instance’s matter is in-progress to
+CDP constant value.
+Default: “heard|ready|filed|held|(?:ins*committee)”</p></li>
+<li><p><strong>matter_rejected_pattern</strong> (<em>str</em>) – Regex pattern used to convert Legistar instance’s matter was rejected to CDP
+constant value.
+Default: “rejected|dropped”</p></li>
+<li><p><strong>minutes_item_decision_passed_pattern</strong> (<em>str</em>) – Regex pattern used to convert Legistar instance’s minutes item passage to CDP
+constant value.
+Default: “pass”</p></li>
+<li><p><strong>minutes_item_decision_failed_pattern</strong> (<em>str</em>) – Regex pattern used to convert Legistar instance’s minutes item failure to CDP
+constant value.
+Default: “not|fail”</p></li>
+</ul>
 </dd>
 </dl>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.SeattleScraper" title="cdp_scrapers.instances.seattle.SeattleScraper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdp_scrapers.instances.seattle.SeattleScraper</span></code></a></p>
+<p><a class="reference internal" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_video_uris" title="cdp_scrapers.legistar_utils.LegistarScraper.get_video_uris"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdp_scrapers.legistar_utils.LegistarScraper.get_video_uris</span></code></a>, <a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.SeattleScraper" title="cdp_scrapers.instances.seattle.SeattleScraper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdp_scrapers.instances.seattle.SeattleScraper</span></code></a></p>
 </div>
-<dl class="py method">
-<dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.as_local_time">
-<span class="sig-name descname"><span class="pre">as_local_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_time</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">datetime.datetime</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">datetime.datetime</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.as_local_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.as_local_time" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return input datetime with time zone information.
-This allows for nonambiguous conversions to other zones including UTC.
-:Parameters: <strong>local_time</strong> (<em>datetime</em>)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><strong>local_time</strong> – The date and time attributes (year, month, day, hour, …) remain unchanged.
-tzinfo is now provided.</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>datetime</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.check_for_cdp_min_ingestion">
 <span class="sig-name descname"><span class="pre">check_for_cdp_min_ingestion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">check_days</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">7</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.check_for_cdp_min_ingestion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.check_for_cdp_min_ingestion" title="Permalink to this definition">¶</a></dt>
@@ -264,7 +290,7 @@ tzinfo is now provided.</p>
 <dd class="field-odd"><p><strong>check_days</strong> (<em>int, default=7</em>) – Test duration is the past check_days days from now</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>True if got at least one minimally defined EventIngestionModel</p>
+<dd class="field-even"><p><strong>minimum_ingestion_data_available</strong> – True if got at least one minimally defined EventIngestionModel</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>bool</p>
@@ -273,14 +299,15 @@ tzinfo is now provided.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.date_time_to_datetime">
-<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">date_time_to_datetime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ev_date</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ev_time</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">datetime.datetime</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.date_time_to_datetime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.date_time_to_datetime" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.date_and_time_to_datetime">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">date_and_time_to_datetime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ev_date</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ev_time</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">datetime.datetime</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.date_and_time_to_datetime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.date_and_time_to_datetime" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return datetime from ev_date and ev_time</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ev_date</strong> (<em>str</em>) – Formatted as “%Y-%m-%dT%H:%M:%S”</p></li>
-<li><p><strong>ev_time</strong> (<em>str</em>) – Formatted as “%I:%M %p”</p></li>
+<li><p><strong>ev_time</strong> (<em>Optional[str]</em>) – Formatted as “%I:%M %p”
+Or None and do not attach time to date.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -294,7 +321,7 @@ tzinfo is now provided.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.filter_event_minutes">
-<span class="sig-name descname"><span class="pre">filter_event_minutes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ev_minutes_item</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">cdp_backend.pipeline.ingestion_models.EventMinutesItem</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">cdp_backend.pipeline.ingestion_models.EventMinutesItem</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.filter_event_minutes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.filter_event_minutes" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">filter_event_minutes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ev_minutes_item</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">cdp_backend.pipeline.ingestion_models.EventMinutesItem</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.EventMinutesItem</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.filter_event_minutes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.filter_event_minutes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return None if minutes_item.name contains unimportant text
 that we want to ignore</p>
 <dl class="field-list simple">
@@ -302,78 +329,76 @@ that we want to ignore</p>
 <dd class="field-odd"><p><strong>ev_minutes_item</strong> (<em>EventMinutesItem</em>)</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
+<dd class="field-even"><p><strong>filtered_event_minutes_items</strong> – The allowed minutes item or None is filtered out.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>EventMinutesItem | None</p>
+<dd class="field-odd"><p>Optional[EventMinutesItem]</p>
 </dd>
 </dl>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">IGNORED_MINUTE_ITEMS</span></code></p>
-</div>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.find_time_zone">
-<span class="sig-name descname"><span class="pre">find_time_zone</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.find_time_zone"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.find_time_zone" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return name for a US time zone matching UTC offset calculated from OS clock
-:returns: <strong>time zone name</strong>
-:rtype: str</p>
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">find_time_zone</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.find_time_zone"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.find_time_zone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return name for a US time zone matching UTC offset calculated from OS clock.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.fix_event_minutes">
-<span class="sig-name descname"><span class="pre">fix_event_minutes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ev_minutes_item</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">cdp_backend.pipeline.ingestion_models.EventMinutesItem</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legistar_ev_item</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">cdp_backend.pipeline.ingestion_models.EventMinutesItem</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.fix_event_minutes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.fix_event_minutes" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">fix_event_minutes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ev_minutes_item</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.EventMinutesItem</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legistar_ev_item</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.EventMinutesItem</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.fix_event_minutes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.fix_event_minutes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Inspect the MinutesItem and Matter in ev_minutes_item.
 - Move some fields between them to make the information more meaningful.
 - Enforce matter.result_status when appropriate.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ev_minutes_item</strong> (<em>EventMinutesItem</em>)</p></li>
-<li><p><strong>legistar_ev_item</strong> (<em>Dict</em>) – Legistar EventItem</p></li>
+<li><p><strong>ev_minutes_item</strong> (<em>Optional[EventMinutesItem]</em>) – The specific event minutes item to clean.
+Or None if running this function in a loop with multiple event minutes
+items and you don’t want to clean / the emi was filtered out.</p></li>
+<li><p><strong>legistar_ev_item</strong> (<em>Dict</em>) – The original Legistar EventItem.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>parts of minutes_item and matter could be modified</p>
+<dd class="field-even"><p><strong>cleaned_emi</strong> – The cleaned event minutes item. This can clean both the event minutes item
+and the attached matter information.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>EventMinutesItem</p>
+<dd class="field-odd"><p>Optional[EventMinutesItem]</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.get_event_minutes">
-<span class="sig-name descname"><span class="pre">get_event_minutes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">legistar_ev_items</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.EventMinutesItem</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.get_event_minutes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_event_minutes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return List[EventMinutesItem] for Legistar API EventItems</p>
+<span class="sig-name descname"><span class="pre">get_event_minutes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">legistar_ev_items</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.EventMinutesItem</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.get_event_minutes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_event_minutes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return List[EventMinutesItem] for Legistar API EventItems.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>legistar_ev_items</strong> (<em>List[Dict]</em>) – Legistar API EventItems</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
+<dd class="field-even"><p><strong>event_minutes_items</strong> – Filtered set of event minutes items.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>List[EventMinutesItem] | None</p>
+<dd class="field-odd"><p>Optional[List[EventMinutesItem]]</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.get_event_support_files">
-<span class="sig-name descname"><span class="pre">get_event_support_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">legistar_ev_attachments</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.SupportingFile</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.get_event_support_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_event_support_files" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return List[SupportingFile] for Legistar API MatterAttachments</p>
+<dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.get_event_supporting_files">
+<span class="sig-name descname"><span class="pre">get_event_supporting_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">legistar_ev_attachments</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.SupportingFile</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.get_event_supporting_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_event_supporting_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return List[SupportingFile] for Legistar API MatterAttachments.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>legistar_ev_attachments</strong> (<em>List[Dict]</em>) – Legistar API MatterAttachments</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
+<dd class="field-even"><p><strong>files</strong> – List of supporting files if provided.
+None if empty list or missing information.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>List[SupportingFile] | None</p>
+<dd class="field-odd"><p>Optional[List[SupportingFile]]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -393,7 +418,7 @@ Default is UTC now</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>One instance of EventIngestionModel per Legistar Event</p>
+<dd class="field-even"><p><strong>events</strong> – One instance of EventIngestionModel per Legistar Event</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>List[EventIngestionModel]</p>
@@ -407,151 +432,139 @@ Default is UTC now</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.get_matter">
-<span class="sig-name descname"><span class="pre">get_matter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">legistar_ev</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">cdp_backend.pipeline.ingestion_models.Matter</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.get_matter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_matter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return Matter from Legistar API EventItem</p>
+<span class="sig-name descname"><span class="pre">get_matter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">legistar_ev</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.Matter</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.get_matter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_matter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return Matter from Legistar API EventItem.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>legistar_ev</strong> (<em>Dict</em>) – Legistar API EventItem</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
+<dd class="field-even"><p><strong>matter</strong> – List of converted Legistar matter details to CDP matter objects.
+None if missing information.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Matter | None</p>
+<dd class="field-odd"><p>Optional[Matter]</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.get_matter_status">
-<span class="sig-name descname"><span class="pre">get_matter_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">legistar_matter_status</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">cdp_backend.database.constants.MatterStatusDecision</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.get_matter_status"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_matter_status" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return appropriate MatterStatusDecision constant from EventItemMatterStatus</p>
+<span class="sig-name descname"><span class="pre">get_matter_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">legistar_matter_status</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.get_matter_status"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_matter_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return appropriate MatterStatusDecision constant from EventItemMatterStatus.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>legistar_matter_status</strong> (<em>str</em>) – Legistar API EventItemMatterStatus</p>
+<dd class="field-odd"><p><strong>legistar_matter_status</strong> (<em>str</em>) – Legistar API EventItemMatterStatus.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>ADOPTED | IN_PROGRESS | REJECTED | None</p>
+<dd class="field-even"><p><strong>matter_status</strong> – A constant from CDP allowed matter status decisions.
+None if missing information or if matter status decision parameter patterns
+are not inclusive to the Legistar matter status value.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>MatterStatusDecision</p>
+<dd class="field-odd"><p>Optional[str]</p>
 </dd>
 </dl>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">matter_</span></code></p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdp_backend.database.constants.MatterStatusDecision</span></code></p>
 </div>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.get_minutes_item">
-<span class="sig-name descname"><span class="pre">get_minutes_item</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">legistar_ev_item</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">cdp_backend.pipeline.ingestion_models.MinutesItem</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.get_minutes_item"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_minutes_item" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return MinutesItem from parts of Legistar API EventItem</p>
+<span class="sig-name descname"><span class="pre">get_minutes_item</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">legistar_ev_item</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.MinutesItem</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.get_minutes_item"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_minutes_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return MinutesItem from parts of Legistar API EventItem.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>legistar_ev_item</strong> (<em>Dict</em>) – Legistar API EventItem</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>None if could not get nonempty MinutesItem.name from EventItem</p>
+<dd class="field-even"><p><strong>minutes_item</strong> – None if could not get nonempty MinutesItem.name from EventItem.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>MinutesItem | None</p>
+<dd class="field-odd"><p>Optional[MinutesItem]</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.get_minutes_item_decision">
-<span class="sig-name descname"><span class="pre">get_minutes_item_decision</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">legistar_item_passed_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">cdp_backend.database.constants.EventMinutesItemDecision</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.get_minutes_item_decision"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_minutes_item_decision" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="simple">
-<dt>Return appropriate EventMinutesItemDecision constant</dt><dd><p>from EventItemPassedFlagName</p>
-</dd>
-</dl>
+<span class="sig-name descname"><span class="pre">get_minutes_item_decision</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">legistar_item_passed_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.get_minutes_item_decision"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_minutes_item_decision" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return appropriate EventMinutesItemDecision constant from
+EventItemPassedFlagName.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>legistar_item_passed_name</strong> (<em>str</em>) – Legistar API EventItemPassedFlagName</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>PASSED | FAILED | None</p>
+<dd class="field-even"><p><strong>emi_decision</strong> – A constant from CDP allowed minutes item decisions.
+None if missing information or if minutes item decision parameter
+patterns are no inclusive of the Legistar minutes item decision value.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>MatterStatusDecision</p>
+<dd class="field-odd"><p>Optional[str]</p>
 </dd>
 </dl>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">decision_</span></code></p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdp_backend.database.constants.EventMinutesItemDecision</span></code></p>
 </div>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.get_none_if_empty">
-<span class="sig-name descname"><span class="pre">get_none_if_empty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">cdp_backend.pipeline.ingestion_models.IngestionModel</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">cdp_backend.pipeline.ingestion_models.IngestionModel</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.get_none_if_empty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_none_if_empty" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_none_if_empty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">cdp_backend.pipeline.ingestion_models.IngestionModel</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.IngestionModel</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.get_none_if_empty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_none_if_empty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check required keys in model, return None if any such key has no value.
-i.e. If all required keys have valid value, return as-is</p>
+i.e. If all required keys have valid value, return as-is.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>model</strong> – Person, MinutesItem, etc.</p>
+<dd class="field-odd"><p><strong>model</strong> (<em>IngestionModel</em>) – Person, MinutesItem, etc.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>None or model as-is</p>
+<dd class="field-even"><p><strong>model</strong> – None or model as-is</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>IngestionModel | None</p>
+<dd class="field-odd"><p>Optional[IngestionModel]</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.get_person">
-<span class="sig-name descname"><span class="pre">get_person</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">legistar_person</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">cdp_backend.pipeline.ingestion_models.Person</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.get_person"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_person" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return CDP Person for Legistar Person</p>
+<span class="sig-name descname"><span class="pre">get_person</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">legistar_person</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.Person</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.get_person"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_person" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return CDP Person for Legistar Person.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>legistar_person</strong> (<em>Dict</em>) – Legistar API Person</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
+<dd class="field-even"><p><strong>person</strong> – The Legistar Person converted to a CDP person ingestion model.
+None if missing information.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Person | None</p>
+<dd class="field-odd"><p>Optional[Person]</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.get_required_attrs">
-<span class="sig-name descname"><span class="pre">get_required_attrs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">cdp_backend.pipeline.ingestion_models.IngestionModel</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.get_required_attrs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_required_attrs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return list of keys required in model as specified
-in IngestionModel class definition</p>
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_required_attrs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">cdp_backend.pipeline.ingestion_models.IngestionModel</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.get_required_attrs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_required_attrs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return list of keys required in model as specified in IngestionModel class
+definition.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>model</strong> (<em>IngestionModel</em>) – Person, MinutesItem, etc.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>List of keys (attributes) in model without default value in class definition</p>
+<dd class="field-even"><p><strong>attr_keys</strong> – List of keys (attributes) in model without default value in class
+definition.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>List[str]</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.get_time_zone">
-<span class="sig-name descname"><span class="pre">get_time_zone</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.get_time_zone"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_time_zone" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return time zone name for CDP instance.
-To use dynamically determined time zone,
-use find_time_zone().
-:returns: <strong>time zone name</strong> – i.e. “America/Los_Angeles” | “America/New_York” …
-:rtype: str</p>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SeattleScraper.get_time_zone</span></code></p>
-</div>
-<p class="rubric">Notes</p>
-<p>List of Timezones: <a class="reference external" href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones">https://en.wikipedia.org/wiki/List_of_tz_database_time_zones</a>
-Please only use “Canonical” timezones.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -561,11 +574,10 @@ Please only use “Canonical” timezones.</p>
 If Legistar Event.EventVideoPath is used, return an empty list in the override.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>legstar_ev</strong> (<em>Dict</em>) – Legistar API Event</p>
+<dd class="field-odd"><p><strong>legistar_ev</strong> (<em>Dict</em>) – Data for one Legistar Event.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>List of video and caption URI
-[{“video_uri”: …, “caption_uri”: …}, …]</p>
+<dd class="field-even"><p><strong>video_and_caption_uris</strong> – List of Dict containing video and caption URI for each session found.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>List[Dict]</p>
@@ -574,42 +586,49 @@ If Legistar Event.EventVideoPath is used, return an empty list in the override.<
 <dd class="field-even"><p><strong>NotImplementedError</strong> – This base implementation does nothing</p>
 </dd>
 </dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#cdp_scrapers.legistar_utils.get_legistar_events_for_timespan" title="cdp_scrapers.legistar_utils.get_legistar_events_for_timespan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdp_scrapers.legistar_utils.get_legistar_events_for_timespan</span></code></a></p>
+</div>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.get_vote_decision">
-<span class="sig-name descname"><span class="pre">get_vote_decision</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">legistar_vote</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">cdp_backend.database.constants.VoteDecision</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.get_vote_decision"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_vote_decision" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return appropriate VoteDecision constant based on Legistar Vote</p>
+<span class="sig-name descname"><span class="pre">get_vote_decision</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">legistar_vote</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.get_vote_decision"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_vote_decision" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return appropriate VoteDecision constant based on Legistar Vote.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>legistar_vote</strong> (<em>Dict</em>) – Legistar API Vote</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
+<dd class="field-even"><p><strong>vote_decision</strong> – A constant from CDP allowed vote decisions.
+None if missing vote information or if vote decision parameter patterns are
+not inclusive of the Legistar vote value.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>VoteDecision | None</p>
+<dd class="field-odd"><p>Optional[str]</p>
 </dd>
 </dl>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">vote_</span></code></p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdp_backend.database.constants.VoteDecision</span></code></p>
 </div>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.get_votes">
-<span class="sig-name descname"><span class="pre">get_votes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">legistar_votes</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.Vote</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.get_votes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_votes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return List[Vote] for Legistar API Votes</p>
+<span class="sig-name descname"><span class="pre">get_votes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">legistar_votes</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.Vote</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.get_votes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_votes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return List[Vote] for Legistar API Votes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>legistar_votes</strong> (<em>List[Dict]</em>) – Legistar API Votes</p>
+<dd class="field-odd"><p><strong>legistar_votes</strong> (<em>List[Dict]</em>) – Legistar votes as CDP Vote ingestion models.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
+<dd class="field-even"><p><strong>votes</strong> – List of votes if any were provided.
+None if empty list or missing information.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>List[Vote] | None</p>
+<dd class="field-odd"><p>Optional[List[Vote]]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -617,13 +636,32 @@ If Legistar Event.EventVideoPath is used, return an empty list in the override.<
 <dl class="py property">
 <dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.is_legistar_compatible">
 <em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">is_legistar_compatible</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.is_legistar_compatible" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check that Legistar API recognizes client name</p>
+<dd><p>Check that Legistar API recognizes client name.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>True if client_name is a valid Legistar client name</p>
+<dd class="field-odd"><p><strong>compatible</strong> – True if client_name is a valid Legistar client name</p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.localize_datetime">
+<span class="sig-name descname"><span class="pre">localize_datetime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_time</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">datetime.datetime</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">datetime.datetime</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.localize_datetime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.localize_datetime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return input datetime with time zone information.
+This allows for nonambiguous conversions to other zones including UTC.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>local_time</strong> (<em>datetime</em>) – The datetime to attached timezone information to.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>local_time</strong> – The date and time attributes (year, month, day, hour, …) remain unchanged.
+tzinfo is now provided.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>datetime</p>
 </dd>
 </dl>
 </dd></dl>
@@ -659,7 +697,7 @@ and requests person information for any vote.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.reduced_list">
-<span class="sig-prename descclassname"><span class="pre">cdp_scrapers.legistar_utils.</span></span><span class="sig-name descname"><span class="pre">reduced_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_list</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collapse</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#reduced_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.reduced_list" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">cdp_scrapers.legistar_utils.</span></span><span class="sig-name descname"><span class="pre">reduced_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_list</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collapse</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#reduced_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.reduced_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove all None items from input_list.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -669,10 +707,11 @@ and requests person information for any vote.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
+<dd class="field-even"><p><strong>reduced_list</strong> – All items in the original list except for None values.
+None if all items were None and collapse is True.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>List | None</p>
+<dd class="field-odd"><p>Optional[List]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -680,15 +719,14 @@ and requests person information for any vote.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.str_simplified">
 <span class="sig-prename descclassname"><span class="pre">cdp_scrapers.legistar_utils.</span></span><span class="sig-name descname"><span class="pre">str_simplified</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_str</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#str_simplified"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.str_simplified" title="Permalink to this definition">¶</a></dt>
-<dd><p>Remove leading/trailing whitespaces,
-simplify multiple whitespaces,
-unify newline characters</p>
+<dd><p>Remove leading and trailing whitespaces, simplify multiple whitespaces, unify
+newline characters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>input_str</strong> (<em>str</em>)</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>input_str stripped if it is a string</p>
+<dd class="field-even"><p><strong>cleaned</strong> – input_str stripped if it is a string</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>str</p>
