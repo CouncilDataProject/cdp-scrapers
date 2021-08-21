@@ -48,7 +48,7 @@ for submodule in iter_modules(__path__):
             SCRAPER_FUNCTIONS[member_cls.PYTHON_MUNICIPALITY_SLUG] = scraper_get_events
 
 # Not inhereting from the LegistarScraper?
-# Add your scraper class here
+# Add your scraper function here
 # SCRAPER_FUNCTIONS[{python_municipality_slug}] = {function_callable}
 
 # Set all scraper functions as exports of this module
