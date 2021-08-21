@@ -248,7 +248,7 @@ class LegistarScraper:
     Parameters
     ----------
     client: str
-        Legistar client name, e.g. "seattle" for Seattle
+        Legistar client name, e.g. "seattle" for Seattle, "kingcounty" for King County.
     timezone: str
         The timezone for the target client.
         i.e. "America/Los_Angeles" or "America/New_York"
