@@ -26,6 +26,8 @@ log = logging.getLogger(__name__)
 
 
 class KingCountyScraper(LegistarScraper):
+    MUNICIPALITY_SLUG: str = "king-county"
+
     def __init__(self):
         """
         King County specific implementation of LegistarScraper.

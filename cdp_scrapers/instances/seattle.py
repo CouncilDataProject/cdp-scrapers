@@ -29,6 +29,8 @@ log = logging.getLogger(__name__)
 
 
 class SeattleScraper(LegistarScraper):
+    MUNICIPALITY_SLUG: str = "seattle"
+
     def __init__(self):
         """
         Seattle specific implementation of LegistarScraper.
