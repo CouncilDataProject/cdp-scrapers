@@ -24,7 +24,7 @@ log = logging.getLogger(__name__)
 
 
 class KingCountyScraper(LegistarScraper):
-    MUNICIPALITY_SLUG: str = "king-county"
+    PYTHON_MUNICIPALITY_SLUG: str = "king_county"
 
     def __init__(self):
         """

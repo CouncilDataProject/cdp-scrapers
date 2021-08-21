@@ -6,6 +6,7 @@ Individual scratchpad and maybe up-to-date CDP instance scrapers.
 
 import importlib
 import inspect
+import sys
 from datetime import datetime
 from functools import partial
 from pkgutil import iter_modules
@@ -19,9 +20,9 @@ from cdp_scrapers.legistar_utils import LegistarScraper
 
 
 def _init_and_run_get_events(
-    legistar_scraper: Type[LegistarScraper],
     from_dt: datetime,
     to_dt: datetime,
+    legistar_scraper: Type[LegistarScraper],
     **kwargs: Any,
 ) -> List[EventIngestionModel]:
     scraper = legistar_scraper()
@@ -44,8 +45,12 @@ for submodule in iter_modules(__path__):
                 legistar_scraper=member_cls,
             )
             # Attach the partial function to the scraper functions dict
-            SCRAPER_FUNCTIONS[member_cls.MUNICIPALITY_SLUG] = scraper_get_events
+            SCRAPER_FUNCTIONS[member_cls.PYTHON_MUNICIPALITY_SLUG] = scraper_get_events
 
 # Not inhereting from the LegistarScraper?
 # Add your scraper class here
-# SCRAPER_FUNCTIONS[{municipality_slug}] = {function_callable}
+# SCRAPER_FUNCTIONS[{python_municipality_slug}] = {function_callable}
+
+# Set all scraper functions as exports of this module
+for python_municipality_slug, func in SCRAPER_FUNCTIONS.items():
+    setattr(sys.modules[__name__], f"get_{python_municipality_slug}_events", func)

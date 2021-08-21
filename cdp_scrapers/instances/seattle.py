@@ -26,7 +26,7 @@ log = logging.getLogger(__name__)
 
 
 class SeattleScraper(LegistarScraper):
-    MUNICIPALITY_SLUG: str = "seattle"
+    PYTHON_MUNICIPALITY_SLUG: str = "seattle"
 
     def __init__(self):
         """
