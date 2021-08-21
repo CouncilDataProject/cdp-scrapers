@@ -3,13 +3,11 @@
 
 import logging
 import re
-from datetime import datetime
-from typing import Any, Dict, List
+from typing import Dict, List
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
 
 from bs4 import BeautifulSoup
-from cdp_backend.pipeline.ingestion_models import EventIngestionModel
 
 from ..legistar_utils import (
     CDP_CAPTION_URI,
