@@ -28,9 +28,23 @@ log = logging.getLogger(__name__)
 class KingCountyScraper(LegistarScraper):
     def __init__(self):
         """
-        kingcounty-specific implementation of LegistarScraper
+        King County specific implementation of LegistarScraper.
         """
-        super().__init__("kingcounty")
+        super().__init__(
+            client="kingcounty",
+            timezone="America/Los_Angeles",
+            ignore_minutes_item_patterns=[
+                "This meeting also constitutes a meeting of the City Council",
+                "In-person attendance is currently prohibited",
+                "Times listed are estimated",
+                "has been cancelled",
+                "Deputy City Clerk",
+                "Paste the following link into the address bar of your web browser",
+                "HOW TO WATCH",
+                "page break",
+                "PUBLIC NOTICE",
+            ],
+        )
 
     def get_video_uris(self, legistar_ev: Dict) -> List[Dict]:
         """
@@ -38,15 +52,17 @@ class KingCountyScraper(LegistarScraper):
 
         Parameters
         ----------
-        legistar_ev : Dict
-            Data for one Legistar Event obtained from
-            ..legistar_utils.get_legistar_events_for_timespan()
+        legistar_ev: Dict
+            Data for one Legistar Event.
 
         Returns
         -------
-        List[Dict]
-            List of video and caption URI
-            [{"video_uri": ..., "caption_uri": ...}, ...]
+        video_and_caption_uris: List[Dict]
+            List of Dict containing video and caption URI for each session found.
+
+        See Also
+        --------
+        cdp_scrapers.legistar_utils.get_legistar_events_for_timespan
         """
         try:
             # a td tag with a certain id pattern containing url to video
@@ -120,15 +136,3 @@ class KingCountyScraper(LegistarScraper):
         if len(list_uri) == 0:
             log.debug(f"No video URI found on {video_page_url}")
         return list_uri
-
-    def get_time_zone(self) -> str:
-
-        """
-        Return America Los Angeles (old: US/Pacific) time zone name.
-        Can call find_time_zone() to find dynamically.
-        Returns
-        -------
-        time zone name : str
-            "America/Los_Angeles"
-        """
-        return "America/Los_Angeles"
