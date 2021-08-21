@@ -27,3 +27,7 @@ for submodule in iter_modules(__path__):
         ):
             # Attach the class to scrapers with it's municipality name
             SCRAPERS[member_cls.MUNICIPALITY_SLUG] = member_cls
+
+# Not inhereting from the LegistarScraper?
+# Add your scraper class here
+# SCRAPERS[{municipality_slug}] = {class_def}
