@@ -1,21 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from typing import Dict, List
-from bs4 import BeautifulSoup
-import re
 import logging
+import re
+from typing import Dict, List
+from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
-from urllib.error import (
-    URLError,
-    HTTPError,
-)
+
+from bs4 import BeautifulSoup
 
 from ..legistar_utils import (
-    LegistarScraper,
-    CDP_VIDEO_URI,
     CDP_CAPTION_URI,
+    CDP_VIDEO_URI,
     LEGISTAR_EV_SITE_URL,
+    LegistarScraper,
 )
 
 ###############################################################################

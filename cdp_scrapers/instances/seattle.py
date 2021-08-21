@@ -1,25 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import logging
+import re
 from datetime import datetime
 from typing import Any, Dict, List
-from bs4 import BeautifulSoup
-import re
-import logging
+from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
-from urllib.error import (
-    URLError,
-    HTTPError,
-)
+
+from bs4 import BeautifulSoup
+from cdp_backend.pipeline.ingestion_models import EventIngestionModel
 
 from ..legistar_utils import (
-    LegistarScraper,
-    CDP_VIDEO_URI,
     CDP_CAPTION_URI,
+    CDP_VIDEO_URI,
     LEGISTAR_EV_SITE_URL,
+    LegistarScraper,
 )
-
-from cdp_backend.pipeline.ingestion_models import EventIngestionModel
 
 ###############################################################################
 

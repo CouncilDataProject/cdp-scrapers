@@ -4,36 +4,29 @@
 import logging
 import re
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
+from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
-from urllib.error import URLError, HTTPError
 
 import requests
-
-from cdp_backend.pipeline.ingestion_models import (
-    EventIngestionModel,
-    Body,
-    IngestionModel,
-    Session,
-    EventMinutesItem,
-    MinutesItem,
-    Matter,
-    SupportingFile,
-    Person,
-    Vote,
-)
-
 from cdp_backend.database.constants import (
     EventMinutesItemDecision,
     MatterStatusDecision,
     VoteDecision,
 )
-
-from pytz import (
-    utc,
-    timezone,
-    country_timezones,
+from cdp_backend.pipeline.ingestion_models import (
+    Body,
+    EventIngestionModel,
+    EventMinutesItem,
+    IngestionModel,
+    Matter,
+    MinutesItem,
+    Person,
+    Session,
+    SupportingFile,
+    Vote,
 )
+from pytz import country_timezones, timezone, utc
 
 ###############################################################################
 
