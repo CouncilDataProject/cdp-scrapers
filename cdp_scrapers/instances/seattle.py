@@ -16,6 +16,7 @@ from ..legistar_utils import (
     LegistarScraper,
     CDP_VIDEO_URI,
     CDP_CAPTION_URI,
+    LEGISTAR_EV_SITE_URL,
 )
 
 from cdp_backend.pipeline.ingestion_models import EventIngestionModel
@@ -23,10 +24,6 @@ from cdp_backend.pipeline.ingestion_models import EventIngestionModel
 ###############################################################################
 
 log = logging.getLogger(__name__)
-
-###############################################################################
-
-LEGISTAR_EV_SITE_URL = "EventInSiteURL"
 
 ###############################################################################
 
