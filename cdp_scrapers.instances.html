@@ -234,6 +234,44 @@ from GitHub Actions UI.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="module-cdp_scrapers.instances.kingcounty">
+<span id="cdp-scrapers-instances-kingcounty-module"></span><h2>cdp_scrapers.instances.kingcounty module<a class="headerlink" href="#module-cdp_scrapers.instances.kingcounty" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="cdp_scrapers.instances.kingcounty.KingCountyScraper">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">cdp_scrapers.instances.kingcounty.</span></span><span class="sig-name descname"><span class="pre">KingCountyScraper</span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/kingcounty.html#KingCountyScraper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.kingcounty.KingCountyScraper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="cdp_scrapers.legistar_utils.LegistarScraper.html#cdp_scrapers.legistar_utils.LegistarScraper" title="cdp_scrapers.legistar_utils.LegistarScraper"><code class="xref py py-class docutils literal notranslate"><span class="pre">cdp_scrapers.legistar_utils.LegistarScraper</span></code></a></p>
+<p>kingcounty-specific implementation of LegistarScraper</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cdp_scrapers.instances.kingcounty.KingCountyScraper.get_time_zone">
+<span class="sig-name descname"><span class="pre">get_time_zone</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/kingcounty.html#KingCountyScraper.get_time_zone"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.kingcounty.KingCountyScraper.get_time_zone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return America Los Angeles (old: US/Pacific) time zone name.
+Can call find_time_zone() to find dynamically.
+:returns: <strong>time zone name</strong> – “America/Los_Angeles”
+:rtype: str</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cdp_scrapers.instances.kingcounty.KingCountyScraper.get_video_uris">
+<span class="sig-name descname"><span class="pre">get_video_uris</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">legistar_ev</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/kingcounty.html#KingCountyScraper.get_video_uris"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.kingcounty.KingCountyScraper.get_video_uris" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return URLs for videos and captions parsed from kingcounty.gov web page</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>legistar_ev</strong> (<em>Dict</em>) – Data for one Legistar Event obtained from
+..legistar_utils.get_legistar_events_for_timespan()</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of video and caption URI
+[{“video_uri”: …, “caption_uri”: …}, …]</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>List[Dict]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="module-cdp_scrapers.instances.seattle">
 <span id="cdp-scrapers-instances-seattle-module"></span><h2>cdp_scrapers.instances.seattle module<a class="headerlink" href="#module-cdp_scrapers.instances.seattle" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">

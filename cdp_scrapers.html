@@ -209,6 +209,7 @@
 <li class="toctree-l1"><a class="reference internal" href="cdp_scrapers.instances.html">cdp_scrapers.instances package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="cdp_scrapers.instances.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cdp_scrapers.instances.html#module-cdp_scrapers.instances.empty">cdp_scrapers.instances.empty module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cdp_scrapers.instances.html#module-cdp_scrapers.instances.kingcounty">cdp_scrapers.instances.kingcounty module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cdp_scrapers.instances.html#module-cdp_scrapers.instances.seattle">cdp_scrapers.instances.seattle module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cdp_scrapers.instances.html#module-cdp_scrapers.instances">Module contents</a></li>
 </ul>
@@ -241,17 +242,15 @@ and get_time_zone() functions.</p>
 <dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.as_local_time">
 <span class="sig-name descname"><span class="pre">as_local_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_time</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">datetime.datetime</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">datetime.datetime</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.as_local_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.as_local_time" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return input datetime with time zone information.
-This allows for nonambiguous conversions to other zones including UTC.</p>
+This allows for nonambiguous conversions to other zones including UTC.
+:Parameters: <strong>local_time</strong> (<em>datetime</em>)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>local_time</strong> (<em>datetime</em>)</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>local_time</strong> – The date and time attributes (year, month, day, hour, …) remain unchanged.
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>local_time</strong> – The date and time attributes (year, month, day, hour, …) remain unchanged.
 tzinfo is now provided.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>datetime</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>datetime</p>
 </dd>
 </dl>
 </dd></dl>
@@ -318,15 +317,9 @@ that we want to ignore</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.find_time_zone">
 <span class="sig-name descname"><span class="pre">find_time_zone</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.find_time_zone"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.find_time_zone" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return name for a US time zone matching UTC offset calculated from OS clock</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><strong>time zone name</strong></p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>str</p>
-</dd>
-</dl>
+<dd><p>Return name for a US time zone matching UTC offset calculated from OS clock
+:returns: <strong>time zone name</strong>
+:rtype: str</p>
 </dd></dl>
 
 <dl class="py method">
@@ -549,15 +542,9 @@ in IngestionModel class definition</p>
 <span class="sig-name descname"><span class="pre">get_time_zone</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.get_time_zone"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_time_zone" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return time zone name for CDP instance.
 To use dynamically determined time zone,
-use find_time_zone().</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><strong>time zone name</strong> – i.e. “America/Los_Angeles” | “America/New_York” …</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>str</p>
-</dd>
-</dl>
+use find_time_zone().
+:returns: <strong>time zone name</strong> – i.e. “America/Los_Angeles” | “America/New_York” …
+:rtype: str</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SeattleScraper.get_time_zone</span></code></p>

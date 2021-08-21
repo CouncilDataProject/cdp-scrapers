@@ -268,7 +268,7 @@
 <span class="n">LEGISTAR_MATTER_SPONSOR</span> <span class="o">=</span> <span class="s2">&quot;EventItemMatterRequester&quot;</span>
 <span class="c1"># Session.session_datetime is a combo of EventDate and EventTime</span>
 <span class="c1"># TODO: this means same time for all Sessions in a EventIngestionModel.</span>
-<span class="c1">#       some other legistar api data that can be used instead?</span>
+<span class="c1">#       some other legistar api data that can be used instead</span>
 <span class="n">LEGISTAR_SESSION_DATE</span> <span class="o">=</span> <span class="s2">&quot;EventDate&quot;</span>
 <span class="n">LEGISTAR_SESSION_TIME</span> <span class="o">=</span> <span class="s2">&quot;EventTime&quot;</span>
 <span class="n">LEGISTAR_AGENDA_URI</span> <span class="o">=</span> <span class="s2">&quot;EventAgendaFile&quot;</span>
@@ -282,7 +282,7 @@
 <span class="n">LEGISTAR_EV_ATTACHMENTS</span> <span class="o">=</span> <span class="s2">&quot;EventItemMatterAttachments&quot;</span>
 <span class="n">LEGISTAR_EV_VOTES</span> <span class="o">=</span> <span class="s2">&quot;EventItemVoteInfo&quot;</span>
 <span class="n">LEGISTAR_VOTE_PERSONS</span> <span class="o">=</span> <span class="s2">&quot;PersonInfo&quot;</span>
-
+<span class="n">LEGISTAR_EV_SITE_URL</span> <span class="o">=</span> <span class="s2">&quot;EventInSiteURL&quot;</span>
 <span class="n">CDP_VIDEO_URI</span> <span class="o">=</span> <span class="s2">&quot;video_uri&quot;</span>
 <span class="n">CDP_CAPTION_URI</span> <span class="o">=</span> <span class="s2">&quot;caption_uri&quot;</span>
 
@@ -322,7 +322,6 @@
         <span class="n">begin</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">end</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">end</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
-
     <span class="c1"># The unformatted request parts</span>
     <span class="n">filter_datetime_format</span> <span class="o">=</span> <span class="s2">&quot;EventDate+</span><span class="si">{op}</span><span class="s2">+datetime%27</span><span class="si">{dt}</span><span class="s2">%27&quot;</span>
     <span class="n">request_format</span> <span class="o">=</span> <span class="n">LEGISTAR_EVENT_BASE</span> <span class="o">+</span> <span class="s2">&quot;?$filter=</span><span class="si">{begin}</span><span class="s2">+and+</span><span class="si">{end}</span><span class="s2">&quot;</span>
@@ -342,7 +341,6 @@
             <span class="p">),</span>
         <span class="p">)</span>
     <span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
-
     <span class="c1"># Get all event items for each event</span>
     <span class="n">item_request_format</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">LEGISTAR_EVENT_BASE</span>
@@ -363,7 +361,6 @@
                     <span class="n">event_item_id</span><span class="o">=</span><span class="n">event_item</span><span class="p">[</span><span class="s2">&quot;EventItemId&quot;</span><span class="p">],</span>
                 <span class="p">)</span>
             <span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
-
             <span class="c1"># Get person information</span>
             <span class="k">for</span> <span class="n">vote_info</span> <span class="ow">in</span> <span class="n">event_item</span><span class="p">[</span><span class="s2">&quot;EventItemVoteInfo&quot;</span><span class="p">]:</span>
                 <span class="n">person_request_format</span> <span class="o">=</span> <span class="n">LEGISTAR_PERSON_BASE</span> <span class="o">+</span> <span class="s2">&quot;/</span><span class="si">{person_id}</span><span class="s2">&quot;</span>
@@ -454,6 +451,10 @@
             <span class="s2">&quot;Times listed are estimated&quot;</span><span class="p">,</span>
             <span class="s2">&quot;has been cancelled&quot;</span><span class="p">,</span>
             <span class="s2">&quot;Deputy City Clerk&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Paste the following link into the address bar of your web browser&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;HOW TO WATCH&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;page break&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;PUBLIC NOTICE&quot;</span><span class="p">,</span>
             <span class="c1"># &quot;CALL TO ORDER&quot;,</span>
             <span class="c1"># &quot;ROLL CALL&quot;,</span>
             <span class="c1"># &quot;APPROVAL OF THE JOURNAL&quot;,</span>
@@ -471,9 +472,9 @@
 
         <span class="c1"># regex patterns used to infer cdp_backend.database.constants</span>
         <span class="c1"># from Legistar string fields</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">vote_approve_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;approve|favor&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vote_approve_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;approve|favor|yes&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">vote_abstain_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;abstain|refuse|refrain&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">vote_reject_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;reject|oppose&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vote_reject_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;reject|oppose|no&quot;</span>
         <span class="c1"># TODO: need to debug these using real examples</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">vote_absent_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;absent&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">vote_nonvoting_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;nv|(?:non.*voting)&quot;</span>
@@ -612,7 +613,6 @@
                     <span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_SESSION_TIME</span><span class="p">],</span>
                 <span class="p">)</span>
             <span class="p">)</span>
-
             <span class="c1"># prefer video file path in legistar Event.EventVideoPath</span>
             <span class="k">if</span> <span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_SESSION_VIDEO_URI</span><span class="p">]:</span>
                 <span class="n">list_uri</span> <span class="o">=</span> <span class="p">[</span>
@@ -643,7 +643,6 @@
                     <span class="k">for</span> <span class="n">uri</span> <span class="ow">in</span> <span class="n">list_uri</span>
                 <span class="p">]</span>
             <span class="p">)</span>
-
             <span class="n">ingestion_models</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>
                     <span class="n">EventIngestionModel</span><span class="p">(</span>
@@ -694,7 +693,6 @@
 <span class="sd">        Return time zone name for CDP instance.</span>
 <span class="sd">        To use dynamically determined time zone,</span>
 <span class="sd">        use find_time_zone().</span>
-
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        time zone name : str</span>
@@ -708,7 +706,6 @@
 <span class="sd">        -----</span>
 <span class="sd">        List of Timezones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones</span>
 <span class="sd">        Please only use &quot;Canonical&quot; timezones.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
             <span class="s2">&quot;Time zone name required for proper event timestamping. &quot;</span>
@@ -1110,7 +1107,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">ev_minutes_item</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">ev_minutes_item</span>
-
         <span class="k">if</span> <span class="n">ev_minutes_item</span><span class="o">.</span><span class="n">minutes_item</span> <span class="ow">and</span> <span class="n">ev_minutes_item</span><span class="o">.</span><span class="n">matter</span><span class="p">:</span>
             <span class="c1"># we have both matter and minutes_item</span>
             <span class="c1"># - make minutes_item.name the more concise text e.g. &quot;CB 11111&quot;</span>
@@ -1120,7 +1116,6 @@
             <span class="n">ev_minutes_item</span><span class="o">.</span><span class="n">minutes_item</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">ev_minutes_item</span><span class="o">.</span><span class="n">minutes_item</span><span class="o">.</span><span class="n">name</span>
             <span class="n">ev_minutes_item</span><span class="o">.</span><span class="n">minutes_item</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">ev_minutes_item</span><span class="o">.</span><span class="n">matter</span><span class="o">.</span><span class="n">name</span>
             <span class="n">ev_minutes_item</span><span class="o">.</span><span class="n">matter</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">ev_minutes_item</span><span class="o">.</span><span class="n">minutes_item</span><span class="o">.</span><span class="n">description</span>
-
         <span class="c1"># matter.result_status is allowed to be null</span>
         <span class="c1"># only when no votes or Legistar EventItemMatterStatus is null</span>
         <span class="k">if</span> <span class="n">ev_minutes_item</span><span class="o">.</span><span class="n">matter</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">ev_minutes_item</span><span class="o">.</span><span class="n">matter</span><span class="o">.</span><span class="n">result_status</span><span class="p">:</span>
@@ -1155,11 +1150,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">ev_minutes_item</span><span class="o">.</span><span class="n">minutes_item</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">ev_minutes_item</span><span class="o">.</span><span class="n">minutes_item</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">ev_minutes_item</span>
-
         <span class="k">for</span> <span class="nb">filter</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">IGNORED_MINUTE_ITEMS</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">filter</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">ev_minutes_item</span><span class="o">.</span><span class="n">minutes_item</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="nb">filter</span><span class="p">,</span> <span class="n">ev_minutes_item</span><span class="o">.</span><span class="n">minutes_item</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">):</span>
                 <span class="k">return</span> <span class="kc">None</span>
-
         <span class="k">return</span> <span class="n">ev_minutes_item</span></div>
 
 <div class="viewcode-block" id="LegistarScraper.get_none_if_empty"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_none_if_empty">[docs]</a>    <span class="k">def</span> <span class="nf">get_none_if_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">IngestionModel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IngestionModel</span><span class="p">:</span>
@@ -1272,7 +1265,6 @@
 <div class="viewcode-block" id="LegistarScraper.find_time_zone"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.find_time_zone">[docs]</a>    <span class="k">def</span> <span class="nf">find_time_zone</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return name for a US time zone matching UTC offset calculated from OS clock</span>
-
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        time zone name : str</span>
@@ -1300,11 +1292,9 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return input datetime with time zone information.</span>
 <span class="sd">        This allows for nonambiguous conversions to other zones including UTC.</span>
-
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        local_time : datetime</span>
-
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        local_time : datetime</span>
@@ -1338,15 +1328,26 @@
         <span class="c1"># 2021-07-09T00:00:00</span>
         <span class="n">d</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">ev_date</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%S&quot;</span><span class="p">)</span>
         <span class="c1"># 9:30 AM</span>
-        <span class="n">t</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">ev_time</span><span class="p">,</span> <span class="s2">&quot;%I:%M %p&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">datetime</span><span class="p">(</span>
-            <span class="n">year</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">year</span><span class="p">,</span>
-            <span class="n">month</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">month</span><span class="p">,</span>
-            <span class="n">day</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">day</span><span class="p">,</span>
-            <span class="n">hour</span><span class="o">=</span><span class="n">t</span><span class="o">.</span><span class="n">hour</span><span class="p">,</span>
-            <span class="n">minute</span><span class="o">=</span><span class="n">t</span><span class="o">.</span><span class="n">minute</span><span class="p">,</span>
-            <span class="n">second</span><span class="o">=</span><span class="n">t</span><span class="o">.</span><span class="n">second</span><span class="p">,</span>
-        <span class="p">)</span></div></div>
+        <span class="c1"># some events may have ev_time =None</span>
+        <span class="k">if</span> <span class="n">ev_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">ev_time</span><span class="p">,</span> <span class="s2">&quot;%I:%M %p&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">datetime</span><span class="p">(</span>
+                <span class="n">year</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">year</span><span class="p">,</span>
+                <span class="n">month</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">month</span><span class="p">,</span>
+                <span class="n">day</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">day</span><span class="p">,</span>
+                <span class="n">hour</span><span class="o">=</span><span class="n">t</span><span class="o">.</span><span class="n">hour</span><span class="p">,</span>
+                <span class="n">minute</span><span class="o">=</span><span class="n">t</span><span class="o">.</span><span class="n">minute</span><span class="p">,</span>
+                <span class="n">second</span><span class="o">=</span><span class="n">t</span><span class="o">.</span><span class="n">second</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">datetime</span><span class="p">(</span>
+                <span class="n">year</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">year</span><span class="p">,</span>
+                <span class="n">month</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">month</span><span class="p">,</span>
+                <span class="n">day</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">day</span><span class="p">,</span>
+                <span class="n">hour</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="n">minute</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="n">second</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="p">)</span></div></div>
 </pre></div>
 
            </div>

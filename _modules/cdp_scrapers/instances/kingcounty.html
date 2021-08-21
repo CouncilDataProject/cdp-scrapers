@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>cdp_scrapers.instances.seattle &mdash; cdp-scrapers 0.1.1 documentation</title>
+  <title>cdp_scrapers.instances.kingcounty &mdash; cdp-scrapers 0.1.1 documentation</title>
   
 
   
@@ -172,7 +172,7 @@
         
           <li><a href="../../cdp_scrapers.html">cdp_scrapers</a> &raquo;</li>
         
-      <li>cdp_scrapers.instances.seattle</li>
+      <li>cdp_scrapers.instances.kingcounty</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -187,12 +187,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for cdp_scrapers.instances.seattle</h1><div class="highlight"><pre>
+  <h1>Source code for cdp_scrapers.instances.kingcounty</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
 
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
 <span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">logging</span>
@@ -209,8 +208,6 @@
     <span class="n">LEGISTAR_EV_SITE_URL</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">cdp_backend.pipeline.ingestion_models</span> <span class="kn">import</span> <span class="n">EventIngestionModel</span>
-
 <span class="c1">###############################################################################</span>
 
 <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -218,16 +215,16 @@
 <span class="c1">###############################################################################</span>
 
 
-<div class="viewcode-block" id="SeattleScraper"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.SeattleScraper">[docs]</a><span class="k">class</span> <span class="nc">SeattleScraper</span><span class="p">(</span><span class="n">LegistarScraper</span><span class="p">):</span>
+<div class="viewcode-block" id="KingCountyScraper"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.kingcounty.KingCountyScraper">[docs]</a><span class="k">class</span> <span class="nc">KingCountyScraper</span><span class="p">(</span><span class="n">LegistarScraper</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Seattle-specific implementation of LegistarScraper</span>
+<span class="sd">        kingcounty-specific implementation of LegistarScraper</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">&quot;seattle&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">&quot;kingcounty&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="SeattleScraper.get_video_uris"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.SeattleScraper.get_video_uris">[docs]</a>    <span class="k">def</span> <span class="nf">get_video_uris</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_ev</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+<div class="viewcode-block" id="KingCountyScraper.get_video_uris"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.kingcounty.KingCountyScraper.get_video_uris">[docs]</a>    <span class="k">def</span> <span class="nf">get_video_uris</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_ev</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return URLs for videos and captions parsed from seattlechannel.org web page</span>
+<span class="sd">        Return URLs for videos and captions parsed from kingcounty.gov web page</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -243,19 +240,33 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># a td tag with a certain id pattern containing url to video</span>
+
             <span class="k">with</span> <span class="n">urlopen</span><span class="p">(</span><span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_EV_SITE_URL</span><span class="p">])</span> <span class="k">as</span> <span class="n">resp</span><span class="p">:</span>
                 <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">resp</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="s2">&quot;html.parser&quot;</span><span class="p">)</span>
+
         <span class="k">except</span> <span class="n">URLError</span> <span class="ow">or</span> <span class="n">HTTPError</span><span class="p">:</span>
             <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to open </span><span class="si">{</span><span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_EV_SITE_URL</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="p">[]</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># this gets us the url for the web PAGE containing the video</span>
-            <span class="n">video_page_url</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span>
+            <span class="c1"># video link is provided in the window.open()command inside onclick event</span>
+            <span class="c1"># &lt;a id=&quot;ctl00_ContentPlaceHolder1_hypVideo&quot;</span>
+            <span class="c1"># data-event-id=&quot;75f1e143-6756-496f-911b-d3abe61d64a5&quot;</span>
+            <span class="c1"># data-running-text=&quot;In&amp;amp;nbsp;progress&quot; class=&quot;videolink&quot;</span>
+            <span class="c1"># onclick=&quot;window.open(&#39;Video.aspx?</span>
+            <span class="c1"># Mode=Granicus&amp;amp;ID1=8844&amp;amp;G=D64&amp;amp;Mode2=Video&#39;,&#39;video&#39;);</span>
+            <span class="c1"># return false;&quot;</span>
+            <span class="c1"># href=&quot;#&quot; style=&quot;color:Blue;font-family:Tahoma;font-size:10pt;&quot;&gt;Video&lt;/a&gt;</span>
+            <span class="n">extract_url</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span>
                 <span class="s2">&quot;a&quot;</span><span class="p">,</span>
                 <span class="nb">id</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;ct\S*_ContentPlaceHolder\S*_hypVideo&quot;</span><span class="p">),</span>
                 <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;videolink&quot;</span><span class="p">,</span>
-            <span class="p">)[</span><span class="s2">&quot;href&quot;</span><span class="p">]</span>
+            <span class="p">)[</span><span class="s2">&quot;onclick&quot;</span><span class="p">]</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">extract_url</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="n">extract_url</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;&#39;,&quot;</span><span class="p">)</span>
+            <span class="n">video_page_url</span> <span class="o">=</span> <span class="s2">&quot;https://kingcounty.legistar.com/&quot;</span> <span class="o">+</span> <span class="n">extract_url</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
+
         <span class="c1"># catch if find() didn&#39;t find video web page url (no &lt;a id=... href=.../&gt;)</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;No URL for video page on </span><span class="si">{legistar_ev[LEGISTAR_EV_SITE_URL]}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -267,118 +278,50 @@
             <span class="k">with</span> <span class="n">urlopen</span><span class="p">(</span><span class="n">video_page_url</span><span class="p">)</span> <span class="k">as</span> <span class="n">resp</span><span class="p">:</span>
                 <span class="c1"># now load the page to get the actual video url</span>
                 <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">resp</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="s2">&quot;html.parser&quot;</span><span class="p">)</span>
+
         <span class="k">except</span> <span class="n">URLError</span> <span class="ow">or</span> <span class="n">HTTPError</span><span class="p">:</span>
             <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to open </span><span class="si">{</span><span class="n">video_page_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="p">[]</span>
 
-        <span class="c1"># &lt;script&gt;</span>
-        <span class="c1"># ...</span>
-        <span class="c1"># playerInstance.setup({</span>
-        <span class="c1"># sources: [</span>
-        <span class="c1">#     {</span>
-        <span class="c1">#         file: &quot;//...mp4&quot;,</span>
-        <span class="c1">#         label: &quot;Auto&quot;</span>
-        <span class="c1">#     }</span>
-        <span class="c1"># ],</span>
-        <span class="c1"># ...</span>
-        <span class="c1"># tracks: [{</span>
-        <span class="c1">#     file: &quot;documents/seattlechannel/closedcaption/2021/...vtt&quot;,</span>
-        <span class="c1">#     label: &quot;English&quot;,</span>
-        <span class="c1">#     kind: &quot;captions&quot;,</span>
-        <span class="c1">#     &quot;default&quot;: true</span>
-        <span class="c1"># }</span>
-        <span class="c1">#</span>
-        <span class="c1">#  ],</span>
-        <span class="c1"># ...</span>
+        <span class="c1"># source link for the video is embedded in the script of downloadLinks.</span>
+        <span class="c1"># &lt;script type=&quot;text/javascript&quot;&gt;</span>
+        <span class="c1"># var meta_id = &#39;&#39;,</span>
+        <span class="c1"># currentClipIndex = 0,</span>
+        <span class="c1"># clipList = eval([8844]),</span>
+        <span class="c1"># downloadLinks = eval([[&quot;\/\/69.5.90.100:443\/MediaVault\/Download.aspx?</span>
+        <span class="c1"># server=king.granicus.com&amp;clip_id=8844&quot;,</span>
+        <span class="c1"># &quot;http:\/\/archive-media.granicus.com:443\/OnDemand\/king\/king_e560cf63-5570-416e-a47d-0e1e13652224.mp4&quot;,null]]);</span>
+        <span class="c1"># &lt;/script&gt;</span>
 
-        <span class="c1"># entire script tag text that has the video player setup call</span>
         <span class="n">video_script_text</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span>
-            <span class="s2">&quot;script&quot;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;playerInstance\.setup&quot;</span><span class="p">)</span>
+            <span class="s2">&quot;script&quot;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;downloadLinks&quot;</span><span class="p">)</span>
         <span class="p">)</span><span class="o">.</span><span class="n">string</span>
-
-        <span class="c1"># playerSetup({...</span>
-        <span class="c1">#             ^</span>
-        <span class="n">player_arg_start</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
-            <span class="sa">r</span><span class="s2">&quot;playerInstance\.setup\((\{)&quot;</span><span class="p">,</span> <span class="n">video_script_text</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-
-        <span class="c1"># ...});</span>
-        <span class="c1">#     ^</span>
-        <span class="c1"># playerInstance... # more playerInstance code</span>
-        <span class="n">video_json_blob</span> <span class="o">=</span> <span class="n">video_script_text</span><span class="p">[</span>
-            <span class="n">player_arg_start</span> <span class="p">:</span> <span class="n">player_arg_start</span>
-            <span class="o">+</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
-                <span class="sa">r</span><span class="s2">&quot;\)\;\s*\n\s*playerInstance&quot;</span><span class="p">,</span> <span class="n">video_script_text</span><span class="p">[</span><span class="n">player_arg_start</span><span class="p">:]</span>
-            <span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="p">]</span>
-
-        <span class="c1"># not smart enough to make one-line regex for all the &#39;file&#39;s in &#39;sources&#39;</span>
-        <span class="n">videos_start</span> <span class="o">=</span> <span class="n">video_json_blob</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;sources:&quot;</span><span class="p">)</span>
-        <span class="n">videos_end</span> <span class="o">=</span> <span class="n">video_json_blob</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;],&quot;</span><span class="p">,</span> <span class="n">videos_start</span><span class="p">)</span>
-        <span class="c1"># as shown above, url will start with // so prepend https:</span>
-        <span class="n">video_uris</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s2">&quot;https:&quot;</span> <span class="o">+</span> <span class="n">i</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span>
-                <span class="sa">r</span><span class="s2">&quot;file\:\s*</span><span class="se">\&quot;</span><span class="s2">([^</span><span class="se">\&quot;</span><span class="s2">]+)&quot;</span><span class="p">,</span>
-                <span class="n">video_json_blob</span><span class="p">[</span><span class="n">videos_start</span><span class="p">:</span><span class="n">videos_end</span><span class="p">],</span>
-            <span class="p">)</span>
-        <span class="p">]</span>
-
-        <span class="n">captions_start</span> <span class="o">=</span> <span class="n">video_json_blob</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;tracks:&quot;</span><span class="p">)</span>
-        <span class="n">captions_end</span> <span class="o">=</span> <span class="n">video_json_blob</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;],&quot;</span><span class="p">,</span> <span class="n">captions_start</span><span class="p">)</span>
-        <span class="n">caption_uris</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s2">&quot;https://www.seattlechannel.org/&quot;</span> <span class="o">+</span> <span class="n">i</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span>
-                <span class="sa">r</span><span class="s2">&quot;file\:\s*</span><span class="se">\&quot;</span><span class="s2">([^</span><span class="se">\&quot;</span><span class="s2">]+)&quot;</span><span class="p">,</span>
-                <span class="n">video_json_blob</span><span class="p">[</span><span class="n">captions_start</span><span class="p">:</span><span class="n">captions_end</span><span class="p">],</span>
-            <span class="p">)</span>
-        <span class="p">]</span>
-
-        <span class="c1"># use max count between videos and captions</span>
-        <span class="c1"># so we don&#39;t lose any (e.g. caption = None if &lt; # videos)</span>
-        <span class="nb">iter</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">video_uris</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">caption_uris</span><span class="p">)))</span>
+        <span class="c1"># Below two lines of code tries to extract video url from downLoadLinks variable</span>
+        <span class="c1"># &quot;http:\/\/archive-media.granicus.com:443\/OnDemand\/king\/king_e560cf63-5570-416e-a47d-0e1e13652224.mp4&quot;</span>
+        <span class="n">downloadLinks</span> <span class="o">=</span> <span class="n">video_script_text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;[[&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">video_url</span> <span class="o">=</span> <span class="n">downloadLinks</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;&quot;,&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)</span>
+        <span class="c1"># Cleans up the video url to remove backward slash(\)</span>
+        <span class="n">video_uri</span> <span class="o">=</span> <span class="n">video_url</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="c1"># caption URIs are not found for kingcounty events.</span>
+        <span class="n">caption_uri</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">list_uri</span> <span class="o">=</span> <span class="p">[]</span>
-
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">iter</span><span class="p">:</span>
-            <span class="c1"># just in case # videos != # captions</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">video_uri</span> <span class="o">=</span> <span class="n">video_uris</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
-                <span class="n">video_uri</span> <span class="o">=</span> <span class="kc">None</span>
-
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">caption_uri</span> <span class="o">=</span> <span class="n">caption_uris</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
-                <span class="n">caption_uri</span> <span class="o">=</span> <span class="kc">None</span>
-
-            <span class="n">list_uri</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="n">CDP_VIDEO_URI</span><span class="p">:</span> <span class="n">video_uri</span><span class="p">,</span> <span class="n">CDP_CAPTION_URI</span><span class="p">:</span> <span class="n">caption_uri</span><span class="p">})</span>
+        <span class="n">list_uri</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="n">CDP_VIDEO_URI</span><span class="p">:</span> <span class="n">video_uri</span><span class="p">,</span> <span class="n">CDP_CAPTION_URI</span><span class="p">:</span> <span class="n">caption_uri</span><span class="p">})</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_uri</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No video URI found on </span><span class="si">{</span><span class="n">video_page_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">list_uri</span></div>
 
-<div class="viewcode-block" id="SeattleScraper.get_time_zone"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.SeattleScraper.get_time_zone">[docs]</a>    <span class="k">def</span> <span class="nf">get_time_zone</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<div class="viewcode-block" id="KingCountyScraper.get_time_zone"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.kingcounty.KingCountyScraper.get_time_zone">[docs]</a>    <span class="k">def</span> <span class="nf">get_time_zone</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return America Los Angeles (old: US/Pacific) time zone name.</span>
 <span class="sd">        Can call find_time_zone() to find dynamically.</span>
-
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        time zone name : str</span>
 <span class="sd">            &quot;America/Los_Angeles&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="s2">&quot;America/Los_Angeles&quot;</span></div></div>
-
-
-<div class="viewcode-block" id="get_events"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.get_events">[docs]</a><span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span>
-    <span class="n">from_dt</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span>
-    <span class="n">to_dt</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Implimentation of the Seattle Scrapper to provide to a cookiecutter or for testing.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">SeattleScraper</span><span class="p">()</span><span class="o">.</span><span class="n">get_events</span><span class="p">(</span><span class="n">begin</span><span class="o">=</span><span class="n">from_dt</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">to_dt</span><span class="p">)</span></div>
 </pre></div>
 
            </div>
