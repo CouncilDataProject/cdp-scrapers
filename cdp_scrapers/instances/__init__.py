@@ -7,14 +7,14 @@ Individual scratchpad and maybe up-to-date CDP instance scrapers.
 from pkgutil import iter_modules
 import importlib
 import inspect
-from typing import Dict
+from typing import Dict, Type
 
 from cdp_scrapers.legistar_utils import LegistarScraper
 
 ###############################################################################
 
 
-SCRAPERS: Dict[str, LegistarScraper] = {}
+SCRAPERS: Dict[str, Type[LegistarScraper]] = {}
 for submodule in iter_modules(__path__):
     # Import the submodule
     mod = importlib.import_module(f"{__name__}.{submodule.name}")
