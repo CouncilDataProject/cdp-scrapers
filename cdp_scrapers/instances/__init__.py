@@ -4,17 +4,31 @@
 Individual scratchpad and maybe up-to-date CDP instance scrapers.
 """
 
-from pkgutil import iter_modules
 import importlib
 import inspect
-from typing import Dict, Type
+from datetime import datetime
+from functools import partial
+from pkgutil import iter_modules
+from typing import Any, Callable, Dict, List, Type
+
+from cdp_backend.pipeline.ingestion_models import EventIngestionModel
 
 from cdp_scrapers.legistar_utils import LegistarScraper
 
 ###############################################################################
 
 
-SCRAPERS: Dict[str, Type[LegistarScraper]] = {}
+def _init_and_run_get_events(
+    legistar_scraper: Type[LegistarScraper],
+    from_dt: datetime,
+    to_dt: datetime,
+    **kwargs: Any,
+) -> List[EventIngestionModel]:
+    scraper = legistar_scraper()
+    return scraper.get_events(begin=from_dt, end=to_dt, **kwargs)
+
+
+SCRAPER_FUNCTIONS: Dict[str, Callable] = {}
 for submodule in iter_modules(__path__):
     # Import the submodule
     mod = importlib.import_module(f"{__name__}.{submodule.name}")
@@ -25,9 +39,13 @@ for submodule in iter_modules(__path__):
             issubclass(member_cls, LegistarScraper)
             and member_cls is not LegistarScraper
         ):
-            # Attach the class to scrapers with it's municipality name
-            SCRAPERS[member_cls.MUNICIPALITY_SLUG] = member_cls
+            scraper_get_events = partial(
+                _init_and_run_get_events,
+                legistar_scraper=member_cls,
+            )
+            # Attach the partial function to the scraper functions dict
+            SCRAPER_FUNCTIONS[member_cls.MUNICIPALITY_SLUG] = scraper_get_events
 
 # Not inhereting from the LegistarScraper?
 # Add your scraper class here
-# SCRAPERS[{municipality_slug}] = {class_def}
+# SCRAPER_FUNCTIONS[{municipality_slug}] = {function_callable}
