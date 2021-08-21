@@ -27,9 +27,10 @@ dev_requirements = [
 ]
 
 requirements = [
-    "cdp-backend~=3.0.0.dev6",
+    "cdp-backend~=3.0.0.dev8",
     "requests~=2.25.1",
     "beautifulsoup4>=4.9.3",
+    "pytz>=2021.1",
 ]
 
 extra_requirements = {
@@ -42,10 +43,10 @@ extra_requirements = {
 }
 
 setup(
-    author="Jackson Maxfield Brown",
+    author="Jackson Maxfield Brown, Sung Cho",
     author_email="jmaxfieldbrown@gmail.com",
     classifiers=[
-        "Development Status :: 2 - Pre-Alpha",
+        "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Natural Language :: English",
@@ -71,6 +72,6 @@ setup(
     url="https://github.com/CouncilDataProject/cdp-scrapers",
     # Do not edit this string manually, always use bumpversion
     # Details in CONTRIBUTING.rst
-    version="0.0.0",
+    version="0.1.1",
     zip_safe=False,
 )

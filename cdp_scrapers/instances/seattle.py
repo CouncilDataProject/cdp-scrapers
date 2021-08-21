@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from typing import Dict, List
+from datetime import datetime
+from typing import Any, Dict, List
 from bs4 import BeautifulSoup
 import re
 import logging
@@ -17,6 +18,8 @@ from ..legistar_utils import (
     CDP_CAPTION_URI,
     LEGISTAR_EV_SITE_URL,
 )
+
+from cdp_backend.pipeline.ingestion_models import EventIngestionModel
 
 ###############################################################################
 
@@ -163,3 +166,26 @@ class SeattleScraper(LegistarScraper):
         if len(list_uri) == 0:
             log.debug(f"No video URI found on {video_page_url}")
         return list_uri
+
+    def get_time_zone(self) -> str:
+        """
+        Return America Los Angeles (old: US/Pacific) time zone name.
+        Can call find_time_zone() to find dynamically.
+
+        Returns
+        -------
+        time zone name : str
+            "America/Los_Angeles"
+        """
+        return "America/Los_Angeles"
+
+
+def get_events(
+    from_dt: datetime,
+    to_dt: datetime,
+    **kwargs: Any,
+) -> List[EventIngestionModel]:
+    """
+    Implimentation of the Seattle Scrapper to provide to a cookiecutter or for testing.
+    """
+    return SeattleScraper().get_events(begin=from_dt, end=to_dt)

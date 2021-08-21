@@ -185,9 +185,11 @@ def get_legistar_events_for_timespan(
     return response
 
 
-def stripped(input_str: str) -> str:
+def str_simplified(input_str: str) -> str:
     """
-    Return leading and trailing whitespace removed if it is a string
+    Remove leading/trailing whitespaces,
+    simplify multiple whitespaces,
+    unify newline characters
 
     Parameters
     ----------
@@ -198,8 +200,15 @@ def stripped(input_str: str) -> str:
     str
         input_str stripped if it is a string
     """
-    if isinstance(input_str, str):
-        return input_str.strip()
+    if not isinstance(input_str, str):
+        return input_str
+
+    input_str = input_str.strip()
+    # unify newline to \n
+    input_str = re.sub(r"[\r\n\f]+", r"\n", input_str)
+    # multiple spaces and tabs to 1 space
+    input_str = re.sub(r"([ \t\v])+", r"\1", input_str)
+
     return input_str
 
 
@@ -227,7 +236,8 @@ def reduced_list(input_list: List[Any], collapse: bool = True) -> List:
 
 class LegistarScraper:
     """
-    Base class for transforming Legistar API data to CDP IngestionModel
+    Base class for transforming Legistar API data to CDP IngestionModel.
+
     A given installation must define a derived class and implement get_video_uris()
     and get_time_zone() functions.
 
@@ -238,7 +248,7 @@ class LegistarScraper:
 
     See Also
     --------
-    instances.SeattleScraper
+    cdp_scrapers.instances.seattle.SeattleScraper
     """
 
     def __init__(self, client: str):
@@ -404,14 +414,20 @@ class LegistarScraper:
             begin=begin,
             end=end,
         ):
-            session_time = self.date_time_to_datetime(
-                legistar_ev[LEGISTAR_SESSION_DATE], legistar_ev[LEGISTAR_SESSION_TIME]
+            # better to return time as local time with time zone info,
+            # rather than as utc time.
+            # this way the calling pipeline can find out what is the local zone.
+            session_time = self.as_local_time(
+                self.date_time_to_datetime(
+                    legistar_ev[LEGISTAR_SESSION_DATE],
+                    legistar_ev[LEGISTAR_SESSION_TIME],
+                )
             )
             # prefer video file path in legistar Event.EventVideoPath
             if legistar_ev[LEGISTAR_SESSION_VIDEO_URI]:
                 list_uri = [
                     {
-                        CDP_VIDEO_URI: stripped(
+                        CDP_VIDEO_URI: str_simplified(
                             legistar_ev[LEGISTAR_SESSION_VIDEO_URI]
                         ),
                         CDP_CAPTION_URI: None,
@@ -440,9 +456,9 @@ class LegistarScraper:
             ingestion_models.append(
                 self.get_none_if_empty(
                     EventIngestionModel(
-                        agenda_uri=stripped(legistar_ev[LEGISTAR_AGENDA_URI]),
-                        minutes_uri=stripped(legistar_ev[LEGISTAR_MINUTES_URI]),
-                        body=Body(name=stripped(legistar_ev[LEGISTAR_BODY_NAME])),
+                        agenda_uri=str_simplified(legistar_ev[LEGISTAR_AGENDA_URI]),
+                        minutes_uri=str_simplified(legistar_ev[LEGISTAR_MINUTES_URI]),
+                        body=Body(name=str_simplified(legistar_ev[LEGISTAR_BODY_NAME])),
                         sessions=sessions,
                         event_minutes_items=self.get_event_minutes(
                             legistar_ev[LEGISTAR_EV_ITEMS]
@@ -453,7 +469,7 @@ class LegistarScraper:
 
         # easier for calling pipeline to handle an empty list rather than None
         # so request reduced_list() to give me [], not None
-        return reduced_list(ingestion_models, collapse=True)
+        return reduced_list(ingestion_models, collapse=False)
 
     def get_video_uris(self, legistar_ev: Dict) -> List[Dict]:
         """
@@ -483,7 +499,6 @@ class LegistarScraper:
         raise NotImplementedError
 
     def get_time_zone(self) -> str:
-
         """
         Return time zone name for CDP instance.
         To use dynamically determined time zone,
@@ -492,9 +507,11 @@ class LegistarScraper:
         -------
         time zone name : str
             i.e. "America/Los_Angeles" | "America/New_York" ...
+
         See Also
         --------
         SeattleScraper.get_time_zone()
+
         Notes
         -----
         List of Timezones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
@@ -709,11 +726,11 @@ class LegistarScraper:
         """
         return self.get_none_if_empty(
             Person(
-                email=stripped(legistar_person[LEGISTAR_PERSON_EMAIL]),
+                email=str_simplified(legistar_person[LEGISTAR_PERSON_EMAIL]),
                 external_source_id=legistar_person[LEGISTAR_PERSON_EXT_ID],
-                name=stripped(legistar_person[LEGISTAR_PERSON_NAME]),
-                phone=stripped(legistar_person[LEGISTAR_PERSON_PHONE]),
-                website=stripped(legistar_person[LEGISTAR_PERSON_WEBSITE]),
+                name=str_simplified(legistar_person[LEGISTAR_PERSON_NAME]),
+                phone=str_simplified(legistar_person[LEGISTAR_PERSON_PHONE]),
+                website=str_simplified(legistar_person[LEGISTAR_PERSON_WEBSITE]),
                 is_active=bool(legistar_person[LEGISTAR_PERSON_ACTIVE]),
             )
         )
@@ -765,8 +782,8 @@ class LegistarScraper:
                 self.get_none_if_empty(
                     SupportingFile(
                         external_source_id=attachment[LEGISTAR_FILE_EXT_ID],
-                        name=stripped(attachment[LEGISTAR_FILE_NAME]),
-                        uri=stripped(attachment[LEGISTAR_FILE_URI]),
+                        name=str_simplified(attachment[LEGISTAR_FILE_NAME]),
+                        uri=str_simplified(attachment[LEGISTAR_FILE_URI]),
                     )
                 )
                 for attachment in legistar_ev_attachments
@@ -803,11 +820,11 @@ class LegistarScraper:
                 external_source_id=legistar_ev[LEGISTAR_MATTER_EXT_ID],
                 # Too often EventItemMatterName is not filled
                 # but EventItemMatterFile is
-                name=stripped(legistar_ev[LEGISTAR_MATTER_NAME])
-                or stripped(legistar_ev[LEGISTAR_MATTER_TITLE]),
-                matter_type=stripped(legistar_ev[LEGISTAR_MATTER_TYPE]),
+                name=str_simplified(legistar_ev[LEGISTAR_MATTER_NAME])
+                or str_simplified(legistar_ev[LEGISTAR_MATTER_TITLE]),
+                matter_type=str_simplified(legistar_ev[LEGISTAR_MATTER_TYPE]),
                 sponsors=sponsors,
-                title=stripped(legistar_ev[LEGISTAR_MATTER_TITLE]),
+                title=str_simplified(legistar_ev[LEGISTAR_MATTER_TITLE]),
                 result_status=self.get_matter_status(
                     legistar_ev[LEGISTAR_MATTER_STATUS]
                 ),
@@ -832,7 +849,7 @@ class LegistarScraper:
         return self.get_none_if_empty(
             MinutesItem(
                 external_source_id=legistar_ev_item[LEGISTAR_MINUTE_EXT_ID],
-                name=stripped(legistar_ev_item[LEGISTAR_MINUTE_NAME]),
+                name=str_simplified(legistar_ev_item[LEGISTAR_MINUTE_NAME]),
             )
         )
 
