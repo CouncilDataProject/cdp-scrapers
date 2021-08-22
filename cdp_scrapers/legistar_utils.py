@@ -40,11 +40,6 @@ LEGISTAR_EVENT_BASE = LEGISTAR_BASE + "/Events"
 LEGISTAR_MATTER_BASE = LEGISTAR_BASE + "/Matters"
 LEGISTAR_PERSON_BASE = LEGISTAR_BASE + "/Persons"
 
-# TODO: make these member attributes in LegistarScraper
-#       so that instances can use different Legistar keys
-#       more easily. i.e. modify one of these in __init__()
-#       As opposed to overriding a method that uses these.
-
 # e.g. Session.video_uri =  EventVideoPath from legistar api
 LEGISTAR_SESSION_VIDEO_URI = "EventVideoPath"
 LEGISTAR_EV_MINUTE_DECISION = "EventItemPassedFlagName"
@@ -57,6 +52,7 @@ LEGISTAR_PERSON_PHONE = "PersonPhone"
 LEGISTAR_PERSON_WEBSITE = "PersonWWW"
 LEGISTAR_PERSON_ACTIVE = "PersonActiveFlag"
 LEGISTAR_BODY_NAME = "EventBodyName"
+LEGISTAR_BODY_EXT_ID = "EventBodyId"
 LEGISTAR_VOTE_DECISION = "VoteResult"
 LEGISTAR_VOTE_EXT_ID = "VoteId"
 LEGISTAR_FILE_EXT_ID = "MatterAttachmentId"
@@ -86,6 +82,7 @@ LEGISTAR_EV_ATTACHMENTS = "EventItemMatterAttachments"
 LEGISTAR_EV_VOTES = "EventItemVoteInfo"
 LEGISTAR_VOTE_PERSONS = "PersonInfo"
 LEGISTAR_EV_SITE_URL = "EventInSiteURL"
+LEGISTAR_EV_EXT_ID = "EventId"
 CDP_VIDEO_URI = "video_uri"
 CDP_CAPTION_URI = "caption_uri"
 
@@ -202,7 +199,7 @@ def str_simplified(input_str: str) -> str:
     # unify newline to \n
     input_str = re.sub(r"[\r\n\f]+", r"\n", input_str)
     # multiple spaces and tabs to 1 space
-    input_str = re.sub(r"([ \t\v])+", r"\1", input_str)
+    input_str = re.sub(r"[ \t\v]+", " ", input_str)
 
     return input_str
 
@@ -312,8 +309,10 @@ class LegistarScraper:
         vote_reject_pattern: str = r"reject|oppose|no",
         vote_absent_pattern: str = r"absent",
         vote_nonvoting_pattern: str = r"nv|(?:non.*voting)",
-        matter_adopted_pattern: str = r"approved|confirmed|passed|adopted",
-        matter_in_progress_pattern: str = r"heard|ready|filed|held|(?:in\s*committee)",
+        matter_adopted_pattern: str = (
+            r"approved|confirmed|passed|adopted|consent|(?:voted.*com+it+ee)"
+        ),
+        matter_in_progress_pattern: str = r"heard|read|filed|held|(?:in.*com+it+ee)",
         matter_rejected_pattern: str = r"rejected|dropped",
         minutes_item_decision_passed_pattern: str = r"pass",
         minutes_item_decision_failed_pattern: str = r"not|fail",
@@ -505,6 +504,7 @@ class LegistarScraper:
             f"{legistar_matter_status}. consider updating matter_*_pattern"
         )
 
+        log.debug(f"no MatterStatusDecision filter for {legistar_matter_status}")
         return None
 
     def get_minutes_item_decision(
@@ -554,6 +554,7 @@ class LegistarScraper:
         ):
             return EventMinutesItemDecision.FAILED
 
+        log.debug(f"no EventMinutesItemDecision filter for {legistar_item_passed_name}")
         return None
 
     def get_vote_decision(self, legistar_vote: Dict) -> Optional[str]:
@@ -576,12 +577,10 @@ class LegistarScraper:
         --------
         cdp_backend.database.constants.VoteDecision
         """
-        if (
-            not legistar_vote[LEGISTAR_VOTE_VAL_NAME]
-            # don't want to make assumption about VoteValueId = 0 meaning here
-            # so treating VoteValueId as null only when None
-            and legistar_vote[LEGISTAR_VOTE_VAL_ID] is None
-        ):
+        vote_value = legistar_vote[LEGISTAR_VOTE_VAL_NAME]
+        # don't want to make assumption about VoteValueId = 0 meaning here
+        # so treating VoteValueId as null only when None
+        if not vote_value and legistar_vote[LEGISTAR_VOTE_VAL_ID] is None:
             return None
 
         # NOTE: The required integer VoteValueId = 16 seems to be "in favor".
@@ -593,7 +592,7 @@ class LegistarScraper:
         if (
             re.search(
                 self.vote_approve_pattern,
-                legistar_vote[LEGISTAR_VOTE_VAL_NAME],
+                vote_value,
                 re.IGNORECASE,
             )
             is not None
@@ -602,7 +601,7 @@ class LegistarScraper:
         elif (
             re.search(
                 self.vote_reject_pattern,
-                legistar_vote[LEGISTAR_VOTE_VAL_NAME],
+                vote_value,
                 re.IGNORECASE,
             )
             is not None
@@ -612,7 +611,7 @@ class LegistarScraper:
         nonvoting = (
             re.search(
                 self.vote_nonvoting_pattern,
-                legistar_vote[LEGISTAR_VOTE_VAL_NAME],
+                vote_value,
                 re.IGNORECASE,
             )
             is not None
@@ -622,7 +621,7 @@ class LegistarScraper:
         if (
             re.search(
                 self.vote_absent_pattern,
-                legistar_vote[LEGISTAR_VOTE_VAL_NAME],
+                vote_value,
                 re.IGNORECASE,
             )
             is not None
@@ -636,7 +635,7 @@ class LegistarScraper:
         elif (
             re.search(
                 self.vote_abstain_pattern,
-                legistar_vote[LEGISTAR_VOTE_VAL_NAME],
+                vote_value,
                 re.IGNORECASE,
             )
             is not None
@@ -648,6 +647,8 @@ class LegistarScraper:
             elif nonvoting:
                 return VoteDecision.ABSTAIN_NON_VOTING
 
+        if not decision:
+            log.debug(f"no VoteDecision filter for {vote_value}")
         return decision
 
     def get_person(self, legistar_person: Dict) -> Optional[Person]:
@@ -665,12 +666,17 @@ class LegistarScraper:
             The Legistar Person converted to a CDP person ingestion model.
             None if missing information.
         """
+        phone = str_simplified(legistar_person[LEGISTAR_PERSON_PHONE])
+        if phone:
+            # (123)456... -> 123-456...
+            phone = phone.replace("(", "").replace(")", "-")
+
         return self.get_none_if_empty(
             Person(
                 email=str_simplified(legistar_person[LEGISTAR_PERSON_EMAIL]),
                 external_source_id=legistar_person[LEGISTAR_PERSON_EXT_ID],
                 name=str_simplified(legistar_person[LEGISTAR_PERSON_NAME]),
-                phone=str_simplified(legistar_person[LEGISTAR_PERSON_PHONE]),
+                phone=phone,
                 website=str_simplified(legistar_person[LEGISTAR_PERSON_WEBSITE]),
                 is_active=bool(legistar_person[LEGISTAR_PERSON_ACTIVE]),
             )
@@ -755,7 +761,9 @@ class LegistarScraper:
                 [
                     self.get_none_if_empty(
                         # at least try. this info isn't always filled
-                        Person(name=legistar_ev[LEGISTAR_MATTER_SPONSOR])
+                        Person(
+                            name=str_simplified(legistar_ev[LEGISTAR_MATTER_SPONSOR])
+                        )
                     )
                 ]
             )
@@ -1114,12 +1122,16 @@ class LegistarScraper:
             ingestion_models.append(
                 self.get_none_if_empty(
                     EventIngestionModel(
+                        external_source_id=legistar_ev[LEGISTAR_EV_EXT_ID],
                         agenda_uri=str_simplified(legistar_ev[LEGISTAR_AGENDA_URI]),
                         minutes_uri=str_simplified(legistar_ev[LEGISTAR_MINUTES_URI]),
-                        body=Body(name=str_simplified(legistar_ev[LEGISTAR_BODY_NAME])),
                         sessions=sessions,
                         event_minutes_items=self.get_event_minutes(
                             legistar_ev[LEGISTAR_EV_ITEMS]
+                        ),
+                        body=Body(
+                            external_source_id=legistar_ev[LEGISTAR_BODY_EXT_ID],
+                            name=str_simplified(legistar_ev[LEGISTAR_BODY_NAME]),
                         ),
                     )
                 )
