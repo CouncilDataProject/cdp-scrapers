@@ -312,8 +312,8 @@ class LegistarScraper:
         vote_reject_pattern: str = r"reject|oppose|no",
         vote_absent_pattern: str = r"absent",
         vote_nonvoting_pattern: str = r"nv|(?:non.*voting)",
-        matter_adopted_pattern: str = r"approved|confirmed|passed|adopted",
-        matter_in_progress_pattern: str = r"heard|ready|filed|held|(?:in\s*committee)",
+        matter_adopted_pattern: str = r"approved|confirmed|passed|adopted|consent",
+        matter_in_progress_pattern: str = r"heard|read|filed|held|(?:in\s*committee)",
         matter_rejected_pattern: str = r"rejected|dropped",
         minutes_item_decision_passed_pattern: str = r"pass",
         minutes_item_decision_failed_pattern: str = r"not|fail",
@@ -760,7 +760,9 @@ class LegistarScraper:
                 [
                     self.get_none_if_empty(
                         # at least try. this info isn't always filled
-                        Person(name=legistar_ev[LEGISTAR_MATTER_SPONSOR])
+                        Person(name=str_simplified(
+                            legistar_ev[LEGISTAR_MATTER_SPONSOR]
+                        ))
                     )
                 ]
             )
