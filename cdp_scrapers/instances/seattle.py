@@ -1,24 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from datetime import datetime
-from typing import Any, Dict, List
-from bs4 import BeautifulSoup
-import re
 import logging
+import re
+from typing import Dict, List
+from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
-from urllib.error import (
-    URLError,
-    HTTPError,
-)
 
-from ..legistar_utils import (
-    LegistarScraper,
-    CDP_VIDEO_URI,
-    CDP_CAPTION_URI,
-)
+from bs4 import BeautifulSoup
 
-from cdp_backend.pipeline.ingestion_models import EventIngestionModel
+from ..legistar_utils import LEGISTAR_EV_SITE_URL, LegistarScraper
+from ..types import ContentURIs
 
 ###############################################################################
 
@@ -26,33 +18,49 @@ log = logging.getLogger(__name__)
 
 ###############################################################################
 
-LEGISTAR_EV_SITE_URL = "EventInSiteURL"
-
-###############################################################################
-
 
 class SeattleScraper(LegistarScraper):
+    PYTHON_MUNICIPALITY_SLUG: str = "seattle"
+
     def __init__(self):
         """
-        Seattle-specific implementation of LegistarScraper
+        Seattle specific implementation of LegistarScraper.
         """
-        super().__init__("seattle")
+        super().__init__(
+            client="seattle",
+            timezone="America/Los_Angeles",
+            ignore_minutes_item_patterns=[
+                "This meeting also constitutes a meeting of the City Council",
+                "In-person attendance is currently prohibited",
+                "Times listed are estimated",
+                "has been cancelled",
+                "Deputy City Clerk",
+                "Executive Sessions are closed to the public",
+                "Executive Session on Pending, Potential, or Actual Litigation",
+                # Common to see "CITY COUNCIL:",
+                # Or more generally "{body name}:"
+                # Check for last char ":"
+                r".+:$",
+            ],
+        )
 
-    def get_video_uris(self, legistar_ev: Dict) -> List[Dict]:
+    def get_content_uris(self, legistar_ev: Dict) -> List[ContentURIs]:
         """
         Return URLs for videos and captions parsed from seattlechannel.org web page
 
         Parameters
         ----------
-        legistar_ev : Dict
-            Data for one Legistar Event obtained from
-            ..legistar_utils.get_legistar_events_for_timespan()
+        legistar_ev: Dict
+            Data for one Legistar Event.
 
         Returns
         -------
-        List[Dict]
-            List of video and caption URI
-            [{"video_uri": ..., "caption_uri": ...}, ...]
+        content_uris: List[ContentURIs]
+            List of ContentURIs objects for each session found.
+
+        See Also
+        --------
+        cdp_scrapers.legistar_utils.get_legistar_events_for_timespan
         """
         try:
             # a td tag with a certain id pattern containing url to video
@@ -164,31 +172,8 @@ class SeattleScraper(LegistarScraper):
             except IndexError:
                 caption_uri = None
 
-            list_uri.append({CDP_VIDEO_URI: video_uri, CDP_CAPTION_URI: caption_uri})
+            list_uri.append(ContentURIs(video_uri=video_uri, caption_uri=caption_uri))
 
         if len(list_uri) == 0:
             log.debug(f"No video URI found on {video_page_url}")
         return list_uri
-
-    def get_time_zone(self) -> str:
-        """
-        Return America Los Angeles (old: US/Pacific) time zone name.
-        Can call find_time_zone() to find dynamically.
-
-        Returns
-        -------
-        time zone name : str
-            "America/Los_Angeles"
-        """
-        return "America/Los_Angeles"
-
-
-def get_events(
-    from_dt: datetime,
-    to_dt: datetime,
-    **kwargs: Any,
-) -> List[EventIngestionModel]:
-    """
-    Implimentation of the Seattle Scrapper to provide to a cookiecutter or for testing.
-    """
-    return SeattleScraper().get_events(begin=from_dt, end=to_dt)
