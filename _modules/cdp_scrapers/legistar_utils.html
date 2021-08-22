@@ -230,11 +230,6 @@
 <span class="n">LEGISTAR_MATTER_BASE</span> <span class="o">=</span> <span class="n">LEGISTAR_BASE</span> <span class="o">+</span> <span class="s2">&quot;/Matters&quot;</span>
 <span class="n">LEGISTAR_PERSON_BASE</span> <span class="o">=</span> <span class="n">LEGISTAR_BASE</span> <span class="o">+</span> <span class="s2">&quot;/Persons&quot;</span>
 
-<span class="c1"># TODO: make these member attributes in LegistarScraper</span>
-<span class="c1">#       so that instances can use different Legistar keys</span>
-<span class="c1">#       more easily. i.e. modify one of these in __init__()</span>
-<span class="c1">#       As opposed to overriding a method that uses these.</span>
-
 <span class="c1"># e.g. Session.video_uri =  EventVideoPath from legistar api</span>
 <span class="n">LEGISTAR_SESSION_VIDEO_URI</span> <span class="o">=</span> <span class="s2">&quot;EventVideoPath&quot;</span>
 <span class="n">LEGISTAR_EV_MINUTE_DECISION</span> <span class="o">=</span> <span class="s2">&quot;EventItemPassedFlagName&quot;</span>
@@ -247,6 +242,7 @@
 <span class="n">LEGISTAR_PERSON_WEBSITE</span> <span class="o">=</span> <span class="s2">&quot;PersonWWW&quot;</span>
 <span class="n">LEGISTAR_PERSON_ACTIVE</span> <span class="o">=</span> <span class="s2">&quot;PersonActiveFlag&quot;</span>
 <span class="n">LEGISTAR_BODY_NAME</span> <span class="o">=</span> <span class="s2">&quot;EventBodyName&quot;</span>
+<span class="n">LEGISTAR_BODY_EXT_ID</span> <span class="o">=</span> <span class="s2">&quot;EventBodyId&quot;</span>
 <span class="n">LEGISTAR_VOTE_DECISION</span> <span class="o">=</span> <span class="s2">&quot;VoteResult&quot;</span>
 <span class="n">LEGISTAR_VOTE_EXT_ID</span> <span class="o">=</span> <span class="s2">&quot;VoteId&quot;</span>
 <span class="n">LEGISTAR_FILE_EXT_ID</span> <span class="o">=</span> <span class="s2">&quot;MatterAttachmentId&quot;</span>
@@ -276,6 +272,7 @@
 <span class="n">LEGISTAR_EV_VOTES</span> <span class="o">=</span> <span class="s2">&quot;EventItemVoteInfo&quot;</span>
 <span class="n">LEGISTAR_VOTE_PERSONS</span> <span class="o">=</span> <span class="s2">&quot;PersonInfo&quot;</span>
 <span class="n">LEGISTAR_EV_SITE_URL</span> <span class="o">=</span> <span class="s2">&quot;EventInSiteURL&quot;</span>
+<span class="n">LEGISTAR_EV_EXT_ID</span> <span class="o">=</span> <span class="s2">&quot;EventId&quot;</span>
 <span class="n">CDP_VIDEO_URI</span> <span class="o">=</span> <span class="s2">&quot;video_uri&quot;</span>
 <span class="n">CDP_CAPTION_URI</span> <span class="o">=</span> <span class="s2">&quot;caption_uri&quot;</span>
 
@@ -392,7 +389,7 @@
     <span class="c1"># unify newline to \n</span>
     <span class="n">input_str</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[\r\n\f]+&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\n&quot;</span><span class="p">,</span> <span class="n">input_str</span><span class="p">)</span>
     <span class="c1"># multiple spaces and tabs to 1 space</span>
-    <span class="n">input_str</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;([ \t\v])+&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\1&quot;</span><span class="p">,</span> <span class="n">input_str</span><span class="p">)</span>
+    <span class="n">input_str</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[ \t\v]+&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">input_str</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">input_str</span></div>
 
@@ -502,8 +499,10 @@
         <span class="n">vote_reject_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;reject|oppose|no&quot;</span><span class="p">,</span>
         <span class="n">vote_absent_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;absent&quot;</span><span class="p">,</span>
         <span class="n">vote_nonvoting_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;nv|(?:non.*voting)&quot;</span><span class="p">,</span>
-        <span class="n">matter_adopted_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;approved|confirmed|passed|adopted&quot;</span><span class="p">,</span>
-        <span class="n">matter_in_progress_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;heard|ready|filed|held|(?:in\s*committee)&quot;</span><span class="p">,</span>
+        <span class="n">matter_adopted_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s2">&quot;approved|confirmed|passed|adopted|consent|(?:voted.*com+it+ee)&quot;</span>
+        <span class="p">),</span>
+        <span class="n">matter_in_progress_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;heard|read|filed|held|(?:in.*com+it+ee)&quot;</span><span class="p">,</span>
         <span class="n">matter_rejected_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;rejected|dropped&quot;</span><span class="p">,</span>
         <span class="n">minutes_item_decision_passed_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;pass&quot;</span><span class="p">,</span>
         <span class="n">minutes_item_decision_failed_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;not|fail&quot;</span><span class="p">,</span>
@@ -695,6 +694,7 @@
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">legistar_matter_status</span><span class="si">}</span><span class="s2">. consider updating matter_*_pattern&quot;</span>
         <span class="p">)</span>
 
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;no MatterStatusDecision filter for </span><span class="si">{</span><span class="n">legistar_matter_status</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="LegistarScraper.get_minutes_item_decision"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_minutes_item_decision">[docs]</a>    <span class="k">def</span> <span class="nf">get_minutes_item_decision</span><span class="p">(</span>
@@ -744,6 +744,7 @@
         <span class="p">):</span>
             <span class="k">return</span> <span class="n">EventMinutesItemDecision</span><span class="o">.</span><span class="n">FAILED</span>
 
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;no EventMinutesItemDecision filter for </span><span class="si">{</span><span class="n">legistar_item_passed_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="LegistarScraper.get_vote_decision"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_vote_decision">[docs]</a>    <span class="k">def</span> <span class="nf">get_vote_decision</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_vote</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
@@ -766,12 +767,10 @@
 <span class="sd">        --------</span>
 <span class="sd">        cdp_backend.database.constants.VoteDecision</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="ow">not</span> <span class="n">legistar_vote</span><span class="p">[</span><span class="n">LEGISTAR_VOTE_VAL_NAME</span><span class="p">]</span>
-            <span class="c1"># don&#39;t want to make assumption about VoteValueId = 0 meaning here</span>
-            <span class="c1"># so treating VoteValueId as null only when None</span>
-            <span class="ow">and</span> <span class="n">legistar_vote</span><span class="p">[</span><span class="n">LEGISTAR_VOTE_VAL_ID</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span>
-        <span class="p">):</span>
+        <span class="n">vote_value</span> <span class="o">=</span> <span class="n">legistar_vote</span><span class="p">[</span><span class="n">LEGISTAR_VOTE_VAL_NAME</span><span class="p">]</span>
+        <span class="c1"># don&#39;t want to make assumption about VoteValueId = 0 meaning here</span>
+        <span class="c1"># so treating VoteValueId as null only when None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">vote_value</span> <span class="ow">and</span> <span class="n">legistar_vote</span><span class="p">[</span><span class="n">LEGISTAR_VOTE_VAL_ID</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
         <span class="c1"># NOTE: The required integer VoteValueId = 16 seems to be &quot;in favor&quot;.</span>
@@ -783,7 +782,7 @@
         <span class="k">if</span> <span class="p">(</span>
             <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">vote_approve_pattern</span><span class="p">,</span>
-                <span class="n">legistar_vote</span><span class="p">[</span><span class="n">LEGISTAR_VOTE_VAL_NAME</span><span class="p">],</span>
+                <span class="n">vote_value</span><span class="p">,</span>
                 <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
@@ -792,7 +791,7 @@
         <span class="k">elif</span> <span class="p">(</span>
             <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">vote_reject_pattern</span><span class="p">,</span>
-                <span class="n">legistar_vote</span><span class="p">[</span><span class="n">LEGISTAR_VOTE_VAL_NAME</span><span class="p">],</span>
+                <span class="n">vote_value</span><span class="p">,</span>
                 <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
@@ -802,7 +801,7 @@
         <span class="n">nonvoting</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">vote_nonvoting_pattern</span><span class="p">,</span>
-                <span class="n">legistar_vote</span><span class="p">[</span><span class="n">LEGISTAR_VOTE_VAL_NAME</span><span class="p">],</span>
+                <span class="n">vote_value</span><span class="p">,</span>
                 <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
@@ -812,7 +811,7 @@
         <span class="k">if</span> <span class="p">(</span>
             <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">vote_absent_pattern</span><span class="p">,</span>
-                <span class="n">legistar_vote</span><span class="p">[</span><span class="n">LEGISTAR_VOTE_VAL_NAME</span><span class="p">],</span>
+                <span class="n">vote_value</span><span class="p">,</span>
                 <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
@@ -826,7 +825,7 @@
         <span class="k">elif</span> <span class="p">(</span>
             <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">vote_abstain_pattern</span><span class="p">,</span>
-                <span class="n">legistar_vote</span><span class="p">[</span><span class="n">LEGISTAR_VOTE_VAL_NAME</span><span class="p">],</span>
+                <span class="n">vote_value</span><span class="p">,</span>
                 <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
@@ -838,6 +837,8 @@
             <span class="k">elif</span> <span class="n">nonvoting</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">VoteDecision</span><span class="o">.</span><span class="n">ABSTAIN_NON_VOTING</span>
 
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">decision</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;no VoteDecision filter for </span><span class="si">{</span><span class="n">vote_value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">decision</span></div>
 
 <div class="viewcode-block" id="LegistarScraper.get_person"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_person">[docs]</a>    <span class="k">def</span> <span class="nf">get_person</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_person</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Person</span><span class="p">]:</span>
@@ -855,12 +856,17 @@
 <span class="sd">            The Legistar Person converted to a CDP person ingestion model.</span>
 <span class="sd">            None if missing information.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">phone</span> <span class="o">=</span> <span class="n">str_simplified</span><span class="p">(</span><span class="n">legistar_person</span><span class="p">[</span><span class="n">LEGISTAR_PERSON_PHONE</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">phone</span><span class="p">:</span>
+            <span class="c1"># (123)456... -&gt; 123-456...</span>
+            <span class="n">phone</span> <span class="o">=</span> <span class="n">phone</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;(&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;)&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>
             <span class="n">Person</span><span class="p">(</span>
                 <span class="n">email</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">legistar_person</span><span class="p">[</span><span class="n">LEGISTAR_PERSON_EMAIL</span><span class="p">]),</span>
                 <span class="n">external_source_id</span><span class="o">=</span><span class="n">legistar_person</span><span class="p">[</span><span class="n">LEGISTAR_PERSON_EXT_ID</span><span class="p">],</span>
                 <span class="n">name</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">legistar_person</span><span class="p">[</span><span class="n">LEGISTAR_PERSON_NAME</span><span class="p">]),</span>
-                <span class="n">phone</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">legistar_person</span><span class="p">[</span><span class="n">LEGISTAR_PERSON_PHONE</span><span class="p">]),</span>
+                <span class="n">phone</span><span class="o">=</span><span class="n">phone</span><span class="p">,</span>
                 <span class="n">website</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">legistar_person</span><span class="p">[</span><span class="n">LEGISTAR_PERSON_WEBSITE</span><span class="p">]),</span>
                 <span class="n">is_active</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">legistar_person</span><span class="p">[</span><span class="n">LEGISTAR_PERSON_ACTIVE</span><span class="p">]),</span>
             <span class="p">)</span>
@@ -945,7 +951,9 @@
                 <span class="p">[</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>
                         <span class="c1"># at least try. this info isn&#39;t always filled</span>
-                        <span class="n">Person</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_MATTER_SPONSOR</span><span class="p">])</span>
+                        <span class="n">Person</span><span class="p">(</span>
+                            <span class="n">name</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_MATTER_SPONSOR</span><span class="p">])</span>
+                        <span class="p">)</span>
                     <span class="p">)</span>
                 <span class="p">]</span>
             <span class="p">)</span>
@@ -1304,12 +1312,16 @@
             <span class="n">ingestion_models</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>
                     <span class="n">EventIngestionModel</span><span class="p">(</span>
+                        <span class="n">external_source_id</span><span class="o">=</span><span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_EV_EXT_ID</span><span class="p">],</span>
                         <span class="n">agenda_uri</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_AGENDA_URI</span><span class="p">]),</span>
                         <span class="n">minutes_uri</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_MINUTES_URI</span><span class="p">]),</span>
-                        <span class="n">body</span><span class="o">=</span><span class="n">Body</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_BODY_NAME</span><span class="p">])),</span>
                         <span class="n">sessions</span><span class="o">=</span><span class="n">sessions</span><span class="p">,</span>
                         <span class="n">event_minutes_items</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event_minutes</span><span class="p">(</span>
                             <span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_EV_ITEMS</span><span class="p">]</span>
+                        <span class="p">),</span>
+                        <span class="n">body</span><span class="o">=</span><span class="n">Body</span><span class="p">(</span>
+                            <span class="n">external_source_id</span><span class="o">=</span><span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_BODY_EXT_ID</span><span class="p">],</span>
+                            <span class="n">name</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_BODY_NAME</span><span class="p">]),</span>
                         <span class="p">),</span>
                     <span class="p">)</span>
                 <span class="p">)</span>
