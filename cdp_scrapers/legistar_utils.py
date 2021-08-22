@@ -201,6 +201,9 @@ def str_simplified(input_str: str) -> str:
     # multiple spaces and tabs to 1 space
     input_str = re.sub(r"[ \t\v]+", " ", input_str)
 
+    # Replace utf-8 char encodings with single utf-8 chars themselves
+    input_str = input_str.encode("utf-8").decode("utf-8")
+
     return input_str
 
 
@@ -233,7 +236,7 @@ class LegistarScraper:
     Base class for transforming Legistar API data to CDP IngestionModel.
 
     If get_events() naively fails and raises an error, a given installation must define
-    a derived class and implement the get_video_uris() function.
+    a derived class and implement the get_content_uris() function.
 
     Parameters
     ----------
