@@ -28,6 +28,8 @@ from cdp_backend.pipeline.ingestion_models import (
 )
 from pytz import country_timezones, timezone, utc
 
+from .types import ContentURIs
+
 ###############################################################################
 
 log = logging.getLogger(__name__)
@@ -83,8 +85,6 @@ LEGISTAR_EV_VOTES = "EventItemVoteInfo"
 LEGISTAR_VOTE_PERSONS = "PersonInfo"
 LEGISTAR_EV_SITE_URL = "EventInSiteURL"
 LEGISTAR_EV_EXT_ID = "EventId"
-CDP_VIDEO_URI = "video_uri"
-CDP_CAPTION_URI = "caption_uri"
 
 ###############################################################################
 
@@ -201,6 +201,9 @@ def str_simplified(input_str: str) -> str:
     # multiple spaces and tabs to 1 space
     input_str = re.sub(r"[ \t\v]+", " ", input_str)
 
+    # Replace utf-8 char encodings with single utf-8 chars themselves
+    input_str = input_str.encode("utf-8").decode("utf-8")
+
     return input_str
 
 
@@ -233,7 +236,7 @@ class LegistarScraper:
     Base class for transforming Legistar API data to CDP IngestionModel.
 
     If get_events() naively fails and raises an error, a given installation must define
-    a derived class and implement the get_video_uris() function.
+    a derived class and implement the get_content_uris() function.
 
     Parameters
     ----------
@@ -295,7 +298,7 @@ class LegistarScraper:
 
     See Also
     --------
-    cdp_scrapers.legistar_utils.LegistarScraper.get_video_uris
+    cdp_scrapers.legistar_utils.LegistarScraper.get_content_uris
     cdp_scrapers.instances.seattle.SeattleScraper
     """  # noqa: W605
 
@@ -1011,7 +1014,7 @@ class LegistarScraper:
                 second=0,
             )
 
-    def get_video_uris(self, legistar_ev: Dict) -> List[Dict]:
+    def get_content_uris(self, legistar_ev: Dict) -> List[ContentURIs]:
         """
         Must implement in class derived from LegistarScraper.
         If Legistar Event.EventVideoPath is used, return an empty list in the override.
@@ -1023,8 +1026,8 @@ class LegistarScraper:
 
         Returns
         -------
-        video_and_caption_uris: List[Dict]
-            List of Dict containing video and caption URI for each session found.
+        event_content_uris: List[ContentURIs]
+            List of ContentURIs objects for each session found.
 
         Raises
         ------
@@ -1036,7 +1039,7 @@ class LegistarScraper:
         cdp_scrapers.legistar_utils.get_legistar_events_for_timespan
         """
         log.critical(
-            "get_video_uris() is required because "
+            "get_content_uris() is required because "
             f"Legistar Event.EventVideoPath is not used by {self.client_name}"
         )
         raise NotImplementedError
@@ -1066,7 +1069,7 @@ class LegistarScraper:
 
         See Also
         --------
-        get_legistar_events_for_timespan
+        cdp_scrapers.legistar_utils.get_legistar_events_for_timespan
         """
         if begin is None:
             begin = datetime.utcnow() - timedelta(days=2)
@@ -1092,16 +1095,16 @@ class LegistarScraper:
             # prefer video file path in legistar Event.EventVideoPath
             if legistar_ev[LEGISTAR_SESSION_VIDEO_URI]:
                 list_uri = [
-                    {
-                        CDP_VIDEO_URI: str_simplified(
+                    ContentURIs(
+                        video_uri=str_simplified(
                             legistar_ev[LEGISTAR_SESSION_VIDEO_URI]
                         ),
-                        CDP_CAPTION_URI: None,
-                    }
+                        caption_uri=None,
+                    )
                 ]
             else:
-                list_uri = self.get_video_uris(legistar_ev) or [
-                    {CDP_VIDEO_URI: None, CDP_CAPTION_URI: None}
+                list_uri = self.get_content_uris(legistar_ev) or [
+                    ContentURIs(video_uri=None, caption_uri=None)
                 ]
 
             sessions = []
@@ -1111,12 +1114,12 @@ class LegistarScraper:
                         Session(
                             session_datetime=session_time,
                             session_index=len(sessions),
-                            video_uri=uri[CDP_VIDEO_URI],
-                            caption_uri=uri[CDP_CAPTION_URI],
+                            video_uri=content_uris.video_uri,
+                            caption_uri=content_uris.caption_uri,
                         )
                     )
                     # Session per video
-                    for uri in list_uri
+                    for content_uris in list_uri
                 ]
             )
             ingestion_models.append(
