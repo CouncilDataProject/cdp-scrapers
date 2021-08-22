@@ -9,12 +9,8 @@ from urllib.request import urlopen
 
 from bs4 import BeautifulSoup
 
-from ..legistar_utils import (
-    CDP_CAPTION_URI,
-    CDP_VIDEO_URI,
-    LEGISTAR_EV_SITE_URL,
-    LegistarScraper,
-)
+from ..legistar_utils import LEGISTAR_EV_SITE_URL, LegistarScraper
+from ..types import ContentURIs
 
 ###############################################################################
 
@@ -43,10 +39,13 @@ class KingCountyScraper(LegistarScraper):
                 "HOW TO WATCH",
                 "page break",
                 "PUBLIC NOTICE",
+                "There will be one public hearing on",
+                "Consent Items",
+                "SUBJECT TO A MOTION TO SUSPEND THE RULES TO TAKE ACTION WITHOUT REFERRAL TO COMMITTEE PURSUANT",  # noqa: E501
             ],
         )
 
-    def get_video_uris(self, legistar_ev: Dict) -> List[Dict]:
+    def get_content_uris(self, legistar_ev: Dict) -> List[ContentURIs]:
         """
         Return URLs for videos and captions parsed from kingcounty.gov web page
 
@@ -57,8 +56,8 @@ class KingCountyScraper(LegistarScraper):
 
         Returns
         -------
-        video_and_caption_uris: List[Dict]
-            List of Dict containing video and caption URI for each session found.
+        content_uris: List[ContentURIs]
+            List of ContentURIs objects for each session found.
 
         See Also
         --------
@@ -129,10 +128,4 @@ class KingCountyScraper(LegistarScraper):
         # Cleans up the video url to remove backward slash(\)
         video_uri = video_url.replace("\\", "")
         # caption URIs are not found for kingcounty events.
-        caption_uri = None
-        list_uri = []
-        list_uri.append({CDP_VIDEO_URI: video_uri, CDP_CAPTION_URI: caption_uri})
-
-        if len(list_uri) == 0:
-            log.debug(f"No video URI found on {video_page_url}")
-        return list_uri
+        return [ContentURIs(video_uri=video_uri, caption_uri=None)]
