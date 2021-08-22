@@ -39,6 +39,9 @@ class KingCountyScraper(LegistarScraper):
                 "HOW TO WATCH",
                 "page break",
                 "PUBLIC NOTICE",
+                "There will be one public hearing on",
+                "Consent Items",
+                "SUBJECT TO A MOTION TO SUSPEND THE RULES TO TAKE ACTION WITHOUT REFERRAL TO COMMITTEE PURSUANT",
             ],
         )
 
