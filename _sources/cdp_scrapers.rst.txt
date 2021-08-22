@@ -20,6 +20,14 @@ cdp\_scrapers.legistar\_utils module
    :undoc-members:
    :show-inheritance:
 
+cdp\_scrapers.types module
+--------------------------
+
+.. automodule:: cdp_scrapers.types
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

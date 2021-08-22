@@ -19,6 +19,7 @@
       ~LegistarScraper.filter_event_minutes
       ~LegistarScraper.find_time_zone
       ~LegistarScraper.fix_event_minutes
+      ~LegistarScraper.get_content_uris
       ~LegistarScraper.get_event_minutes
       ~LegistarScraper.get_event_supporting_files
       ~LegistarScraper.get_events
@@ -29,7 +30,6 @@
       ~LegistarScraper.get_none_if_empty
       ~LegistarScraper.get_person
       ~LegistarScraper.get_required_attrs
-      ~LegistarScraper.get_video_uris
       ~LegistarScraper.get_vote_decision
       ~LegistarScraper.get_votes
       ~LegistarScraper.localize_datetime

@@ -105,6 +105,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.html#submodules">Submodules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.html#module-cdp_scrapers.legistar_utils">cdp_scrapers.legistar_utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.html#module-cdp_scrapers.types">cdp_scrapers.types module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.html#module-cdp_scrapers">Module contents</a></li>
 </ul>
 </li>
@@ -201,6 +202,7 @@
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
+ | <a href="#V"><strong>V</strong></a>
  
 </div>
 <h2 id="_">_</h2>
@@ -214,6 +216,8 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="cdp_scrapers.html#cdp_scrapers.types.ContentURIs.caption_uri">caption_uri (cdp_scrapers.types.ContentURIs attribute)</a>
+</li>
       <li>
     cdp_scrapers
 
@@ -235,8 +239,6 @@
         <li><a href="cdp_scrapers.instances.html#module-cdp_scrapers.instances.empty">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     cdp_scrapers.instances.kingcounty
 
@@ -244,6 +246,8 @@
         <li><a href="cdp_scrapers.instances.html#module-cdp_scrapers.instances.kingcounty">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     cdp_scrapers.instances.seattle
 
@@ -258,7 +262,16 @@
         <li><a href="cdp_scrapers.html#module-cdp_scrapers.legistar_utils">module</a>
 </li>
       </ul></li>
+      <li>
+    cdp_scrapers.types
+
+      <ul>
+        <li><a href="cdp_scrapers.html#module-cdp_scrapers.types">module</a>
+</li>
+      </ul></li>
       <li><a href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.check_for_cdp_min_ingestion">check_for_cdp_min_ingestion() (cdp_scrapers.legistar_utils.LegistarScraper method)</a>
+</li>
+      <li><a href="cdp_scrapers.html#cdp_scrapers.types.ContentURIs">ContentURIs (class in cdp_scrapers.types)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -290,6 +303,14 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="cdp_scrapers.instances.html#cdp_scrapers.instances.kingcounty.KingCountyScraper.get_content_uris">get_content_uris() (cdp_scrapers.instances.kingcounty.KingCountyScraper method)</a>
+
+      <ul>
+        <li><a href="cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.SeattleScraper.get_content_uris">(cdp_scrapers.instances.seattle.SeattleScraper method)</a>
+</li>
+        <li><a href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_content_uris">(cdp_scrapers.legistar_utils.LegistarScraper method)</a>
+</li>
+      </ul></li>
       <li><a href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_event_minutes">get_event_minutes() (cdp_scrapers.legistar_utils.LegistarScraper method)</a>
 </li>
       <li><a href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_event_supporting_files">get_event_supporting_files() (cdp_scrapers.legistar_utils.LegistarScraper method)</a>
@@ -306,14 +327,14 @@
 </li>
       <li><a href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_matter">get_matter() (cdp_scrapers.legistar_utils.LegistarScraper method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_matter_status">get_matter_status() (cdp_scrapers.legistar_utils.LegistarScraper method)</a>
 </li>
       <li><a href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_minutes_item">get_minutes_item() (cdp_scrapers.legistar_utils.LegistarScraper method)</a>
 </li>
       <li><a href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_minutes_item_decision">get_minutes_item_decision() (cdp_scrapers.legistar_utils.LegistarScraper method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cdp_scrapers.html#cdp_scrapers.get_module_version">get_module_version() (in module cdp_scrapers)</a>
 </li>
       <li><a href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_none_if_empty">get_none_if_empty() (cdp_scrapers.legistar_utils.LegistarScraper method)</a>
@@ -324,14 +345,6 @@
 </li>
       <li><a href="cdp_scrapers.instances.html#cdp_scrapers.instances.get_seattle_events">get_seattle_events() (in module cdp_scrapers.instances)</a>
 </li>
-      <li><a href="cdp_scrapers.instances.html#cdp_scrapers.instances.kingcounty.KingCountyScraper.get_video_uris">get_video_uris() (cdp_scrapers.instances.kingcounty.KingCountyScraper method)</a>
-
-      <ul>
-        <li><a href="cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.SeattleScraper.get_video_uris">(cdp_scrapers.instances.seattle.SeattleScraper method)</a>
-</li>
-        <li><a href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_video_uris">(cdp_scrapers.legistar_utils.LegistarScraper method)</a>
-</li>
-      </ul></li>
       <li><a href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_vote_decision">get_vote_decision() (cdp_scrapers.legistar_utils.LegistarScraper method)</a>
 </li>
       <li><a href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_votes">get_votes() (cdp_scrapers.legistar_utils.LegistarScraper method)</a>
@@ -386,6 +399,8 @@
 </li>
         <li><a href="cdp_scrapers.html#module-cdp_scrapers.legistar_utils">cdp_scrapers.legistar_utils</a>
 </li>
+        <li><a href="cdp_scrapers.html#module-cdp_scrapers.types">cdp_scrapers.types</a>
+</li>
       </ul></li>
   </ul></td>
 </tr></table>
@@ -420,6 +435,14 @@
       <li><a href="cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.SeattleScraper">SeattleScraper (class in cdp_scrapers.instances.seattle)</a>
 </li>
       <li><a href="cdp_scrapers.html#cdp_scrapers.legistar_utils.str_simplified">str_simplified() (in module cdp_scrapers.legistar_utils)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="V">V</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="cdp_scrapers.html#cdp_scrapers.types.ContentURIs.video_uri">video_uri (cdp_scrapers.types.ContentURIs attribute)</a>
 </li>
   </ul></td>
 </tr></table>

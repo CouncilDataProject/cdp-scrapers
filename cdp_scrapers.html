@@ -107,6 +107,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-cdp_scrapers.legistar_utils">cdp_scrapers.legistar_utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cdp_scrapers.types">cdp_scrapers.types module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-cdp_scrapers">Module contents</a></li>
 </ul>
 </li>
@@ -228,7 +229,7 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Base class for transforming Legistar API data to CDP IngestionModel.</p>
 <p>If get_events() naively fails and raises an error, a given installation must define
-a derived class and implement the get_video_uris() function.</p>
+a derived class and implement the get_content_uris() function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -279,7 +280,7 @@ Default: “not|fail”</p></li>
 </dl>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference internal" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_video_uris" title="cdp_scrapers.legistar_utils.LegistarScraper.get_video_uris"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdp_scrapers.legistar_utils.LegistarScraper.get_video_uris</span></code></a>, <a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.SeattleScraper" title="cdp_scrapers.instances.seattle.SeattleScraper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdp_scrapers.instances.seattle.SeattleScraper</span></code></a></p>
+<p><a class="reference internal" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_content_uris" title="cdp_scrapers.legistar_utils.LegistarScraper.get_content_uris"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdp_scrapers.legistar_utils.LegistarScraper.get_content_uris</span></code></a>, <a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.SeattleScraper" title="cdp_scrapers.instances.seattle.SeattleScraper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdp_scrapers.instances.seattle.SeattleScraper</span></code></a></p>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.check_for_cdp_min_ingestion">
@@ -369,6 +370,31 @@ and the attached matter information.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.get_content_uris">
+<span class="sig-name descname"><span class="pre">get_content_uris</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">legistar_ev</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#cdp_scrapers.types.ContentURIs" title="cdp_scrapers.types.ContentURIs"><span class="pre">cdp_scrapers.types.ContentURIs</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.get_content_uris"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_content_uris" title="Permalink to this definition">¶</a></dt>
+<dd><p>Must implement in class derived from LegistarScraper.
+If Legistar Event.EventVideoPath is used, return an empty list in the override.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>legistar_ev</strong> (<em>Dict</em>) – Data for one Legistar Event.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>event_content_uris</strong> – List of ContentURIs objects for each session found.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>List[<a class="reference internal" href="#cdp_scrapers.types.ContentURIs" title="cdp_scrapers.types.ContentURIs">ContentURIs</a>]</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>NotImplementedError</strong> – This base implementation does nothing</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#cdp_scrapers.legistar_utils.get_legistar_events_for_timespan" title="cdp_scrapers.legistar_utils.get_legistar_events_for_timespan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdp_scrapers.legistar_utils.get_legistar_events_for_timespan</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.get_event_minutes">
 <span class="sig-name descname"><span class="pre">get_event_minutes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">legistar_ev_items</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.EventMinutesItem</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.get_event_minutes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_event_minutes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return List[EventMinutesItem] for Legistar API EventItems.</p>
@@ -426,7 +452,7 @@ Default is UTC now</p></li>
 </dl>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference internal" href="#cdp_scrapers.legistar_utils.get_legistar_events_for_timespan" title="cdp_scrapers.legistar_utils.get_legistar_events_for_timespan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_legistar_events_for_timespan</span></code></a></p>
+<p><a class="reference internal" href="#cdp_scrapers.legistar_utils.get_legistar_events_for_timespan" title="cdp_scrapers.legistar_utils.get_legistar_events_for_timespan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdp_scrapers.legistar_utils.get_legistar_events_for_timespan</span></code></a></p>
 </div>
 </dd></dl>
 
@@ -565,31 +591,6 @@ definition.</p>
 <dd class="field-odd"><p>List[str]</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.get_video_uris">
-<span class="sig-name descname"><span class="pre">get_video_uris</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">legistar_ev</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.get_video_uris"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_video_uris" title="Permalink to this definition">¶</a></dt>
-<dd><p>Must implement in class derived from LegistarScraper.
-If Legistar Event.EventVideoPath is used, return an empty list in the override.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>legistar_ev</strong> (<em>Dict</em>) – Data for one Legistar Event.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>video_and_caption_uris</strong> – List of Dict containing video and caption URI for each session found.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>List[Dict]</p>
-</dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>NotImplementedError</strong> – This base implementation does nothing</p>
-</dd>
-</dl>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><a class="reference internal" href="#cdp_scrapers.legistar_utils.get_legistar_events_for_timespan" title="cdp_scrapers.legistar_utils.get_legistar_events_for_timespan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdp_scrapers.legistar_utils.get_legistar_events_for_timespan</span></code></a></p>
-</div>
 </dd></dl>
 
 <dl class="py method">
@@ -732,6 +733,28 @@ newline characters.</p>
 <dd class="field-odd"><p>str</p>
 </dd>
 </dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cdp_scrapers.types">
+<span id="cdp-scrapers-types-module"></span><h2>cdp_scrapers.types module<a class="headerlink" href="#module-cdp_scrapers.types" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="cdp_scrapers.types.ContentURIs">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">cdp_scrapers.types.</span></span><span class="sig-name descname"><span class="pre">ContentURIs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">video_uri</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">caption_uri</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cdp_scrapers/types.html#ContentURIs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.types.ContentURIs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">NamedTuple</span></code></p>
+<p>Create new instance of ContentURIs(video_uri, caption_uri)</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cdp_scrapers.types.ContentURIs.caption_uri">
+<span class="sig-name descname"><span class="pre">caption_uri</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cdp_scrapers.types.ContentURIs.caption_uri" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cdp_scrapers.types.ContentURIs.video_uri">
+<span class="sig-name descname"><span class="pre">video_uri</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cdp_scrapers.types.ContentURIs.video_uri" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
 </dd></dl>
 
 </div>

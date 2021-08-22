@@ -107,6 +107,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.html#submodules">Submodules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.html#module-cdp_scrapers.legistar_utils">cdp_scrapers.legistar_utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.html#module-cdp_scrapers.types">cdp_scrapers.types module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.html#module-cdp_scrapers">Module contents</a></li>
 </ul>
 </li>
@@ -247,18 +248,18 @@ from GitHub Actions UI.</p>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cdp_scrapers.instances.kingcounty.KingCountyScraper.get_video_uris">
-<span class="sig-name descname"><span class="pre">get_video_uris</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">legistar_ev</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/kingcounty.html#KingCountyScraper.get_video_uris"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.kingcounty.KingCountyScraper.get_video_uris" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="cdp_scrapers.instances.kingcounty.KingCountyScraper.get_content_uris">
+<span class="sig-name descname"><span class="pre">get_content_uris</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">legistar_ev</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.types.ContentURIs" title="cdp_scrapers.types.ContentURIs"><span class="pre">cdp_scrapers.types.ContentURIs</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/kingcounty.html#KingCountyScraper.get_content_uris"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.kingcounty.KingCountyScraper.get_content_uris" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return URLs for videos and captions parsed from kingcounty.gov web page</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>legistar_ev</strong> (<em>Dict</em>) – Data for one Legistar Event.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>video_and_caption_uris</strong> – List of Dict containing video and caption URI for each session found.</p>
+<dd class="field-even"><p><strong>content_uris</strong> – List of ContentURIs objects for each session found.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>List[Dict]</p>
+<dd class="field-odd"><p>List[<a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.types.ContentURIs" title="cdp_scrapers.types.ContentURIs">ContentURIs</a>]</p>
 </dd>
 </dl>
 <div class="admonition seealso">
@@ -283,18 +284,18 @@ from GitHub Actions UI.</p>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cdp_scrapers.instances.seattle.SeattleScraper.get_video_uris">
-<span class="sig-name descname"><span class="pre">get_video_uris</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">legistar_ev</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/seattle.html#SeattleScraper.get_video_uris"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.seattle.SeattleScraper.get_video_uris" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="cdp_scrapers.instances.seattle.SeattleScraper.get_content_uris">
+<span class="sig-name descname"><span class="pre">get_content_uris</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">legistar_ev</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.types.ContentURIs" title="cdp_scrapers.types.ContentURIs"><span class="pre">cdp_scrapers.types.ContentURIs</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/seattle.html#SeattleScraper.get_content_uris"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.seattle.SeattleScraper.get_content_uris" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return URLs for videos and captions parsed from seattlechannel.org web page</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>legistar_ev</strong> (<em>Dict</em>) – Data for one Legistar Event.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>video_and_caption_uris</strong> – List of Dict containing video and caption URI for each session found.</p>
+<dd class="field-even"><p><strong>content_uris</strong> – List of ContentURIs objects for each session found.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>List[Dict]</p>
+<dd class="field-odd"><p>List[<a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.types.ContentURIs" title="cdp_scrapers.types.ContentURIs">ContentURIs</a>]</p>
 </dd>
 </dl>
 <div class="admonition seealso">
