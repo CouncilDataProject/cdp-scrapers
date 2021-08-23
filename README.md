@@ -61,30 +61,11 @@ Our current event scraper structure is as shown above. The main function get_eve
 gets all the required data and it calls the get_videos_url function to return the 
 required video data.
 
-<table>
-    <tr>
-        <td>
-            If your city uses Legistar and the Legistar data is publicly available
-        </td>
-        <td>
-            - You may be able to reuse our scraper and only need to rewrite the section 
-            with the error<br>
-            - If the Legistar data returned only does not include the EventVideoPath 
-            field for the video_uri data, you will only need to create your own 
-            get_videos_url function from your video provider
-        </td>
-    </tr>
-    <tr>
-        <td>
-            If your city does not use Legistar
-        </td>
-        <td>
-            you will need to build your own event scraper
-        </td>
-    </tr>
-</table>
+|    |    |
+|----|----|
+|If your city uses Legistar and the Legistar data is publicly available|- You may be able to reuse our scraper and only need to rewrite the section with the error<br><br>- If the Legistar data returned only does not include the EventVideoPath field for the video_uri data, you will only need to create your own get_videos_url function from your video provider|
+|If your city does not use Legistar|you will need to build your own event scraper|
 
-<br>
 Example of a completed scraper: [cdp_scrapers.instances.seattle.get_events](https://councildataproject.org/cdp-scrapers/cdp_scrapers.instances.html#module-cdp_scrapers.instances.seattle)
 
 If you would like to deploy a CDP instance or would like to use this library as a method for retrieving formatted legislative data, please feel free to contribute a new custom municipality scraper!

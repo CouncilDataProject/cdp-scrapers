@@ -4,7 +4,6 @@
 
 - Unimportant `EventMinutesItem`
 
-
 ```python
 EventMinutesItem(
     minutes_item=MinutesItem(
