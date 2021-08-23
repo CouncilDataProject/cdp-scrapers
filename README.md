@@ -25,9 +25,34 @@ event scraper functions.
 
 ## Quick Start
 
+### Legistar
+
+General Legistar utility functions.
+
+```python
+from cdp_scrapers.legistar_utils import get_legistar_events_for_timespan, LegistarScraper
+from datetime import datetime
+
+# Get all events (and minutes item and voting details)
+# for a provided timespan for a legistar client
+# Returns List[Dict]
+seattle_legistar_events = get_legistar_events_for_timespan(
+    client="seattle",
+    start=datetime(2021, 7, 12),
+    end=datetime(2021, 7, 14),
+)
+
+# Or parse and convert to CDP EventIngestionModel
+seattle_scraper = LegistarScraper("seattle")
+seattle_cdp_parsed_events = seattle_scraper.get_events(
+    begin=datetime(2021, 7, 12),
+    end=datetime(2021, 7, 14),
+)
+```
+
 ### Scrapers
 
-#### Event scraper structure
+#### Event Scraper Structure
 
 (show get_events.png)
 <!-- ![get_events](./docs/_static/get_events.png) -->
@@ -87,30 +112,10 @@ tested again afterwards.
 
 For more details about creating a custom scraper, please visit here. (or wherever Sung’s detailed docs will go)
 
-### Legistar
+## Installation
 
-General Legistar utility functions.
-
-```python
-from cdp_scrapers.legistar_utils import get_legistar_events_for_timespan, LegistarScraper
-from datetime import datetime
-
-# Get all events (and minutes item and voting details)
-# for a provided timespan for a legistar client
-# Returns List[Dict]
-seattle_legistar_events = get_legistar_events_for_timespan(
-    client="seattle",
-    start=datetime(2021, 7, 12),
-    end=datetime(2021, 7, 14),
-)
-
-# Or parse and convert to CDP EventIngestionModel
-seattle_scraper = LegistarScraper("seattle")
-seattle_cdp_parsed_events = seattle_scraper.get_events(
-    begin=datetime(2021, 7, 12),
-    end=datetime(2021, 7, 14),
-)
-```
+**Stable Release:** `pip install cdp-scrapers`<br>
+**Development Head:** `pip install git+https://github.com/CouncilDataProject/cdp-scrapers.git`
 
 ## Documentation
 

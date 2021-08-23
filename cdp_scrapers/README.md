@@ -16,21 +16,28 @@ EventMinutesItem(
 ```
 
 `minutes_item.name` comes from Legistar EventItem["EventItemTitle"]. Legistar 
-EventItems wil often contain unimportant information, as shown above, that we 
-want to exclude from ingesting into CDP. The `IGNORED_MINUTE_ITEMS` attribute in 
+EventItems will often contain unimportant information, as shown above, that we 
+want to exclude from ingesting into CDP. The `ignore_minutes_item_patterns` attribute in 
 `LegistarScraper` 
-defies a `List[str]` that we want to filter out. 
-`IGNORED_MINUTE_ITEMS` is used in `filter_event_minutes()`, case-insensitively.
+defines a `List[str]` that we want to filter out. 
+`ignore_minutes_item_patterns` is used in `filter_event_minutes()`, case-insensitively.
 
-In `__init__()` of your class derived from LegistarScraper, overwrite or append to 
-`self.IGNORED_MINUTE_ITEMS`. e.g.
+Set the list of filter strings in `__init__()` of your class derived from LegistarScraper. e.g.
 
 ```python
 class MyScraper(LegistarScraper):
     def __init__(self):
-        super().__init__("my_city")
-
-        self.IGNORED_MINUTE_ITEMS[MinutesItem].append("This meeting also constitutes a meeting")
+        super().__init__(
+            client="my_municipality",
+            timezone="America/Los_Angeles",
+            ignore_minutes_item_patterns=[
+                "This meeting also constitutes a meeting of the City Council",
+                # Common to see "CITY COUNCIL:",
+                # Or more generally "{body name}:"
+                # Check for last char ":"
+                r".+:$",
+            ],
+        )
 ```
 
 With that filter in place, this entire `EventMinutesItem` becomes `None`.
@@ -81,7 +88,7 @@ votes = reduced_list(
 )
 ```
 
-## Legistar -> CDP Ingestion
+## Legistar to CDP `IngestionModel`
 
 Here are some notes on what Legistar API fields to use for `IngestionModel` fields.
 
@@ -93,36 +100,36 @@ for 2021-07-28", for example.
 
 ## Instance-specific scraping
 
-Base `LegistarScraper` was written such that ideally, an installation needs to 
-define a derived class with just a couple of methods implemented.
-
-```python
-class MyMunicipalityScraper(LegistarScraper):
-    def __init__(self):
-        """
-        municipality-specific implementation of LegistarScraper
-        """
-        super().__init__("municipality_legistar_id")
-
-    def get_time_zone(self) -> str:
-        return "America/Los_Angeles"
-```
+In an ideal situation, in your `LegistarScraper` class you need to provide just 
+the municipality's Legistar client ID and the time zone. See the `MyScraper` example above.
 
 You can override and implement your own methods as necessary. For example, the base
-implementation for `get_event_support_files()` uses "MatterAttachmentId", 
-"MatterAttachmentName", "MatterAttachmentHyperlink" from Legistar for 
-`SupportingFile.external_source_id`, `SupportingFile.name`, `SupportingFile.uri`, 
-respectively. You can define and implement `get_event_support_files()` in your 
+implementation for `get_event_support_files()` uses `"MatterAttachmentId"`, 
+`"MatterAttachmentName"`, `"MatterAttachmentHyperlink"` from Legistar:
+
+```python
+[
+    SupportingFile(
+        external_source_id=attachment["MatterAttachmentId"],
+        name=attachment["MatterAttachmentName"],
+        uri=attachment["MatterAttachmentHyperlink"],
+    )
+    # Legistar "MatterAttachments"
+    for attachment in legistar_ev_attachments
+]
+```
+
+You can define and implement `get_event_support_files()` in your 
 `LegistarScraper`-derived class to use a completely different mapping for 
 `SupportingFile`.
 
 ### Scraping for `Session.video_uri`
 
 The "big" scraping that an instance will probably have to provide is 
-`get_video_uris()`. The base class will try to use Legistar "EventVideoPath" but 
+`get_content_uris()`. The base class will try to use Legistar "EventVideoPath" but 
 it is likely that information is not filled. In these situations Legistar might 
 point to some external resource, such as a web page hosted somewhere else, that 
-does have URI for the video from the given event. See `SeattleScraper.get_video_uris()`
+does have URI for the video from the given event. See `SeattleScraper.get_content_uris()`.
 
 ### Other notes
 
