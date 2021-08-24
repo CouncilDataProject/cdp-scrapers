@@ -57,13 +57,15 @@ seattle_cdp_parsed_events = seattle_scraper.get_events(
 (show get_events.png)
 <!-- ![get_events](./docs/_static/get_events.png) -->
 
-Our current event scraper structure is as shown above. The main function get_events 
-gets all the required data and it calls the get_videos_url function to return the 
+Our current event scraper structure is as shown above. The main function `get_events` 
+gets all the required data and it calls the `get_content_uris` function to return the 
 required video data.
+
+Need to fix this table formatting. So ugly.
 
 |    |    |
 |----|----|
-|If your city uses Legistar and the Legistar data is publicly available|- You may be able to reuse our scraper and only need to rewrite the section with the error<br><br>- If the Legistar data returned only does not include the EventVideoPath field for the video_uri data, you will only need to create your own get_videos_url function from your video provider|
+|If your city uses Legistar and the Legistar data is publicly available|- You may be able to reuse our scraper and only need to rewrite the section with the error<br><br>- If the Legistar data returned only does not include the EventVideoPath field for the video_uri data, you will only need to create your own `get_content_uris` function from your video provider|
 |If your city does not use Legistar|you will need to build your own event scraper|
 
 Example of a completed scraper: [cdp_scrapers.instances.seattle.get_events](https://councildataproject.org/cdp-scrapers/cdp_scrapers.instances.html#module-cdp_scrapers.instances.seattle)
@@ -91,7 +93,7 @@ If it is successful, you may proceed to the next deployment step. If not, we wil
 automatically share the error message so you can fix the issue and the scraper can be 
 tested again afterwards.
 
-For more details about creating a custom scraper, please visit here. (or wherever Sung’s detailed docs will go)
+For more details about creating a custom scraper, please visit [here](cdp_scrapers/README.md)
 
 ## Installation
 

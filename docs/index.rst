@@ -8,7 +8,9 @@ Welcome to cdp-scrapers's documentation!
 
    Overview <self>
    installation
-   Package modules <modules>
+   Legistar ID <finding_legistar_id.rst>
+   LegistarScraper <legistar_scraper.rst>
+   Package Modules <modules>
    contributing
 
 .. mdinclude:: ../README.md
