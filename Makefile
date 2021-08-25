@@ -53,6 +53,7 @@ gen-docs: ## generate Sphinx HTML documentation, including API docs
 	rm -f docs/modules.rst
 	sphinx-apidoc -o docs/ cdp_scrapers **/tests/
 	$(MAKE) -C docs html
+	cp -r ./images ./docs/_build/html/images
 
 docs: ## generate Sphinx HTML documentation, including API docs, and serve to browser
 	make gen-docs

@@ -97,7 +97,7 @@ are usually the "things that were discussed" which is why minutes can link to
 matters. "Approval of Agenda" is a minutes item and links to the Matter "Agenda 
 for 2021-07-28", for example.
 
-## Instance-specific scraping
+## Instance-Specific scraping
 
 In an ideal situation, in your `LegistarScraper` class you need to provide just 
 the municipality's Legistar client ID and the time zone. See the `MyScraper` example above.

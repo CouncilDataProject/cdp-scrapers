@@ -11,7 +11,7 @@ easily discoverable so here are some steps to find it.
 2. Look at the URL of the website and if it contains “legistar”, then your 
 municipality uses Legistar. If it does not, your municipality likely does not use 
 Legistar and you should review step three for another method for determining if your municipality utilizes Legistar.  
-![Legistar ID for Seattle](./_static/seattle_legistar_url.png)
+![Legistar ID for Seattle](./images/seattle_legistar_url.png)
 
 3. If step 2 fails, try an online search with query words such as “Legistar 
 municipality council agendas”. If your municipality uses Legistar, the top search 

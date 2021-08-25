@@ -54,8 +54,7 @@ seattle_cdp_parsed_events = seattle_scraper.get_events(
 
 #### Event Scraper Structure
 
-(show get_events.png)
-<!-- ![get_events](./docs/_static/get_events.png) -->
+![get_events](./images/get_events.png)
 
 Our current event scraper structure is as shown above. The main function `get_events` 
 gets all the required data and it calls the `get_content_uris` function to return the 
@@ -65,20 +64,23 @@ Need to fix this table formatting. So ugly.
 
 |    |    |
 |----|----|
-|If your city uses Legistar and the Legistar data is publicly available|- You may be able to reuse our scraper and only need to rewrite the section with the error<br><br>- If the Legistar data returned only does not include the EventVideoPath field for the video_uri data, you will only need to create your own `get_content_uris` function from your video provider|
+|If your city uses Legistar<br>and the Legistar data is publicly available|You may be able to reuse our scraper<br>and only need to rewrite the section with the error<br><br>If the Legistar data returned only does not include<br>the EventVideoPath field for the video_uri data, you will<br>only need to create your own `get_content_uris` function<br>from your video provider|
 |If your city does not use Legistar|you will need to build your own event scraper|
 
 Example of a completed scraper: [cdp_scrapers.instances.seattle.get_events](https://councildataproject.org/cdp-scrapers/cdp_scrapers.instances.html#module-cdp_scrapers.instances.seattle)
 
-If you would like to deploy a CDP instance or would like to use this library as a method for retrieving formatted legislative data, please feel free to contribute a new custom municipality scraper!
+If you would like to deploy a CDP instance or would like to use this library as a 
+method for retrieving formatted legislative data, please feel free to contribute a new 
+custom municipality scraper!
 
 #### Creating a Custom Scraper
 
-If it isn't possible to use our generalized Legistar tooling to write your scraper, you will need to create your own event scraper to proceed with the deployment.
+If it isn't possible to use our generalized Legistar tooling to write your scraper, 
+you will need to create your own event scraper to proceed with the deployment.
 
 1. Please see our documentation on the 
-[minimum data required for CDP event ingestion](https://councildataproject.org/cdp-backend/ingestion_models.html) to understand what 
-data your scraper should return.
+[minimum data required for CDP event ingestion](https://councildataproject.org/cdp-backend/ingestion_models.html) 
+to understand what data your scraper should return.
 
 2. From there, begin with our 
 [empty custom scraper function template](https://councildataproject.org/cdp-scrapers/_modules/cdp_scrapers/instances/empty.html#get_events) 
