@@ -13,6 +13,9 @@ from pkgutil import iter_modules
 from typing import Any, Callable, Dict, List, Type
 
 from cdp_backend.pipeline.ingestion_models import EventIngestionModel
+from cdp_backend.pipeline.mock_get_events import (
+    get_events as get_test_deployment_events,
+)
 
 from cdp_scrapers.legistar_utils import LegistarScraper
 
@@ -50,6 +53,7 @@ for submodule in iter_modules(__path__):
 # Not inhereting from the LegistarScraper?
 # Add your scraper function here
 # SCRAPER_FUNCTIONS[{python_municipality_slug}] = {function_callable}
+SCRAPER_FUNCTIONS["test_deployment"] = get_test_deployment_events
 
 # Set all scraper functions as exports of this module
 for python_municipality_slug, func in SCRAPER_FUNCTIONS.items():
