@@ -71,6 +71,9 @@ If your city does not use Legistar.
 
 Example of a completed scraper: [cdp_scrapers.instances.seattle.get_events](https://councildataproject.org/cdp-scrapers/cdp_scrapers.instances.html#module-cdp_scrapers.instances.seattle)
 
+For more details about creating a custom scraper for your municipality's Legistar data, 
+please visit [here](https://councildataproject.org/cdp-scrapers/legistar_scraper.html).
+
 If you would like to deploy a CDP instance or would like to use this library as a 
 method for retrieving formatted legislative data, please feel free to contribute a new 
 custom municipality scraper!
@@ -96,8 +99,6 @@ so it can be added into the final repo for your CDP instance.
 If it is successful, you may proceed to the next deployment step. If not, we will 
 automatically share the error message so you can fix the issue and the scraper can be 
 tested again afterwards.
-
-For more details about creating a custom scraper, please visit [here](cdp_scrapers/README.md)
 
 ## Installation
 
