@@ -60,12 +60,14 @@ Our current event scraper structure is as shown above. The main function `get_ev
 gets all the required data and it calls the `get_content_uris` function to return the 
 required video data.
 
-Need to fix this table formatting. So ugly.
+If your city uses Legistar and the Legistar data is publicly available.
+- You may be able to reuse our scraper with minimal modifications, such as providing the 
+correct Legistar client ID for your municipality.
+- If the Legistar data returned only does not include the EventVideoPath field for the 
+`Session.video_uri` data, you will only need to implement `get_content_uris`.
 
-|    |    |
-|----|----|
-|If your city uses Legistar<br>and the Legistar data is publicly available|You may be able to reuse our scraper<br>and only need to rewrite the section with the error<br><br>If the Legistar data returned only does not include<br>the EventVideoPath field for the video_uri data, you will<br>only need to create your own `get_content_uris` function<br>from your video provider|
-|If your city does not use Legistar|you will need to build your own event scraper|
+If your city does not use Legistar.
+- You will need to build your own event scraper.
 
 Example of a completed scraper: [cdp_scrapers.instances.seattle.get_events](https://councildataproject.org/cdp-scrapers/cdp_scrapers.instances.html#module-cdp_scrapers.instances.seattle)
 
