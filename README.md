@@ -69,7 +69,7 @@ correct Legistar client ID for your municipality.
 If your city does not use Legistar.
 - You will need to build your own event scraper.
 
-Example of a completed scraper: [cdp_scrapers.instances.seattle.get_events](https://councildataproject.org/cdp-scrapers/cdp_scrapers.instances.html#module-cdp_scrapers.instances.seattle)
+Example of a completed scraper: [cdp_scrapers.instances.seattle.SeattleScraper](https://councildataproject.org/cdp_scrapers/instances/seattle.html#SeattleScraper)
 
 For more details about creating a custom scraper for your municipality's Legistar data, 
 please visit [here](https://councildataproject.org/cdp-scrapers/legistar_scraper.html).
