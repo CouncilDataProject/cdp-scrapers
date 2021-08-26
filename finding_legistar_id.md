@@ -1,4 +1,4 @@
-# Searching for your Municipality's Legistar ID
+# Searching for Your Municipality's Legistar ID
 
 Legistar is the most widely used legislation tracking tool in the nation. We are 
 leveraging Legistar's wide coverage to help standardize and streamline part of our 

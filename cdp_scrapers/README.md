@@ -96,7 +96,7 @@ are usually the "things that were discussed" which is why minutes can link to
 matters. "Approval of Agenda" is a minutes item and links to the Matter "Agenda 
 for 2021-07-28", for example.
 
-## Instance-Specific scraping
+## Instance-Specific Scraping
 
 In an ideal situation, in your `LegistarScraper` class you need to provide just 
 the municipality's Legistar client ID and the time zone. See the `MyScraper` example above.
@@ -129,7 +129,7 @@ it is likely that information is not filled. In these situations Legistar might
 point to some external resource, such as a web page hosted somewhere else, that 
 does have URI for the video from the given event. See `SeattleScraper.get_content_uris()`.
 
-### Other notes
+### Other Notes
 
 - Recommend calling `legistar_utils.str_simplified()` on string fields to remove 
 leading/trailing whitespace and simplify consecutive whitespace.
