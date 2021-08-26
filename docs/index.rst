@@ -8,7 +8,7 @@ Welcome to cdp-scrapers's documentation!
 
    Overview <self>
    installation
-   Legistar ID <finding_legistar_id.rst>
+   Searching for your Municipality's Legistar ID <finding_legistar_id.rst>
    LegistarScraper <legistar_scraper.rst>
    Package Modules <modules>
    contributing

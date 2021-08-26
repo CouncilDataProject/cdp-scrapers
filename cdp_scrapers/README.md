@@ -16,9 +16,8 @@ EventMinutesItem(
 
 `minutes_item.name` comes from Legistar EventItem["EventItemTitle"]. Legistar 
 EventItems will often contain unimportant information, as shown above, that we 
-want to exclude from ingesting into CDP. The `ignore_minutes_item_patterns` attribute in 
-`LegistarScraper` 
-defines a `List[str]` that we want to filter out. 
+want to exclude from ingesting into CDP. The `ignore_minutes_item_patterns` parameter in 
+`LegistarScraper` defines a `List[str]` that we want to filter out. 
 `ignore_minutes_item_patterns` is used in `filter_event_minutes()`, case-insensitively.
 
 Set the list of filter strings in `__init__()` of your class derived from LegistarScraper. e.g.
