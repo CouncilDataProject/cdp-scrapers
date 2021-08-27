@@ -1,0 +1,387 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Notes on LegistarScraper &mdash; cdp-scrapers 0.2.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="cdp_scrapers" href="modules.html" />
+    <link rel="prev" title="Searching for Your Municipality’s Legistar ID" href="finding_legistar_id.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> cdp-scrapers
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#stable-release">Stable release</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#from-sources">From sources</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="finding_legistar_id.html">Searching for your Municipality's Legistar ID</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">LegistarScraper</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#filtering">Filtering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#legistar-to-cdp-ingestionmodel">Legistar to CDP <code class="docutils literal notranslate"><span class="pre">IngestionModel</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#instance-specific-scraping">Instance-Specific Scraping</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#scraping-for-session-video-uri">Scraping for <code class="docutils literal notranslate"><span class="pre">Session.video_uri</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#other-notes">Other Notes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Package Modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cdp_scrapers.html">cdp_scrapers package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.instances.html">cdp_scrapers.instances package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.html#module-cdp_scrapers.legistar_utils">cdp_scrapers.legistar_utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.html#module-cdp_scrapers.types">cdp_scrapers.types module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.html#module-cdp_scrapers">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#get-started">Get Started!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#deploying">Deploying</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Core Components:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cdp_scrapers.instances.empty.get_events.html">cdp_scrapers.instances.empty.get_events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cdp_scrapers.legistar_utils.LegistarScraper.html">cdp_scrapers.legistar_utils.LegistarScraper</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cdp-scrapers</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Notes on <code class="docutils literal notranslate"><span class="pre">LegistarScraper</span></code></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/legistar_scraper.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <div class="rst-breadcrumbs-buttons" role="navigation" aria-label="breadcrumb navigation">
+      
+        <a href="modules.html" class="btn btn-neutral float-right" title="cdp_scrapers" accesskey="n">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+      
+      
+        <a href="finding_legistar_id.html" class="btn btn-neutral float-left" title="Searching for Your Municipality’s Legistar ID" accesskey="p"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+      
+  </div>
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="notes-on-legistarscraper">
+<h1>Notes on <code class="docutils literal notranslate"><span class="pre">LegistarScraper</span></code><a class="headerlink" href="#notes-on-legistarscraper" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="filtering">
+<h2>Filtering<a class="headerlink" href="#filtering" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Unimportant <code class="docutils literal notranslate"><span class="pre">EventMinutesItem</span></code></p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">EventMinutesItem</span><span class="p">(</span>
+    <span class="n">minutes_item</span><span class="o">=</span><span class="n">MinutesItem</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;This meeting also constitutes a meeting of the City Council, provided ...&quot;</span><span class="p">,</span>
+        <span class="o">...</span>
+    <span class="p">),</span>
+    <span class="o">...</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">minutes_item.name</span></code> comes from Legistar EventItem[“EventItemTitle”]. Legistar
+EventItems will often contain unimportant information, as shown above, that we
+want to exclude from ingesting into CDP. The <code class="docutils literal notranslate"><span class="pre">ignore_minutes_item_patterns</span></code> parameter in
+<code class="docutils literal notranslate"><span class="pre">LegistarScraper</span></code> defines a <code class="docutils literal notranslate"><span class="pre">List[str]</span></code> that we want to filter out.
+<code class="docutils literal notranslate"><span class="pre">ignore_minutes_item_patterns</span></code> is used in <code class="docutils literal notranslate"><span class="pre">filter_event_minutes()</span></code>, case-insensitively.</p>
+<p>Set the list of filter strings in <code class="docutils literal notranslate"><span class="pre">__init__()</span></code> of your class derived from LegistarScraper. e.g.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyScraper</span><span class="p">(</span><span class="n">LegistarScraper</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">client</span><span class="o">=</span><span class="s2">&quot;my_municipality&quot;</span><span class="p">,</span>
+            <span class="n">timezone</span><span class="o">=</span><span class="s2">&quot;America/Los_Angeles&quot;</span><span class="p">,</span>
+            <span class="n">ignore_minutes_item_patterns</span><span class="o">=</span><span class="p">[</span>
+                <span class="s2">&quot;This meeting also constitutes a meeting of the City Council&quot;</span><span class="p">,</span>
+                <span class="c1"># Common to see &quot;CITY COUNCIL:&quot;,</span>
+                <span class="c1"># Or more generally &quot;{body name}:&quot;</span>
+                <span class="c1"># Check for last char &quot;:&quot;</span>
+                <span class="sa">r</span><span class="s2">&quot;.+:$&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">)</span>
+</pre></div>
+</div>
+<p>With that filter in place, this entire <code class="docutils literal notranslate"><span class="pre">EventMinutesItem</span></code> becomes <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<ul class="simple">
+<li><p>Empty models</p></li>
+</ul>
+<p>Consider another example such as</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">EventMinutesItem</span><span class="p">(</span><span class="n">decision</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">matter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">minutes_item</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">supporting_files</span><span class="o">=</span><span class="p">[],</span> <span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>which means nothing. <code class="docutils literal notranslate"><span class="pre">get_required_attrs()</span></code> returns attributes in a given
+<code class="docutils literal notranslate"><span class="pre">IngestionModel</span></code> without default values as defined in the respective <code class="docutils literal notranslate"><span class="pre">class</span></code>
+definitions. As this is “expensive” dynamic checking, the string lists are cached
+in <code class="docutils literal notranslate"><span class="pre">min_ingestion_keys</span></code>. i.e. <code class="docutils literal notranslate"><span class="pre">get_required_attrs()</span></code> is called just once per
+<code class="docutils literal notranslate"><span class="pre">IngestionModel</span></code> type.</p>
+<p>For example, because <code class="docutils literal notranslate"><span class="pre">minutes_item</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code> in the above
+<code class="docutils literal notranslate"><span class="pre">EventMinutesItem</span></code>, <code class="docutils literal notranslate"><span class="pre">get_none_if_empty()</span></code> will return <code class="docutils literal notranslate"><span class="pre">None</span></code>, instead of the
+given <code class="docutils literal notranslate"><span class="pre">EventMinutesItem</span></code> instance as-is.</p>
+<p>This filtering is applied bottom-up. e.g.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># this is not exactly how the code is written</span>
+<span class="c1"># but a representation of the call path</span>
+
+<span class="c1"># reduced_list() simply removes None from the list</span>
+<span class="n">votes</span> <span class="o">=</span> <span class="n">reduced_list</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="c1"># return None if this Vote is empty</span>
+        <span class="n">get_none_if_empty</span><span class="p">(</span>
+            <span class="n">Vote</span><span class="p">(</span>
+                <span class="c1"># return None if this Person is empty,</span>
+                <span class="c1"># instead of Person(email=None, ...)</span>
+                <span class="n">person</span><span class="o">=</span><span class="n">get_none_if_empty</span><span class="p">(</span>
+                    <span class="n">Person</span><span class="p">(</span>
+                        <span class="n">email</span><span class="o">=...</span><span class="p">,</span>
+                        <span class="o">...</span>
+                    <span class="p">)</span>
+                <span class="p">),</span>
+                <span class="o">...</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">vote</span> <span class="ow">in</span> <span class="n">legistar_votes</span> <span class="c1"># Legistar &quot;EventItemVoteInfo&quot;</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="legistar-to-cdp-ingestionmodel">
+<h2>Legistar to CDP <code class="docutils literal notranslate"><span class="pre">IngestionModel</span></code><a class="headerlink" href="#legistar-to-cdp-ingestionmodel" title="Permalink to this headline">¶</a></h2>
+<p>Here are some notes on what Legistar API fields to use for <code class="docutils literal notranslate"><span class="pre">IngestionModel</span></code> fields.</p>
+<ul class="simple">
+<li><p>“Public Comment” isn’t a matter, it is a minutes item. Minutes items
+are: “something that happened or was discussed during the meeting” while matters
+are usually the “things that were discussed” which is why minutes can link to
+matters. “Approval of Agenda” is a minutes item and links to the Matter “Agenda
+for 2021-07-28”, for example.</p></li>
+</ul>
+</div>
+<div class="section" id="instance-specific-scraping">
+<h2>Instance-Specific Scraping<a class="headerlink" href="#instance-specific-scraping" title="Permalink to this headline">¶</a></h2>
+<p>In an ideal situation, in your <code class="docutils literal notranslate"><span class="pre">LegistarScraper</span></code> class you need to provide just
+the municipality’s Legistar client ID and the time zone. See the <code class="docutils literal notranslate"><span class="pre">MyScraper</span></code> example above.</p>
+<p>You can override and implement your own methods as necessary. For example, the base
+implementation for <code class="docutils literal notranslate"><span class="pre">get_event_support_files()</span></code> uses <code class="docutils literal notranslate"><span class="pre">&quot;MatterAttachmentId&quot;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">&quot;MatterAttachmentName&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;MatterAttachmentHyperlink&quot;</span></code> from Legistar:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+    <span class="n">SupportingFile</span><span class="p">(</span>
+        <span class="n">external_source_id</span><span class="o">=</span><span class="n">attachment</span><span class="p">[</span><span class="s2">&quot;MatterAttachmentId&quot;</span><span class="p">],</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">attachment</span><span class="p">[</span><span class="s2">&quot;MatterAttachmentName&quot;</span><span class="p">],</span>
+        <span class="n">uri</span><span class="o">=</span><span class="n">attachment</span><span class="p">[</span><span class="s2">&quot;MatterAttachmentHyperlink&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="c1"># Legistar &quot;MatterAttachments&quot;</span>
+    <span class="k">for</span> <span class="n">attachment</span> <span class="ow">in</span> <span class="n">legistar_ev_attachments</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>You can define and implement <code class="docutils literal notranslate"><span class="pre">get_event_support_files()</span></code> in your
+<code class="docutils literal notranslate"><span class="pre">LegistarScraper</span></code>-derived class to use a completely different mapping for
+<code class="docutils literal notranslate"><span class="pre">SupportingFile</span></code>.</p>
+<div class="section" id="scraping-for-session-video-uri">
+<h3>Scraping for <code class="docutils literal notranslate"><span class="pre">Session.video_uri</span></code><a class="headerlink" href="#scraping-for-session-video-uri" title="Permalink to this headline">¶</a></h3>
+<p>The “big” scraping that an instance will probably have to provide is
+<code class="docutils literal notranslate"><span class="pre">get_content_uris()</span></code>. The base class will try to use Legistar “EventVideoPath” but
+it is likely that information is not filled. In these situations Legistar might
+point to some external resource, such as a web page hosted somewhere else, that
+does have URI for the video from the given event. See <code class="docutils literal notranslate"><span class="pre">SeattleScraper.get_content_uris()</span></code>.</p>
+</div>
+<div class="section" id="other-notes">
+<h3>Other Notes<a class="headerlink" href="#other-notes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Recommend calling <code class="docutils literal notranslate"><span class="pre">legistar_utils.str_simplified()</span></code> on string fields to remove
+leading/trailing whitespace and simplify consecutive whitespace.</p></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Jackson Maxfield Brown.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
