@@ -89,6 +89,27 @@ LEGISTAR_EV_EXT_ID = "EventId"
 ###############################################################################
 
 
+def get_legistar_person(
+    client: str,
+    person_id: str,
+) -> Optional[Dict]:
+    person_request_format = LEGISTAR_PERSON_BASE + "/{person_id}"
+    person = requests.get(
+        person_request_format.format(
+            client=client,
+            person_id=person_id,
+        )
+    ).json()
+
+    try:
+        if "The request is invalid".lower() in person["Message"].lower():
+            return None
+    except KeyError:
+        pass
+
+    return person
+
+
 def get_legistar_events_for_timespan(
     client: str,
     begin: Optional[datetime] = None,
@@ -166,11 +187,25 @@ def get_legistar_events_for_timespan(
 
             # Get person information
             for vote_info in event_item["EventItemVoteInfo"]:
-                person_request_format = LEGISTAR_PERSON_BASE + "/{person_id}"
-                vote_info["PersonInfo"] = requests.get(
-                    person_request_format.format(
+                vote_info["PersonInfo"] = get_legistar_person(
+                    client=client,
+                    person_id=vote_info["VotePersonId"],
+                )
+
+            if (
+                not isinstance(event_item["EventItemMatterId"], int)
+                or event_item["EventItemMatterId"] < 0
+            ):
+                event_item["MatterSponsorInfo"] = None
+            else:
+                # Get sponsor information
+                sponsor_request_format = (
+                    LEGISTAR_MATTER_BASE + "/{event_item_matter_id}/Sponsors"
+                )
+                event_item["MatterSponsorInfo"] = requests.get(
+                    sponsor_request_format.format(
                         client=client,
-                        person_id=vote_info["VotePersonId"],
+                        event_item_matter_id=event_item["EventItemMatterId"],
                     )
                 ).json()
 
@@ -343,6 +378,11 @@ class LegistarScraper:
         self.minutes_item_decision_failed_pattern: str = (
             minutes_item_decision_failed_pattern
         )
+
+        # cache of Persons to use when filling Matter.sponsors.
+        # Legistar SponsorInfo does not have all the information we want
+        # for a Person
+        self.persons: Dict[int, Person] = {}
 
     @staticmethod
     def get_required_attrs(model: IngestionModel) -> List[str]:
@@ -674,7 +714,7 @@ class LegistarScraper:
             # (123)456... -> 123-456...
             phone = phone.replace("(", "").replace(")", "-")
 
-        return self.get_none_if_empty(
+        person: Person = self.get_none_if_empty(
             Person(
                 email=str_simplified(legistar_person[LEGISTAR_PERSON_EMAIL]),
                 external_source_id=legistar_person[LEGISTAR_PERSON_EXT_ID],
@@ -684,6 +724,12 @@ class LegistarScraper:
                 is_active=bool(legistar_person[LEGISTAR_PERSON_ACTIVE]),
             )
         )
+
+        if person and person.external_source_id not in self.persons:
+            # keep a cache to reuse this info for Matter.sponsors
+            self.persons[person.external_source_id] = person
+
+        return person
 
     def get_votes(self, legistar_votes: List[Dict]) -> Optional[List[Vote]]:
         """
@@ -744,6 +790,32 @@ class LegistarScraper:
             ]
         )
 
+    def get_sponsors(self, legistar_sponsors: List[Dict]) -> Optional[List[Person]]:
+        if not legistar_sponsors:
+            return None
+        sponsors = []
+
+        for sponsor in legistar_sponsors:
+            try:
+                # Did we already process this person?
+                person = self.persons[int(sponsor["MatterSponsorNameId"])]
+            except KeyError:
+                # new Person, ask Legistar
+                legistar_person = get_legistar_person(
+                    client=self.client_name,
+                    # MatterSponsorNameId is same as PersonId
+                    person_id=sponsor["MatterSponsorNameId"],
+                )
+                if legistar_person:
+                    person = self.get_person(legistar_person)
+                else:
+                    continue
+
+            if person:
+                sponsors.append(person)
+
+        return reduced_list(sponsors)
+
     def get_matter(self, legistar_ev: Dict) -> Optional[Matter]:
         """
         Return Matter from Legistar API EventItem.
@@ -759,20 +831,6 @@ class LegistarScraper:
             List of converted Legistar matter details to CDP matter objects.
             None if missing information.
         """
-        try:
-            sponsors = reduced_list(
-                [
-                    self.get_none_if_empty(
-                        # at least try. this info isn't always filled
-                        Person(
-                            name=str_simplified(legistar_ev[LEGISTAR_MATTER_SPONSOR])
-                        )
-                    )
-                ]
-            )
-        except KeyError:
-            sponsors = None
-
         return self.get_none_if_empty(
             Matter(
                 external_source_id=legistar_ev[LEGISTAR_MATTER_EXT_ID],
@@ -781,7 +839,7 @@ class LegistarScraper:
                 name=str_simplified(legistar_ev[LEGISTAR_MATTER_NAME])
                 or str_simplified(legistar_ev[LEGISTAR_MATTER_TITLE]),
                 matter_type=str_simplified(legistar_ev[LEGISTAR_MATTER_TYPE]),
-                sponsors=sponsors,
+                sponsors=self.get_sponsors(legistar_ev["MatterSponsorInfo"]),
                 title=str_simplified(legistar_ev[LEGISTAR_MATTER_TITLE]),
                 result_status=self.get_matter_status(
                     legistar_ev[LEGISTAR_MATTER_STATUS]
