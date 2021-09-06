@@ -91,10 +91,19 @@ LEGISTAR_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
 ###############################################################################
 
 
+known_persons: Dict[int, Dict[str, Any]] = {}
+
+
 def get_legistar_person(
     client: str,
-    person_id: str,
-) -> Optional[Dict]:
+    person_id: int,
+) -> Optional[Dict[str, Any]]:
+    try:
+        return known_persons[person_id]
+    except KeyError:
+        # new person
+        pass
+
     person_request_format = LEGISTAR_PERSON_BASE + "/{person_id}"
     response = requests.get(
         person_request_format.format(
@@ -104,6 +113,7 @@ def get_legistar_person(
     )
 
     if response.status_code != 200:
+        known_persons[person_id] = None
         return None
 
     person = response.json()
@@ -121,6 +131,7 @@ def get_legistar_person(
     else:
         person["OfficeRecordInfo"] = None
 
+    known_persons[person_id] = person
     return person
 
 
@@ -1161,6 +1172,12 @@ class LegistarScraper:
         if end is None:
             end = datetime.utcnow()
 
+        # a given person's information being updated
+        # during a single get_events call is miniscule
+        # so use a cache to prevent 10s-100s of web requests
+        # for the same person during this call
+        global known_persons
+        known_persons.clear()
         ingestion_models = []
 
         for legistar_ev in get_legistar_events_for_timespan(
