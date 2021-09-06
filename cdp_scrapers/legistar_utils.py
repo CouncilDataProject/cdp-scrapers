@@ -25,8 +25,9 @@ from cdp_backend.pipeline.ingestion_models import (
     Session,
     SupportingFile,
     Vote,
+    Role,
 )
-from pytz import country_timezones, timezone, utc
+import pytz
 
 from .types import ContentURIs
 
@@ -86,6 +87,7 @@ LEGISTAR_VOTE_PERSONS = "PersonInfo"
 LEGISTAR_EV_SITE_URL = "EventInSiteURL"
 LEGISTAR_EV_EXT_ID = "EventId"
 
+LEGISTAR_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
 ###############################################################################
 
 
@@ -94,18 +96,30 @@ def get_legistar_person(
     person_id: str,
 ) -> Optional[Dict]:
     person_request_format = LEGISTAR_PERSON_BASE + "/{person_id}"
-    person = requests.get(
+    response = requests.get(
         person_request_format.format(
             client=client,
             person_id=person_id,
         )
-    ).json()
+    )
 
-    try:
-        if "The request is invalid".lower() in person["Message"].lower():
-            return None
-    except KeyError:
-        pass
+    if response.status_code != 200:
+        return None
+
+    person = response.json()
+
+    # all known OfficeRecords (roles) for this person
+    response = requests.get(
+        (person_request_format + "/OfficeRecords").format(
+            client=client,
+            person_id=person_id,
+        )
+    )
+
+    if response.status_code == 200:
+        person["OfficeRecordInfo"] = response.json()
+    else:
+        person["OfficeRecordInfo"] = None
 
     return person
 
@@ -356,7 +370,7 @@ class LegistarScraper:
         minutes_item_decision_failed_pattern: str = r"not|fail",
     ):
         self.client_name: str = client
-        self.timezone: str = timezone
+        self.timezone: pytz.timezone = pytz.timezone(timezone)
         self.ignore_minutes_item_patterns: List[str] = ignore_minutes_item_patterns
 
         # regex patterns used to infer cdp_backend.database.constants
@@ -378,11 +392,6 @@ class LegistarScraper:
         self.minutes_item_decision_failed_pattern: str = (
             minutes_item_decision_failed_pattern
         )
-
-        # cache of Persons to use when filling Matter.sponsors.
-        # Legistar SponsorInfo does not have all the information we want
-        # for a Person
-        self.persons: Dict[int, Person] = {}
 
     @staticmethod
     def get_required_attrs(model: IngestionModel) -> List[str]:
@@ -694,6 +703,36 @@ class LegistarScraper:
             log.debug(f"no VoteDecision filter for {vote_value}")
         return decision
 
+    def get_roles(
+        self, legistar_office_records: List[Dict[str, Any]]
+    ) -> Optional[List[Role]]:
+        if not legistar_office_records:
+            return None
+
+        return reduced_list(
+            [
+                self.get_none_if_empty(
+                    Role(
+                        # e.g. 2017-11-30T00:00:00
+                        start_datetime=self.localize_datetime(
+                            datetime.strptime(
+                                record["OfficeRecordStartDate"],
+                                LEGISTAR_DATETIME_FORMAT,
+                            )
+                        ),
+                        end_datetime=self.localize_datetime(
+                            datetime.strptime(
+                                record["OfficeRecordEndDate"], LEGISTAR_DATETIME_FORMAT
+                            )
+                        ),
+                        external_source_id=record["OfficeRecordId"],
+                        title=record["OfficeRecordTitle"],
+                    )
+                )
+                for record in legistar_office_records
+            ]
+        )
+
     def get_person(self, legistar_person: Dict) -> Optional[Person]:
         """
         Return CDP Person for Legistar Person.
@@ -709,12 +748,15 @@ class LegistarScraper:
             The Legistar Person converted to a CDP person ingestion model.
             None if missing information.
         """
+        if not legistar_person:
+            return None
+
         phone = str_simplified(legistar_person[LEGISTAR_PERSON_PHONE])
         if phone:
             # (123)456... -> 123-456...
             phone = phone.replace("(", "").replace(")", "-")
 
-        person: Person = self.get_none_if_empty(
+        return self.get_none_if_empty(
             Person(
                 email=str_simplified(legistar_person[LEGISTAR_PERSON_EMAIL]),
                 external_source_id=legistar_person[LEGISTAR_PERSON_EXT_ID],
@@ -722,14 +764,9 @@ class LegistarScraper:
                 phone=phone,
                 website=str_simplified(legistar_person[LEGISTAR_PERSON_WEBSITE]),
                 is_active=bool(legistar_person[LEGISTAR_PERSON_ACTIVE]),
+                roles=self.get_roles(legistar_person["OfficeRecordInfo"]),
             )
         )
-
-        if person and person.external_source_id not in self.persons:
-            # keep a cache to reuse this info for Matter.sponsors
-            self.persons[person.external_source_id] = person
-
-        return person
 
     def get_votes(self, legistar_votes: List[Dict]) -> Optional[List[Vote]]:
         """
@@ -793,28 +830,18 @@ class LegistarScraper:
     def get_sponsors(self, legistar_sponsors: List[Dict]) -> Optional[List[Person]]:
         if not legistar_sponsors:
             return None
-        sponsors = []
 
-        for sponsor in legistar_sponsors:
-            try:
-                # Did we already process this person?
-                person = self.persons[int(sponsor["MatterSponsorNameId"])]
-            except KeyError:
-                # new Person, ask Legistar
-                legistar_person = get_legistar_person(
-                    client=self.client_name,
-                    # MatterSponsorNameId is same as PersonId
-                    person_id=sponsor["MatterSponsorNameId"],
+        return reduced_list(
+            [
+                self.get_person(
+                    get_legistar_person(
+                        client=self.client_name,
+                        person_id=sponsor["MatterSponsorNameId"],
+                    )
                 )
-                if legistar_person:
-                    person = self.get_person(legistar_person)
-                else:
-                    continue
-
-            if person:
-                sponsors.append(person)
-
-        return reduced_list(sponsors)
+                for sponsor in legistar_sponsors
+            ]
+        )
 
     def get_matter(self, legistar_ev: Dict) -> Optional[Matter]:
         """
@@ -988,11 +1015,11 @@ class LegistarScraper:
         """
         Return name for a US time zone matching UTC offset calculated from OS clock.
         """
-        utc_now = utc.localize(datetime.utcnow())
+        utc_now = pytz.utc.localize(datetime.utcnow())
         local_now = datetime.now()
 
-        for zone_name in country_timezones("us"):
-            zone = timezone(zone_name)
+        for zone_name in pytz.country_timezones("us"):
+            zone = pytz.timezone(zone_name)
             # if this is my time zone
             # utc_now as local time should be VERY close to local_now
             if (
@@ -1049,7 +1076,7 @@ class LegistarScraper:
             date using ev_date and time using ev_time
         """
         # 2021-07-09T00:00:00
-        d = datetime.strptime(ev_date, "%Y-%m-%dT%H:%M:%S")
+        d = datetime.strptime(ev_date, LEGISTAR_DATETIME_FORMAT)
         # 9:30 AM
         # some events may have ev_time =None
         if ev_time is not None:
