@@ -130,6 +130,8 @@ def get_legistar_body(
     -----
     known_bodies cache is cleared for every LegistarScraper.get_events() call
     """
+    global known_bodies
+
     if use_cache:
         try:
             return known_bodies[body_id]
@@ -181,6 +183,8 @@ def get_legistar_person(
     -----
     known_persons cache is cleared for every LegistarScraper.get_events() call
     """
+    global known_persons
+
     if use_cache:
         try:
             return known_persons[person_id]
