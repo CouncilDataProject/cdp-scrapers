@@ -855,7 +855,7 @@ class LegistarScraper:
 
         return self.get_none_if_empty(
             Body(
-                external_source_id=legistar_body[LEGISTAR_BODY_EXT_ID],
+                external_source_id=str(legistar_body[LEGISTAR_BODY_EXT_ID]),
                 is_active=bool(legistar_body[LEGISTAR_BODY_ACTIVE]),
                 name=str_simplified(legistar_body[LEGISTAR_BODY_NAME]),
             )
@@ -897,7 +897,7 @@ class LegistarScraper:
                                 record[LEGISTAR_ROLE_END], LEGISTAR_DATETIME_FORMAT
                             )
                         ),
-                        external_source_id=record[LEGISTAR_ROLE_EXT_ID],
+                        external_source_id=str(record[LEGISTAR_ROLE_EXT_ID]),
                         title=str_simplified(record[LEGISTAR_ROLE_TITLE]),
                     )
                 )
@@ -935,7 +935,7 @@ class LegistarScraper:
         return self.get_none_if_empty(
             Person(
                 email=str_simplified(legistar_person[LEGISTAR_PERSON_EMAIL]),
-                external_source_id=legistar_person[LEGISTAR_PERSON_EXT_ID],
+                external_source_id=str(legistar_person[LEGISTAR_PERSON_EXT_ID]),
                 name=str_simplified(legistar_person[LEGISTAR_PERSON_NAME]),
                 phone=phone,
                 website=str_simplified(legistar_person[LEGISTAR_PERSON_WEBSITE]),
@@ -964,7 +964,7 @@ class LegistarScraper:
                 self.get_none_if_empty(
                     Vote(
                         decision=self.get_vote_decision(vote),
-                        external_source_id=vote[LEGISTAR_VOTE_EXT_ID],
+                        external_source_id=str(vote[LEGISTAR_VOTE_EXT_ID]),
                         person=self.get_person(vote[LEGISTAR_VOTE_PERSONS]),
                     )
                 )
@@ -994,7 +994,7 @@ class LegistarScraper:
             [
                 self.get_none_if_empty(
                     SupportingFile(
-                        external_source_id=attachment[LEGISTAR_FILE_EXT_ID],
+                        external_source_id=str(attachment[LEGISTAR_FILE_EXT_ID]),
                         name=str_simplified(attachment[LEGISTAR_FILE_NAME]),
                         uri=str_simplified(attachment[LEGISTAR_FILE_URI]),
                     )
@@ -1037,7 +1037,7 @@ class LegistarScraper:
         """
         return self.get_none_if_empty(
             Matter(
-                external_source_id=legistar_ev[LEGISTAR_MATTER_EXT_ID],
+                external_source_id=str(legistar_ev[LEGISTAR_MATTER_EXT_ID]),
                 # Too often EventItemMatterName is not filled
                 # but EventItemMatterFile is
                 name=str_simplified(legistar_ev[LEGISTAR_MATTER_NAME])
@@ -1068,7 +1068,7 @@ class LegistarScraper:
 
         return self.get_none_if_empty(
             MinutesItem(
-                external_source_id=legistar_ev_item[LEGISTAR_MINUTE_EXT_ID],
+                external_source_id=str(legistar_ev_item[LEGISTAR_MINUTE_EXT_ID]),
                 name=str_simplified(legistar_ev_item[LEGISTAR_MINUTE_NAME]),
             )
         )
@@ -1385,7 +1385,7 @@ class LegistarScraper:
             ingestion_models.append(
                 self.get_none_if_empty(
                     EventIngestionModel(
-                        external_source_id=legistar_ev[LEGISTAR_EV_EXT_ID],
+                        external_source_id=str(legistar_ev[LEGISTAR_EV_EXT_ID]),
                         agenda_uri=str_simplified(legistar_ev[LEGISTAR_AGENDA_URI]),
                         minutes_uri=str_simplified(legistar_ev[LEGISTAR_MINUTES_URI]),
                         sessions=sessions,
