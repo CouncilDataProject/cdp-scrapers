@@ -249,8 +249,6 @@ def get_legistar_events_for_timespan(
     end: Optional[datetime]
         The timespan end datetime to query for events before.
         Default: UTC now
-    cache_persons_bodies: bool
-        True: Store responses to prevent duplicate queries for a person or a body
 
     Returns
     -------
