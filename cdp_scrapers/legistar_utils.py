@@ -107,10 +107,10 @@ known_bodies: Dict[int, Dict[str, Any]] = {}
 def get_legistar_body(
     client: str,
     body_id: int,
+    use_cache: bool = False,
 ) -> Optional[Dict[str, Any]]:
     """
     Return information for a single legistar body in JSON.
-    Cache in known_bodies.
 
     Parameters
     ----------
@@ -118,6 +118,8 @@ def get_legistar_body(
         Which legistar client to target. Ex: "seattle"
     body_id: int
         Unique ID for this body in the legistar municipality
+    use_cache: bool
+        True: Store result to prevent querying repeatedly for same body_id
 
     Returns
     -------
@@ -128,11 +130,12 @@ def get_legistar_body(
     -----
     known_bodies cache is cleared for every LegistarScraper.get_events() call
     """
-    try:
-        return known_bodies[body_id]
-    except KeyError:
-        # new body
-        pass
+    if use_cache:
+        try:
+            return known_bodies[body_id]
+        except KeyError:
+            # new body
+            pass
 
     body_request_format = LEGISTAR_BODY_BASE + "/{body_id}"
     response = requests.get(
@@ -147,17 +150,18 @@ def get_legistar_body(
     else:
         body = None
 
-    known_bodies[body_id] = body
+    if use_cache:
+        known_bodies[body_id] = body
     return body
 
 
 def get_legistar_person(
     client: str,
     person_id: int,
+    use_cache: bool = False,
 ) -> Optional[Dict[str, Any]]:
     """
     Return information for a single legistar person in JSON.
-    Cache in known_persons.
 
     Parameters
     ----------
@@ -165,6 +169,8 @@ def get_legistar_person(
         Which legistar client to target. Ex: "seattle"
     person_id: int
         Unique ID for this person in the legistar municipality
+    use_cache: bool
+        True: Store result to prevent querying repeatedly for same person_id
 
     Returns
     -------
@@ -175,11 +181,12 @@ def get_legistar_person(
     -----
     known_persons cache is cleared for every LegistarScraper.get_events() call
     """
-    try:
-        return known_persons[person_id]
-    except KeyError:
-        # new person
-        pass
+    if use_cache:
+        try:
+            return known_persons[person_id]
+        except KeyError:
+            # new person
+            pass
 
     person_request_format = LEGISTAR_PERSON_BASE + "/{person_id}"
     response = requests.get(
@@ -190,7 +197,8 @@ def get_legistar_person(
     )
 
     if response.status_code != 200:
-        known_persons[person_id] = None
+        if use_cache:
+            known_persons[person_id] = None
         return None
 
     person = response.json()
@@ -205,18 +213,20 @@ def get_legistar_person(
 
     if response.status_code != 200:
         person[LEGISTAR_PERSON_ROLES] = None
-        known_persons[person_id] = person
+        if use_cache:
+            known_persons[person_id] = person
         return person
 
     office_records: List[Dict[str, Any]] = response.json()
     for record in office_records:
         # body for this role
         record[LEGISTAR_ROLE_BODY] = get_legistar_body(
-            client=client, body_id=record["OfficeRecordBodyId"]
+            client=client, body_id=record["OfficeRecordBodyId"], use_cache=use_cache
         )
 
     person[LEGISTAR_PERSON_ROLES] = office_records
-    known_persons[person_id] = person
+    if use_cache:
+        known_persons[person_id] = person
     return person
 
 
@@ -224,6 +234,7 @@ def get_legistar_events_for_timespan(
     client: str,
     begin: Optional[datetime] = None,
     end: Optional[datetime] = None,
+    cache_persons_bodies: bool = False,
 ) -> List[Dict]:
     """
     Get all legistar events and each events minutes items, people, and votes, for a
@@ -239,6 +250,8 @@ def get_legistar_events_for_timespan(
     end: Optional[datetime]
         The timespan end datetime to query for events before.
         Default: UTC now
+    cache_persons_bodies: bool
+        True: Store responses to prevent duplicate queries for a person or a body
 
     Returns
     -------
@@ -287,7 +300,7 @@ def get_legistar_events_for_timespan(
 
         # Attach info for the body responsible for this event
         event[LEGISTAR_EV_BODY] = get_legistar_body(
-            client=client, body_id=event["EventBodyId"]
+            client=client, body_id=event["EventBodyId"], use_cache=cache_persons_bodies
         )
 
         # Get vote information
@@ -305,6 +318,7 @@ def get_legistar_events_for_timespan(
                 vote_info["PersonInfo"] = get_legistar_person(
                     client=client,
                     person_id=vote_info["VotePersonId"],
+                    use_cache=cache_persons_bodies,
                 )
 
             if (
@@ -986,6 +1000,7 @@ class LegistarScraper:
                     get_legistar_person(
                         client=self.client_name,
                         person_id=sponsor[LEGISTAR_SPONSOR_ID],
+                        use_cache=True,
                     )
                 )
                 for sponsor in legistar_sponsors
@@ -1325,9 +1340,7 @@ class LegistarScraper:
         ingestion_models = []
 
         for legistar_ev in get_legistar_events_for_timespan(
-            self.client_name,
-            begin=begin,
-            end=end,
+            self.client_name, begin=begin, end=end, cache_persons_bodies=True
         ):
             # better to return time as local time with time zone info,
             # rather than as utc time.
