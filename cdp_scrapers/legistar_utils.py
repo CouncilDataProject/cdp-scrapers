@@ -234,7 +234,6 @@ def get_legistar_events_for_timespan(
     client: str,
     begin: Optional[datetime] = None,
     end: Optional[datetime] = None,
-    cache_persons_bodies: bool = False,
 ) -> List[Dict]:
     """
     Get all legistar events and each events minutes items, people, and votes, for a
@@ -271,6 +270,18 @@ def get_legistar_events_for_timespan(
     filter_datetime_format = "EventDate+{op}+datetime%27{dt}%27"
     request_format = LEGISTAR_EVENT_BASE + "?$filter={begin}+and+{end}"
 
+    # a given person and/or body's information being updated
+    # during the lifetime of this single call is miniscule.
+    # use a cache to prevent 10s-100s of web requests
+    # for the same person/body
+    global known_persons, known_bodies
+    # See Also
+    # get_legistar_person()
+    known_persons.clear()
+    # See Also
+    # get_legistar_body()
+    known_bodies.clear()
+
     # Get response from formatted request
     log.debug(f"Querying Legistar for events between: {begin} - {end}")
     response = requests.get(
@@ -300,7 +311,7 @@ def get_legistar_events_for_timespan(
 
         # Attach info for the body responsible for this event
         event[LEGISTAR_EV_BODY] = get_legistar_body(
-            client=client, body_id=event["EventBodyId"], use_cache=cache_persons_bodies
+            client=client, body_id=event["EventBodyId"], use_cache=True
         )
 
         # Get vote information
@@ -318,7 +329,7 @@ def get_legistar_events_for_timespan(
                 vote_info["PersonInfo"] = get_legistar_person(
                     client=client,
                     person_id=vote_info["VotePersonId"],
-                    use_cache=cache_persons_bodies,
+                    use_cache=True,
                 )
 
             if (
@@ -327,7 +338,7 @@ def get_legistar_events_for_timespan(
             ):
                 event_item[LEGISTAR_MATTER_SPONSORS] = None
             else:
-                # Get sponsor information
+                # this person's sponsor
                 sponsor_request_format = (
                     LEGISTAR_MATTER_BASE + "/{event_item_matter_id}/Sponsors"
                 )
@@ -1325,22 +1336,10 @@ class LegistarScraper:
         if end is None:
             end = datetime.utcnow()
 
-        # a given person and/or body's information being updated
-        # during a single get_events call is miniscule.
-        # use a cache to prevent 10s-100s of web requests
-        # for the same person/body during this call
-        global known_persons, known_bodies
-        # See Also
-        # get_legistar_person()
-        known_persons.clear()
-        # See Also
-        # get_legistar_body()
-        known_bodies.clear()
-
         ingestion_models = []
 
         for legistar_ev in get_legistar_events_for_timespan(
-            self.client_name, begin=begin, end=end, cache_persons_bodies=True
+            self.client_name, begin=begin, end=end
         ):
             # better to return time as local time with time zone info,
             # rather than as utc time.
