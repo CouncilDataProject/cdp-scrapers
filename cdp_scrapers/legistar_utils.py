@@ -42,6 +42,7 @@ LEGISTAR_VOTE_BASE = LEGISTAR_BASE + "/EventItems"
 LEGISTAR_EVENT_BASE = LEGISTAR_BASE + "/Events"
 LEGISTAR_MATTER_BASE = LEGISTAR_BASE + "/Matters"
 LEGISTAR_PERSON_BASE = LEGISTAR_BASE + "/Persons"
+LEGISTAR_BODY_BASE = LEGISTAR_BASE + "/Bodies"
 
 # e.g. Session.video_uri =  EventVideoPath from legistar api
 LEGISTAR_SESSION_VIDEO_URI = "EventVideoPath"
@@ -92,6 +93,34 @@ LEGISTAR_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
 
 
 known_persons: Dict[int, Dict[str, Any]] = {}
+known_bodies: Dict[int, Dict[str, Any]] = {}
+
+
+def get_legistar_body(
+    client: str,
+    body_id: int,
+) -> Optional[Dict[str, Any]]:
+    try:
+        return known_bodies[body_id]
+    except KeyError:
+        # new body
+        pass
+
+    body_request_format = LEGISTAR_BODY_BASE + "/{body_id}"
+    response = requests.get(
+        body_request_format.format(
+            client=client,
+            body_id=body_id,
+        )
+    )
+
+    if response.status_code == 200:
+        body = response.json()
+    else:
+        body = None
+
+    known_bodies[body_id] = body
+    return body
 
 
 def get_legistar_person(
@@ -126,11 +155,19 @@ def get_legistar_person(
         )
     )
 
-    if response.status_code == 200:
-        person["OfficeRecordInfo"] = response.json()
-    else:
+    if response.status_code != 200:
         person["OfficeRecordInfo"] = None
+        known_persons[person_id] = person
+        return person
 
+    office_records: List[Dict[str, Any]] = response.json()
+    for record in office_records:
+        # body for this role
+        record["OfficeRecordBodyInfo"] = get_legistar_body(
+            client=client, body_id=record["OfficeRecordBodyId"]
+        )
+
+    person["OfficeRecordInfo"] = office_records
     known_persons[person_id] = person
     return person
 
@@ -199,6 +236,11 @@ def get_legistar_events_for_timespan(
         event["EventItems"] = requests.get(
             item_request_format.format(client=client, event_id=event["EventId"])
         ).json()
+
+        # Attach info for the body responsible for this event
+        event["EventBodyInfo"] = get_legistar_body(
+            client=client, body_id=event["EventBodyId"]
+        )
 
         # Get vote information
         for event_item in event["EventItems"]:
@@ -714,6 +756,18 @@ class LegistarScraper:
             log.debug(f"no VoteDecision filter for {vote_value}")
         return decision
 
+    def get_body(self, legistar_body: Dict[str, Any]) -> Optional[Body]:
+        if not legistar_body:
+            return None
+
+        return self.get_none_if_empty(
+            Body(
+                external_source_id=legistar_body["BodyId"],
+                is_active=bool(legistar_body["BodyActiveFlag"]),
+                name=str_simplified(legistar_body["BodyName"]),
+            )
+        )
+
     def get_roles(
         self, legistar_office_records: List[Dict[str, Any]]
     ) -> Optional[List[Role]]:
@@ -724,6 +778,7 @@ class LegistarScraper:
             [
                 self.get_none_if_empty(
                     Role(
+                        body=self.get_body(record["OfficeRecordBodyInfo"]),
                         # e.g. 2017-11-30T00:00:00
                         start_datetime=self.localize_datetime(
                             datetime.strptime(
@@ -737,7 +792,7 @@ class LegistarScraper:
                             )
                         ),
                         external_source_id=record["OfficeRecordId"],
-                        title=record["OfficeRecordTitle"],
+                        title=str_simplified(record["OfficeRecordTitle"]),
                     )
                 )
                 for record in legistar_office_records
@@ -1172,12 +1227,13 @@ class LegistarScraper:
         if end is None:
             end = datetime.utcnow()
 
-        # a given person's information being updated
-        # during a single get_events call is miniscule
-        # so use a cache to prevent 10s-100s of web requests
-        # for the same person during this call
-        global known_persons
+        # a given person and/or body's information being updated
+        # during a single get_events call is miniscule.
+        # use a cache to prevent 10s-100s of web requests
+        # for the same person/body during this call
+        global known_persons, known_bodies
         known_persons.clear()
+        known_bodies.clear()
         ingestion_models = []
 
         for legistar_ev in get_legistar_events_for_timespan(
@@ -1234,10 +1290,7 @@ class LegistarScraper:
                         event_minutes_items=self.get_event_minutes(
                             legistar_ev[LEGISTAR_EV_ITEMS]
                         ),
-                        body=Body(
-                            external_source_id=legistar_ev[LEGISTAR_BODY_EXT_ID],
-                            name=str_simplified(legistar_ev[LEGISTAR_BODY_NAME]),
-                        ),
+                        body=self.get_body(legistar_ev["EventBodyInfo"]),
                     )
                 )
             )
