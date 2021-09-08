@@ -1,4 +1,5 @@
 import sys
+import json
 from argparse import ArgumentParser
 from datetime import (datetime, timedelta)
 from functools import partial
@@ -59,11 +60,9 @@ if __name__ == "__main__":
         sys.exit("[]")
 
     ingestions: List[EventIngestionModel] = get_events(from_dt=from_dt, to_dt=to_dt)
-
-    print("[")
-    for i in range(len(ingestions)):
-        for line in ingestions[i].to_json(indent="    ").splitlines():
-            print(f"    {line}\n")
-        if i < len(ingestions) - 1:
-            print(",")
-    print("]")
+    print(
+        json.dumps(
+            [json.loads(ingestion.to_json()) for ingestion in ingestions],
+            indent="    ",
+        )
+    )
