@@ -30,7 +30,8 @@ event scraper functions.
 General Legistar utility functions.
 
 ```python
-from cdp_scrapers.legistar_utils import get_legistar_events_for_timespan, LegistarScraper
+from cdp_scrapers.legistar_utils import get_legistar_events_for_timespan
+from cdp_scrapers.instances import get_seattle_events
 from datetime import datetime
 
 # Get all events (and minutes item and voting details)
@@ -38,15 +39,15 @@ from datetime import datetime
 # Returns List[Dict]
 seattle_legistar_events = get_legistar_events_for_timespan(
     client="seattle",
+    timezone="America/Los_Angeles",
     start=datetime(2021, 7, 12),
     end=datetime(2021, 7, 14),
 )
 
 # Or parse and convert to CDP EventIngestionModel
-seattle_scraper = LegistarScraper("seattle")
-seattle_cdp_parsed_events = seattle_scraper.get_events(
-    begin=datetime(2021, 7, 12),
-    end=datetime(2021, 7, 14),
+seattle_cdp_parsed_events = get_seattle_events(
+    from_dt=datetime(2021, 7, 12),
+    to_dt=datetime(2021, 7, 14),
 )
 ```
 
