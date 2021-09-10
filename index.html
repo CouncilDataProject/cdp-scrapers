@@ -238,7 +238,8 @@ event scraper functions.</p>
 <div class="section" id="legistar">
 <h3>Legistar<a class="headerlink" href="#legistar" title="Permalink to this headline">¶</a></h3>
 <p>General Legistar utility functions.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cdp_scrapers.legistar_utils</span> <span class="kn">import</span> <span class="n">get_legistar_events_for_timespan</span><span class="p">,</span> <span class="n">LegistarScraper</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cdp_scrapers.legistar_utils</span> <span class="kn">import</span> <span class="n">get_legistar_events_for_timespan</span>
+<span class="kn">from</span> <span class="nn">cdp_scrapers.instances</span> <span class="kn">import</span> <span class="n">get_seattle_events</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
 
 <span class="c1"># Get all events (and minutes item and voting details)</span>
@@ -246,15 +247,15 @@ event scraper functions.</p>
 <span class="c1"># Returns List[Dict]</span>
 <span class="n">seattle_legistar_events</span> <span class="o">=</span> <span class="n">get_legistar_events_for_timespan</span><span class="p">(</span>
     <span class="n">client</span><span class="o">=</span><span class="s2">&quot;seattle&quot;</span><span class="p">,</span>
+    <span class="n">timezone</span><span class="o">=</span><span class="s2">&quot;America/Los_Angeles&quot;</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2021</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span>
     <span class="n">end</span><span class="o">=</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2021</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">14</span><span class="p">),</span>
 <span class="p">)</span>
 
 <span class="c1"># Or parse and convert to CDP EventIngestionModel</span>
-<span class="n">seattle_scraper</span> <span class="o">=</span> <span class="n">LegistarScraper</span><span class="p">(</span><span class="s2">&quot;seattle&quot;</span><span class="p">)</span>
-<span class="n">seattle_cdp_parsed_events</span> <span class="o">=</span> <span class="n">seattle_scraper</span><span class="o">.</span><span class="n">get_events</span><span class="p">(</span>
-    <span class="n">begin</span><span class="o">=</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2021</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span>
-    <span class="n">end</span><span class="o">=</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2021</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">14</span><span class="p">),</span>
+<span class="n">seattle_cdp_parsed_events</span> <span class="o">=</span> <span class="n">get_seattle_events</span><span class="p">(</span>
+    <span class="n">from_dt</span><span class="o">=</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2021</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span>
+    <span class="n">to_dt</span><span class="o">=</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2021</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">14</span><span class="p">),</span>
 <span class="p">)</span>
 </pre></div>
 </div>
