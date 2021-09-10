@@ -42,6 +42,10 @@ class KingCountyScraper(LegistarScraper):
                 "There will be one public hearing on",
                 "Consent Items",
                 "SUBJECT TO A MOTION TO SUSPEND THE RULES TO TAKE ACTION WITHOUT REFERRAL TO COMMITTEE PURSUANT",  # noqa: E501
+                "If you do not have access to the ZOOM application",
+                "Executive Session: For 15 minutes, with action to follow",
+                "on the agenda for procedural matters",
+                "This is a mandatory referral to the",
             ],
         )
 
