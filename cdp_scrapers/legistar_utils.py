@@ -70,7 +70,7 @@ LEGISTAR_MATTER_NAME = "EventItemMatterName"
 LEGISTAR_MATTER_TYPE = "EventItemMatterType"
 LEGISTAR_MATTER_STATUS = "EventItemMatterStatus"
 LEGISTAR_MATTER_SPONSORS = "MatterSponsorInfo"
-LEGISTAR_SPONSOR_ID = "MatterSponsorNameId"
+LEGISTAR_SPONSOR_PERSON = "SponsorPersonInfo"
 # Session.session_datetime is a combo of EventDate and EventTime
 # TODO: this means same time for all Sessions in a EventIngestionModel.
 #       some other legistar api data that can be used instead
@@ -340,16 +340,27 @@ def get_legistar_events_for_timespan(
             ):
                 event_item[LEGISTAR_MATTER_SPONSORS] = None
             else:
-                # this person's sponsor
+                # this matter's sponsors
                 sponsor_request_format = (
                     LEGISTAR_MATTER_BASE + "/{event_item_matter_id}/Sponsors"
                 )
-                event_item[LEGISTAR_MATTER_SPONSORS] = requests.get(
+                sponsors = requests.get(
                     sponsor_request_format.format(
                         client=client,
                         event_item_matter_id=event_item["EventItemMatterId"],
                     )
                 ).json()
+
+                # legistar MatterSponsor just has a reference to a Person
+                # so further obtain the actual Person information
+                for sponsor in sponsors:
+                    sponsor[LEGISTAR_SPONSOR_PERSON] = get_legistar_person(
+                        client=client,
+                        person_id=sponsor["MatterSponsorNameId"],
+                        use_cache=True,
+                    )
+
+                event_item[LEGISTAR_MATTER_SPONSORS] = sponsors
 
     log.debug(f"Collected {len(response)} Legistar events")
     return response
@@ -1009,13 +1020,7 @@ class LegistarScraper:
 
         return reduced_list(
             [
-                self.get_person(
-                    get_legistar_person(
-                        client=self.client_name,
-                        person_id=sponsor[LEGISTAR_SPONSOR_ID],
-                        use_cache=True,
-                    )
-                )
+                self.get_person(sponsor["SponsorPersonInfo"])
                 for sponsor in legistar_sponsors
             ]
         )
