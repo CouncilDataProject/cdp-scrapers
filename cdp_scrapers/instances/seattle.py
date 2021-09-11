@@ -37,6 +37,7 @@ class SeattleScraper(LegistarScraper):
                 "Deputy City Clerk",
                 "Executive Sessions are closed to the public",
                 "Executive Session on Pending, Potential, or Actual Litigation",
+                "Items of Business",
                 # Common to see "CITY COUNCIL:",
                 # Or more generally "{body name}:"
                 # Check for last char ":"
