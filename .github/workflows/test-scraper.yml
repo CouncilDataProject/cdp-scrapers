@@ -1,0 +1,53 @@
+name: Test Scraper
+
+on:
+  issue_comment:
+    types: [created, edited]
+
+jobs:
+  test-scraper:
+    if: ${{ startsWith(github.event.comment.body, '/test-scraper') }}
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+
+    steps:
+      - name: Show Acknowledgement
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            Begin action `/test-scraper`. This may take several minutes.
+
+      - uses: actions/checkout@v2
+
+      - name: Set Up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install .
+
+      - name: Run Scraper
+        run: |
+          python .github/workflows/scripts/run-scraper.py ${{ github.event.comment.body }}
+
+      - name: Set Scraper Results as Response
+        id: test-result
+        run: |
+          body=$(cat run-scraper-results.md)
+          body="${body//'%'/'%25'}"
+          body="${body//$'\n'/'%0A'}"
+          body="${body//$'\r'/'%0D'}" 
+          echo "::set-output name=body::$body"
+
+      - name: Show Test Result
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            ${{ steps.test-result.outputs.body }}
