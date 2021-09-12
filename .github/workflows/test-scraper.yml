@@ -13,14 +13,18 @@ jobs:
       pull-requests: write
 
     steps:
-      - name: Show Acknowledgement
-        uses: peter-evans/create-or-update-comment@v1
+      # unlike pull_request and issue triggers
+      # must specify merge HEAD as ref for action/checkout
+      # when triggered by comment in pull request
+      - name: Check Out Merge Repository
+        if: ${{ github.event.issue.pull_request }}
+        uses: actions/checkout@v2
         with:
-          issue-number: ${{ github.event.issue.number }}
-          body: |
-            Begin action `/test-scraper`. This may take several minutes.
+          ref: refs/pull/${{ github.event.issue.number }}/merge
 
-      - uses: actions/checkout@v2
+      - name: Check Out Reference Repository
+        if: ${{ ! github.event.issue.pull_request }}
+        uses: actions/checkout@v2
 
       - name: Set Up Python
         uses: actions/setup-python@v2
