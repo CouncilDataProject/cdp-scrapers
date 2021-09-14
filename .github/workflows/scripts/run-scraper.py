@@ -26,13 +26,9 @@ RESULTS_FILE = "run-scraper-results.md"
 
 def iso_strptime(dt: str) -> Optional[datetime]:
     try:
-        return datetime.strptime(dt, "%Y-%m-%dT%H:%M:%S")
+        return datetime.fromisoformat(dt)
     except (TypeError, ValueError):
-        try:
-            # try with fractional second
-            return datetime.strptime(dt, "%Y-%m-%dT%H:%M:%S.%f")
-        except (TypeError, ValueError):
-            pass
+        pass
 
     return None
 
@@ -84,7 +80,7 @@ def save_events(get_events_name: str, from_dt_str: str, to_dt_str: str) -> None:
             json.loads(ingestion.to_json())
             for ingestion in get_events(from_dt=from_dt, to_dt=to_dt)
         ],
-        indent="    ",
+        indent=4,
     )
 
     with open(RESULTS_FILE, "wt") as results_file:
