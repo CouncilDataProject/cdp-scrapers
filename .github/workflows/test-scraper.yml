@@ -1,0 +1,103 @@
+# Reference
+# https://github.com/CouncilDataProject/cookiecutter-cdp-deployment
+
+name: Test Scraper
+
+on:
+  issue_comment:
+    types: [created, edited]
+
+jobs:
+  test-scraper:
+    if: ${{ startsWith(github.event.comment.body, '/test-scraper') }}
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+
+    steps:
+      #########################################################################
+      # Check initiator is a member of CDP
+
+      - name: Get CDP Organization Members
+        id: cdp-members
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        run: |
+          members="$(gh api -X GET 'orgs/CouncilDataProject/members' -F per_page=100 --paginate --cache 1h --jq '[.[].login] | join("---")')"
+          echo "::set-output name=members::$members"
+      - name: Generate Safe Username Check
+        id: safe-username
+        run: |
+          username=${{ github.event.comment.user.login }}
+          username="---$username---"
+          echo "::set-output name=username::$username"
+      - name: Check Job Initiator - Message
+        if: |
+          !contains(
+            steps.cdp-members.outputs.members,
+            steps.safe-username.outputs.username
+          )
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            ❌ ❌ **Rejected** ❌ ❌
+
+            User (${{ github.event.comment.user.login }}) attempted to run `/test-scraper` without permissions.
+            _Only users which are members of the CouncilDataProject organization may run `/test-scraper` bot._
+            **Stopping Scraper Test**
+
+      - name: Check Job Initiator - Exit
+        if: |
+          !contains(
+            steps.cdp-members.outputs.members,
+            steps.safe-username.outputs.username
+          )
+        run: |
+          exit 1
+      #########################################################################
+      # Workflow Setup
+
+      # unlike pull_request and issue triggers
+      # must specify merge HEAD as ref for action/checkout
+      # when triggered by comment in pull request
+      - name: Check Out Merge Repository
+        if: ${{ github.event.issue.pull_request }}
+        uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.issue.number }}/merge
+
+      - name: Check Out Reference Repository
+        if: ${{ ! github.event.issue.pull_request }}
+        uses: actions/checkout@v2
+
+      - name: Set Up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install .
+
+      - name: Run Scraper
+        run: |
+          python .github/workflows/scripts/run-scraper.py ${{ github.event.comment.body }}
+
+      - name: Set Scraper Results as Response
+        id: test-result
+        run: |
+          body=$(cat run-scraper-results.md)
+          body="${body//'%'/'%25'}"
+          body="${body//$'\n'/'%0A'}"
+          body="${body//$'\r'/'%0D'}" 
+          echo "::set-output name=body::$body"
+
+      - name: Show Test Result
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            ${{ steps.test-result.outputs.body }}
