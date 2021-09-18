@@ -19,7 +19,8 @@ log = logging.getLogger(__name__)
 
 ###############################################################################
 
-RESULTS_FILE = "run-scraper-results.md"
+PARAMS_FILE = "scraper-params.txt"
+RESULTS_FILE = "scraper-results.json"
 
 ###############################################################################
 
@@ -75,22 +76,22 @@ def save_events(get_events_name: str, from_dt_str: str, to_dt_str: str) -> None:
         to_dt = datetime.utcnow()
 
     get_events: partial = getattr(instances, f"{get_events_name}")
-    events_json: str = json.dumps(
-        [
-            json.loads(ingestion.to_json())
-            for ingestion in get_events(from_dt=from_dt, to_dt=to_dt)
-        ],
-        indent=4,
-    )
 
+    with open(PARAMS_FILE, "wt") as params_file:
+        params_file.write(
+            f"--from_dt={from_dt.isoformat()} "
+            f"--to_dt={to_dt.isoformat()} "
+            f"{get_events_name}\n"
+        )
     with open(RESULTS_FILE, "wt") as results_file:
         results_file.write(
-            f"`--from_dt={from_dt.isoformat()} "
-            f"--to_dt={to_dt.isoformat()} "
-            f"{get_events_name}`  \n\n"
-            "```json\n"
-            f"{events_json}\n"
-            "```\n"
+            json.dumps(
+                [
+                    json.loads(ingestion.to_json())
+                    for ingestion in get_events(from_dt=from_dt, to_dt=to_dt)
+                ],
+                indent=4,
+            )
         )
 
 
