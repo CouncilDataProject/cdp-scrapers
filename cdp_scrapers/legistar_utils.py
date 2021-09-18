@@ -951,7 +951,6 @@ class LegistarScraper:
                 phone=phone,
                 website=str_simplified(legistar_person[LEGISTAR_PERSON_WEBSITE]),
                 is_active=bool(legistar_person[LEGISTAR_PERSON_ACTIVE]),
-                roles=self.get_roles(legistar_person[LEGISTAR_PERSON_ROLES]),
             )
         )
 
