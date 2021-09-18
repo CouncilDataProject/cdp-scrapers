@@ -29,7 +29,7 @@ jobs:
       - name: Get CDP Organization Members
         id: cdp-members
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         run: |
           members="$(gh api -X GET 'orgs/CouncilDataProject/members' -F per_page=100 --paginate --cache 1h --jq '[.[].login] | join("---")')"
           echo "::set-output name=members::$members"
