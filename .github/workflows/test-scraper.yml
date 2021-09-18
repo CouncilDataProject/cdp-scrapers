@@ -23,47 +23,6 @@ jobs:
           body: |
             Begin `/test-scraper`. This may take several minutes.
 
-      #########################################################################
-      # Check initiator is a member of CDP
-
-      - name: Get CDP Organization Members
-        id: cdp-members
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          members="$(gh api -X GET 'orgs/CouncilDataProject/members' -F per_page=100 --paginate --cache 1h --jq '[.[].login] | join("---")')"
-          echo "::set-output name=members::$members"
-      - name: Generate Safe Username Check
-        id: safe-username
-        run: |
-          username=${{ github.event.comment.user.login }}
-          username="---$username---"
-          echo "::set-output name=username::$username"
-      - name: Check Job Initiator - Message
-        if: |
-          !contains(
-            steps.cdp-members.outputs.members,
-            steps.safe-username.outputs.username
-          )
-        uses: peter-evans/create-or-update-comment@v1
-        with:
-          issue-number: ${{ github.event.issue.number }}
-          body: |
-            ❌ ❌ **Rejected** ❌ ❌
-
-            User (${{ github.event.comment.user.login }}) attempted to run `/test-scraper` without permissions.
-            _Only users which are members of the CouncilDataProject organization may run `/test-scraper` bot._
-            **Stopping Scraper Test**
-
-      - name: Check Job Initiator - Exit
-        if: |
-          !contains(
-            steps.cdp-members.outputs.members,
-            steps.safe-username.outputs.username
-          )
-        run: |
-          exit 1
-      #########################################################################
       # Workflow Setup
 
       # unlike pull_request and issue triggers
