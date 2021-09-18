@@ -96,8 +96,10 @@ jobs:
       - name: Upload Results
         uses: actions/upload-artifact@v2
         with:
-          name: scraper-test-results.md
-          path: run-scraper-results.md
+          name: scraper-test-results
+          path: |
+            scraper-params.txt
+            scraper-results.json
       
       - name: Show Test Result
         uses: peter-evans/create-or-update-comment@v1
@@ -106,4 +108,4 @@ jobs:
           body: |
             `/test-scraper` is finished.
             Please go to the [Actions page](${{ github.event.repository.html_url }}/actions) then click on the latest workflow titled "${{ github.event.issue.title }}".
-            The results are saved in `scraper-test-results.md` under Artifacts on the workflow summary page.
+            The results are saved in `scraper-test-results` under Artifacts on the workflow summary page.
