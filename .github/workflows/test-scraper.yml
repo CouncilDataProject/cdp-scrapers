@@ -97,6 +97,8 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: scraper-test-results
+          # default 90 seems unnecessary for these test results
+          retention-days: 7
           path: |
             scraper-params.txt
             scraper-results.json
