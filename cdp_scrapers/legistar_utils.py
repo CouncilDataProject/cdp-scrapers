@@ -25,8 +25,9 @@ from cdp_backend.pipeline.ingestion_models import (
     Session,
     SupportingFile,
     Vote,
+    Role,
 )
-from pytz import country_timezones, timezone, utc
+import pytz
 
 from .types import ContentURIs
 
@@ -41,6 +42,7 @@ LEGISTAR_VOTE_BASE = LEGISTAR_BASE + "/EventItems"
 LEGISTAR_EVENT_BASE = LEGISTAR_BASE + "/Events"
 LEGISTAR_MATTER_BASE = LEGISTAR_BASE + "/Matters"
 LEGISTAR_PERSON_BASE = LEGISTAR_BASE + "/Persons"
+LEGISTAR_BODY_BASE = LEGISTAR_BASE + "/Bodies"
 
 # e.g. Session.video_uri =  EventVideoPath from legistar api
 LEGISTAR_SESSION_VIDEO_URI = "EventVideoPath"
@@ -53,8 +55,10 @@ LEGISTAR_PERSON_NAME = "PersonFullName"
 LEGISTAR_PERSON_PHONE = "PersonPhone"
 LEGISTAR_PERSON_WEBSITE = "PersonWWW"
 LEGISTAR_PERSON_ACTIVE = "PersonActiveFlag"
-LEGISTAR_BODY_NAME = "EventBodyName"
-LEGISTAR_BODY_EXT_ID = "EventBodyId"
+LEGISTAR_PERSON_ROLES = "OfficeRecordInfo"
+LEGISTAR_BODY_NAME = "BodyName"
+LEGISTAR_BODY_EXT_ID = "BodyId"
+LEGISTAR_BODY_ACTIVE = "BodyActiveFlag"
 LEGISTAR_VOTE_DECISION = "VoteResult"
 LEGISTAR_VOTE_EXT_ID = "VoteId"
 LEGISTAR_FILE_EXT_ID = "MatterAttachmentId"
@@ -65,8 +69,8 @@ LEGISTAR_MATTER_TITLE = "EventItemMatterFile"
 LEGISTAR_MATTER_NAME = "EventItemMatterName"
 LEGISTAR_MATTER_TYPE = "EventItemMatterType"
 LEGISTAR_MATTER_STATUS = "EventItemMatterStatus"
-# NOTE: this may not be present
-LEGISTAR_MATTER_SPONSOR = "EventItemMatterRequester"
+LEGISTAR_MATTER_SPONSORS = "MatterSponsorInfo"
+LEGISTAR_SPONSOR_PERSON = "SponsorPersonInfo"
 # Session.session_datetime is a combo of EventDate and EventTime
 # TODO: this means same time for all Sessions in a EventIngestionModel.
 #       some other legistar api data that can be used instead
@@ -78,6 +82,11 @@ LEGISTAR_MINUTE_EXT_ID = "EventItemId"
 LEGISTAR_MINUTE_NAME = "EventItemTitle"
 LEGISTAR_VOTE_VAL_ID = "VoteValueId"
 LEGISTAR_VOTE_VAL_NAME = "VoteValueName"
+LEGISTAR_ROLE_BODY = "OfficeRecordBodyInfo"
+LEGISTAR_ROLE_START = "OfficeRecordStartDate"
+LEGISTAR_ROLE_END = "OfficeRecordEndDate"
+LEGISTAR_ROLE_EXT_ID = "OfficeRecordId"
+LEGISTAR_ROLE_TITLE = "OfficeRecordTitle"
 
 LEGISTAR_EV_ITEMS = "EventItems"
 LEGISTAR_EV_ATTACHMENTS = "EventItemMatterAttachments"
@@ -85,8 +94,144 @@ LEGISTAR_EV_VOTES = "EventItemVoteInfo"
 LEGISTAR_VOTE_PERSONS = "PersonInfo"
 LEGISTAR_EV_SITE_URL = "EventInSiteURL"
 LEGISTAR_EV_EXT_ID = "EventId"
+LEGISTAR_EV_BODY = "EventBodyInfo"
 
+LEGISTAR_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
 ###############################################################################
+
+
+known_persons: Dict[int, Dict[str, Any]] = {}
+known_bodies: Dict[int, Dict[str, Any]] = {}
+
+
+def get_legistar_body(
+    client: str,
+    body_id: int,
+    use_cache: bool = False,
+) -> Optional[Dict[str, Any]]:
+    """
+    Return information for a single legistar body in JSON.
+
+    Parameters
+    ----------
+    client: str
+        Which legistar client to target. Ex: "seattle"
+    body_id: int
+        Unique ID for this body in the legistar municipality
+    use_cache: bool
+        True: Store result to prevent querying repeatedly for same body_id
+
+    Returns
+    -------
+    body: Dict[str, Any]
+        legistar API body
+
+    Notes
+    -----
+    known_bodies cache is cleared for every LegistarScraper.get_events() call
+    """
+    global known_bodies
+
+    if use_cache:
+        try:
+            return known_bodies[body_id]
+        except KeyError:
+            # new body
+            pass
+
+    body_request_format = LEGISTAR_BODY_BASE + "/{body_id}"
+    response = requests.get(
+        body_request_format.format(
+            client=client,
+            body_id=body_id,
+        )
+    )
+
+    if response.status_code == 200:
+        body = response.json()
+    else:
+        body = None
+
+    if use_cache:
+        known_bodies[body_id] = body
+    return body
+
+
+def get_legistar_person(
+    client: str,
+    person_id: int,
+    use_cache: bool = False,
+) -> Optional[Dict[str, Any]]:
+    """
+    Return information for a single legistar person in JSON.
+
+    Parameters
+    ----------
+    client: str
+        Which legistar client to target. Ex: "seattle"
+    person_id: int
+        Unique ID for this person in the legistar municipality
+    use_cache: bool
+        True: Store result to prevent querying repeatedly for same person_id
+
+    Returns
+    -------
+    person: Dict[str, Any]
+        legistar API person
+
+    Notes
+    -----
+    known_persons cache is cleared for every LegistarScraper.get_events() call
+    """
+    global known_persons
+
+    if use_cache:
+        try:
+            return known_persons[person_id]
+        except KeyError:
+            # new person
+            pass
+
+    person_request_format = LEGISTAR_PERSON_BASE + "/{person_id}"
+    response = requests.get(
+        person_request_format.format(
+            client=client,
+            person_id=person_id,
+        )
+    )
+
+    if response.status_code != 200:
+        if use_cache:
+            known_persons[person_id] = None
+        return None
+
+    person = response.json()
+
+    # all known OfficeRecords (roles) for this person
+    response = requests.get(
+        (person_request_format + "/OfficeRecords").format(
+            client=client,
+            person_id=person_id,
+        )
+    )
+
+    if response.status_code != 200:
+        person[LEGISTAR_PERSON_ROLES] = None
+        if use_cache:
+            known_persons[person_id] = person
+        return person
+
+    office_records: List[Dict[str, Any]] = response.json()
+    for record in office_records:
+        # body for this role
+        record[LEGISTAR_ROLE_BODY] = get_legistar_body(
+            client=client, body_id=record["OfficeRecordBodyId"], use_cache=use_cache
+        )
+
+    person[LEGISTAR_PERSON_ROLES] = office_records
+    if use_cache:
+        known_persons[person_id] = person
+    return person
 
 
 def get_legistar_events_for_timespan(
@@ -127,6 +272,18 @@ def get_legistar_events_for_timespan(
     filter_datetime_format = "EventDate+{op}+datetime%27{dt}%27"
     request_format = LEGISTAR_EVENT_BASE + "?$filter={begin}+and+{end}"
 
+    # a given person and/or body's information being updated
+    # during the lifetime of this single call is miniscule.
+    # use a cache to prevent 10s-100s of web requests
+    # for the same person/body
+    global known_persons, known_bodies
+    # See Also
+    # get_legistar_person()
+    known_persons.clear()
+    # See Also
+    # get_legistar_body()
+    known_bodies.clear()
+
     # Get response from formatted request
     log.debug(f"Querying Legistar for events between: {begin} - {end}")
     response = requests.get(
@@ -154,6 +311,11 @@ def get_legistar_events_for_timespan(
             item_request_format.format(client=client, event_id=event["EventId"])
         ).json()
 
+        # Attach info for the body responsible for this event
+        event[LEGISTAR_EV_BODY] = get_legistar_body(
+            client=client, body_id=event["EventBodyId"], use_cache=True
+        )
+
         # Get vote information
         for event_item in event["EventItems"]:
             vote_request_format = LEGISTAR_VOTE_BASE + "/{event_item_id}/Votes"
@@ -166,13 +328,39 @@ def get_legistar_events_for_timespan(
 
             # Get person information
             for vote_info in event_item["EventItemVoteInfo"]:
-                person_request_format = LEGISTAR_PERSON_BASE + "/{person_id}"
-                vote_info["PersonInfo"] = requests.get(
-                    person_request_format.format(
+                vote_info["PersonInfo"] = get_legistar_person(
+                    client=client,
+                    person_id=vote_info["VotePersonId"],
+                    use_cache=True,
+                )
+
+            if (
+                not isinstance(event_item["EventItemMatterId"], int)
+                or event_item["EventItemMatterId"] < 0
+            ):
+                event_item[LEGISTAR_MATTER_SPONSORS] = None
+            else:
+                # this matter's sponsors
+                sponsor_request_format = (
+                    LEGISTAR_MATTER_BASE + "/{event_item_matter_id}/Sponsors"
+                )
+                sponsors = requests.get(
+                    sponsor_request_format.format(
                         client=client,
-                        person_id=vote_info["VotePersonId"],
+                        event_item_matter_id=event_item["EventItemMatterId"],
                     )
                 ).json()
+
+                # legistar MatterSponsor just has a reference to a Person
+                # so further obtain the actual Person information
+                for sponsor in sponsors:
+                    sponsor[LEGISTAR_SPONSOR_PERSON] = get_legistar_person(
+                        client=client,
+                        person_id=sponsor["MatterSponsorNameId"],
+                        use_cache=True,
+                    )
+
+                event_item[LEGISTAR_MATTER_SPONSORS] = sponsors
 
     log.debug(f"Collected {len(response)} Legistar events")
     return response
@@ -321,7 +509,7 @@ class LegistarScraper:
         minutes_item_decision_failed_pattern: str = r"not|fail",
     ):
         self.client_name: str = client
-        self.timezone: str = timezone
+        self.timezone: pytz.timezone = pytz.timezone(timezone)
         self.ignore_minutes_item_patterns: List[str] = ignore_minutes_item_patterns
 
         # regex patterns used to infer cdp_backend.database.constants
@@ -654,6 +842,80 @@ class LegistarScraper:
             log.debug(f"no VoteDecision filter for {vote_value}")
         return decision
 
+    def get_body(self, legistar_body: Dict[str, Any]) -> Optional[Body]:
+        """
+        Return CDP Body for Legistar body.
+
+        Parameters
+        ----------
+        legistar_body: Dict
+            Legistar API body
+
+        Returns
+        -------
+        body: Optional[body]
+            The Legistar body converted to a CDP body ingestion model.
+            None if missing required information.
+
+        See Also
+        --------
+        get_legistar_body()
+        """
+        if not legistar_body:
+            return None
+
+        return self.get_none_if_empty(
+            Body(
+                external_source_id=str(legistar_body[LEGISTAR_BODY_EXT_ID]),
+                is_active=bool(legistar_body[LEGISTAR_BODY_ACTIVE]),
+                name=str_simplified(legistar_body[LEGISTAR_BODY_NAME]),
+            )
+        )
+
+    def get_roles(
+        self, legistar_office_records: List[Dict[str, Any]]
+    ) -> Optional[List[Role]]:
+        """
+        Return list of CDP Role from list of legistar OfficeRecord
+
+        Parameters
+        ----------
+        legistar_office_records: List[Dict]
+            Legistar API OfficeRecords
+
+        Returns
+        -------
+        roles: Optional[List[Role]]
+            From Legistar OfficeRecords. None if missing information.
+        """
+        if not legistar_office_records:
+            return None
+
+        return reduced_list(
+            [
+                self.get_none_if_empty(
+                    Role(
+                        body=self.get_body(record[LEGISTAR_ROLE_BODY]),
+                        # e.g. 2017-11-30T00:00:00
+                        start_datetime=self.localize_datetime(
+                            datetime.strptime(
+                                record[LEGISTAR_ROLE_START],
+                                LEGISTAR_DATETIME_FORMAT,
+                            )
+                        ),
+                        end_datetime=self.localize_datetime(
+                            datetime.strptime(
+                                record[LEGISTAR_ROLE_END], LEGISTAR_DATETIME_FORMAT
+                            )
+                        ),
+                        external_source_id=str(record[LEGISTAR_ROLE_EXT_ID]),
+                        title=str_simplified(record[LEGISTAR_ROLE_TITLE]),
+                    )
+                )
+                for record in legistar_office_records
+            ]
+        )
+
     def get_person(self, legistar_person: Dict) -> Optional[Person]:
         """
         Return CDP Person for Legistar Person.
@@ -668,7 +930,14 @@ class LegistarScraper:
         person: Optional[Person]
             The Legistar Person converted to a CDP person ingestion model.
             None if missing information.
+
+        See Also
+        --------
+        get_legistar_person()
         """
+        if not legistar_person:
+            return None
+
         phone = str_simplified(legistar_person[LEGISTAR_PERSON_PHONE])
         if phone:
             # (123)456... -> 123-456...
@@ -677,7 +946,7 @@ class LegistarScraper:
         return self.get_none_if_empty(
             Person(
                 email=str_simplified(legistar_person[LEGISTAR_PERSON_EMAIL]),
-                external_source_id=legistar_person[LEGISTAR_PERSON_EXT_ID],
+                external_source_id=str(legistar_person[LEGISTAR_PERSON_EXT_ID]),
                 name=str_simplified(legistar_person[LEGISTAR_PERSON_NAME]),
                 phone=phone,
                 website=str_simplified(legistar_person[LEGISTAR_PERSON_WEBSITE]),
@@ -705,7 +974,7 @@ class LegistarScraper:
                 self.get_none_if_empty(
                     Vote(
                         decision=self.get_vote_decision(vote),
-                        external_source_id=vote[LEGISTAR_VOTE_EXT_ID],
+                        external_source_id=str(vote[LEGISTAR_VOTE_EXT_ID]),
                         person=self.get_person(vote[LEGISTAR_VOTE_PERSONS]),
                     )
                 )
@@ -735,12 +1004,23 @@ class LegistarScraper:
             [
                 self.get_none_if_empty(
                     SupportingFile(
-                        external_source_id=attachment[LEGISTAR_FILE_EXT_ID],
+                        external_source_id=str(attachment[LEGISTAR_FILE_EXT_ID]),
                         name=str_simplified(attachment[LEGISTAR_FILE_NAME]),
                         uri=str_simplified(attachment[LEGISTAR_FILE_URI]),
                     )
                 )
                 for attachment in legistar_ev_attachments
+            ]
+        )
+
+    def get_sponsors(self, legistar_sponsors: List[Dict]) -> Optional[List[Person]]:
+        if not legistar_sponsors:
+            return None
+
+        return reduced_list(
+            [
+                self.get_person(sponsor["SponsorPersonInfo"])
+                for sponsor in legistar_sponsors
             ]
         )
 
@@ -759,29 +1039,15 @@ class LegistarScraper:
             List of converted Legistar matter details to CDP matter objects.
             None if missing information.
         """
-        try:
-            sponsors = reduced_list(
-                [
-                    self.get_none_if_empty(
-                        # at least try. this info isn't always filled
-                        Person(
-                            name=str_simplified(legistar_ev[LEGISTAR_MATTER_SPONSOR])
-                        )
-                    )
-                ]
-            )
-        except KeyError:
-            sponsors = None
-
         return self.get_none_if_empty(
             Matter(
-                external_source_id=legistar_ev[LEGISTAR_MATTER_EXT_ID],
+                external_source_id=str(legistar_ev[LEGISTAR_MATTER_EXT_ID]),
                 # Too often EventItemMatterName is not filled
                 # but EventItemMatterFile is
                 name=str_simplified(legistar_ev[LEGISTAR_MATTER_NAME])
                 or str_simplified(legistar_ev[LEGISTAR_MATTER_TITLE]),
                 matter_type=str_simplified(legistar_ev[LEGISTAR_MATTER_TYPE]),
-                sponsors=sponsors,
+                sponsors=self.get_sponsors(legistar_ev[LEGISTAR_MATTER_SPONSORS]),
                 title=str_simplified(legistar_ev[LEGISTAR_MATTER_TITLE]),
                 result_status=self.get_matter_status(
                     legistar_ev[LEGISTAR_MATTER_STATUS]
@@ -806,7 +1072,7 @@ class LegistarScraper:
 
         return self.get_none_if_empty(
             MinutesItem(
-                external_source_id=legistar_ev_item[LEGISTAR_MINUTE_EXT_ID],
+                external_source_id=str(legistar_ev_item[LEGISTAR_MINUTE_EXT_ID]),
                 name=str_simplified(legistar_ev_item[LEGISTAR_MINUTE_NAME]),
             )
         )
@@ -930,11 +1196,11 @@ class LegistarScraper:
         """
         Return name for a US time zone matching UTC offset calculated from OS clock.
         """
-        utc_now = utc.localize(datetime.utcnow())
+        utc_now = pytz.utc.localize(datetime.utcnow())
         local_now = datetime.now()
 
-        for zone_name in country_timezones("us"):
-            zone = timezone(zone_name)
+        for zone_name in pytz.country_timezones("us"):
+            zone = pytz.timezone(zone_name)
             # if this is my time zone
             # utc_now as local time should be VERY close to local_now
             if (
@@ -991,7 +1257,7 @@ class LegistarScraper:
             date using ev_date and time using ev_time
         """
         # 2021-07-09T00:00:00
-        d = datetime.strptime(ev_date, "%Y-%m-%dT%H:%M:%S")
+        d = datetime.strptime(ev_date, LEGISTAR_DATETIME_FORMAT)
         # 9:30 AM
         # some events may have ev_time =None
         if ev_time is not None:
@@ -1079,9 +1345,7 @@ class LegistarScraper:
         ingestion_models = []
 
         for legistar_ev in get_legistar_events_for_timespan(
-            self.client_name,
-            begin=begin,
-            end=end,
+            self.client_name, begin=begin, end=end
         ):
             # better to return time as local time with time zone info,
             # rather than as utc time.
@@ -1125,17 +1389,14 @@ class LegistarScraper:
             ingestion_models.append(
                 self.get_none_if_empty(
                     EventIngestionModel(
-                        external_source_id=legistar_ev[LEGISTAR_EV_EXT_ID],
+                        external_source_id=str(legistar_ev[LEGISTAR_EV_EXT_ID]),
                         agenda_uri=str_simplified(legistar_ev[LEGISTAR_AGENDA_URI]),
                         minutes_uri=str_simplified(legistar_ev[LEGISTAR_MINUTES_URI]),
                         sessions=sessions,
                         event_minutes_items=self.get_event_minutes(
                             legistar_ev[LEGISTAR_EV_ITEMS]
                         ),
-                        body=Body(
-                            external_source_id=legistar_ev[LEGISTAR_BODY_EXT_ID],
-                            name=str_simplified(legistar_ev[LEGISTAR_BODY_NAME]),
-                        ),
+                        body=self.get_body(legistar_ev[LEGISTAR_EV_BODY]),
                     )
                 )
             )
