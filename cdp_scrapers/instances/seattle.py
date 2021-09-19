@@ -3,7 +3,7 @@
 
 import logging
 import re
-from typing import Dict, List
+from typing import Dict, List, Optional
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
 
@@ -178,3 +178,49 @@ class SeattleScraper(LegistarScraper):
         if len(list_uri) == 0:
             log.debug(f"No video URI found on {video_page_url}")
         return list_uri
+
+    def get_seat_name(self, name: str) -> Optional[str]:
+        try:
+            # has table with all council members
+            with urlopen("https://seattle.legistar.com/MainBody.aspx") as resp:
+                soup = BeautifulSoup(resp.read(), "html.parser")
+        except URLError or HTTPError:
+            log.debug("Failed to open https://seattle.legistar.com/MainBody.aspx")
+            return None
+
+        # <tr id="ctl00_ContentPlaceHolder1_gridPeople_ctl00__0" ...>
+        #     <td class="rgSorted" style="white-space:nowrap;">
+        #         <a ...>Alex Pedersen</a>
+        #     </td>
+        #     <td>Councilmember<br /><em>Council Position No. 4</em></td>
+        #     <td>1/1/2020</td>
+        #     <td style="white-space:nowrap;">
+        #         <span ...>12/31/2023</span>
+        #     </td>
+        #     <td style="white-space:nowrap;">
+        #         <a ...>Alex.Pedersen@seattle.gov</a>
+        #     </td>
+        #     <td style="white-space:nowrap;">
+        #         <a ...>http://www.seat...ouncil/pedersen</a>
+        #     </td>
+        # </tr>
+        for tr in soup.find_all(
+            "tr",
+            # each row with this id in said table is for a council member
+            id=re.compile(r"ctl\d+_ContentPlaceHolder\d+_gridPeople_ctl\d+__\d+"),
+        ):
+            # row has the member's name
+            if tr.find(string=re.compile(name, re.IGNORECASE)):
+                try:
+                    # the td we want is the only one with both <br> and <em> tags
+                    # <td>Councilmember<br /><em>Council Position No. 4</em></td>
+                    # the seat is the <em>-phasized text
+                    return [
+                        td for td in tr.find_all("td")
+                        if td.find("br") is not None and td.find("em") is not None
+                    ][0].em.text
+                except IndexError:
+                    log.debug(f"no seat information parsed from {tr}")
+                    return None
+
+        return None
