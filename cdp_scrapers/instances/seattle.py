@@ -179,7 +179,8 @@ class SeattleScraper(LegistarScraper):
             log.debug(f"No video URI found on {video_page_url}")
         return list_uri
 
-    def get_seat_name(self, name: str) -> Optional[str]:
+    @staticmethod
+    def get_seat_name(name: str) -> Optional[str]:
         try:
             # has table with all council members
             with urlopen("https://seattle.legistar.com/MainBody.aspx") as resp:
@@ -224,3 +225,30 @@ class SeattleScraper(LegistarScraper):
                     return None
 
         return None
+
+    @staticmethod
+    def get_district_image() -> Optional[bytes]:
+        site_url = "https://www.seattle.gov/"
+        url = (
+            f"{site_url}/cityclerk/agendas-and-legislative-resources/"
+            "find-your-council-district"
+        )
+        try:
+            with urlopen(url) as resp:
+                soup = BeautifulSoup(resp.read(), "html.parser")
+        except (URLError, HTTPError):
+            log.debug(f"Failed to open {url}")
+            return None
+
+        try:
+            # <img alt="District Map" src="Images/Clerk/DistrictsMap.jpg" ...
+            img_url = site_url + soup.find("img", alt="District Map")["src"]
+        except (TypeError, KeyError):
+            return None
+
+        # finally return the byte data of the map image
+        try:
+            return urlopen(img_url).read()
+        except (URLError, HTTPError):
+            log.debug(f"Failed to download {img_url}")
+            return None
