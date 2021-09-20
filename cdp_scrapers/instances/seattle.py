@@ -9,6 +9,8 @@ from urllib.request import urlopen
 
 from bs4 import BeautifulSoup
 
+from cdp_backend.pipeline.ingestion_models import Person, Seat
+
 from ..legistar_utils import LEGISTAR_EV_SITE_URL, LegistarScraper
 from ..types import ContentURIs
 
@@ -185,7 +187,7 @@ class SeattleScraper(LegistarScraper):
         return list_uri
 
     @staticmethod
-    def get_seat_name(name: str) -> Optional[str]:
+    def get_static_person_info() -> List[Person]:
         try:
             # has table with all council members
             with urlopen("https://seattle.legistar.com/MainBody.aspx") as resp:
@@ -193,6 +195,8 @@ class SeattleScraper(LegistarScraper):
         except URLError or HTTPError:
             log.debug("Failed to open https://seattle.legistar.com/MainBody.aspx")
             return None
+
+        static_person_info: List[Person] = []
 
         # <tr id="ctl00_ContentPlaceHolder1_gridPeople_ctl00__0" ...>
         #     <td class="rgSorted" style="white-space:nowrap;">
@@ -215,44 +219,27 @@ class SeattleScraper(LegistarScraper):
             # each row with this id in said table is for a council member
             id=re.compile(r"ctl\d+_ContentPlaceHolder\d+_gridPeople_ctl\d+__\d+"),
         ):
-            # row has the member's name
-            if tr.find(string=re.compile(name, re.IGNORECASE)):
-                try:
-                    # the td we want is the only one with both <br> and <em> tags
-                    # <td>Councilmember<br /><em>Council Position No. 4</em></td>
-                    # the seat is the <em>-phasized text
-                    return [
-                        td
-                        for td in tr.find_all("td")
-                        if td.find("br") is not None and td.find("em") is not None
-                    ][0].em.text
-                except IndexError:
-                    log.debug(f"no seat information parsed from {tr}")
-                    return None
-
-        return None
-
-    @staticmethod
-    def get_all_seats() -> Optional[List[PersonSeat]]:
-        try:
-            # has table with all council members
-            with urlopen("https://seattle.legistar.com/MainBody.aspx") as resp:
-                soup = BeautifulSoup(resp.read(), "html.parser")
-        except URLError or HTTPError:
-            log.debug("Failed to open https://seattle.legistar.com/MainBody.aspx")
-            return None
-
-        return [
-            # i.string = "Alex Pedersen" in
-            # <a id="ct...hypPerson" ...>Alex Pedersen</a>
-            PersonSeat(i.string, SeattleScraper.get_seat_name(i.string))
-            for i in soup.find_all(
+            # <a> tag in this row with this id has full name
+            name = tr.find(
                 "a",
                 id=re.compile(
                     r"ctl\d*_ContentPlaceHolder\d*_gridPeople_ctl\d*_ctl\d*_hypPerson"
                 ),
-            )
-        ]
+            ).string
+
+            # <td> in this row with <br> and <em> has seat name
+            # row has the member's name, e.g.
+            # <td>Councilmember<br /><em>Council Position No. 4</em></td>
+            # the seat is the <em>-phasized text
+            seat = [
+                td
+                for td in tr.find_all("td")
+                if td.find("br") is not None and td.find("em") is not None
+            ][0].em.text
+
+            static_person_info.append(Person(name=name, seat=Seat(name=seat)))
+
+        return static_person_info
 
     @staticmethod
     def get_district_image_url() -> Optional[str]:
