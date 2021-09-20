@@ -3,7 +3,7 @@
 
 import logging
 import re
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, NamedTuple
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
 
@@ -17,6 +17,11 @@ from ..types import ContentURIs
 log = logging.getLogger(__name__)
 
 ###############################################################################
+
+
+class PersonSeat(NamedTuple):
+    name: str
+    seat: str
 
 
 class SeattleScraper(LegistarScraper):
@@ -217,7 +222,8 @@ class SeattleScraper(LegistarScraper):
                     # <td>Councilmember<br /><em>Council Position No. 4</em></td>
                     # the seat is the <em>-phasized text
                     return [
-                        td for td in tr.find_all("td")
+                        td
+                        for td in tr.find_all("td")
                         if td.find("br") is not None and td.find("em") is not None
                     ][0].em.text
                 except IndexError:
@@ -227,10 +233,32 @@ class SeattleScraper(LegistarScraper):
         return None
 
     @staticmethod
-    def get_district_image() -> Optional[bytes]:
+    def get_all_seats() -> Optional[List[PersonSeat]]:
+        try:
+            # has table with all council members
+            with urlopen("https://seattle.legistar.com/MainBody.aspx") as resp:
+                soup = BeautifulSoup(resp.read(), "html.parser")
+        except URLError or HTTPError:
+            log.debug("Failed to open https://seattle.legistar.com/MainBody.aspx")
+            return None
+
+        return [
+            # i.string = "Alex Pedersen" in
+            # <a id="ct...hypPerson" ...>Alex Pedersen</a>
+            PersonSeat(i.string, SeattleScraper.get_seat_name(i.string))
+            for i in soup.find_all(
+                "a",
+                id=re.compile(
+                    r"ctl\d*_ContentPlaceHolder\d*_gridPeople_ctl\d*_ctl\d*_hypPerson"
+                ),
+            )
+        ]
+
+    @staticmethod
+    def get_district_image_url() -> Optional[str]:
         site_url = "https://www.seattle.gov/"
         url = (
-            f"{site_url}/cityclerk/agendas-and-legislative-resources/"
+            f"{site_url}cityclerk/agendas-and-legislative-resources/"
             "find-your-council-district"
         )
         try:
@@ -242,13 +270,8 @@ class SeattleScraper(LegistarScraper):
 
         try:
             # <img alt="District Map" src="Images/Clerk/DistrictsMap.jpg" ...
-            img_url = site_url + soup.find("img", alt="District Map")["src"]
+            return site_url + soup.find("img", alt="District Map")["src"]
         except (TypeError, KeyError):
-            return None
+            pass
 
-        # finally return the byte data of the map image
-        try:
-            return urlopen(img_url).read()
-        except (URLError, HTTPError):
-            log.debug(f"Failed to download {img_url}")
-            return None
+        return None
