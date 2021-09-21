@@ -187,7 +187,61 @@ class SeattleScraper(LegistarScraper):
         return list_uri
 
     @staticmethod
+    def get_district_image_url() -> Optional[str]:
+        site_url = "https://www.seattle.gov/"
+        url = (
+            f"{site_url}cityclerk/agendas-and-legislative-resources/"
+            "find-your-council-district"
+        )
+        try:
+            with urlopen(url) as resp:
+                soup = BeautifulSoup(resp.read(), "html.parser")
+        except (URLError, HTTPError):
+            log.debug(f"Failed to open {url}")
+            return None
+
+        try:
+            # <img alt="District Map" src="Images/Clerk/DistrictsMap.jpg" ...
+            return site_url + soup.find("img", alt="District Map")["src"]
+        except (TypeError, KeyError):
+            pass
+
+        return None
+
+    @staticmethod
+    def get_person_picture_url(person_www: str) -> Optional[str]:
+        try:
+            # http://www.seattle.gov/council/pedersen
+            with urlopen(person_www) as resp:
+                soup = BeautifulSoup(resp.read(), "html.parser")
+        except URLError or HTTPError:
+            log.debug("Failed to open {person_www}")
+            return None
+
+        # <div class="featureWrapperShort" style="background-image:
+        # url('/assets/images/Council/Members/Pedersen/
+        # Councilmember-Alex-Pedersen_homepage-banner.jpg')"></div>
+        div = soup.find(
+            "div", class_="featureWrapperShort", style=re.compile(r"background\-image")
+        )
+        if not div:
+            return None
+
+        try:
+            # now get just the image uri '/assets/...'
+            return "http://www.seattle.gov/" + re.search(
+                r"url\('([^']+)", div["style"]
+            ).group(1)
+        except AttributeError:
+            pass
+
+        return None
+
+    @staticmethod
     def get_static_person_info() -> List[Person]:
+        # will be used for all seats. simple district boundaries map
+        district_map_url = SeattleScraper.get_district_image_url()
+
         try:
             # has table with all council members
             with urlopen("https://seattle.legistar.com/MainBody.aspx") as resp:
@@ -220,45 +274,65 @@ class SeattleScraper(LegistarScraper):
             id=re.compile(r"ctl\d+_ContentPlaceHolder\d+_gridPeople_ctl\d+__\d+"),
         ):
             # <a> tag in this row with this id has full name
-            name = tr.find(
-                "a",
-                id=re.compile(
-                    r"ctl\d*_ContentPlaceHolder\d*_gridPeople_ctl\d*_ctl\d*_hypPerson"
-                ),
-            ).string
+            try:
+                name = tr.find(
+                    "a",
+                    id=re.compile(
+                        r"ctl\d*_ContentPlaceHolder\d*"
+                        r"_gridPeople_ctl\d*_ctl\d*_hypPerson"
+                    ),
+                ).text
+            except AttributeError:
+                # find() returned None
+                continue
+
+            # <a> tag in this row with this id has url
+            # for web page with more info on this person
+            try:
+                person_picture_url = SeattleScraper.get_person_picture_url(
+                    tr.find(
+                        "a",
+                        id=re.compile(
+                            r"ctl\d*_ContentPlaceHolder\d*"
+                            r"_gridPeople_ctl\d*_ctl\d*_hypWebSite"
+                        ),
+                    )["href"]
+                )
+            except AttributeError:
+                # find() returned None
+                continue
 
             # <td> in this row with <br> and <em> has seat name
-            # row has the member's name, e.g.
             # <td>Councilmember<br /><em>Council Position No. 4</em></td>
             # the seat is the <em>-phasized text
-            seat = [
-                td
-                for td in tr.find_all("td")
-                if td.find("br") is not None and td.find("em") is not None
-            ][0].em.text
+            try:
+                seat = Seat(
+                    name=[
+                        td
+                        for td in tr.find_all("td")
+                        if td.find("br") is not None and td.find("em") is not None
+                    ][0].em.text
+                )
+            except IndexError:
+                # accessed 0-th item in an empty list []
+                continue
 
-            static_person_info.append(Person(name=name, seat=Seat(name=seat)))
+            # from "Council Position No. 4"
+            #     Seat.electoral_area: District 4
+            #     Seat.name: Position 4
+            # from "At-large Council Position No. 9"
+            #     Seat.electoral_area: At-large
+            #     Seat.name: Position 9
+
+            seat_number = seat.name.split()[-1]
+            seat.electoral_area = "District " + seat_number
+            if re.search("large", seat.name, re.IGNORECASE):
+                seat.electoral_area = seat.name.split()[0]
+
+            seat.name = "Position " + seat_number
+            seat.image_uri = district_map_url
+            static_person_info.append(
+                Person(name=name, picture_uri=person_picture_url, seat=seat)
+            )
 
         return static_person_info
-
-    @staticmethod
-    def get_district_image_url() -> Optional[str]:
-        site_url = "https://www.seattle.gov/"
-        url = (
-            f"{site_url}cityclerk/agendas-and-legislative-resources/"
-            "find-your-council-district"
-        )
-        try:
-            with urlopen(url) as resp:
-                soup = BeautifulSoup(resp.read(), "html.parser")
-        except (URLError, HTTPError):
-            log.debug(f"Failed to open {url}")
-            return None
-
-        try:
-            # <img alt="District Map" src="Images/Clerk/DistrictsMap.jpg" ...
-            return site_url + soup.find("img", alt="District Map")["src"]
-        except (TypeError, KeyError):
-            pass
-
-        return None
