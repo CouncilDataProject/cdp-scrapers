@@ -67,7 +67,7 @@ class SeattleScraper(LegistarScraper):
                 # Check for last char ":"
                 r".+:$",
             ],
-            known_persons=known_persons
+            known_persons=known_persons,
         )
 
     def get_content_uris(self, legistar_ev: Dict) -> List[ContentURIs]:
@@ -322,13 +322,15 @@ class SeattleScraper(LegistarScraper):
         ):
             # <a> tag in this row with this id has full name
             try:
-                name = str_simplified(tr.find(
-                    "a",
-                    id=re.compile(
-                        r"ctl\d*_ContentPlaceHolder\d*"
-                        r"_gridPeople_ctl\d*_ctl\d*_hypPerson"
-                    ),
-                ).text)
+                name = str_simplified(
+                    tr.find(
+                        "a",
+                        id=re.compile(
+                            r"ctl\d*_ContentPlaceHolder\d*"
+                            r"_gridPeople_ctl\d*_ctl\d*_hypPerson"
+                        ),
+                    ).text
+                )
             except AttributeError:
                 # find() returned None
                 continue
@@ -354,11 +356,13 @@ class SeattleScraper(LegistarScraper):
             # the seat is the <em>-phasized text
             try:
                 seat = Seat(
-                    name=str_simplified([
-                        td
-                        for td in tr.find_all("td")
-                        if td.find("br") is not None and td.find("em") is not None
-                    ][0].em.text)
+                    name=str_simplified(
+                        [
+                            td
+                            for td in tr.find_all("td")
+                            if td.find("br") is not None and td.find("em") is not None
+                        ][0].em.text
+                    )
                 )
             except IndexError:
                 # accessed 0-th item in an empty list []
@@ -412,5 +416,7 @@ class SeattleScraper(LegistarScraper):
             return False
 
         with open(file_path, "wt") as dump:
-            dump.write(json.dumps({STATIC_FILE_KEY_PERSONS: static_person_info}, indent=4))
+            dump.write(
+                json.dumps({STATIC_FILE_KEY_PERSONS: static_person_info}, indent=4)
+            )
         return True
