@@ -3,7 +3,9 @@
 
 import logging
 import re
-from typing import Dict, List, Optional, NamedTuple
+import json
+import os
+from typing import Dict, List, Optional
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
 
@@ -11,7 +13,7 @@ from bs4 import BeautifulSoup
 
 from cdp_backend.pipeline.ingestion_models import Person, Seat
 
-from ..legistar_utils import LEGISTAR_EV_SITE_URL, LegistarScraper
+from ..legistar_utils import LEGISTAR_EV_SITE_URL, LegistarScraper, str_simplified
 from ..types import ContentURIs
 
 ###############################################################################
@@ -20,10 +22,25 @@ log = logging.getLogger(__name__)
 
 ###############################################################################
 
+STATIC_FILE_KEY_PERSONS = "persons"
+STATIC_FILE_DEFAULT_PATH = "cdp_scrapers/instances/seattle-static.json"
 
-class PersonSeat(NamedTuple):
-    name: str
-    seat: str
+known_persons: Optional[Dict[str, Person]] = None
+
+# load long-term static data at file load-time
+if os.path.exists(STATIC_FILE_DEFAULT_PATH):
+    with open(STATIC_FILE_DEFAULT_PATH, "rb") as json_file:
+        static_data = json.load(json_file)
+
+    known_persons = {}
+    for name, person in static_data[STATIC_FILE_KEY_PERSONS].items():
+        known_persons[name] = Person.from_dict(person)
+
+
+if known_persons:
+    log.debug(f"loaded static data for {', '.join(known_persons.keys())}")
+
+###############################################################################
 
 
 class SeattleScraper(LegistarScraper):
@@ -50,6 +67,7 @@ class SeattleScraper(LegistarScraper):
                 # Check for last char ":"
                 r".+:$",
             ],
+            known_persons=known_persons
         )
 
     def get_content_uris(self, legistar_ev: Dict) -> List[ContentURIs]:
@@ -188,6 +206,15 @@ class SeattleScraper(LegistarScraper):
 
     @staticmethod
     def get_district_image_url() -> Optional[str]:
+        """
+        Return URL for a district map image used on seattle.gov
+        Shows all district boundaries
+
+        Returns
+        -------
+        Image URL: Optional[str]
+            District map image URL
+        """
         site_url = "https://www.seattle.gov/"
         url = (
             f"{site_url}cityclerk/agendas-and-legislative-resources/"
@@ -210,8 +237,20 @@ class SeattleScraper(LegistarScraper):
 
     @staticmethod
     def get_person_picture_url(person_www: str) -> Optional[str]:
+        """
+        Parse person_www and return banner image used on the web page
+
+        Parameters
+        ----------
+        person_www: str
+            e.g. http://www.seattle.gov/council/pedersen
+
+        Returns
+        -------
+        Image URL: Optional[str]
+            Full URL to banner image displayed on person_www
+        """
         try:
-            # http://www.seattle.gov/council/pedersen
             with urlopen(person_www) as resp:
                 soup = BeautifulSoup(resp.read(), "html.parser")
         except URLError or HTTPError:
@@ -238,7 +277,15 @@ class SeattleScraper(LegistarScraper):
         return None
 
     @staticmethod
-    def get_static_person_info() -> List[Person]:
+    def get_static_person_info() -> Optional[List[Person]]:
+        """
+        Return partial Persons with static long-term information
+        such as picture_uri, seat
+
+        Returns
+        -------
+        persons: Optional[List[Person]]
+        """
         # will be used for all seats. simple district boundaries map
         district_map_url = SeattleScraper.get_district_image_url()
 
@@ -275,13 +322,13 @@ class SeattleScraper(LegistarScraper):
         ):
             # <a> tag in this row with this id has full name
             try:
-                name = tr.find(
+                name = str_simplified(tr.find(
                     "a",
                     id=re.compile(
                         r"ctl\d*_ContentPlaceHolder\d*"
                         r"_gridPeople_ctl\d*_ctl\d*_hypPerson"
                     ),
-                ).text
+                ).text)
             except AttributeError:
                 # find() returned None
                 continue
@@ -307,11 +354,11 @@ class SeattleScraper(LegistarScraper):
             # the seat is the <em>-phasized text
             try:
                 seat = Seat(
-                    name=[
+                    name=str_simplified([
                         td
                         for td in tr.find_all("td")
                         if td.find("br") is not None and td.find("em") is not None
-                    ][0].em.text
+                    ][0].em.text)
                 )
             except IndexError:
                 # accessed 0-th item in an empty list []
@@ -324,10 +371,10 @@ class SeattleScraper(LegistarScraper):
             #     Seat.electoral_area: At-large
             #     Seat.name: Position 9
 
-            seat_number = seat.name.split()[-1]
+            seat_number = str_simplified(seat.name.split()[-1])
             seat.electoral_area = "District " + seat_number
             if re.search("large", seat.name, re.IGNORECASE):
-                seat.electoral_area = seat.name.split()[0]
+                seat.electoral_area = str_simplified(seat.name.split()[0])
 
             seat.name = "Position " + seat_number
             seat.image_uri = district_map_url
@@ -336,3 +383,34 @@ class SeattleScraper(LegistarScraper):
             )
 
         return static_person_info
+
+    @staticmethod
+    def dump_static_info(file_path: str) -> bool:
+        """
+        Save static data in json format
+
+        Parameters
+        ----------
+        file_path: str
+            Static data dump file path
+
+        Returns
+        -------
+        bool
+            True if some data was saved in file_path
+
+        See Also
+        --------
+        LegistarScraper.inject_known_data()
+        """
+        static_person_info = {}
+        for person in SeattleScraper.get_static_person_info():
+            # save this Person in json keyed by the name
+            static_person_info[person.name] = json.loads(person.to_json())
+
+        if not static_person_info:
+            return False
+
+        with open(file_path, "wt") as dump:
+            dump.write(json.dumps({STATIC_FILE_KEY_PERSONS: static_person_info}, indent=4))
+        return True
