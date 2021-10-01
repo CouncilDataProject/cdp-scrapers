@@ -507,7 +507,7 @@ class LegistarScraper:
         matter_rejected_pattern: str = r"rejected|dropped",
         minutes_item_decision_passed_pattern: str = r"pass",
         minutes_item_decision_failed_pattern: str = r"not|fail",
-        known_persons: Dict[str, Person] = None,
+        known_persons: Optional[Dict[str, Person]] = None,
     ):
         self.client_name: str = client
         self.timezone: pytz.timezone = pytz.timezone(timezone)
@@ -938,7 +938,12 @@ class LegistarScraper:
         --------
         get_legistar_person()
         """
-        if not legistar_person:
+        if (
+            not legistar_person
+            or not legistar_person[LEGISTAR_PERSON_NAME]
+            # have seen PersonFullName with something like "no sponsor required"
+            or re.search("no.*required", legistar_person[LEGISTAR_PERSON_NAME], re.I)
+        ):
             return None
 
         phone = str_simplified(legistar_person[LEGISTAR_PERSON_PHONE])
@@ -1334,16 +1339,7 @@ class LegistarScraper:
         except (TypeError, KeyError):
             return person
 
-        for attr in [
-            "email",
-            "is_active",
-            "name",
-            "phone",
-            "picture_uri",
-            "router_string",
-            "seat",
-            "website",
-        ]:
+        for attr in person.__dataclass_fields__.keys():
             # input person has new information so prefer that
             # over static long-term information
             setattr(person, attr, getattr(person, attr) or getattr(known_person, attr))
