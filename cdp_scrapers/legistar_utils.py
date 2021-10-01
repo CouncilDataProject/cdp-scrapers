@@ -483,6 +483,10 @@ class LegistarScraper:
         Regex pattern used to convert Legistar instance's minutes item failure to CDP
         constant value.
         Default: "not|fail"
+    known_persons: Optional[Dict[str, Person]]
+        Dictionary used to inject information into Persons in place of missing
+        attributes after dynamic scraping in get_events().
+        Default: None
 
     See Also
     --------
