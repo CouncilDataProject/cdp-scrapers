@@ -4,10 +4,10 @@
 import logging
 import re
 import json
-import os
 from typing import Dict, List, Optional
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
+from pathlib import Path
 
 from bs4 import BeautifulSoup
 
@@ -22,13 +22,30 @@ log = logging.getLogger(__name__)
 
 ###############################################################################
 
+seat_image_uris: Dict[int, str] = {
+    1: "https://uploads.visitseattle.org/2015/03/"
+    "AlkiBeach_NickHallPhotography-720x313.jpg",
+    2: "https://uploads.visitseattle.org/2015/03/Safeco_DavidNewman-720x313.jpg",
+    3: "https://uploads.visitseattle.org/2015/03/"
+    "NoguchiNeedle_DavidNewman-2-720x313.jpg",
+    4: "https://uploads.visitseattle.org/2015/03/"
+    "Suzzallo_Reading_Room_NicholasBoos-720x313.jpg",
+    5: "http://www.seattle.gov/images/Departments/SDOT/BridgeStairsProgram/"
+    "AerialRendering_2020.jpg",
+    6: "https://uploads.visitseattle.org/2015/03/"
+    "BallardFarmersMarket_kallu-2-720x313.jpg",
+    7: "https://uploads.visitseattle.org/2015/03/QueenAnne_LempelZiv-720x313.jpg",
+    8: "https://www.seattle.gov/Images/Clerk/DistrictsMap.jpg",
+    9: "https://www.seattle.gov/Images/Clerk/DistrictsMap.jpg",
+}
+
 STATIC_FILE_KEY_PERSONS = "persons"
-STATIC_FILE_DEFAULT_PATH = "cdp_scrapers/instances/seattle-static.json"
+STATIC_FILE_DEFAULT_PATH = Path(__file__).parent / "seattle-static.json"
 
 known_persons: Optional[Dict[str, Person]] = None
 
 # load long-term static data at file load-time
-if os.path.exists(STATIC_FILE_DEFAULT_PATH):
+if Path(STATIC_FILE_DEFAULT_PATH).exists():
     with open(STATIC_FILE_DEFAULT_PATH, "rb") as json_file:
         static_data = json.load(json_file)
 
@@ -205,37 +222,6 @@ class SeattleScraper(LegistarScraper):
         return list_uri
 
     @staticmethod
-    def get_district_image_url() -> Optional[str]:
-        """
-        Return URL for a district map image used on seattle.gov
-        Shows all district boundaries
-
-        Returns
-        -------
-        Image URL: Optional[str]
-            District map image URL
-        """
-        site_url = "https://www.seattle.gov/"
-        url = (
-            f"{site_url}cityclerk/agendas-and-legislative-resources/"
-            "find-your-council-district"
-        )
-        try:
-            with urlopen(url) as resp:
-                soup = BeautifulSoup(resp.read(), "html.parser")
-        except (URLError, HTTPError):
-            log.debug(f"Failed to open {url}")
-            return None
-
-        try:
-            # <img alt="District Map" src="Images/Clerk/DistrictsMap.jpg" ...
-            return site_url + soup.find("img", alt="District Map")["src"]
-        except (TypeError, KeyError):
-            pass
-
-        return None
-
-    @staticmethod
     def get_person_picture_url(person_www: str) -> Optional[str]:
         """
         Parse person_www and return banner image used on the web page
@@ -280,15 +266,11 @@ class SeattleScraper(LegistarScraper):
     def get_static_person_info() -> Optional[List[Person]]:
         """
         Return partial Persons with static long-term information
-        such as picture_uri, seat
 
         Returns
         -------
         persons: Optional[List[Person]]
         """
-        # will be used for all seats. simple district boundaries map
-        district_map_url = SeattleScraper.get_district_image_url()
-
         try:
             # has table with all council members
             with urlopen("https://seattle.legistar.com/MainBody.aspx") as resp:
@@ -375,13 +357,24 @@ class SeattleScraper(LegistarScraper):
             #     Seat.electoral_area: At-large
             #     Seat.name: Position 9
 
-            seat_number = str_simplified(seat.name.split()[-1])
-            seat.electoral_area = "District " + seat_number
-            if re.search("large", seat.name, re.IGNORECASE):
-                seat.electoral_area = str_simplified(seat.name.split()[0])
+            match = re.search(
+                r"(?P<atlarge>At.*large)?.*position.*(?P<position_num>\d+)",
+                seat.name,
+                re.IGNORECASE,
+            )
+            if match:
+                seat_number = match.group("position_num")
+                seat.electoral_area = f"District {seat_number}"
+                if match.group("atlarge"):
+                    seat.electoral_area = str_simplified(match.group("atlarge"))
 
-            seat.name = "Position " + seat_number
-            seat.image_uri = district_map_url
+                seat.name = f"Position {seat_number}"
+                try:
+                    seat.image_uri = seat_image_uris[int(seat_number)]
+                except KeyError:
+                    # don't have image url for this district in seat_image_uris
+                    pass
+
             static_person_info.append(
                 Person(name=name, picture_uri=person_picture_url, seat=seat)
             )
