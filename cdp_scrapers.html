@@ -137,7 +137,7 @@
 <span id="cdp-scrapers-legistar-utils-module"></span><h2>cdp_scrapers.legistar_utils module<a class="headerlink" href="#module-cdp_scrapers.legistar_utils" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">cdp_scrapers.legistar_utils.</span></span><span class="sig-name descname"><span class="pre">LegistarScraper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timezone</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_minutes_item_patterns</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_approve_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'approve|favor|yes'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_abstain_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'abstain|refuse|refrain'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_reject_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'reject|oppose|no'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_absent_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'absent'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_nonvoting_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'nv|(?:non.*voting)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matter_adopted_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'approved|confirmed|passed|adopted|consent|(?:voted.*com+it+ee)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matter_in_progress_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'heard|read|filed|held|(?:in.*com+it+ee)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matter_rejected_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'rejected|dropped'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minutes_item_decision_passed_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'pass'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minutes_item_decision_failed_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'not|fail'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">cdp_scrapers.legistar_utils.</span></span><span class="sig-name descname"><span class="pre">LegistarScraper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timezone</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_minutes_item_patterns</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_approve_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'approve|favor|yes'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_abstain_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'abstain|refuse|refrain'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_reject_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'reject|oppose|no'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_absent_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'absent'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_nonvoting_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'nv|(?:non.*voting)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matter_adopted_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'approved|confirmed|passed|adopted|consent|(?:voted.*com+it+ee)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matter_in_progress_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'heard|read|filed|held|(?:in.*com+it+ee)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matter_rejected_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'rejected|dropped'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minutes_item_decision_passed_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'pass'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minutes_item_decision_failed_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'not|fail'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">known_persons</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">cdp_backend.pipeline.ingestion_models.Person</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Base class for transforming Legistar API data to CDP IngestionModel.</p>
 <p>If get_events() naively fails and raises an error, a given installation must define
@@ -187,6 +187,9 @@ Default: “pass”</p></li>
 <li><p><strong>minutes_item_decision_failed_pattern</strong> (<em>str</em>) – Regex pattern used to convert Legistar instance’s minutes item failure to CDP
 constant value.
 Default: “not|fail”</p></li>
+<li><p><strong>known_persons</strong> (<em>Optional[Dict[str, Person]]</em>) – Dictionary used to inject information into Persons in place of missing
+attributes after dynamic scraping in get_events().
+Default: None</p></li>
 </ul>
 </dd>
 </dl>
@@ -594,6 +597,43 @@ None if empty list or missing information.</p>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.inject_known_data">
+<span class="sig-name descname"><span class="pre">inject_known_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">events</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.EventIngestionModel</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.EventIngestionModel</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.inject_known_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.inject_known_data" title="Permalink to this definition"></a></dt>
+<dd><p>Augment with long-term static data that changes very infrequently.
+e.e. self.known_persons which includes Person.picture_uri, Person.seat</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>events</strong> – Returned events from get_events()</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>events</strong> – Input events with static information possibly injected</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>List[EventIngestionModel]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.inject_known_person">
+<span class="sig-name descname"><span class="pre">inject_known_person</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">person</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">cdp_backend.pipeline.ingestion_models.Person</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">cdp_backend.pipeline.ingestion_models.Person</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.inject_known_person"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.inject_known_person" title="Permalink to this definition"></a></dt>
+<dd><p>Inject information from self.known_persons
+if person exists in the dictionary for long-term static data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>person</strong> (<em>Person</em>) – Person into which to inject data from known_persons</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Input person updated with more information
+or as-is if person not found in known_persons</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Person</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.is_legistar_compatible">
 <em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">is_legistar_compatible</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.is_legistar_compatible" title="Permalink to this definition"></a></dt>
@@ -649,7 +689,7 @@ tzinfo is now provided.</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p>known_bodies cache is cleared for every LegistarScraper.get_events() call</p>
+<p>known_legistar_bodies cache is cleared for every LegistarScraper.get_events() call</p>
 </dd></dl>
 
 <dl class="py function">
@@ -699,7 +739,7 @@ and requests person information for any vote.</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p>known_persons cache is cleared for every LegistarScraper.get_events() call</p>
+<p>known_legistar_persons cache is cleared for every LegistarScraper.get_events() call</p>
 </dd></dl>
 
 <dl class="py function">

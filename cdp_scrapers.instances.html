@@ -195,6 +195,27 @@ from GitHub Actions UI.</p>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="cdp_scrapers.instances.seattle.SeattleScraper.dump_static_info">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">dump_static_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/seattle.html#SeattleScraper.dump_static_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.seattle.SeattleScraper.dump_static_info" title="Permalink to this definition"></a></dt>
+<dd><p>Save static data in json format</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file_path</strong> (<em>str</em>) – Static data dump file path</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if some data was saved in file_path</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">LegistarScraper.inject_known_data</span></code></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.instances.seattle.SeattleScraper.get_content_uris">
 <span class="sig-name descname"><span class="pre">get_content_uris</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">legistar_ev</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.types.ContentURIs" title="cdp_scrapers.types.ContentURIs"><span class="pre">cdp_scrapers.types.ContentURIs</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/seattle.html#SeattleScraper.get_content_uris"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.seattle.SeattleScraper.get_content_uris" title="Permalink to this definition"></a></dt>
 <dd><p>Return URLs for videos and captions parsed from seattlechannel.org web page</p>
@@ -213,6 +234,37 @@ from GitHub Actions UI.</p>
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.get_legistar_events_for_timespan" title="cdp_scrapers.legistar_utils.get_legistar_events_for_timespan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdp_scrapers.legistar_utils.get_legistar_events_for_timespan</span></code></a></p>
 </div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cdp_scrapers.instances.seattle.SeattleScraper.get_person_picture_url">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_person_picture_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">person_www</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/seattle.html#SeattleScraper.get_person_picture_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.seattle.SeattleScraper.get_person_picture_url" title="Permalink to this definition"></a></dt>
+<dd><p>Parse person_www and return banner image used on the web page</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>person_www</strong> (<em>str</em>) – e.g. <a class="reference external" href="http://www.seattle.gov/council/pedersen">http://www.seattle.gov/council/pedersen</a></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>Image URL</strong> – Full URL to banner image displayed on person_www</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Optional[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cdp_scrapers.instances.seattle.SeattleScraper.get_static_person_info">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_static_person_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.Person</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/seattle.html#SeattleScraper.get_static_person_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.seattle.SeattleScraper.get_static_person_info" title="Permalink to this definition"></a></dt>
+<dd><p>Return partial Persons with static long-term information</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>persons</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Optional[List[Person]]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
