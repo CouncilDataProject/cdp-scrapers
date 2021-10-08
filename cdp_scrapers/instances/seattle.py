@@ -22,23 +22,6 @@ log = logging.getLogger(__name__)
 
 ###############################################################################
 
-seat_image_uris: Dict[int, str] = {
-    1: "https://uploads.visitseattle.org/2015/03/"
-    "AlkiBeach_NickHallPhotography-720x313.jpg",
-    2: "https://uploads.visitseattle.org/2015/03/Safeco_DavidNewman-720x313.jpg",
-    3: "https://uploads.visitseattle.org/2015/03/"
-    "NoguchiNeedle_DavidNewman-2-720x313.jpg",
-    4: "https://uploads.visitseattle.org/2015/03/"
-    "Suzzallo_Reading_Room_NicholasBoos-720x313.jpg",
-    5: "http://www.seattle.gov/images/Departments/SDOT/BridgeStairsProgram/"
-    "AerialRendering_2020.jpg",
-    6: "https://uploads.visitseattle.org/2015/03/"
-    "BallardFarmersMarket_kallu-2-720x313.jpg",
-    7: "https://uploads.visitseattle.org/2015/03/QueenAnne_LempelZiv-720x313.jpg",
-    8: "https://www.seattle.gov/Images/Clerk/DistrictsMap.jpg",
-    9: "https://www.seattle.gov/Images/Clerk/DistrictsMap.jpg",
-}
-
 STATIC_FILE_KEY_PERSONS = "persons"
 STATIC_FILE_DEFAULT_PATH = Path(__file__).parent / "seattle-static.json"
 
@@ -366,14 +349,9 @@ class SeattleScraper(LegistarScraper):
                 seat_number = match.group("position_num")
                 seat.electoral_area = f"District {seat_number}"
                 if match.group("atlarge"):
-                    seat.electoral_area = str_simplified(match.group("atlarge"))
+                    seat.electoral_area = "Citywide"
 
                 seat.name = f"Position {seat_number}"
-                try:
-                    seat.image_uri = seat_image_uris[int(seat_number)]
-                except KeyError:
-                    # don't have image url for this district in seat_image_uris
-                    pass
 
             static_person_info.append(
                 Person(name=name, picture_uri=person_picture_url, seat=seat)
