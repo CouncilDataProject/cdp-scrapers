@@ -1348,17 +1348,6 @@ class LegistarScraper:
             # over static long-term information
             setattr(person, attr, getattr(person, attr) or getattr(known_person, attr))
 
-        # now that we have seat from static hard-coded data
-        # we can bring in seat.roles (OfficeRecords from Legistar API)
-        if person.seat and not person.seat.roles:
-            person.seat.roles = self.get_roles(
-                get_legistar_person(
-                    client=self.client_name,
-                    person_id=person.external_source_id,
-                    use_cache=True,
-                )[LEGISTAR_PERSON_ROLES]
-            )
-
         return person
 
     def inject_known_data(
@@ -1390,20 +1379,18 @@ class LegistarScraper:
             # EventMinutesItem.votes.person
             for minute_item in event.event_minutes_items:
                 if minute_item.matter and minute_item.matter.sponsors:
-                    minute_item.matter.sponsors = [
-                        self.inject_known_person(sponsor)
-                        for sponsor in minute_item.matter.sponsors
-                    ]
-                if minute_item.votes:
-                    minute_item.votes = [
-                        Vote(
-                            decision=vote.decision,
-                            external_source_id=vote.external_source_id,
-                            person=self.inject_known_person(vote.person),
-                        )
-                        for vote in minute_item.votes
-                    ]
+                    for sponsor in minute_item.matter.sponsors:
+                        sponsor = self.inject_known_person(sponsor)
 
+                if minute_item.votes:
+                    for vote in minute_item.votes:
+                        vote.person = self.inject_known_person(vote.person)
+
+        return events
+
+    def post_process_ingestion_models(
+        self, events: List[EventIngestionModel]
+    ) -> List[EventIngestionModel]:
         return events
 
     def get_events(
@@ -1501,6 +1488,7 @@ class LegistarScraper:
         # so request reduced_list() to give me [], not None
         events = reduced_list(ingestion_models, collapse=False)
         events = self.inject_known_data(events)
+        events = self.post_process_ingestion_models(events)
 
         return events
 

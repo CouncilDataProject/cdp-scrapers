@@ -11,9 +11,19 @@ from pathlib import Path
 
 from bs4 import BeautifulSoup
 
-from cdp_backend.pipeline.ingestion_models import Person, Seat
+from cdp_backend.pipeline.ingestion_models import (
+    Person,
+    Seat,
+    EventIngestionModel,
+)
 
-from ..legistar_utils import LEGISTAR_EV_SITE_URL, LegistarScraper, str_simplified
+from ..legistar_utils import (
+    LEGISTAR_EV_SITE_URL,
+    LEGISTAR_PERSON_ROLES,
+    LegistarScraper,
+    str_simplified,
+    get_legistar_person,
+)
 from ..types import ContentURIs
 
 ###############################################################################
@@ -203,6 +213,40 @@ class SeattleScraper(LegistarScraper):
         if len(list_uri) == 0:
             log.debug(f"No video URI found on {video_page_url}")
         return list_uri
+
+    def set_person_roles(self, person: Person) -> Person:
+        # we can now bring in seat.roles (OfficeRecords from Legistar API) because
+        # this is called after inject_known_data(), so we know about Person.seat
+        if person and person.seat and not person.seat.roles:
+            person.seat.roles = self.get_roles(
+                get_legistar_person(
+                    client=self.client_name,
+                    person_id=person.external_source_id,
+                    use_cache=True,
+                )[LEGISTAR_PERSON_ROLES]
+            )
+
+        return person
+
+    def post_process_ingestion_models(
+        self, events: List[EventIngestionModel]
+    ) -> List[EventIngestionModel]:
+        for event in events:
+            if not event.event_minutes_items:
+                continue
+            # 2 places for Person:
+            # EventMinutesItem.matter.sponsors
+            # EventMinutesItem.votes.person
+            for minute_item in event.event_minutes_items:
+                if minute_item.matter and minute_item.matter.sponsors:
+                    for sponsor in minute_item.matter.sponsors:
+                        sponsor = self.set_person_roles(sponsor)
+
+                if minute_item.votes:
+                    for vote in minute_item.votes:
+                        vote.person = self.set_person_roles(vote.person)
+
+        return events
 
     @staticmethod
     def get_person_picture_url(person_www: str) -> Optional[str]:
