@@ -1348,6 +1348,17 @@ class LegistarScraper:
             # over static long-term information
             setattr(person, attr, getattr(person, attr) or getattr(known_person, attr))
 
+        # now that we have seat from static hard-coded data
+        # we can bring in seat.roles (OfficeRecords from Legistar API)
+        if person.seat and not person.seat.roles:
+            person.seat.roles = self.get_roles(
+                get_legistar_person(
+                    client=self.client_name,
+                    person_id=person.external_source_id,
+                    use_cache=True,
+                )[LEGISTAR_PERSON_ROLES]
+            )
+
         return person
 
     def inject_known_data(
@@ -1391,6 +1402,20 @@ class LegistarScraper:
     def post_process_ingestion_models(
         self, events: List[EventIngestionModel]
     ) -> List[EventIngestionModel]:
+        """
+        Called at the end of get_events() for fully custom site-specific prcessing.
+        inject_known_data() already operated on input events.
+
+        Parameters
+        ----------
+        events:
+            Returned events from get_events()
+
+        Returns
+        -------
+        events: List[EventIngestionModel]
+            Base implementation simply returns input events as-is
+        """
         return events
 
     def get_events(
