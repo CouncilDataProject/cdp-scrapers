@@ -7,13 +7,20 @@ import json
 from typing import Dict, List, Optional
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
+from urllib.parse import urlsplit, parse_qs, quote_plus
 from pathlib import Path
+from datetime import datetime
 
 from bs4 import BeautifulSoup
 
 from cdp_backend.pipeline.ingestion_models import Person, Seat
 
-from ..legistar_utils import LEGISTAR_EV_SITE_URL, LegistarScraper, str_simplified
+from ..legistar_utils import (
+    LEGISTAR_EV_SITE_URL,
+    LEGISTAR_SESSION_DATE,
+    LegistarScraper,
+    str_simplified,
+)
 from ..types import ContentURIs
 
 ###############################################################################
@@ -70,14 +77,14 @@ class SeattleScraper(LegistarScraper):
             known_persons=known_persons,
         )
 
-    def get_content_uris(self, legistar_ev: Dict) -> List[ContentURIs]:
+    def parse_content_uris(self, video_page_url: str) -> List[ContentURIs]:
         """
         Return URLs for videos and captions parsed from seattlechannel.org web page
 
         Parameters
         ----------
-        legistar_ev: Dict
-            Data for one Legistar Event.
+        video_page_url: str
+            URL to a web page for a particular meeting video
 
         Returns
         -------
@@ -86,30 +93,8 @@ class SeattleScraper(LegistarScraper):
 
         See Also
         --------
-        cdp_scrapers.legistar_utils.get_legistar_events_for_timespan
+        get_content_uris()
         """
-        try:
-            # a td tag with a certain id pattern containing url to video
-            with urlopen(legistar_ev[LEGISTAR_EV_SITE_URL]) as resp:
-                soup = BeautifulSoup(resp.read(), "html.parser")
-        except URLError or HTTPError:
-            log.debug(f"Failed to open {legistar_ev[LEGISTAR_EV_SITE_URL]}")
-            return []
-
-        try:
-            # this gets us the url for the web PAGE containing the video
-            video_page_url = soup.find(
-                "a",
-                id=re.compile(r"ct\S*_ContentPlaceHolder\S*_hypVideo"),
-                class_="videolink",
-            )["href"]
-        # catch if find() didn't find video web page url (no <a id=... href=.../>)
-        except KeyError:
-            log.debug("No URL for video page on {legistar_ev[LEGISTAR_EV_SITE_URL]}")
-            return []
-
-        log.debug(f"{legistar_ev[LEGISTAR_EV_SITE_URL]} -> {video_page_url}")
-
         try:
             with urlopen(video_page_url) as resp:
                 # now load the page to get the actual video url
@@ -203,6 +188,178 @@ class SeattleScraper(LegistarScraper):
         if len(list_uri) == 0:
             log.debug(f"No video URI found on {video_page_url}")
         return list_uri
+
+    @staticmethod
+    def roman_to_int(roman: str):
+        """
+        Roman numeral to an integer
+
+        Parameters
+        ----------
+        roman: str
+            Roman numeral string
+
+        Returns
+        -------
+        int
+            Input roman numeral as integer
+
+        References
+        ----------
+        https://www.w3resource.com/python-exercises/class-exercises/python-class-exercise-2.php
+        """
+        rom_val = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100, "D": 500, "M": 1000}
+        int_val = 0
+        for i in range(len(roman)):
+            if i > 0 and rom_val[roman[i]] > rom_val[roman[i - 1]]:
+                int_val += rom_val[roman[i]] - 2 * rom_val[roman[i - 1]]
+            else:
+                int_val += rom_val[roman[i]]
+        return int_val
+
+    def get_video_page_urls(
+        self, legistar_ev: Dict, video_list_page_url: str
+    ) -> List[str]:
+        """
+        Return URLs to web pages containing videos
+        for the meeting described in legistar_ev
+
+        Parameters
+        ----------
+        legistar_ev: Dict
+            Data for one Legistar Event.
+
+        video_list_page_url: str
+            URL to web page listing videos featuring the responsible group/body
+            for the event described in legistar_ev.
+            This is the "Video" button link from the meeting's details web page.
+
+        Returns
+        -------
+        video_page_urls: List[str]
+            web page URL per video
+
+        See Also
+        --------
+        get_content_uris()
+        """
+        event_date = datetime.fromisoformat(
+            legistar_ev[LEGISTAR_SESSION_DATE]
+        ).strftime("%m/%d/%y")
+
+        # request list of videos for this group on this event's date
+        with urlopen(
+            # this is the query sent by the "filter" button on the web page
+            f"{video_list_page_url}&filterTerm={quote_plus(event_date)}"
+            "&itemsPerPage=25&toggleDisplay=Thumbnail_Excerpt"
+        ) as resp:
+            response = resp.read()
+
+        # <div class="paginationContainer">
+        #     <div class="row borderBottomNone paginationItem">
+        #         <div class="col-xs-12 col-sm-4 col-md-3">
+        #                     <a href='/BudgetCommittee?videoid=x132213'... </a>
+        #         </div>
+        #         <div class="col-xs-12 col-sm-8 col-md-9">
+        #             <div class="titleDateContainer">
+        #                 <h2 class="paginationTitle">
+        #                     <a href="/BudgetCommittee?videoid=x132213" ... </a>
+        #             </h2>
+        #                     <div class="videoDate">10/14/2021</div>
+        #         </div>
+        #         <div class="titleExcerptText"><p><em>Pursuant to Washington ... </div>
+        #     </div>
+        # </div>
+        #    <div class="row borderBottomNone paginationItem">
+
+        session_video_page_urls: Dict[int, str] = {}
+
+        # want <a> tag in the <div> with
+        # title attribute that contains the event date and "session #"
+        # and onclick attribute that calls loadJWPlayer
+
+        soup = BeautifulSoup(response, "html.parser")
+        for link in soup.find("div", class_="paginationContainer",).find_all(
+            "a",
+            onclick=re.compile("loadJWPlayer"),
+            title=re.compile(event_date),
+        ):
+            match = re.search(
+                r"session\s(?P<base_ten>\d*)(?P<roman>[a-z]*)",
+                link["title"],
+                re.IGNORECASE,
+            )
+            if match:
+                if match.group("base_ten"):
+                    session_video_page_urls[
+                        int(match.group("base_ten"))
+                    ] = f"https://www.seattlechannel.org{link['href']}"
+                elif match.group("roman"):
+                    session_video_page_urls[
+                        int(SeattleScraper.roman_to_int(match.group("roman")))
+                    ] = f"https://www.seattlechannel.org{link['href']}"
+
+        # ordered by session number
+        return [
+            session_video_page_urls[session]
+            for session in sorted(session_video_page_urls.keys())
+        ]
+
+    def get_content_uris(self, legistar_ev: Dict) -> List[ContentURIs]:
+        """
+        Return URLs for videos and captions parsed from seattlechannel.org web page
+
+        Parameters
+        ----------
+        legistar_ev: Dict
+            Data for one Legistar Event.
+
+        Returns
+        -------
+        content_uris: List[ContentURIs]
+            List of ContentURIs objects for each session found.
+
+        See Also
+        --------
+        cdp_scrapers.legistar_utils.get_legistar_events_for_timespan
+        """
+        try:
+            # a td tag with a certain id pattern containing url to video
+            with urlopen(legistar_ev[LEGISTAR_EV_SITE_URL]) as resp:
+                soup = BeautifulSoup(resp.read(), "html.parser")
+        except URLError or HTTPError:
+            log.debug(f"Failed to open {legistar_ev[LEGISTAR_EV_SITE_URL]}")
+            return []
+
+        try:
+            # this gets us the url for the web PAGE containing the video
+            video_page_url = soup.find(
+                "a",
+                id=re.compile(r"ct\S*_ContentPlaceHolder\S*_hypVideo"),
+                class_="videolink",
+            )["href"]
+        # catch if find() didn't find video web page url (no <a id=... href=.../>)
+        except KeyError:
+            log.debug("No URL for video page on {legistar_ev[LEGISTAR_EV_SITE_URL]}")
+            return []
+
+        log.debug(f"{legistar_ev[LEGISTAR_EV_SITE_URL]} -> {video_page_url}")
+
+        try:
+            if parse_qs(urlsplit(video_page_url).query)["videoid"]:
+                # video link contains specific videoid
+                return self.parse_content_uris(video_page_url)
+        except KeyError:
+            # video_page_url has no videoid or videoid has no value
+            pass
+
+        return [
+            uris
+            # 1 web page per session video for this multi-session event
+            for video_page_url in self.get_video_page_urls(legistar_ev, video_page_url)
+            # video and caption urls on the session video web page
+            for uris in self.parse_content_uris(video_page_url)
+        ]
 
     @staticmethod
     def get_person_picture_url(person_www: str) -> Optional[str]:
