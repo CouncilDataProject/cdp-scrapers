@@ -77,9 +77,7 @@ class SeattleScraper(LegistarScraper):
             known_persons=known_persons,
         )
 
-    def parse_content_uris(
-        self, video_page_url: str, event_short_date: str
-    ) -> List[ContentURIs]:
+    def parse_content_uris(self, video_page_url: str) -> List[ContentURIs]:
         """
         Return URLs for videos and captions parsed from seattlechannel.org web page
 
@@ -87,9 +85,6 @@ class SeattleScraper(LegistarScraper):
         ----------
         video_page_url: str
             URL to a web page for a particular meeting video
-
-        event_short_date: str
-            datetime representing the meeting's date, used for verification m/d/yy
 
         Returns
         -------
@@ -132,17 +127,6 @@ class SeattleScraper(LegistarScraper):
         video_script_text = soup.find(
             "script", text=re.compile(r"playerInstance\.setup")
         ).string
-
-        # halt if event date not in video's idstring
-        # likely means some change on video web page source / script
-
-        # e.g. idstring:'Select Budget Committee Session II 10/14/21'
-        #      idstring:'City Council 10/11/21'
-        if not re.search(f"idstring:.+{event_short_date}.+", video_script_text):
-            raise ValueError(
-                f"event date {event_short_date} not in video idstring.\n"
-                f"{video_page_url} may be for a different event's video.\n"
-            )
 
         # playerSetup({...
         #             ^
@@ -228,27 +212,27 @@ class SeattleScraper(LegistarScraper):
         int_val = 0
         for i in range(len(roman)):
             if i > 0 and rom_val[roman[i]] > rom_val[roman[i - 1]]:
-                # subtract twice the i-1 th number since it has already been added
                 int_val += rom_val[roman[i]] - 2 * rom_val[roman[i - 1]]
             else:
                 int_val += rom_val[roman[i]]
         return int_val
 
     def get_video_page_urls(
-        self, video_list_page_url: str, event_short_date: str
+        self, legistar_ev: Dict, video_list_page_url: str
     ) -> List[str]:
         """
-        Return URLs to web pages hosting videos for meetings from event_short_date
+        Return URLs to web pages containing videos
+        for the meeting described in legistar_ev
 
         Parameters
         ----------
+        legistar_ev: Dict
+            Data for one Legistar Event.
+
         video_list_page_url: str
             URL to web page listing videos featuring the responsible group/body
             for the event described in legistar_ev.
-            e.g. http://www.seattlechannel.org/BudgetCommittee?Mode2=Video
-
-        event_short_date: str
-            datetime representing the meeting's date m/d/yy
+            This is the "Video" button link from the meeting's details web page.
 
         Returns
         -------
@@ -259,10 +243,14 @@ class SeattleScraper(LegistarScraper):
         --------
         get_content_uris()
         """
+        event_date = datetime.fromisoformat(
+            legistar_ev[LEGISTAR_SESSION_DATE]
+        ).strftime("%m/%d/%y")
+
         # request list of videos for this group on this event's date
         with urlopen(
             # this is the query sent by the "filter" button on the web page
-            f"{video_list_page_url}&filterTerm={quote_plus(event_short_date)}"
+            f"{video_list_page_url}&filterTerm={quote_plus(event_date)}"
             "&itemsPerPage=25&toggleDisplay=Thumbnail_Excerpt"
         ) as resp:
             response = resp.read()
@@ -287,35 +275,28 @@ class SeattleScraper(LegistarScraper):
         session_video_page_urls: Dict[int, str] = {}
 
         # want <a> tag in the <div> with
-        # title attribute that contains the event date,
-        # onclick attribute that calls loadJWPlayer,
-        # href attribute that contains videoid
+        # title attribute that contains the event date and "session #"
+        # and onclick attribute that calls loadJWPlayer
 
         soup = BeautifulSoup(response, "html.parser")
         for link in soup.find("div", class_="paginationContainer",).find_all(
             "a",
-            href=re.compile("videoid"),
             onclick=re.compile("loadJWPlayer"),
-            title=re.compile(event_short_date),
+            title=re.compile(event_date),
         ):
-            # e.g. "Session I mm/dd/yy"
             match = re.search(
-                r"session\s(?P<session_int>\d*)(?P<session_roman>[IVXLCDM]*)",
+                r"session\s(?P<base_ten>\d*)(?P<roman>[a-z]*)",
                 link["title"],
                 re.IGNORECASE,
             )
             if match:
-                if match.group("session_int"):
+                if match.group("base_ten"):
                     session_video_page_urls[
-                        int(match.group("session_int"))
+                        int(match.group("base_ten"))
                     ] = f"https://www.seattlechannel.org{link['href']}"
-                elif match.group("session_roman"):
+                elif match.group("roman"):
                     session_video_page_urls[
-                        int(SeattleScraper.roman_to_int(match.group("session_roman")))
-                    ] = f"https://www.seattlechannel.org{link['href']}"
-                else:
-                    session_video_page_urls[
-                        len(session_video_page_urls)
+                        int(SeattleScraper.roman_to_int(match.group("roman")))
                     ] = f"https://www.seattlechannel.org{link['href']}"
 
         # ordered by session number
@@ -357,37 +338,27 @@ class SeattleScraper(LegistarScraper):
                 id=re.compile(r"ct\S*_ContentPlaceHolder\S*_hypVideo"),
                 class_="videolink",
             )["href"]
-            log.debug(f"{legistar_ev[LEGISTAR_EV_SITE_URL]} -> {video_page_url}")
         # catch if find() didn't find video web page url (no <a id=... href=.../>)
         except KeyError:
             log.debug("No URL for video page on {legistar_ev[LEGISTAR_EV_SITE_URL]}")
             return []
 
-        event_short_date = datetime.fromisoformat(legistar_ev[LEGISTAR_SESSION_DATE])
-        # want no leading zero for month and day
-        event_short_date = (
-            f"{event_short_date.month}/"
-            f"{event_short_date.day}/"
-            f"{event_short_date.strftime('%y')}"
-        )
+        log.debug(f"{legistar_ev[LEGISTAR_EV_SITE_URL]} -> {video_page_url}")
 
         try:
             if parse_qs(urlsplit(video_page_url).query)["videoid"]:
                 # video link contains specific videoid
-                return self.parse_content_uris(video_page_url, event_short_date)
+                return self.parse_content_uris(video_page_url)
         except KeyError:
             # video_page_url has no videoid or videoid has no value
             pass
 
-        # at this point video_page_url points to generic video list page like
-        # http://www.seattlechannel.org/BudgetCommittee?Mode2=Video
-
         return [
             uris
             # 1 web page per session video for this multi-session event
-            for page_url in self.get_video_page_urls(video_page_url, event_short_date)
+            for video_page_url in self.get_video_page_urls(legistar_ev, video_page_url)
             # video and caption urls on the session video web page
-            for uris in self.parse_content_uris(page_url, event_short_date)
+            for uris in self.parse_content_uris(video_page_url)
         ]
 
     @staticmethod
