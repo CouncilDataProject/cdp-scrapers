@@ -298,7 +298,7 @@ class SeattleScraper(LegistarScraper):
             onclick=re.compile("loadJWPlayer"),
             title=re.compile(event_short_date),
         ):
-            # e.g. "Session I mm/dd/yy"
+            # e.g. "Session I m/d/yy"
             match = re.search(
                 r"session\s(?P<session_int>\d*)(?P<session_roman>[IVXLCDM]*)",
                 link["title"],
@@ -340,7 +340,7 @@ class SeattleScraper(LegistarScraper):
 
         See Also
         --------
-        cdp_scrapers.legistar_utils.get_legistar_events_for_timespan
+        parse_content_uris()
         """
         try:
             # a td tag with a certain id pattern containing url to video
@@ -364,7 +364,7 @@ class SeattleScraper(LegistarScraper):
             return []
 
         event_short_date = datetime.fromisoformat(legistar_ev[LEGISTAR_SESSION_DATE])
-        # want no leading zero for month and day
+        # want no leading zero for month or day
         event_short_date = (
             f"{event_short_date.month}/"
             f"{event_short_date.day}/"
@@ -376,7 +376,6 @@ class SeattleScraper(LegistarScraper):
                 # video link contains specific videoid
                 return self.parse_content_uris(video_page_url, event_short_date)
         except KeyError:
-            # video_page_url has no videoid or videoid has no value
             pass
 
         # at this point video_page_url points to generic video list page like
