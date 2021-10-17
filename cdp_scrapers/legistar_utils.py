@@ -1269,7 +1269,7 @@ class LegistarScraper:
             date using ev_date and time using ev_time
         """
         # 2021-07-09T00:00:00
-        d = datetime.fromisoformat(ev_date)
+        d = datetime.strptime(ev_date, LEGISTAR_DATETIME_FORMAT)
         # 9:30 AM
         # some events may have ev_time =None
         if ev_time is not None:
@@ -1479,30 +1479,32 @@ class LegistarScraper:
                     ContentURIs(video_uri=None, caption_uri=None)
                 ]
 
+            sessions = []
+            sessions = reduced_list(
+                [
+                    self.get_none_if_empty(
+                        Session(
+                            session_datetime=session_time,
+                            session_index=len(sessions),
+                            video_uri=content_uris.video_uri,
+                            caption_uri=content_uris.caption_uri,
+                        )
+                    )
+                    # Session per video
+                    for content_uris in list_uri
+                ]
+            )
             ingestion_models.append(
                 self.get_none_if_empty(
                     EventIngestionModel(
                         external_source_id=str(legistar_ev[LEGISTAR_EV_EXT_ID]),
                         agenda_uri=str_simplified(legistar_ev[LEGISTAR_AGENDA_URI]),
                         minutes_uri=str_simplified(legistar_ev[LEGISTAR_MINUTES_URI]),
-                        body=self.get_body(legistar_ev[LEGISTAR_EV_BODY]),
-                        sessions=reduced_list(
-                            [
-                                self.get_none_if_empty(
-                                    Session(
-                                        session_datetime=session_time,
-                                        session_index=list_uri.index(content_uris),
-                                        video_uri=content_uris.video_uri,
-                                        caption_uri=content_uris.caption_uri,
-                                    )
-                                )
-                                # Session per video
-                                for content_uris in list_uri
-                            ]
-                        ),
+                        sessions=sessions,
                         event_minutes_items=self.get_event_minutes(
                             legistar_ev[LEGISTAR_EV_ITEMS]
                         ),
+                        body=self.get_body(legistar_ev[LEGISTAR_EV_BODY]),
                     )
                 )
             )
