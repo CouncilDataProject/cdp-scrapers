@@ -129,6 +129,16 @@ it is likely that information is not filled. In these situations Legistar might
 point to some external resource, such as a web page hosted somewhere else, that 
 does have URI for the video from the given event. See `SeattleScraper.get_content_uris()`.
 
+### Information From Other Sources
+
+In the event that you have information for `IngestionModel` from some source other than your municipality's Legistar API, `LegistarScraper` provides two ways that you can implement completely to your preference. Both are called at the end of `get_events()` after `List[EventIngestionModel]` have been scraped for the given time range.
+
+1. `known_persons`  
+Some of a `Person`'s information may not change for a long time, perhaps on the order of years. Examples are `Person.picture_uri` and `Person.seat`. `LegistarScraper` defines `known_persons` parameter of type `Dict[str, Person]` where the keys are `Person.name`. This dictionary is used in `inject_known_person()` to "inject" information in the scraped `Person`s. See the `seattle-static.json` file and `SeattleScraper.__init__()` for example usage.
+
+2. `post_process_ingestion_models()`  
+This is a final, fully-custom method where you can augment and insert any information into the `IngestionModel`s as necessary. The base implemenation simply returns the input `List[EventIngestionModel]` as-is.
+
 ### Other Notes
 
 - Recommend calling `legistar_utils.str_simplified()` on string fields to remove 
