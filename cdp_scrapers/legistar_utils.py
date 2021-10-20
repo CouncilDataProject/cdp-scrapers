@@ -1390,20 +1390,32 @@ class LegistarScraper:
             # EventMinutesItem.votes.person
             for minute_item in event.event_minutes_items:
                 if minute_item.matter and minute_item.matter.sponsors:
-                    minute_item.matter.sponsors = [
-                        self.inject_known_person(sponsor)
-                        for sponsor in minute_item.matter.sponsors
-                    ]
-                if minute_item.votes:
-                    minute_item.votes = [
-                        Vote(
-                            decision=vote.decision,
-                            external_source_id=vote.external_source_id,
-                            person=self.inject_known_person(vote.person),
-                        )
-                        for vote in minute_item.votes
-                    ]
+                    for sponsor in minute_item.matter.sponsors:
+                        sponsor = self.inject_known_person(sponsor)
 
+                if minute_item.votes:
+                    for vote in minute_item.votes:
+                        vote.person = self.inject_known_person(vote.person)
+
+        return events
+
+    def post_process_ingestion_models(
+        self, events: List[EventIngestionModel]
+    ) -> List[EventIngestionModel]:
+        """
+        Called at the end of get_events() for fully custom site-specific prcessing.
+        inject_known_data() already operated on input events.
+
+        Parameters
+        ----------
+        events:
+            Returned events from get_events()
+
+        Returns
+        -------
+        events: List[EventIngestionModel]
+            Base implementation simply returns input events as-is
+        """
         return events
 
     def get_events(
@@ -1501,6 +1513,7 @@ class LegistarScraper:
         # so request reduced_list() to give me [], not None
         events = reduced_list(ingestion_models, collapse=False)
         events = self.inject_known_data(events)
+        events = self.post_process_ingestion_models(events)
 
         return events
 
