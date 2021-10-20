@@ -54,6 +54,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#legistar-to-cdp-ingestionmodel">Legistar to CDP <code class="docutils literal notranslate"><span class="pre">IngestionModel</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#instance-specific-scraping">Instance-Specific Scraping</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#scraping-for-session-video-uri">Scraping for <code class="docutils literal notranslate"><span class="pre">Session.video_uri</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#information-from-other-sources">Information From Other Sources</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#other-notes">Other Notes</a></li>
 </ul>
 </li>
@@ -231,6 +232,16 @@ implementation for <code class="docutils literal notranslate"><span class="pre">
 it is likely that information is not filled. In these situations Legistar might
 point to some external resource, such as a web page hosted somewhere else, that
 does have URI for the video from the given event. See <code class="docutils literal notranslate"><span class="pre">SeattleScraper.get_content_uris()</span></code>.</p>
+</section>
+<section id="information-from-other-sources">
+<h3>Information From Other Sources<a class="headerlink" href="#information-from-other-sources" title="Permalink to this headline"></a></h3>
+<p>In the event that you have information for <code class="docutils literal notranslate"><span class="pre">IngestionModel</span></code> from some source other than your municipality’s Legistar API, <code class="docutils literal notranslate"><span class="pre">LegistarScraper</span></code> provides two ways that you can implement completely to your preference. Both are called at the end of <code class="docutils literal notranslate"><span class="pre">get_events()</span></code> after <code class="docutils literal notranslate"><span class="pre">List[EventIngestionModel]</span></code> have been scraped for the given time range.</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">known_persons</span></code><span class="raw-html-m2r"><br></span>
+Some of a <code class="docutils literal notranslate"><span class="pre">Person</span></code>‘s information may not change for a long time, perhaps on the order of years. Examples are <code class="docutils literal notranslate"><span class="pre">Person.picture_uri</span></code> and <code class="docutils literal notranslate"><span class="pre">Person.seat</span></code>. <code class="docutils literal notranslate"><span class="pre">LegistarScraper</span></code> defines <code class="docutils literal notranslate"><span class="pre">known_persons</span></code> parameter of type <code class="docutils literal notranslate"><span class="pre">Dict[str,</span> <span class="pre">Person]</span></code> where the keys are <code class="docutils literal notranslate"><span class="pre">Person.name</span></code>. This dictionary is used in <code class="docutils literal notranslate"><span class="pre">inject_known_person()</span></code> to “inject” information in the scraped <code class="docutils literal notranslate"><span class="pre">Person</span></code>s. See the <code class="docutils literal notranslate"><span class="pre">seattle-static.json</span></code> file and <code class="docutils literal notranslate"><span class="pre">SeattleScraper.__init__()</span></code> for example usage.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">post_process_ingestion_models()</span></code><span class="raw-html-m2r"><br></span>
+This is a final, fully-custom method where you can augment and insert any information into the <code class="docutils literal notranslate"><span class="pre">IngestionModel</span></code>s as necessary. The base implemenation simply returns the input <code class="docutils literal notranslate"><span class="pre">List[EventIngestionModel]</span></code> as-is.</p></li>
+</ol>
 </section>
 <section id="other-notes">
 <h3>Other Notes<a class="headerlink" href="#other-notes" title="Permalink to this headline"></a></h3>

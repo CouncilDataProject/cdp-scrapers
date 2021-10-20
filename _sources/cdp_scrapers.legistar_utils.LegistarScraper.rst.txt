@@ -38,6 +38,7 @@
       ~LegistarScraper.inject_known_data
       ~LegistarScraper.inject_known_person
       ~LegistarScraper.localize_datetime
+      ~LegistarScraper.post_process_ingestion_models
    
    
 

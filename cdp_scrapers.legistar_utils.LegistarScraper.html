@@ -53,6 +53,7 @@
 <li class="toctree-l2"><a class="reference internal" href="legistar_scraper.html#legistar-to-cdp-ingestionmodel">Legistar to CDP <code class="docutils literal notranslate"><span class="pre">IngestionModel</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="legistar_scraper.html#instance-specific-scraping">Instance-Specific Scraping</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="legistar_scraper.html#scraping-for-session-video-uri">Scraping for <code class="docutils literal notranslate"><span class="pre">Session.video_uri</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="legistar_scraper.html#information-from-other-sources">Information From Other Sources</a></li>
 <li class="toctree-l3"><a class="reference internal" href="legistar_scraper.html#other-notes">Other Notes</a></li>
 </ul>
 </li>
@@ -259,6 +260,9 @@ Default: None</p></li>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.localize_datetime" title="cdp_scrapers.legistar_utils.LegistarScraper.localize_datetime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">localize_datetime</span></code></a>(local_time)</p></td>
 <td><p>Return input datetime with time zone information.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.post_process_ingestion_models" title="cdp_scrapers.legistar_utils.LegistarScraper.post_process_ingestion_models"><code class="xref py py-obj docutils literal notranslate"><span class="pre">post_process_ingestion_models</span></code></a>(events)</p></td>
+<td><p>Called at the end of get_events() for fully custom site-specific prcessing.</p></td>
 </tr>
 </tbody>
 </table>

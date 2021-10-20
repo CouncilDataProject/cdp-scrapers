@@ -54,6 +54,7 @@
 <li class="toctree-l2"><a class="reference internal" href="legistar_scraper.html#legistar-to-cdp-ingestionmodel">Legistar to CDP <code class="docutils literal notranslate"><span class="pre">IngestionModel</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="legistar_scraper.html#instance-specific-scraping">Instance-Specific Scraping</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="legistar_scraper.html#scraping-for-session-video-uri">Scraping for <code class="docutils literal notranslate"><span class="pre">Session.video_uri</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="legistar_scraper.html#information-from-other-sources">Information From Other Sources</a></li>
 <li class="toctree-l3"><a class="reference internal" href="legistar_scraper.html#other-notes">Other Notes</a></li>
 </ul>
 </li>
@@ -663,6 +664,24 @@ tzinfo is now provided.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>datetime</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.post_process_ingestion_models">
+<span class="sig-name descname"><span class="pre">post_process_ingestion_models</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">events</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.EventIngestionModel</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.EventIngestionModel</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.post_process_ingestion_models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.post_process_ingestion_models" title="Permalink to this definition"></a></dt>
+<dd><p>Called at the end of get_events() for fully custom site-specific prcessing.
+inject_known_data() already operated on input events.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>events</strong> – Returned events from get_events()</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>events</strong> – Base implementation simply returns input events as-is</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>List[EventIngestionModel]</p>
 </dd>
 </dl>
 </dd></dl>

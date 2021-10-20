@@ -51,6 +51,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../legistar_scraper.html#legistar-to-cdp-ingestionmodel">Legistar to CDP <code class="docutils literal notranslate"><span class="pre">IngestionModel</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../legistar_scraper.html#instance-specific-scraping">Instance-Specific Scraping</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../legistar_scraper.html#scraping-for-session-video-uri">Scraping for <code class="docutils literal notranslate"><span class="pre">Session.video_uri</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../legistar_scraper.html#information-from-other-sources">Information From Other Sources</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../legistar_scraper.html#other-notes">Other Notes</a></li>
 </ul>
 </li>
@@ -1500,20 +1501,32 @@
             <span class="c1"># EventMinutesItem.votes.person</span>
             <span class="k">for</span> <span class="n">minute_item</span> <span class="ow">in</span> <span class="n">event</span><span class="o">.</span><span class="n">event_minutes_items</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">minute_item</span><span class="o">.</span><span class="n">matter</span> <span class="ow">and</span> <span class="n">minute_item</span><span class="o">.</span><span class="n">matter</span><span class="o">.</span><span class="n">sponsors</span><span class="p">:</span>
-                    <span class="n">minute_item</span><span class="o">.</span><span class="n">matter</span><span class="o">.</span><span class="n">sponsors</span> <span class="o">=</span> <span class="p">[</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">inject_known_person</span><span class="p">(</span><span class="n">sponsor</span><span class="p">)</span>
-                        <span class="k">for</span> <span class="n">sponsor</span> <span class="ow">in</span> <span class="n">minute_item</span><span class="o">.</span><span class="n">matter</span><span class="o">.</span><span class="n">sponsors</span>
-                    <span class="p">]</span>
-                <span class="k">if</span> <span class="n">minute_item</span><span class="o">.</span><span class="n">votes</span><span class="p">:</span>
-                    <span class="n">minute_item</span><span class="o">.</span><span class="n">votes</span> <span class="o">=</span> <span class="p">[</span>
-                        <span class="n">Vote</span><span class="p">(</span>
-                            <span class="n">decision</span><span class="o">=</span><span class="n">vote</span><span class="o">.</span><span class="n">decision</span><span class="p">,</span>
-                            <span class="n">external_source_id</span><span class="o">=</span><span class="n">vote</span><span class="o">.</span><span class="n">external_source_id</span><span class="p">,</span>
-                            <span class="n">person</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inject_known_person</span><span class="p">(</span><span class="n">vote</span><span class="o">.</span><span class="n">person</span><span class="p">),</span>
-                        <span class="p">)</span>
-                        <span class="k">for</span> <span class="n">vote</span> <span class="ow">in</span> <span class="n">minute_item</span><span class="o">.</span><span class="n">votes</span>
-                    <span class="p">]</span>
+                    <span class="k">for</span> <span class="n">sponsor</span> <span class="ow">in</span> <span class="n">minute_item</span><span class="o">.</span><span class="n">matter</span><span class="o">.</span><span class="n">sponsors</span><span class="p">:</span>
+                        <span class="n">sponsor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inject_known_person</span><span class="p">(</span><span class="n">sponsor</span><span class="p">)</span>
 
+                <span class="k">if</span> <span class="n">minute_item</span><span class="o">.</span><span class="n">votes</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">vote</span> <span class="ow">in</span> <span class="n">minute_item</span><span class="o">.</span><span class="n">votes</span><span class="p">:</span>
+                        <span class="n">vote</span><span class="o">.</span><span class="n">person</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inject_known_person</span><span class="p">(</span><span class="n">vote</span><span class="o">.</span><span class="n">person</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">events</span></div>
+
+<div class="viewcode-block" id="LegistarScraper.post_process_ingestion_models"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.post_process_ingestion_models">[docs]</a>    <span class="k">def</span> <span class="nf">post_process_ingestion_models</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">events</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Called at the end of get_events() for fully custom site-specific prcessing.</span>
+<span class="sd">        inject_known_data() already operated on input events.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        events:</span>
+<span class="sd">            Returned events from get_events()</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        events: List[EventIngestionModel]</span>
+<span class="sd">            Base implementation simply returns input events as-is</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">events</span></div>
 
 <div class="viewcode-block" id="LegistarScraper.get_events"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_events">[docs]</a>    <span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span>
@@ -1611,6 +1624,7 @@
         <span class="c1"># so request reduced_list() to give me [], not None</span>
         <span class="n">events</span> <span class="o">=</span> <span class="n">reduced_list</span><span class="p">(</span><span class="n">ingestion_models</span><span class="p">,</span> <span class="n">collapse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">events</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inject_known_data</span><span class="p">(</span><span class="n">events</span><span class="p">)</span>
+        <span class="n">events</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_process_ingestion_models</span><span class="p">(</span><span class="n">events</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">events</span></div>
 
