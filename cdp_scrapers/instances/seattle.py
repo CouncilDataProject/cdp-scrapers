@@ -360,7 +360,7 @@ class SeattleScraper(LegistarScraper):
             log.debug(f"{legistar_ev[LEGISTAR_EV_SITE_URL]} -> {video_page_url}")
         # catch if find() didn't find video web page url (no <a id=... href=.../>)
         except KeyError:
-            log.debug("No URL for video page on {legistar_ev[LEGISTAR_EV_SITE_URL]}")
+            log.debug(f"No URL for video page on {legistar_ev[LEGISTAR_EV_SITE_URL]}")
             return []
 
         event_short_date = datetime.fromisoformat(legistar_ev[LEGISTAR_SESSION_DATE])
