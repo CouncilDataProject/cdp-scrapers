@@ -1380,7 +1380,7 @@
 <span class="sd">            date using ev_date and time using ev_time</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># 2021-07-09T00:00:00</span>
-        <span class="n">d</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">ev_date</span><span class="p">,</span> <span class="n">LEGISTAR_DATETIME_FORMAT</span><span class="p">)</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">ev_date</span><span class="p">)</span>
         <span class="c1"># 9:30 AM</span>
         <span class="c1"># some events may have ev_time =None</span>
         <span class="k">if</span> <span class="n">ev_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1590,32 +1590,30 @@
                     <span class="n">ContentURIs</span><span class="p">(</span><span class="n">video_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">caption_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
                 <span class="p">]</span>
 
-            <span class="n">sessions</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">sessions</span> <span class="o">=</span> <span class="n">reduced_list</span><span class="p">(</span>
-                <span class="p">[</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>
-                        <span class="n">Session</span><span class="p">(</span>
-                            <span class="n">session_datetime</span><span class="o">=</span><span class="n">session_time</span><span class="p">,</span>
-                            <span class="n">session_index</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">sessions</span><span class="p">),</span>
-                            <span class="n">video_uri</span><span class="o">=</span><span class="n">content_uris</span><span class="o">.</span><span class="n">video_uri</span><span class="p">,</span>
-                            <span class="n">caption_uri</span><span class="o">=</span><span class="n">content_uris</span><span class="o">.</span><span class="n">caption_uri</span><span class="p">,</span>
-                        <span class="p">)</span>
-                    <span class="p">)</span>
-                    <span class="c1"># Session per video</span>
-                    <span class="k">for</span> <span class="n">content_uris</span> <span class="ow">in</span> <span class="n">list_uri</span>
-                <span class="p">]</span>
-            <span class="p">)</span>
             <span class="n">ingestion_models</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>
                     <span class="n">EventIngestionModel</span><span class="p">(</span>
                         <span class="n">external_source_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_EV_EXT_ID</span><span class="p">]),</span>
                         <span class="n">agenda_uri</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_AGENDA_URI</span><span class="p">]),</span>
                         <span class="n">minutes_uri</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_MINUTES_URI</span><span class="p">]),</span>
-                        <span class="n">sessions</span><span class="o">=</span><span class="n">sessions</span><span class="p">,</span>
+                        <span class="n">body</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_body</span><span class="p">(</span><span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_EV_BODY</span><span class="p">]),</span>
+                        <span class="n">sessions</span><span class="o">=</span><span class="n">reduced_list</span><span class="p">(</span>
+                            <span class="p">[</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>
+                                    <span class="n">Session</span><span class="p">(</span>
+                                        <span class="n">session_datetime</span><span class="o">=</span><span class="n">session_time</span><span class="p">,</span>
+                                        <span class="n">session_index</span><span class="o">=</span><span class="n">list_uri</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">content_uris</span><span class="p">),</span>
+                                        <span class="n">video_uri</span><span class="o">=</span><span class="n">content_uris</span><span class="o">.</span><span class="n">video_uri</span><span class="p">,</span>
+                                        <span class="n">caption_uri</span><span class="o">=</span><span class="n">content_uris</span><span class="o">.</span><span class="n">caption_uri</span><span class="p">,</span>
+                                    <span class="p">)</span>
+                                <span class="p">)</span>
+                                <span class="c1"># Session per video</span>
+                                <span class="k">for</span> <span class="n">content_uris</span> <span class="ow">in</span> <span class="n">list_uri</span>
+                            <span class="p">]</span>
+                        <span class="p">),</span>
                         <span class="n">event_minutes_items</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event_minutes</span><span class="p">(</span>
                             <span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_EV_ITEMS</span><span class="p">]</span>
                         <span class="p">),</span>
-                        <span class="n">body</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_body</span><span class="p">(</span><span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_EV_BODY</span><span class="p">]),</span>
                     <span class="p">)</span>
                 <span class="p">)</span>
             <span class="p">)</span>

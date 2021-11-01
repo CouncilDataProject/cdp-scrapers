@@ -233,8 +233,25 @@ from GitHub Actions UI.</p>
 </dl>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.get_legistar_events_for_timespan" title="cdp_scrapers.legistar_utils.get_legistar_events_for_timespan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdp_scrapers.legistar_utils.get_legistar_events_for_timespan</span></code></a></p>
+<p><a class="reference internal" href="#cdp_scrapers.instances.seattle.SeattleScraper.parse_content_uris" title="cdp_scrapers.instances.seattle.SeattleScraper.parse_content_uris"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_content_uris</span></code></a></p>
 </div>
+<p class="rubric">Notes</p>
+<p>get_events() calls get_content_uris() to get video and caption URIs.
+get_content_uris() gets video page URL from EventInSiteURL.
+If “videoid” in video page URL, calls parse_content_uris().
+Else, calls get_video_page_urls() to get proper video page URL with “videoid”,</p>
+<blockquote>
+<div><p>then calls parse_content_uris().</p>
+</div></blockquote>
+<dl class="simple">
+<dt>get_events()</dt><dd><dl class="simple">
+<dt>-&gt; get_content_uris()</dt><dd><p>-&gt; parse_content_uris()
+or
+-&gt; get_video_page_urls(), parse_content_uris()</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -266,6 +283,75 @@ from GitHub Actions UI.</p>
 <dd class="field-even"><p>Optional[List[Person]]</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cdp_scrapers.instances.seattle.SeattleScraper.get_video_page_urls">
+<span class="sig-name descname"><span class="pre">get_video_page_urls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">video_list_page_url</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_short_date</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/seattle.html#SeattleScraper.get_video_page_urls"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.seattle.SeattleScraper.get_video_page_urls" title="Permalink to this definition"></a></dt>
+<dd><p>Return URLs to web pages hosting videos for meetings from event_short_date</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>video_list_page_url</strong> (<em>str</em>) – URL to web page listing videos featuring the responsible group/body
+for the event described in legistar_ev.
+e.g. <a class="reference external" href="http://www.seattlechannel.org/BudgetCommittee?Mode2=Video">http://www.seattlechannel.org/BudgetCommittee?Mode2=Video</a></p></li>
+<li><p><strong>event_short_date</strong> (<em>str</em>) – datetime representing the meeting’s date m/d/yy</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>video_page_urls</strong> – web page URL per video</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>List[str]</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#cdp_scrapers.instances.seattle.SeattleScraper.get_content_uris" title="cdp_scrapers.instances.seattle.SeattleScraper.get_content_uris"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_content_uris</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cdp_scrapers.instances.seattle.SeattleScraper.parse_content_uris">
+<span class="sig-name descname"><span class="pre">parse_content_uris</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">video_page_url</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_short_date</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.types.ContentURIs" title="cdp_scrapers.types.ContentURIs"><span class="pre">cdp_scrapers.types.ContentURIs</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/seattle.html#SeattleScraper.parse_content_uris"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.seattle.SeattleScraper.parse_content_uris" title="Permalink to this definition"></a></dt>
+<dd><p>Return URLs for videos and captions parsed from seattlechannel.org web page</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>video_page_url</strong> (<em>str</em>) – URL to a web page for a particular meeting video</p></li>
+<li><p><strong>event_short_date</strong> (<em>str</em>) – datetime representing the meeting’s date, used for verification m/d/yy</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>content_uris</strong> – List of ContentURIs objects for each session found.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>List[<a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.types.ContentURIs" title="cdp_scrapers.types.ContentURIs">ContentURIs</a>]</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#cdp_scrapers.instances.seattle.SeattleScraper.get_content_uris" title="cdp_scrapers.instances.seattle.SeattleScraper.get_content_uris"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_content_uris</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cdp_scrapers.instances.seattle.SeattleScraper.roman_to_int">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">roman_to_int</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">roman</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cdp_scrapers/instances/seattle.html#SeattleScraper.roman_to_int"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.seattle.SeattleScraper.roman_to_int" title="Permalink to this definition"></a></dt>
+<dd><p>Roman numeral to an integer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>roman</strong> (<em>str</em>) – Roman numeral string</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Input roman numeral as integer</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<p><a class="reference external" href="https://www.w3resource.com/python-exercises/class-exercises/python-class-exercise-2.php">https://www.w3resource.com/python-exercises/class-exercises/python-class-exercise-2.php</a></p>
 </dd></dl>
 
 </dd></dl>
