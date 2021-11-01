@@ -341,6 +341,19 @@ class SeattleScraper(LegistarScraper):
         See Also
         --------
         parse_content_uris()
+
+        Notes
+        -----
+        get_events() calls get_content_uris() to get video and caption URIs.
+        get_content_uris() gets video page URL from EventInSiteURL.
+        If "videoid" in video page URL, calls parse_content_uris().
+        Else, calls get_video_page_urls() to get proper video page URL with "videoid",
+            then calls parse_content_uris().
+        get_events()
+            -> get_content_uris()
+                -> parse_content_uris()
+                or
+                -> get_video_page_urls(), parse_content_uris()
         """
         try:
             # a td tag with a certain id pattern containing url to video
