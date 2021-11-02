@@ -100,8 +100,8 @@ LEGISTAR_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
 ###############################################################################
 
 
-known_persons: Dict[int, Dict[str, Any]] = {}
-known_bodies: Dict[int, Dict[str, Any]] = {}
+known_legistar_persons: Dict[int, Dict[str, Any]] = {}
+known_legistar_bodies: Dict[int, Dict[str, Any]] = {}
 
 
 def get_legistar_body(
@@ -128,13 +128,13 @@ def get_legistar_body(
 
     Notes
     -----
-    known_bodies cache is cleared for every LegistarScraper.get_events() call
+    known_legistar_bodies cache is cleared for every LegistarScraper.get_events() call
     """
-    global known_bodies
+    global known_legistar_bodies
 
     if use_cache:
         try:
-            return known_bodies[body_id]
+            return known_legistar_bodies[body_id]
         except KeyError:
             # new body
             pass
@@ -153,7 +153,7 @@ def get_legistar_body(
         body = None
 
     if use_cache:
-        known_bodies[body_id] = body
+        known_legistar_bodies[body_id] = body
     return body
 
 
@@ -181,13 +181,13 @@ def get_legistar_person(
 
     Notes
     -----
-    known_persons cache is cleared for every LegistarScraper.get_events() call
+    known_legistar_persons cache is cleared for every LegistarScraper.get_events() call
     """
-    global known_persons
+    global known_legistar_persons
 
     if use_cache:
         try:
-            return known_persons[person_id]
+            return known_legistar_persons[person_id]
         except KeyError:
             # new person
             pass
@@ -202,7 +202,7 @@ def get_legistar_person(
 
     if response.status_code != 200:
         if use_cache:
-            known_persons[person_id] = None
+            known_legistar_persons[person_id] = None
         return None
 
     person = response.json()
@@ -218,7 +218,7 @@ def get_legistar_person(
     if response.status_code != 200:
         person[LEGISTAR_PERSON_ROLES] = None
         if use_cache:
-            known_persons[person_id] = person
+            known_legistar_persons[person_id] = person
         return person
 
     office_records: List[Dict[str, Any]] = response.json()
@@ -230,7 +230,7 @@ def get_legistar_person(
 
     person[LEGISTAR_PERSON_ROLES] = office_records
     if use_cache:
-        known_persons[person_id] = person
+        known_legistar_persons[person_id] = person
     return person
 
 
@@ -276,13 +276,13 @@ def get_legistar_events_for_timespan(
     # during the lifetime of this single call is miniscule.
     # use a cache to prevent 10s-100s of web requests
     # for the same person/body
-    global known_persons, known_bodies
+    global known_legistar_persons, known_legistar_bodies
     # See Also
     # get_legistar_person()
-    known_persons.clear()
+    known_legistar_persons.clear()
     # See Also
     # get_legistar_body()
-    known_bodies.clear()
+    known_legistar_bodies.clear()
 
     # Get response from formatted request
     log.debug(f"Querying Legistar for events between: {begin} - {end}")
@@ -483,6 +483,10 @@ class LegistarScraper:
         Regex pattern used to convert Legistar instance's minutes item failure to CDP
         constant value.
         Default: "not|fail"
+    known_persons: Optional[Dict[str, Person]]
+        Dictionary used to inject information into Persons in place of missing
+        attributes after dynamic scraping in get_events().
+        Default: None
 
     See Also
     --------
@@ -507,6 +511,7 @@ class LegistarScraper:
         matter_rejected_pattern: str = r"rejected|dropped",
         minutes_item_decision_passed_pattern: str = r"pass",
         minutes_item_decision_failed_pattern: str = r"not|fail",
+        known_persons: Optional[Dict[str, Person]] = None,
     ):
         self.client_name: str = client
         self.timezone: pytz.timezone = pytz.timezone(timezone)
@@ -531,6 +536,8 @@ class LegistarScraper:
         self.minutes_item_decision_failed_pattern: str = (
             minutes_item_decision_failed_pattern
         )
+
+        self.known_persons = known_persons
 
     @staticmethod
     def get_required_attrs(model: IngestionModel) -> List[str]:
@@ -935,7 +942,12 @@ class LegistarScraper:
         --------
         get_legistar_person()
         """
-        if not legistar_person:
+        if (
+            not legistar_person
+            or not legistar_person[LEGISTAR_PERSON_NAME]
+            # have seen PersonFullName with something like "no sponsor required"
+            or re.search("no.*required", legistar_person[LEGISTAR_PERSON_NAME], re.I)
+        ):
             return None
 
         phone = str_simplified(legistar_person[LEGISTAR_PERSON_PHONE])
@@ -1257,7 +1269,7 @@ class LegistarScraper:
             date using ev_date and time using ev_time
         """
         # 2021-07-09T00:00:00
-        d = datetime.strptime(ev_date, LEGISTAR_DATETIME_FORMAT)
+        d = datetime.fromisoformat(ev_date)
         # 9:30 AM
         # some events may have ev_time =None
         if ev_time is not None:
@@ -1309,6 +1321,102 @@ class LegistarScraper:
             f"Legistar Event.EventVideoPath is not used by {self.client_name}"
         )
         raise NotImplementedError
+
+    def inject_known_person(self, person: Person) -> Person:
+        """
+        Inject information from self.known_persons
+        if person exists in the dictionary for long-term static data
+
+        Parameters
+        ----------
+        person: Person
+            Person into which to inject data from known_persons
+
+        Returns
+        -------
+        Person
+            Input person updated with more information
+            or as-is if person not found in known_persons
+        """
+        try:
+            known_person = self.known_persons[person.name]
+        except (TypeError, KeyError):
+            return person
+
+        for attr in person.__dataclass_fields__.keys():
+            # input person has new information so prefer that
+            # over static long-term information
+            setattr(person, attr, getattr(person, attr) or getattr(known_person, attr))
+
+        # now that we have seat from static hard-coded data
+        # we can bring in seat.roles (OfficeRecords from Legistar API)
+        if person.seat and not person.seat.roles:
+            person.seat.roles = self.get_roles(
+                get_legistar_person(
+                    client=self.client_name,
+                    person_id=person.external_source_id,
+                    use_cache=True,
+                )[LEGISTAR_PERSON_ROLES]
+            )
+
+        return person
+
+    def inject_known_data(
+        self, events: List[EventIngestionModel]
+    ) -> List[EventIngestionModel]:
+        """
+        Augment with long-term static data that changes very infrequently.
+        e.e. self.known_persons which includes Person.picture_uri, Person.seat
+
+        Parameters
+        ----------
+        events:
+            Returned events from get_events()
+
+        Returns
+        -------
+        events: List[EventIngestionModel]
+            Input events with static information possibly injected
+        """
+        # don't waste time if we don't have any static person info at all
+        if not self.known_persons:
+            return events
+
+        for event in events:
+            if not event.event_minutes_items:
+                continue
+            # 2 places for Person:
+            # EventMinutesItem.matter.sponsors
+            # EventMinutesItem.votes.person
+            for minute_item in event.event_minutes_items:
+                if minute_item.matter and minute_item.matter.sponsors:
+                    for sponsor in minute_item.matter.sponsors:
+                        sponsor = self.inject_known_person(sponsor)
+
+                if minute_item.votes:
+                    for vote in minute_item.votes:
+                        vote.person = self.inject_known_person(vote.person)
+
+        return events
+
+    def post_process_ingestion_models(
+        self, events: List[EventIngestionModel]
+    ) -> List[EventIngestionModel]:
+        """
+        Called at the end of get_events() for fully custom site-specific prcessing.
+        inject_known_data() already operated on input events.
+
+        Parameters
+        ----------
+        events:
+            Returned events from get_events()
+
+        Returns
+        -------
+        events: List[EventIngestionModel]
+            Base implementation simply returns input events as-is
+        """
+        return events
 
     def get_events(
         self,
@@ -1371,39 +1479,41 @@ class LegistarScraper:
                     ContentURIs(video_uri=None, caption_uri=None)
                 ]
 
-            sessions = []
-            sessions = reduced_list(
-                [
-                    self.get_none_if_empty(
-                        Session(
-                            session_datetime=session_time,
-                            session_index=len(sessions),
-                            video_uri=content_uris.video_uri,
-                            caption_uri=content_uris.caption_uri,
-                        )
-                    )
-                    # Session per video
-                    for content_uris in list_uri
-                ]
-            )
             ingestion_models.append(
                 self.get_none_if_empty(
                     EventIngestionModel(
                         external_source_id=str(legistar_ev[LEGISTAR_EV_EXT_ID]),
                         agenda_uri=str_simplified(legistar_ev[LEGISTAR_AGENDA_URI]),
                         minutes_uri=str_simplified(legistar_ev[LEGISTAR_MINUTES_URI]),
-                        sessions=sessions,
+                        body=self.get_body(legistar_ev[LEGISTAR_EV_BODY]),
+                        sessions=reduced_list(
+                            [
+                                self.get_none_if_empty(
+                                    Session(
+                                        session_datetime=session_time,
+                                        session_index=list_uri.index(content_uris),
+                                        video_uri=content_uris.video_uri,
+                                        caption_uri=content_uris.caption_uri,
+                                    )
+                                )
+                                # Session per video
+                                for content_uris in list_uri
+                            ]
+                        ),
                         event_minutes_items=self.get_event_minutes(
                             legistar_ev[LEGISTAR_EV_ITEMS]
                         ),
-                        body=self.get_body(legistar_ev[LEGISTAR_EV_BODY]),
                     )
                 )
             )
 
         # easier for calling pipeline to handle an empty list rather than None
         # so request reduced_list() to give me [], not None
-        return reduced_list(ingestion_models, collapse=False)
+        events = reduced_list(ingestion_models, collapse=False)
+        events = self.inject_known_data(events)
+        events = self.post_process_ingestion_models(events)
+
+        return events
 
     @property
     def is_legistar_compatible(self) -> bool:
