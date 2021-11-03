@@ -67,12 +67,14 @@ class SeattleScraper(LegistarScraper):
                 "has been cancelled",
                 "Deputy City Clerk",
                 "Executive Sessions are closed to the public",
-                "Executive Session on Pending, Potential, or Actual Litigation",
+                # Sometimes will have number after "Session", e.g. "Session I"
+                r"Executive Session \S*\s*on Pending, Potential, or Actual Litigation",
                 "Items of Business",
                 # Common to see "CITY COUNCIL:",
                 # Or more generally "{body name}:"
                 # Check for last char ":"
                 r".+:$",
+                "Pursuant to Washington State",
             ],
             known_persons=known_persons,
         )
