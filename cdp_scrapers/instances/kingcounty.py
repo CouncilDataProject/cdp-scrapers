@@ -9,7 +9,7 @@ from urllib.request import urlopen
 
 from bs4 import BeautifulSoup
 
-from ..legistar_utils import LEGISTAR_EV_SITE_URL, LegistarScraper
+from ..legistar_utils import LEGISTAR_EV_SITE_URL, LegistarScraper, str_simplified
 from ..types import ContentURIs
 
 ###############################################################################
@@ -133,3 +133,20 @@ class KingCountyScraper(LegistarScraper):
         video_uri = video_url.replace("\\", "")
         # caption URIs are not found for kingcounty events.
         return [ContentURIs(video_uri=video_uri, caption_uri=None)]
+
+    @staticmethod
+    def get_person_urls() -> Dict[str, str]:
+        # this page lists current council members with urls to personal pages
+        with urlopen(
+            "https://kingcounty.gov/council/councilmembers/find_district.aspx"
+        ) as resp:
+            soup = BeautifulSoup(resp.read(), "html.parser")
+
+        # look for <map> tag. it'll have <area> per district/person
+        # <map name="rade_img_map_1339527544713" id="rade_img_map_1339527544713">
+        # <area alt="Rod Dembowski" shape="RECT" href="/Dembowski.aspx" />
+        person_urls: Dict[str, str] = {}
+        for i in soup.find("map").find_all("area", href=re.compile(r"\S")):
+            person_urls[str_simplified(i["alt"])] = f"https://kingcounty.gov{i['href']}"
+
+        return person_urls
