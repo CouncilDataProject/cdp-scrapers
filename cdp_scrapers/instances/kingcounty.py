@@ -3,13 +3,20 @@
 
 import logging
 import re
+import json
 from typing import Dict, List
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
+from pathlib import Path
 
 from bs4 import BeautifulSoup
 
-from ..legistar_utils import LEGISTAR_EV_SITE_URL, LegistarScraper, str_simplified
+from cdp_backend.pipeline.ingestion_models import Person
+from ..legistar_utils import (
+    LEGISTAR_EV_SITE_URL,
+    LegistarScraper,
+    str_simplified,
+)
 from ..types import ContentURIs
 
 ###############################################################################
@@ -150,3 +157,77 @@ class KingCountyScraper(LegistarScraper):
             person_urls[str_simplified(i["alt"])] = f"https://kingcounty.gov{i['href']}"
 
         return person_urls
+
+    @staticmethod
+    def get_static_person_info(name: str, home_url: str) -> Person:
+        with urlopen(home_url) as resp:
+            soup = BeautifulSoup(resp.read(), "html.parser")
+
+        # the one <figure> tag contains banner image and e-mail address
+        # <figure>
+        # <img src="/~/media/council/images/..." />
+        # <a href="mailto:rod.dembowski@kingcounty.gov">rod.dembowski@kingcounty.gov</a>
+        banner = soup.find("figure")
+        if banner:
+            try:
+                picture_uri = f"https://kingcounty.gov{banner.img['src']}"
+            except TypeError:
+                # no <img> under <figure>
+                picture_uri = None
+            try:
+                email = str_simplified(
+                    banner.find("a", href=re.compile(".*mailto.*"))["href"].replace(
+                        "mailto:", ""
+                    )
+                )
+            except AttributeError:
+                # no <a href="mailto..."> tag
+                email = None
+        else:
+            picture_uri = None
+            email = None
+
+        # there is always a <table> near the bottom of the page
+        # that contains telephone number along with TTY telephone and/or fax numbers
+
+        # <table class="table table-condensed">
+        # ...
+        #             <h6><strong>Contact Council Chair Dembowski</strong></h6>
+        # ...
+        #             <td>   <strong>Main phone: </strong><br>
+        #             <a href="tel:2064771001">206-477-1001</a></td>
+
+        # some have broken <strong> tags with <br> so must iterate to find
+        for i in soup.find_all("strong"):
+            if re.search(f".*Contact.*{name.split()[-1]}.*", i.text, re.I | re.S):
+                table = i.find_parent("table")
+                if table:
+                    try:
+                        phone = str_simplified(
+                            table.find(
+                                "strong", string=re.compile(".*Main phone.*", re.I)
+                            )
+                            .find_next_sibling("a")
+                            .string
+                        )
+                        break
+                    except AttributeError:
+                        # find() returned None
+                        phone = None
+
+        return Person(
+            name=name,
+            picture_uri=picture_uri,
+            email=email,
+            phone=phone,
+        )
+
+    @staticmethod
+    def dump_static_info(file_path: Path):
+        static_person_info: Dict[str, str] = {}
+        for name, home_url in KingCountyScraper.get_person_urls().items():
+            static_person_info[name] = json.loads(
+                KingCountyScraper.get_static_person_info(name, home_url).to_json()
+            )
+
+        print(static_person_info)
