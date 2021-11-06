@@ -11,7 +11,7 @@ from pathlib import Path
 
 from bs4 import BeautifulSoup
 
-from cdp_backend.pipeline.ingestion_models import Person
+from cdp_backend.pipeline.ingestion_models import Person, Seat
 from ..legistar_utils import (
     LEGISTAR_EV_SITE_URL,
     LegistarScraper,
@@ -24,6 +24,8 @@ from ..types import ContentURIs
 log = logging.getLogger(__name__)
 
 ###############################################################################
+
+STATIC_FILE_KEY_PERSONS = "persons"
 
 
 class KingCountyScraper(LegistarScraper):
@@ -142,92 +144,80 @@ class KingCountyScraper(LegistarScraper):
         return [ContentURIs(video_uri=video_uri, caption_uri=None)]
 
     @staticmethod
-    def get_person_urls() -> Dict[str, str]:
-        # this page lists current council members with urls to personal pages
+    def get_static_person_info() -> List[Person]:
+        # this page lists current council members
         with urlopen(
             "https://kingcounty.gov/council/councilmembers/find_district.aspx"
         ) as resp:
             soup = BeautifulSoup(resp.read(), "html.parser")
 
-        # look for <map> tag. it'll have <area> per district/person
-        # <map name="rade_img_map_1339527544713" id="rade_img_map_1339527544713">
-        # <area alt="Rod Dembowski" shape="RECT" href="/Dembowski.aspx" />
-        person_urls: Dict[str, str] = {}
-        for i in soup.find("map").find_all("area", href=re.compile(r"\S")):
-            person_urls[str_simplified(i["alt"])] = f"https://kingcounty.gov{i['href']}"
+        persons: List[Person] = []
 
-        return person_urls
+        # there is a series of council member portrait pictures
+        # marked by text "official portrait"
 
-    @staticmethod
-    def get_static_person_info(name: str, home_url: str) -> Person:
-        with urlopen(home_url) as resp:
-            soup = BeautifulSoup(resp.read(), "html.parser")
-
-        # the one <figure> tag contains banner image and e-mail address
-        # <figure>
-        # <img src="/~/media/council/images/..." />
-        # <a href="mailto:rod.dembowski@kingcounty.gov">rod.dembowski@kingcounty.gov</a>
-        banner = soup.find("figure")
-        if banner:
-            try:
-                picture_uri = f"https://kingcounty.gov{banner.img['src']}"
-            except TypeError:
-                # no <img> under <figure>
-                picture_uri = None
-            try:
-                email = str_simplified(
-                    banner.find("a", href=re.compile(".*mailto.*"))["href"].replace(
-                        "mailto:", ""
-                    )
+        # <a href="/council/dembowski.aspx"><strong>Rod Dembowski</strong><br/>
+        # </a>District 1<br/>
+        # 206-477-1001<br/>
+        # <a href="mailto:...">rod.dembowski@kingcounty.gov </a><br/>
+        # Member since: 2013<br/>
+        # Current t<span style="color: rgb(0, 0, 0);">erm: 2018-2021</span><br/>
+        # <a href="/~/media/...">Official portrait</a>
+        # ...
+        # repeat similar blob for the next council person
+        # ...
+        for picture in soup.find_all(
+            "a", text=re.compile(".*official.*portrait.*", re.I)
+        ):
+            picture_uri = f"https://kingcounty.gov{str_simplified(picture['href'])}"
+            # preceding 2 <a> tags have email and website url, in that order
+            email_tag = picture.find_previous_sibling("a")
+            email = str_simplified(email_tag.text)
+            website_tag = email_tag.find_previous_sibling("a")
+            website = f"https://kingcounty.gov{str_simplified(website_tag['href'])}"
+            name = str_simplified(website_tag.text)
+            # this area in plain text contains role and phone for this person
+            # Rod Dembowski
+            # District 1
+            # 206-477-1001
+            # rod.dembowski@kingcounty.gov
+            parent_tag = picture.find_parent()
+            # position number is the trailing number in the line after name
+            # and the line after position is the telephone
+            match = re.search(
+                f".*{name}.*\\s+.*(?P<position>\\d+)\\s+(?P<phone>[\\d\\-\\(\\)]+)",
+                parent_tag.text,
+                re.IGNORECASE,
+            )
+            phone = match.group("phone")
+            seat = Seat(name=f"Position {match.group('position')}")
+            persons.append(
+                Person(
+                    name=name,
+                    picture_uri=picture_uri,
+                    email=email,
+                    website=website,
+                    phone=phone,
+                    seat=seat,
                 )
-            except AttributeError:
-                # no <a href="mailto..."> tag
-                email = None
-        else:
-            picture_uri = None
-            email = None
+            )
 
-        # there is always a <table> near the bottom of the page
-        # that contains telephone number along with TTY telephone and/or fax numbers
-
-        # <table class="table table-condensed">
-        # ...
-        #             <h6><strong>Contact Council Chair Dembowski</strong></h6>
-        # ...
-        #             <td>   <strong>Main phone: </strong><br>
-        #             <a href="tel:2064771001">206-477-1001</a></td>
-
-        # some have broken <strong> tags with <br> so must iterate to find
-        for i in soup.find_all("strong"):
-            if re.search(f".*Contact.*{name.split()[-1]}.*", i.text, re.I | re.S):
-                table = i.find_parent("table")
-                if table:
-                    try:
-                        phone = str_simplified(
-                            table.find(
-                                "strong", string=re.compile(".*Main phone.*", re.I)
-                            )
-                            .find_next_sibling("a")
-                            .string
-                        )
-                        break
-                    except AttributeError:
-                        # find() returned None
-                        phone = None
-
-        return Person(
-            name=name,
-            picture_uri=picture_uri,
-            email=email,
-            phone=phone,
-        )
+        return persons
 
     @staticmethod
     def dump_static_info(file_path: Path):
-        static_person_info: Dict[str, str] = {}
-        for name, home_url in KingCountyScraper.get_person_urls().items():
-            static_person_info[name] = json.loads(
-                KingCountyScraper.get_static_person_info(name, home_url).to_json()
+        with open(file_path, "wt") as dump:
+            dump.write(
+                # to allow for easy future addition of info other than Persons
+                # save under top-level key "persons" in the file
+                json.dumps(
+                    {
+                        STATIC_FILE_KEY_PERSONS: [
+                            json.loads(p.to_json())
+                            for p in KingCountyScraper.get_static_person_info()
+                        ]
+                    },
+                    indent=4,
+                )
             )
-
-        print(static_person_info)
+        return True
