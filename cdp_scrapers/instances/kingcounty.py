@@ -167,15 +167,17 @@ class KingCountyScraper(LegistarScraper):
         # repeat similar blob for the next council person
         # ...
         for picture in soup.find_all(
-            "a", text=re.compile(".*official.*portrait.*", re.I)
+            "a", text=re.compile(".*official.*portrait.*", re.IGNORECASE)
         ):
             picture_uri = f"https://kingcounty.gov{str_simplified(picture['href'])}"
+
             # preceding 2 <a> tags have email and website url, in that order
             email_tag = picture.find_previous_sibling("a")
             email = str_simplified(email_tag.text)
             website_tag = email_tag.find_previous_sibling("a")
             website = f"https://kingcounty.gov{str_simplified(website_tag['href'])}"
             name = str_simplified(website_tag.text)
+
             # this area in plain text contains role and phone for this person
             # Rod Dembowski
             # District 1
@@ -191,6 +193,7 @@ class KingCountyScraper(LegistarScraper):
             )
             phone = match.group("phone")
             seat = Seat(name=f"Position {match.group('position')}")
+
             persons.append(
                 Person(
                     name=name,

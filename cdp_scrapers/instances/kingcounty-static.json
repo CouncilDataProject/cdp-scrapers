@@ -1,0 +1,166 @@
+{
+    "persons": [
+        {
+            "name": "Rod Dembowski",
+            "is_active": true,
+            "router_string": null,
+            "email": "rod.dembowski@kingcounty.gov",
+            "phone": "206-477-1001",
+            "website": "https://kingcounty.gov/council/dembowski.aspx",
+            "picture_uri": "https://kingcounty.gov/~/media/council/images/2018/Dembowski_2x3_print.ashx?la=en",
+            "seat": {
+                "name": "Position 1",
+                "electoral_area": "Bothell, Kenmore, Shoreline, Woodinville",
+                "electoral_type": null,
+                "image_uri": "https://www.shorelinewa.gov/home/showpublishedimage/9678/637006775507230000",
+                "external_source_id": null,
+                "roles": null
+            },
+            "external_source_id": null
+        },
+        {
+            "name": "Girmay Zahilay",
+            "is_active": true,
+            "router_string": null,
+            "email": "girmay.zahilay@kingcounty.gov",
+            "phone": "206-477-1002",
+            "website": "https://kingcounty.gov/zahilay",
+            "picture_uri": "https://kingcounty.gov/~/media/council/Zahilay/Zahilay_DSC8834_2x3.ashx?la=en",
+            "seat": {
+                "name": "Position 2",
+                "electoral_area": "University District, Capitol Hill, Columbia City",
+                "electoral_type": null,
+                "image_uri": "https://uploads.visitseattle.org/2015/03/NoguchiNeedle_DavidNewman-2-720x313.jpg",
+                "external_source_id": null,
+                "roles": null
+            },
+            "external_source_id": null
+        },
+        {
+            "name": "Kathy Lambert",
+            "is_active": true,
+            "router_string": null,
+            "email": "kathy.lambert@kingcounty.gov",
+            "phone": "206-477-1003",
+            "website": "https://kingcounty.gov/lambert",
+            "picture_uri": "https://kingcounty.gov/~/media/Lambert/images/2019/Lambert_2020_2x3.ashx?la=en",
+            "seat": {
+                "name": "Position 3",
+                "electoral_area": "Redmond, Sammamish, Snoqualmie",
+                "electoral_type": null,
+                "image_uri": "https://2zxw4d12tfsv19rf3m1j3t5t-wpengine.netdna-ssl.com/wp-content/uploads/2021/11/WELCOME_1400x540_acf_cropped.jpeg",
+                "external_source_id": null,
+                "roles": null
+            },
+            "external_source_id": null
+        },
+        {
+            "name": "Jeanne Kohl-Welles",
+            "is_active": true,
+            "router_string": null,
+            "email": "jeanne.kohl-welles@kingcounty.gov",
+            "phone": "206-477-1004",
+            "website": "https://kingcounty.gov/council/kohl-welles.aspx",
+            "picture_uri": "https://kingcounty.gov/~/media/council/kohl-welles/images/2020/Kohl_Wells_2x3_print.ashx?la=en",
+            "seat": {
+                "name": "Position 4",
+                "electoral_area": "Ballard, Queen Anne",
+                "electoral_type": null,
+                "image_uri": "https://uploads.visitseattle.org/2015/03/QueenAnne_LempelZiv-720x313.jpg",
+                "external_source_id": null,
+                "roles": null
+            },
+            "external_source_id": null
+        },
+        {
+            "name": "Dave Upthegrove",
+            "is_active": true,
+            "router_string": null,
+            "email": "dave.upthegrove@kingcounty.gov",
+            "phone": "206-477-1005",
+            "website": "https://kingcounty.gov/council/upthegrove.aspx",
+            "picture_uri": "https://kingcounty.gov/~/media/council/images/2018/Upthegove_2x3_print.ashx?la=en",
+            "seat": {
+                "name": "Position 5",
+                "electoral_area": "Kent, Renton",
+                "electoral_type": null,
+                "image_uri": "https://assets.atlasobscura.com/media/W1siZiIsInVwbG9hZHMvcGxhY2VfaW1hZ2VzL2ViYTUzOWViLTQ4YWQtNGJkMi04ODU1LWE0OGUxMTJmZjYwZWRmM2FmMjRjNDFjOWYwY2YzMV9JTUdfNjI3MC5KUEciXSxbInAiLCJ0aHVtYiIsIjEyMDB4PiJdLFsicCIsImNvbnZlcnQiLCItcXVhbGl0eSA4MSAtYXV0by1vcmllbnQiXV0/IMG_6270.JPG",
+                "external_source_id": null,
+                "roles": null
+            },
+            "external_source_id": null
+        },
+        {
+            "name": "Claudia Balducci",
+            "is_active": true,
+            "router_string": null,
+            "email": "claudia.balducci@kingcounty.gov",
+            "phone": "206-477-1006",
+            "website": "https://kingcounty.gov/council/balducci.aspx",
+            "picture_uri": "https://kingcounty.gov/~/media/council/balducci/images/2021/Balducci_highres.ashx?la=en",
+            "seat": {
+                "name": "Position 6",
+                "electoral_area": "Bellevue, Kirkland",
+                "electoral_type": null,
+                "image_uri": "https://bellevuewa.gov/sites/default/files/styles/header_image/public/media/header_image/2019-06/dtp-1600x400.jpg",
+                "external_source_id": null,
+                "roles": null
+            },
+            "external_source_id": null
+        },
+        {
+            "name": "Pete von Reichbauer",
+            "is_active": true,
+            "router_string": null,
+            "email": "pete.vonreichbauer@kingcounty.gov",
+            "phone": "206-477-1007",
+            "website": "https://kingcounty.gov/vonreichbauer",
+            "picture_uri": "https://kingcounty.gov/~/media/council/images/2018/von_Reichbauer_2x3_print.ashx?la=en",
+            "seat": {
+                "name": "Position 7",
+                "electoral_area": "Auburn, Federal Way",
+                "electoral_type": null,
+                "image_uri": "https://images.squarespace-cdn.com/content/v1/6052a75d659a54382fdd9d0c/de431180-5279-4e79-b9b8-9ac0d7ce397d/119676064_3347199895369413_1933009335190743261_o.jpg",
+                "external_source_id": null,
+                "roles": null
+            },
+            "external_source_id": null
+        },
+        {
+            "name": "Joe McDermott",
+            "is_active": true,
+            "router_string": null,
+            "email": "joe.mcdermott@kingcounty.gov",
+            "phone": "206-477-1008",
+            "website": "https://kingcounty.gov/council/mcdermott.aspx",
+            "picture_uri": "https://kingcounty.gov/~/media/council/images/joecropped.ashx?h=321&w=240&la=en",
+            "seat": {
+                "name": "Position 8",
+                "electoral_area": "Burien, Tukwila, West Seattle",
+                "electoral_type": null,
+                "image_uri": "https://uploads.visitseattle.org/2015/03/AlkiBeach_NickHallPhotography-720x313.jpg",
+                "external_source_id": null,
+                "roles": null
+            },
+            "external_source_id": null
+        },
+        {
+            "name": "Reagan Dunn",
+            "is_active": true,
+            "router_string": null,
+            "email": "reagan.dunn@kingcounty.gov",
+            "phone": "206-477-1009",
+            "website": "https://kingcounty.gov/dunn",
+            "picture_uri": "https://kingcounty.gov/~/media/Dunn/images/2019/Dunn_DSC8750_2x3.ashx?la=en",
+            "seat": {
+                "name": "Position 9",
+                "electoral_area": "Covington, Maple Valley, Newcastle",
+                "electoral_type": null,
+                "image_uri": "https://photos.alltrails.com/eyJidWNrZXQiOiJhc3NldHMuYWxsdHJhaWxzLmNvbSIsImtleSI6InVwbG9hZHMvcGhvdG8vaW1hZ2UvMjM5OTA0NTMvN2ZkYWYzNmEyMjY1YTJlMmMwYWU0M2RiZTQxNGIzMmIuanBnIiwiZWRpdHMiOnsidG9Gb3JtYXQiOiJqcGVnIiwicmVzaXplIjp7IndpZHRoIjoyMDQ4LCJoZWlnaHQiOjIwNDgsImZpdCI6Imluc2lkZSJ9LCJyb3RhdGUiOm51bGwsImpwZWciOnsidHJlbGxpc1F1YW50aXNhdGlvbiI6dHJ1ZSwib3ZlcnNob290RGVyaW5naW5nIjp0cnVlLCJvcHRpbWlzZVNjYW5zIjp0cnVlLCJxdWFudGlzYXRpb25UYWJsZSI6M319fQ==",
+                "external_source_id": null,
+                "roles": null
+            },
+            "external_source_id": null
+        }
+    ]
+}
