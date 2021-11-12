@@ -1,6 +1,6 @@
 {
-    "persons": [
-        {
+    "persons": {
+        "Rod Dembowski": {
             "name": "Rod Dembowski",
             "is_active": true,
             "router_string": null,
@@ -18,7 +18,7 @@
             },
             "external_source_id": null
         },
-        {
+        "Girmay Zahilay": {
             "name": "Girmay Zahilay",
             "is_active": true,
             "router_string": null,
@@ -36,7 +36,7 @@
             },
             "external_source_id": null
         },
-        {
+        "Kathy Lambert": {
             "name": "Kathy Lambert",
             "is_active": true,
             "router_string": null,
@@ -54,7 +54,7 @@
             },
             "external_source_id": null
         },
-        {
+        "Jeanne Kohl-Welles": {
             "name": "Jeanne Kohl-Welles",
             "is_active": true,
             "router_string": null,
@@ -72,7 +72,7 @@
             },
             "external_source_id": null
         },
-        {
+        "Dave Upthegrove": {
             "name": "Dave Upthegrove",
             "is_active": true,
             "router_string": null,
@@ -90,7 +90,7 @@
             },
             "external_source_id": null
         },
-        {
+        "Claudia Balducci": {
             "name": "Claudia Balducci",
             "is_active": true,
             "router_string": null,
@@ -108,7 +108,7 @@
             },
             "external_source_id": null
         },
-        {
+        "Pete von Reichbauer": {
             "name": "Pete von Reichbauer",
             "is_active": true,
             "router_string": null,
@@ -126,7 +126,7 @@
             },
             "external_source_id": null
         },
-        {
+        "Joe McDermott": {
             "name": "Joe McDermott",
             "is_active": true,
             "router_string": null,
@@ -144,7 +144,7 @@
             },
             "external_source_id": null
         },
-        {
+        "Reagan Dunn": {
             "name": "Reagan Dunn",
             "is_active": true,
             "router_string": null,
@@ -154,13 +154,13 @@
             "picture_uri": "https://kingcounty.gov/~/media/Dunn/images/2019/Dunn_DSC8750_2x3.ashx?la=en",
             "seat": {
                 "name": "Position 9",
-                "electoral_area": "Covington, Maple Valley, Newcastle",
+                "electoral_area": null,
                 "electoral_type": null,
-                "image_uri": "https://photos.alltrails.com/eyJidWNrZXQiOiJhc3NldHMuYWxsdHJhaWxzLmNvbSIsImtleSI6InVwbG9hZHMvcGhvdG8vaW1hZ2UvMjM5OTA0NTMvN2ZkYWYzNmEyMjY1YTJlMmMwYWU0M2RiZTQxNGIzMmIuanBnIiwiZWRpdHMiOnsidG9Gb3JtYXQiOiJqcGVnIiwicmVzaXplIjp7IndpZHRoIjoyMDQ4LCJoZWlnaHQiOjIwNDgsImZpdCI6Imluc2lkZSJ9LCJyb3RhdGUiOm51bGwsImpwZWciOnsidHJlbGxpc1F1YW50aXNhdGlvbiI6dHJ1ZSwib3ZlcnNob290RGVyaW5naW5nIjp0cnVlLCJvcHRpbWlzZVNjYW5zIjp0cnVlLCJxdWFudGlzYXRpb25UYWJsZSI6M319fQ==",
+                "image_uri": null,
                 "external_source_id": null,
                 "roles": null
             },
             "external_source_id": null
         }
-    ]
+    }
 }

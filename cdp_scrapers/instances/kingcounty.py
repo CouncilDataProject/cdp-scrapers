@@ -4,7 +4,7 @@
 import logging
 import re
 import json
-from typing import Dict, List
+from typing import Dict, List, Optional
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
 from pathlib import Path
@@ -26,6 +26,24 @@ log = logging.getLogger(__name__)
 ###############################################################################
 
 STATIC_FILE_KEY_PERSONS = "persons"
+STATIC_FILE_DEFAULT_PATH = Path(__file__).parent / "kingcounty-static.json"
+
+known_persons: Optional[Dict[str, Person]] = None
+
+# load long-term static data at file load-time
+if Path(STATIC_FILE_DEFAULT_PATH).exists():
+    with open(STATIC_FILE_DEFAULT_PATH, "rb") as json_file:
+        static_data = json.load(json_file)
+
+    known_persons = {}
+    for name, person in static_data[STATIC_FILE_KEY_PERSONS].items():
+        known_persons[name] = Person.from_dict(person)
+
+
+if known_persons:
+    log.debug(f"loaded static data for {', '.join(known_persons.keys())}")
+
+###############################################################################
 
 
 class KingCountyScraper(LegistarScraper):
@@ -56,6 +74,7 @@ class KingCountyScraper(LegistarScraper):
                 "on the agenda for procedural matters",
                 "This is a mandatory referral to the",
             ],
+            known_persons=known_persons,
         )
 
     def get_content_uris(self, legistar_ev: Dict) -> List[ContentURIs]:
@@ -144,14 +163,15 @@ class KingCountyScraper(LegistarScraper):
         return [ContentURIs(video_uri=video_uri, caption_uri=None)]
 
     @staticmethod
-    def get_static_person_info() -> List[Person]:
+    def get_static_person_info() -> Dict[str, Person]:
         # this page lists current council members
         with urlopen(
             "https://kingcounty.gov/council/councilmembers/find_district.aspx"
         ) as resp:
             soup = BeautifulSoup(resp.read(), "html.parser")
 
-        persons: List[Person] = []
+        # keyed by name
+        persons: Dict[str, Person] = {}
 
         # there is a series of council member portrait pictures
         # marked by text "official portrait"
@@ -194,33 +214,24 @@ class KingCountyScraper(LegistarScraper):
             phone = match.group("phone")
             seat = Seat(name=f"Position {match.group('position')}")
 
-            persons.append(
-                Person(
-                    name=name,
-                    picture_uri=picture_uri,
-                    email=email,
-                    website=website,
-                    phone=phone,
-                    seat=seat,
-                )
+            persons[name] = Person(
+                name=name,
+                picture_uri=picture_uri,
+                email=email,
+                website=website,
+                phone=phone,
+                seat=seat,
             )
 
         return persons
 
     @staticmethod
-    def dump_static_info(file_path: Path):
+    def dump_static_info(file_path: Path) -> None:
+        static_info_json = {STATIC_FILE_KEY_PERSONS: {}}
+        for [name, person] in KingCountyScraper.get_static_person_info().items():
+            # to allow for easy future addition of info other than Persons
+            # save under top-level key "persons" in the file
+            static_info_json[STATIC_FILE_KEY_PERSONS][name] = person.to_dict()
+
         with open(file_path, "wt") as dump:
-            dump.write(
-                # to allow for easy future addition of info other than Persons
-                # save under top-level key "persons" in the file
-                json.dumps(
-                    {
-                        STATIC_FILE_KEY_PERSONS: [
-                            json.loads(p.to_json())
-                            for p in KingCountyScraper.get_static_person_info()
-                        ]
-                    },
-                    indent=4,
-                )
-            )
-        return True
+            dump.write(json.dumps(static_info_json, indent=4))
