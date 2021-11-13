@@ -28,9 +28,11 @@ log = logging.getLogger(__name__)
 STATIC_FILE_KEY_PERSONS = "persons"
 STATIC_FILE_DEFAULT_PATH = Path(__file__).parent / "kingcounty-static.json"
 
+# will be passed into LegistarScraper.__init__()
+# to inject data into Persons to fill in information missing in Legistar API
 known_persons: Optional[Dict[str, Person]] = None
 
-# load long-term static data at file load-time
+# load long-term static data at file load-time, if file exists
 if Path(STATIC_FILE_DEFAULT_PATH).exists():
     with open(STATIC_FILE_DEFAULT_PATH, "rb") as json_file:
         static_data = json.load(json_file)
@@ -164,6 +166,19 @@ class KingCountyScraper(LegistarScraper):
 
     @staticmethod
     def get_static_person_info() -> Dict[str, Person]:
+        """
+        Scrape current council members information from kingcounty.gov
+
+        Returns
+        -------
+        persons: Dict[str, Person]
+            keyed by name
+
+        Notes
+        -----
+        Parse https://kingcounty.gov/council/councilmembers/find_district.aspx
+        that contains list of current council members name, position, contact info
+        """
         # this page lists current council members
         with urlopen(
             "https://kingcounty.gov/council/councilmembers/find_district.aspx"
@@ -227,6 +242,16 @@ class KingCountyScraper(LegistarScraper):
 
     @staticmethod
     def dump_static_info(file_path: Path) -> None:
+        """
+        Call this to save current council members information as Persons
+        in json format to file_path.
+        Intended to be called once every N years when the council changes.
+
+        Parameters
+        ----------
+        file_path: Path
+            output json file path
+        """
         static_info_json = {STATIC_FILE_KEY_PERSONS: {}}
         for [name, person] in KingCountyScraper.get_static_person_info().items():
             # to allow for easy future addition of info other than Persons

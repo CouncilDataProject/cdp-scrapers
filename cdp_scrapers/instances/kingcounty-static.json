@@ -28,7 +28,7 @@
             "picture_uri": "https://kingcounty.gov/~/media/council/Zahilay/Zahilay_DSC8834_2x3.ashx?la=en",
             "seat": {
                 "name": "Position 2",
-                "electoral_area": "University District, Capitol Hill, Columbia City",
+                "electoral_area": "Eastern Seattle",
                 "electoral_type": null,
                 "image_uri": "https://uploads.visitseattle.org/2015/03/NoguchiNeedle_DavidNewman-2-720x313.jpg",
                 "external_source_id": null,
@@ -64,7 +64,7 @@
             "picture_uri": "https://kingcounty.gov/~/media/council/kohl-welles/images/2020/Kohl_Wells_2x3_print.ashx?la=en",
             "seat": {
                 "name": "Position 4",
-                "electoral_area": "Ballard, Queen Anne",
+                "electoral_area": "Western Seattle",
                 "electoral_type": null,
                 "image_uri": "https://uploads.visitseattle.org/2015/03/QueenAnne_LempelZiv-720x313.jpg",
                 "external_source_id": null,
@@ -154,9 +154,9 @@
             "picture_uri": "https://kingcounty.gov/~/media/Dunn/images/2019/Dunn_DSC8750_2x3.ashx?la=en",
             "seat": {
                 "name": "Position 9",
-                "electoral_area": null,
+                "electoral_area": "Covington, Maple Valley",
                 "electoral_type": null,
-                "image_uri": null,
+                "image_uri": "https://photos.alltrails.com/eyJidWNrZXQiOiJhc3NldHMuYWxsdHJhaWxzLmNvbSIsImtleSI6InVwbG9hZHMvcGhvdG8vaW1hZ2UvMjM5OTA0NTMvN2ZkYWYzNmEyMjY1YTJlMmMwYWU0M2RiZTQxNGIzMmIuanBnIiwiZWRpdHMiOnsidG9Gb3JtYXQiOiJqcGVnIiwicmVzaXplIjp7IndpZHRoIjoyMDQ4LCJoZWlnaHQiOjIwNDgsImZpdCI6Imluc2lkZSJ9LCJyb3RhdGUiOm51bGwsImpwZWciOnsidHJlbGxpc1F1YW50aXNhdGlvbiI6dHJ1ZSwib3ZlcnNob290RGVyaW5naW5nIjp0cnVlLCJvcHRpbWlzZVNjYW5zIjp0cnVlLCJxdWFudGlzYXRpb25UYWJsZSI6M319fQ==",
                 "external_source_id": null,
                 "roles": null
             },
