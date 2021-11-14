@@ -7,7 +7,7 @@
             "email": null,
             "phone": null,
             "website": null,
-            "picture_uri": "http://www.seattle.gov//assets/images/Council/Members/Pedersen/Councilmember-Alex-Pedersen_homepage-banner.jpg",
+            "picture_uri": "http://www.seattle.gov//assets/Images/Council/Members/Pedersen/Councilmember-Alex-Pedersen_square-headshot.jpg",
             "seat": {
                 "name": "Position 4",
                 "electoral_area": "Northeast Seattle",
@@ -25,7 +25,7 @@
             "email": null,
             "phone": null,
             "website": null,
-            "picture_uri": "http://www.seattle.gov//assets/images/Council/Members/Lewis/lewis_homepage_banner.jpg",
+            "picture_uri": "http://www.seattle.gov//assets/Images/Council/Members/Lewis/Andrew-Lewis-Campaign-Headshot_300x300.jpg",
             "seat": {
                 "name": "Position 7",
                 "electoral_area": "Pioneer Square to Magnolia",
@@ -43,7 +43,7 @@
             "email": null,
             "phone": null,
             "website": null,
-            "picture_uri": "http://www.seattle.gov//assets/images/Council/Members/Strauss/strauss_homepage_banner.jpg",
+            "picture_uri": "http://www.seattle.gov//assets/Images/Council/Members/Strauss/strauss_headshot_300x300.jpg",
             "seat": {
                 "name": "Position 6",
                 "electoral_area": "Northwest Seattle",
@@ -61,7 +61,7 @@
             "email": null,
             "phone": null,
             "website": null,
-            "picture_uri": "http://www.seattle.gov//assets/images/Council/Members/Juarez/DeboraJuarezBanner.jpg",
+            "picture_uri": "http://www.seattle.gov//assets/Images/Council/Members/Juarez/Debora-Juarez-2018_225x225.jpg",
             "seat": {
                 "name": "Position 5",
                 "electoral_area": "North Seattle",
@@ -79,7 +79,7 @@
             "email": null,
             "phone": null,
             "website": null,
-            "picture_uri": "http://www.seattle.gov//assets/images/Council/Members/Sawant/Councilmember-Kshama-Sawant_blue-banner.jpg",
+            "picture_uri": "http://www.seattle.gov//assets/Images/Council/Members/Sawant/Sawant_225x225.jpg",
             "seat": {
                 "name": "Position 3",
                 "electoral_area": "Central Seattle",
@@ -97,7 +97,7 @@
             "email": null,
             "phone": null,
             "website": null,
-            "picture_uri": "http://www.seattle.gov//assets/images/Council/Members/Herbold/Lisa-Herbold-Homepage.jpg",
+            "picture_uri": "http://www.seattle.gov//assets/Images/Council/Members/Herbold/Herbold_225x225.jpg",
             "seat": {
                 "name": "Position 1",
                 "electoral_area": "West Seattle",
@@ -115,12 +115,12 @@
             "email": null,
             "phone": null,
             "website": null,
-            "picture_uri": "https://images.unsplash.com/photo-1523665307251-7f4e0e7b23fc?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8",
+            "picture_uri": "http://www.seattle.gov//assets/Images/Council/Members/Gonzalez/Lorena-González_2020-headshot_225x225.jpg",
             "seat": {
                 "name": "Position 9",
                 "electoral_area": "Citywide",
                 "electoral_type": null,
-                "image_uri": "https://www.seattle.gov/Images/Clerk/DistrictsMap.jpg",
+                "image_uri": "https://upload.wikimedia.org/wikipedia/commons/3/36/SeattleI5Skyline.jpg",
                 "external_source_id": null,
                 "roles": null
             },
@@ -133,7 +133,7 @@
             "email": null,
             "phone": null,
             "website": null,
-            "picture_uri": "http://www.seattle.gov//assets/images/Council/Members/Morales/morales_homepage_banner.jpg",
+            "picture_uri": "http://www.seattle.gov//assets/Images/Council/Members/Morales/Tammy-Morales_headshot_final_300x300.jpg",
             "seat": {
                 "name": "Position 2",
                 "electoral_area": "Southeast Seattle",
@@ -151,12 +151,12 @@
             "email": null,
             "phone": null,
             "website": null,
-            "picture_uri": "http://www.seattle.gov//assets/images/Council/Members/Mosqueda/Mosqueda-blue-banner_1920x450.jpg",
+            "picture_uri": "http://www.seattle.gov//assets/Images/Council/Members/Mosqueda/Mosqueda_225x225.jpg",
             "seat": {
                 "name": "Position 8",
                 "electoral_area": "Citywide",
                 "electoral_type": null,
-                "image_uri": "https://images.unsplash.com/photo-1523665307251-7f4e0e7b23fc?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8",
+                "image_uri": "https://upload.wikimedia.org/wikipedia/commons/3/36/SeattleI5Skyline.jpg",
                 "external_source_id": null,
                 "roles": null
             },
