@@ -114,18 +114,47 @@
 
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 <span class="kn">from</span> <span class="nn">urllib.error</span> <span class="kn">import</span> <span class="n">HTTPError</span><span class="p">,</span> <span class="n">URLError</span>
 <span class="kn">from</span> <span class="nn">urllib.request</span> <span class="kn">import</span> <span class="n">urlopen</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
 
-<span class="kn">from</span> <span class="nn">..legistar_utils</span> <span class="kn">import</span> <span class="n">LEGISTAR_EV_SITE_URL</span><span class="p">,</span> <span class="n">LegistarScraper</span>
+<span class="kn">from</span> <span class="nn">cdp_backend.pipeline.ingestion_models</span> <span class="kn">import</span> <span class="n">Person</span><span class="p">,</span> <span class="n">Seat</span>
+<span class="kn">from</span> <span class="nn">..legistar_utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">LEGISTAR_EV_SITE_URL</span><span class="p">,</span>
+    <span class="n">LegistarScraper</span><span class="p">,</span>
+    <span class="n">str_simplified</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">..types</span> <span class="kn">import</span> <span class="n">ContentURIs</span>
 
 <span class="c1">###############################################################################</span>
 
 <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="c1">###############################################################################</span>
+
+<span class="n">STATIC_FILE_KEY_PERSONS</span> <span class="o">=</span> <span class="s2">&quot;persons&quot;</span>
+<span class="n">STATIC_FILE_DEFAULT_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;kingcounty-static.json&quot;</span>
+
+<span class="c1"># will be passed into LegistarScraper.__init__()</span>
+<span class="c1"># to inject data into Persons to fill in information missing in Legistar API</span>
+<span class="n">known_persons</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Person</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="c1"># load long-term static data at file load-time, if file exists</span>
+<span class="k">if</span> <span class="n">Path</span><span class="p">(</span><span class="n">STATIC_FILE_DEFAULT_PATH</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">STATIC_FILE_DEFAULT_PATH</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">json_file</span><span class="p">:</span>
+        <span class="n">static_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">json_file</span><span class="p">)</span>
+
+    <span class="n">known_persons</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">person</span> <span class="ow">in</span> <span class="n">static_data</span><span class="p">[</span><span class="n">STATIC_FILE_KEY_PERSONS</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">known_persons</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">Person</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">person</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="n">known_persons</span><span class="p">:</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;loaded static data for </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">known_persons</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="c1">###############################################################################</span>
 
@@ -158,6 +187,7 @@
                 <span class="s2">&quot;on the agenda for procedural matters&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;This is a mandatory referral to the&quot;</span><span class="p">,</span>
             <span class="p">],</span>
+            <span class="n">known_persons</span><span class="o">=</span><span class="n">known_persons</span><span class="p">,</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="KingCountyScraper.get_content_uris"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.kingcounty.KingCountyScraper.get_content_uris">[docs]</a>    <span class="k">def</span> <span class="nf">get_content_uris</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_ev</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ContentURIs</span><span class="p">]:</span>
@@ -243,7 +273,104 @@
         <span class="c1"># Cleans up the video url to remove backward slash(\)</span>
         <span class="n">video_uri</span> <span class="o">=</span> <span class="n">video_url</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="c1"># caption URIs are not found for kingcounty events.</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">ContentURIs</span><span class="p">(</span><span class="n">video_uri</span><span class="o">=</span><span class="n">video_uri</span><span class="p">,</span> <span class="n">caption_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">)]</span></div></div>
+        <span class="k">return</span> <span class="p">[</span><span class="n">ContentURIs</span><span class="p">(</span><span class="n">video_uri</span><span class="o">=</span><span class="n">video_uri</span><span class="p">,</span> <span class="n">caption_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">)]</span></div>
+
+<div class="viewcode-block" id="KingCountyScraper.get_static_person_info"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.kingcounty.KingCountyScraper.get_static_person_info">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_static_person_info</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Person</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Scrape current council members information from kingcounty.gov</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        persons: Dict[str, Person]</span>
+<span class="sd">            keyed by name</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Parse https://kingcounty.gov/council/councilmembers/find_district.aspx</span>
+<span class="sd">        that contains list of current council members name, position, contact info</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># this page lists current council members</span>
+        <span class="k">with</span> <span class="n">urlopen</span><span class="p">(</span>
+            <span class="s2">&quot;https://kingcounty.gov/council/councilmembers/find_district.aspx&quot;</span>
+        <span class="p">)</span> <span class="k">as</span> <span class="n">resp</span><span class="p">:</span>
+            <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">resp</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="s2">&quot;html.parser&quot;</span><span class="p">)</span>
+
+        <span class="c1"># keyed by name</span>
+        <span class="n">persons</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Person</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># there is a series of council member portrait pictures</span>
+        <span class="c1"># marked by text &quot;official portrait&quot;</span>
+
+        <span class="c1"># &lt;a href=&quot;/council/dembowski.aspx&quot;&gt;&lt;strong&gt;Rod Dembowski&lt;/strong&gt;&lt;br/&gt;</span>
+        <span class="c1"># &lt;/a&gt;District 1&lt;br/&gt;</span>
+        <span class="c1"># 206-477-1001&lt;br/&gt;</span>
+        <span class="c1"># &lt;a href=&quot;mailto:...&quot;&gt;rod.dembowski@kingcounty.gov &lt;/a&gt;&lt;br/&gt;</span>
+        <span class="c1"># Member since: 2013&lt;br/&gt;</span>
+        <span class="c1"># Current t&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;erm: 2018-2021&lt;/span&gt;&lt;br/&gt;</span>
+        <span class="c1"># &lt;a href=&quot;/~/media/...&quot;&gt;Official portrait&lt;/a&gt;</span>
+        <span class="c1"># ...</span>
+        <span class="c1"># repeat similar blob for the next council person</span>
+        <span class="c1"># ...</span>
+        <span class="k">for</span> <span class="n">picture</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span>
+            <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;.*official.*portrait.*&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="n">picture_uri</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://kingcounty.gov</span><span class="si">{</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">picture</span><span class="p">[</span><span class="s1">&#39;href&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="c1"># preceding 2 &lt;a&gt; tags have email and website url, in that order</span>
+            <span class="n">email_tag</span> <span class="o">=</span> <span class="n">picture</span><span class="o">.</span><span class="n">find_previous_sibling</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">)</span>
+            <span class="n">email</span> <span class="o">=</span> <span class="n">str_simplified</span><span class="p">(</span><span class="n">email_tag</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+            <span class="n">website_tag</span> <span class="o">=</span> <span class="n">email_tag</span><span class="o">.</span><span class="n">find_previous_sibling</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">)</span>
+            <span class="n">website</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://kingcounty.gov</span><span class="si">{</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">website_tag</span><span class="p">[</span><span class="s1">&#39;href&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">str_simplified</span><span class="p">(</span><span class="n">website_tag</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+
+            <span class="c1"># this area in plain text contains role and phone for this person</span>
+            <span class="c1"># Rod Dembowski</span>
+            <span class="c1"># District 1</span>
+            <span class="c1"># 206-477-1001</span>
+            <span class="c1"># rod.dembowski@kingcounty.gov</span>
+            <span class="n">parent_tag</span> <span class="o">=</span> <span class="n">picture</span><span class="o">.</span><span class="n">find_parent</span><span class="p">()</span>
+            <span class="c1"># position number is the trailing number in the line after name</span>
+            <span class="c1"># and the line after position is the telephone</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;.*</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.*</span><span class="se">\\</span><span class="s2">s+.*(?P&lt;position&gt;</span><span class="se">\\</span><span class="s2">d+)</span><span class="se">\\</span><span class="s2">s+(?P&lt;phone&gt;[</span><span class="se">\\</span><span class="s2">d</span><span class="se">\\</span><span class="s2">-</span><span class="se">\\</span><span class="s2">(</span><span class="se">\\</span><span class="s2">)]+)&quot;</span><span class="p">,</span>
+                <span class="n">parent_tag</span><span class="o">.</span><span class="n">text</span><span class="p">,</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">phone</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;phone&quot;</span><span class="p">)</span>
+            <span class="n">seat</span> <span class="o">=</span> <span class="n">Seat</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Position </span><span class="si">{</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;position&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="n">persons</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">Person</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">picture_uri</span><span class="o">=</span><span class="n">picture_uri</span><span class="p">,</span>
+                <span class="n">email</span><span class="o">=</span><span class="n">email</span><span class="p">,</span>
+                <span class="n">website</span><span class="o">=</span><span class="n">website</span><span class="p">,</span>
+                <span class="n">phone</span><span class="o">=</span><span class="n">phone</span><span class="p">,</span>
+                <span class="n">seat</span><span class="o">=</span><span class="n">seat</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">persons</span></div>
+
+<div class="viewcode-block" id="KingCountyScraper.dump_static_info"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.kingcounty.KingCountyScraper.dump_static_info">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">dump_static_info</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Call this to save current council members information as Persons</span>
+<span class="sd">        in json format to file_path.</span>
+<span class="sd">        Intended to be called once every N years when the council changes.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        file_path: Path</span>
+<span class="sd">            output json file path</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">static_info_json</span> <span class="o">=</span> <span class="p">{</span><span class="n">STATIC_FILE_KEY_PERSONS</span><span class="p">:</span> <span class="p">{}}</span>
+        <span class="k">for</span> <span class="p">[</span><span class="n">name</span><span class="p">,</span> <span class="n">person</span><span class="p">]</span> <span class="ow">in</span> <span class="n">KingCountyScraper</span><span class="o">.</span><span class="n">get_static_person_info</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># to allow for easy future addition of info other than Persons</span>
+            <span class="c1"># save under top-level key &quot;persons&quot; in the file</span>
+            <span class="n">static_info_json</span><span class="p">[</span><span class="n">STATIC_FILE_KEY_PERSONS</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">person</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;wt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">dump</span><span class="p">:</span>
+            <span class="n">dump</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">static_info_json</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span></div></div>
 </pre></div>
 
            </div>
