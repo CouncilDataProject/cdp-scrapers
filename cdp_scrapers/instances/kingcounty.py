@@ -75,6 +75,7 @@ class KingCountyScraper(LegistarScraper):
                 "Executive Session: For 15 minutes, with action to follow",
                 "on the agenda for procedural matters",
                 "This is a mandatory referral to the",
+                "Watch King County TV Channel 22",
             ],
             known_persons=known_persons,
         )
