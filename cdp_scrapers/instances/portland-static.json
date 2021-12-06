@@ -1,0 +1,22 @@
+{
+    "persons": {
+        "Rod Dembowski": {
+            "name": "Ted Wheeler",
+            "is_active": true,
+            "router_string": null,
+            "email": "wheelermediarequests@portlandoregon.gov",
+            "phone": "503-823-4120",
+            "website": "https://www.portland.gov/wheeler",
+            "picture_uri": "https://www.portland.gov/sites/default/files/styles/4x5_320w/public/2020-03/mayor-wheeler-headshot-4x5-3-5-2020.jpg",
+            "seat": {
+                "name": "Mayor",
+                "electoral_area": null,
+                "electoral_type": null,
+                "image_uri": "https://www.portland.gov/sites/default/files/styles/facebook/public/2020-01/city_hall_portland_oregon_2012.jpg",
+                "external_source_id": null,
+                "roles": null
+            },
+            "external_source_id": null
+        }
+    }
+}
