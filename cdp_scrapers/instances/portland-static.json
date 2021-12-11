@@ -1,6 +1,6 @@
 {
     "persons": {
-        "Rod Dembowski": {
+        "Ted Wheeler": {
             "name": "Ted Wheeler",
             "is_active": true,
             "router_string": null,
@@ -10,9 +10,81 @@
             "picture_uri": "https://www.portland.gov/sites/default/files/styles/4x5_320w/public/2020-03/mayor-wheeler-headshot-4x5-3-5-2020.jpg",
             "seat": {
                 "name": "Mayor",
-                "electoral_area": null,
+                "electoral_area": "Portland",
                 "electoral_type": null,
                 "image_uri": "https://www.portland.gov/sites/default/files/styles/facebook/public/2020-01/city_hall_portland_oregon_2012.jpg",
+                "external_source_id": null,
+                "roles": null
+            },
+            "external_source_id": null
+        },
+        "Carmen Rubio": {
+            "name": "Carmen Rubio",
+            "is_active": true,
+            "router_string": null,
+            "email": "comm.rubio@portlandoregon.gov",
+            "phone": "503-823-3008",
+            "website": "https://www.portland.gov/rubio",
+            "picture_uri": "https://www.portland.gov/sites/default/files/styles/4x5_320w/public/2021/carmen-rubio.jpg",
+            "seat": {
+                "name": "Position 1",
+                "electoral_area": "Portland",
+                "electoral_type": null,
+                "image_uri": "https://www.portland.gov/sites/default/files/styles/featured_2_1_600w/public/2019-09/aboutbps_0.jpg",
+                "external_source_id": null,
+                "roles": null
+            },
+            "external_source_id": null
+        },
+        ,"Dan Ryan": {
+            "name": "Dan Ryan",
+            "is_active": true,
+            "router_string": null,
+            "email": "CommissionerRyanOffice@portlandoregon.gov",
+            "phone": "503-823-3589",
+            "website": "https://www.portland.gov/ryan",
+            "picture_uri": "https://www.portland.gov/sites/default/files/styles/4x5_320w/public/2021/katalina-berbari-2_0.jpg",
+            "seat": {
+                "name": "Position 2",
+                "electoral_area": "Portland",
+                "electoral_type": null,
+                "image_uri": "https://www.portland.gov/sites/default/files/styles/featured_2_1_600w/public/2020/50094388718_561b442a17_k.jpg",
+                "external_source_id": null,
+                "roles": null
+            },
+            "external_source_id": null
+        },
+        "Jo Ann Hardesty": {
+            "name": "Jo Ann Hardesty",
+            "is_active": true,
+            "router_string": null,
+            "email": "joann@portlandoregon.gov",
+            "phone": "503-823-4151",
+            "website": "https://www.portland.gov/hardesty",
+            "picture_uri": "https://www.portland.gov/sites/default/files/styles/max_540w/public/2020-01/jo-ann-hardesty-portrait-about-page.jpg",
+            "seat": {
+                "name": "Position 3",
+                "electoral_area": "Portland",
+                "electoral_type": null,
+                "image_uri": "https://www.portland.gov/sites/default/files/styles/featured_2_1_600w/public/2020-07/station-1.jpg",
+                "external_source_id": null,
+                "roles": null
+            },
+            "external_source_id": null
+        },
+        "Mingus Mapps": {
+            "name": "Mingus Mapps",
+            "is_active": true,
+            "router_string": null,
+            "email": "MappsOffice@portlandoregon.gov",
+            "phone": "503-823-4682",
+            "website": "https://www.portland.gov/mapps",
+            "picture_uri": "https://www.portland.gov/sites/default/files/styles/4x5_320w/public/2021/minguswattributionjpegcrop2_0.jpg",
+            "seat": {
+                "name": "Position 4",
+                "electoral_area": "Portland",
+                "electoral_type": null,
+                "image_uri": "https://www.portland.gov/sites/default/files/styles/featured_2_1_600w/public/2020-08/environmental-services-program.jpg",
                 "external_source_id": null,
                 "roles": null
             },
