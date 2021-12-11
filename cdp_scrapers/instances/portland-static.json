@@ -10,11 +10,11 @@
             "picture_uri": "https://www.portland.gov/sites/default/files/styles/4x5_320w/public/2020-03/mayor-wheeler-headshot-4x5-3-5-2020.jpg",
             "seat": {
                 "name": "Mayor",
-                "electoral_area": "Portland",
+                "electoral_area": "Citywide",
                 "electoral_type": null,
                 "image_uri": "https://www.portland.gov/sites/default/files/styles/facebook/public/2020-01/city_hall_portland_oregon_2012.jpg",
                 "external_source_id": null,
-                "roles": null
+                "roles": ["City Budget", "Management and Finance", "Government Relations", "City Attorney", "Police", "Prosper Portland", "Emergency Management", "Equity and Human Rights"]
             },
             "external_source_id": null
         },
@@ -28,11 +28,11 @@
             "picture_uri": "https://www.portland.gov/sites/default/files/styles/4x5_320w/public/2021/carmen-rubio.jpg",
             "seat": {
                 "name": "Position 1",
-                "electoral_area": "Portland",
+                "electoral_area": "Citywide",
                 "electoral_type": null,
                 "image_uri": "https://www.portland.gov/sites/default/files/styles/featured_2_1_600w/public/2019-09/aboutbps_0.jpg",
                 "external_source_id": null,
-                "roles": null
+                "roles": ["Parks & Recreation", "Planning and Sustainability", "Community Technology", "Small Donor Elections"]
             },
             "external_source_id": null
         },
@@ -46,11 +46,11 @@
             "picture_uri": "https://www.portland.gov/sites/default/files/styles/4x5_320w/public/2021/katalina-berbari-2_0.jpg",
             "seat": {
                 "name": "Position 2",
-                "electoral_area": "Portland",
+                "electoral_area": "Citywide",
                 "electoral_type": null,
                 "image_uri": "https://www.portland.gov/sites/default/files/styles/featured_2_1_600w/public/2020/50094388718_561b442a17_k.jpg",
                 "external_source_id": null,
-                "roles": null
+                "roles": ["Development Services (BDS)", "Housing Bureau", "Children's Levy"]
             },
             "external_source_id": null
         },
@@ -64,11 +64,11 @@
             "picture_uri": "https://www.portland.gov/sites/default/files/styles/max_540w/public/2020-01/jo-ann-hardesty-portrait-about-page.jpg",
             "seat": {
                 "name": "Position 3",
-                "electoral_area": "Portland",
+                "electoral_area": "Citywide",
                 "electoral_type": null,
                 "image_uri": "https://www.portland.gov/sites/default/files/styles/featured_2_1_600w/public/2020-07/station-1.jpg",
                 "external_source_id": null,
-                "roles": null
+                "roles": ["Transportation", "Office of Community & Civic Life", "Portland Fire & Rescue", "Fire and Police Disability and Retirement"]
             },
             "external_source_id": null
         },
@@ -82,11 +82,11 @@
             "picture_uri": "https://www.portland.gov/sites/default/files/styles/4x5_320w/public/2021/minguswattributionjpegcrop2_0.jpg",
             "seat": {
                 "name": "Position 4",
-                "electoral_area": "Portland",
+                "electoral_area": "Citywide",
                 "electoral_type": null,
                 "image_uri": "https://www.portland.gov/sites/default/files/styles/featured_2_1_600w/public/2020-08/environmental-services-program.jpg",
                 "external_source_id": null,
-                "roles": null
+                "roles": ["Water", "Environmental Services", "Emergency Communications (9-1-1)"]
             },
             "external_source_id": null
         }
