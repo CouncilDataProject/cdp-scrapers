@@ -386,12 +386,21 @@ class SeattleScraper(LegistarScraper):
             f"{event_short_date.strftime('%y')}"
         )
 
-        try:
-            if parse_qs(urlsplit(video_page_url).query)["videoid"]:
-                # video link contains specific videoid
-                return self.parse_content_uris(video_page_url, event_short_date)
-        except KeyError:
-            pass
+        # Some meetings will have text like "Session II" in "Meeting location".
+        # For those, don't bother verifying video page URL.
+        # They are multi-session and we need to call get_video_page_urls()
+        if (
+            "session ii"
+            not in soup.find(
+                "span", id=re.compile(r"ctl\S*_ContentPlaceHolder\S*_lblLocation$")
+            ).text.lower()
+        ):
+            try:
+                if parse_qs(urlsplit(video_page_url).query)["videoid"]:
+                    # video link contains specific videoid
+                    return self.parse_content_uris(video_page_url, event_short_date)
+            except KeyError:
+                pass
 
         # at this point video_page_url points to generic video list page like
         # http://www.seattlechannel.org/BudgetCommittee?Mode2=Video
