@@ -3,18 +3,47 @@
 
 import logging
 import re
-from typing import Dict, List
+import json
+from typing import Dict, List, Optional
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
+from pathlib import Path
 
 from bs4 import BeautifulSoup
 
-from ..legistar_utils import LEGISTAR_EV_SITE_URL, LegistarScraper
+from cdp_backend.pipeline.ingestion_models import Person, Seat
+from ..legistar_utils import (
+    LEGISTAR_EV_SITE_URL,
+    LegistarScraper,
+    str_simplified,
+)
 from ..types import ContentURIs
 
 ###############################################################################
 
 log = logging.getLogger(__name__)
+
+###############################################################################
+
+STATIC_FILE_KEY_PERSONS = "persons"
+STATIC_FILE_DEFAULT_PATH = Path(__file__).parent / "kingcounty-static.json"
+
+# will be passed into LegistarScraper.__init__()
+# to inject data into Persons to fill in information missing in Legistar API
+known_persons: Optional[Dict[str, Person]] = None
+
+# load long-term static data at file load-time, if file exists
+if Path(STATIC_FILE_DEFAULT_PATH).exists():
+    with open(STATIC_FILE_DEFAULT_PATH, "rb") as json_file:
+        static_data = json.load(json_file)
+
+    known_persons = {}
+    for name, person in static_data[STATIC_FILE_KEY_PERSONS].items():
+        known_persons[name] = Person.from_dict(person)
+
+
+if known_persons:
+    log.debug(f"loaded static data for {', '.join(known_persons.keys())}")
 
 ###############################################################################
 
@@ -46,7 +75,9 @@ class KingCountyScraper(LegistarScraper):
                 "Executive Session: For 15 minutes, with action to follow",
                 "on the agenda for procedural matters",
                 "This is a mandatory referral to the",
+                "Watch King County TV Channel 22",
             ],
+            known_persons=known_persons,
         )
 
     def get_content_uris(self, legistar_ev: Dict) -> List[ContentURIs]:
@@ -133,3 +164,100 @@ class KingCountyScraper(LegistarScraper):
         video_uri = video_url.replace("\\", "")
         # caption URIs are not found for kingcounty events.
         return [ContentURIs(video_uri=video_uri, caption_uri=None)]
+
+    @staticmethod
+    def get_static_person_info() -> Dict[str, Person]:
+        """
+        Scrape current council members information from kingcounty.gov
+
+        Returns
+        -------
+        persons: Dict[str, Person]
+            keyed by name
+
+        Notes
+        -----
+        Parse https://kingcounty.gov/council/councilmembers/find_district.aspx
+        that contains list of current council members name, position, contact info
+        """
+        # this page lists current council members
+        with urlopen(
+            "https://kingcounty.gov/council/councilmembers/find_district.aspx"
+        ) as resp:
+            soup = BeautifulSoup(resp.read(), "html.parser")
+
+        # keyed by name
+        persons: Dict[str, Person] = {}
+
+        # there is a series of council member portrait pictures
+        # marked by text "official portrait"
+
+        # <a href="/council/dembowski.aspx"><strong>Rod Dembowski</strong><br/>
+        # </a>District 1<br/>
+        # 206-477-1001<br/>
+        # <a href="mailto:...">rod.dembowski@kingcounty.gov </a><br/>
+        # Member since: 2013<br/>
+        # Current t<span style="color: rgb(0, 0, 0);">erm: 2018-2021</span><br/>
+        # <a href="/~/media/...">Official portrait</a>
+        # ...
+        # repeat similar blob for the next council person
+        # ...
+        for picture in soup.find_all(
+            "a", text=re.compile(".*official.*portrait.*", re.IGNORECASE)
+        ):
+            picture_uri = f"https://kingcounty.gov{str_simplified(picture['href'])}"
+
+            # preceding 2 <a> tags have email and website url, in that order
+            email_tag = picture.find_previous_sibling("a")
+            email = str_simplified(email_tag.text)
+            website_tag = email_tag.find_previous_sibling("a")
+            website = f"https://kingcounty.gov{str_simplified(website_tag['href'])}"
+            name = str_simplified(website_tag.text)
+
+            # this area in plain text contains role and phone for this person
+            # Rod Dembowski
+            # District 1
+            # 206-477-1001
+            # rod.dembowski@kingcounty.gov
+            parent_tag = picture.find_parent()
+            # position number is the trailing number in the line after name
+            # and the line after position is the telephone
+            match = re.search(
+                f".*{name}.*\\s+.*(?P<position>\\d+)\\s+(?P<phone>[\\d\\-\\(\\)]+)",
+                parent_tag.text,
+                re.IGNORECASE,
+            )
+            phone = match.group("phone")
+            seat = Seat(name=f"Position {match.group('position')}")
+
+            persons[name] = Person(
+                name=name,
+                picture_uri=picture_uri,
+                email=email,
+                website=website,
+                phone=phone,
+                seat=seat,
+            )
+
+        return persons
+
+    @staticmethod
+    def dump_static_info(file_path: Path) -> None:
+        """
+        Call this to save current council members information as Persons
+        in json format to file_path.
+        Intended to be called once every N years when the council changes.
+
+        Parameters
+        ----------
+        file_path: Path
+            output json file path
+        """
+        static_info_json = {STATIC_FILE_KEY_PERSONS: {}}
+        for [name, person] in KingCountyScraper.get_static_person_info().items():
+            # to allow for easy future addition of info other than Persons
+            # save under top-level key "persons" in the file
+            static_info_json[STATIC_FILE_KEY_PERSONS][name] = person.to_dict()
+
+        with open(file_path, "wt") as dump:
+            dump.write(json.dumps(static_info_json, indent=4))
