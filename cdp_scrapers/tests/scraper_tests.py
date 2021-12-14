@@ -15,6 +15,10 @@ from datetime import datetime
         (datetime(2021, 6, 16), datetime(2021, 6, 30), 9, 1,
          "https://www.seattlechannel.org/documents/seattlechannel/closedcaption/2021/"
          "tran_061621_2672121.vtt",
+         "https://video.seattle.gov/media/council/tran_061621_2672121V.mp4"),
+        (datetime(2021, 10, 26), datetime(2021, 10, 28), 9, 1,
+         "https://www.seattlechannel.org/documents/seattlechannel/closedcaption/2021/"
+         "tran_061621_2672121.vtt",
          "https://video.seattle.gov/media/council/tran_061621_2672121V.mp4")
     ],
 )
