@@ -10,18 +10,6 @@ from datetime import datetime
     "event_with_votes, event_minute_item_with_votes, number_of_votes,"
     "expected_caption_uri_in_first_session, expected_video_uri_in_first_session",
     [
-        # Check for 1 event with 1 session and 10 event minute items.
-        (datetime(2021, 6, 16), datetime(2021, 6, 18), 1, 1, 10, -1, -1, -1,
-         "https://www.seattlechannel.org/documents/seattlechannel/closedcaption/2021/"
-         "tran_061621_2672121.vtt",
-         "https://video.seattle.gov/media/council/tran_061621_2672121V.mp4"),
-
-        # Check for 5 events, with the first event having 1 session and 1 minute item.
-        (datetime(2021, 6, 16), datetime(2021, 6, 23), 5, 1, 10, -1, -1, -1,
-         "https://www.seattlechannel.org/documents/seattlechannel/closedcaption/2021/"
-         "tran_061621_2672121.vtt",
-         "https://video.seattle.gov/media/council/tran_061621_2672121V.mp4"),
-
         # Check for 1 event with 2 sessions and 12 event minute items.
         (datetime(2021, 10, 15), datetime(2021, 10, 16), 1, 2, 12, -1, -1, -1,
          "https://www.seattlechannel.org/documents/seattlechannel/closedcaption/2021/"
