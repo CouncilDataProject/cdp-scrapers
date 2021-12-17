@@ -1,5 +1,6 @@
 import pytest
 from cdp_scrapers.instances.seattle import SeattleScraper
+from cdp_scrapers.instances.kingcounty import KingCountyScraper
 from datetime import datetime
 
 
@@ -59,4 +60,43 @@ def test_seattle_scraper(
     assert seattle_events[0].sessions[0].caption_uri ==\
            expected_caption_uri_in_first_session
     assert seattle_events[0].sessions[0].video_uri ==\
+           expected_video_uri_in_first_session
+
+
+@pytest.mark.parametrize(
+    "start_date_time, end_date_time, number_of_events, number_of_event_minute_items,"
+    "event_with_votes, event_minute_item_with_votes, number_of_votes,"
+    "expected_video_uri_in_first_session",
+    [
+        # Check for 1 event with 10 event minute items.
+        (datetime(2021, 6, 17), datetime(2021, 6, 18), 1, 15, -1, -1, -1,
+         "http://archive-media.granicus.com:443/OnDemand/king/"
+         "king_80aac332-5f77-43b4-9259-79d108cdbff1.mp4"),
+
+        # Check for 6 events, with the first event having 1 minute item.
+        # In this event, there are 4 votes found in the 5th event minute item of the
+        # 5th event.
+        (datetime(2021, 6, 16), datetime(2021, 6, 23), 6, 11, 4, 4, 4,
+         "http://archive-media.granicus.com:443/OnDemand/king/"
+         "king_b2529fca-1b29-4f3e-b0c5-aa9f4bbb27d9.mp4"),
+    ],
+)
+def test_king_county_scraper(
+    start_date_time: datetime,
+    end_date_time: datetime,
+    number_of_events: int,
+    number_of_event_minute_items: int,
+    event_with_votes: int,
+    event_minute_item_with_votes: int,
+    number_of_votes: int,
+    expected_video_uri_in_first_session: str
+) -> None:
+    king_county = KingCountyScraper()
+    king_county_events = king_county.get_events(start_date_time, end_date_time)
+    assert len(king_county_events) == number_of_events
+    assert len(king_county_events[0].event_minutes_items) == number_of_event_minute_items
+    if (event_minute_item_with_votes >= 0):
+        assert len(king_county_events[event_with_votes].event_minutes_items[
+                       event_minute_item_with_votes].votes) == number_of_votes
+    assert king_county_events[0].sessions[0].video_uri == \
            expected_video_uri_in_first_session
