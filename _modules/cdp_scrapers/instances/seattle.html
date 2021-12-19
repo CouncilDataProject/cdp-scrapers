@@ -497,12 +497,21 @@
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">event_short_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%y&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
 
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">parse_qs</span><span class="p">(</span><span class="n">urlsplit</span><span class="p">(</span><span class="n">video_page_url</span><span class="p">)</span><span class="o">.</span><span class="n">query</span><span class="p">)[</span><span class="s2">&quot;videoid&quot;</span><span class="p">]:</span>
-                <span class="c1"># video link contains specific videoid</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_content_uris</span><span class="p">(</span><span class="n">video_page_url</span><span class="p">,</span> <span class="n">event_short_date</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="k">pass</span>
+        <span class="c1"># Some meetings will have text like &quot;Session II&quot; in &quot;Meeting location&quot;.</span>
+        <span class="c1"># For those, don&#39;t bother verifying video page URL.</span>
+        <span class="c1"># They are multi-session and we need to call get_video_page_urls()</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="s2">&quot;session ii&quot;</span>
+            <span class="ow">not</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span>
+                <span class="s2">&quot;span&quot;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;ctl\S*_ContentPlaceHolder\S*_lblLocation$&quot;</span><span class="p">)</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">parse_qs</span><span class="p">(</span><span class="n">urlsplit</span><span class="p">(</span><span class="n">video_page_url</span><span class="p">)</span><span class="o">.</span><span class="n">query</span><span class="p">)[</span><span class="s2">&quot;videoid&quot;</span><span class="p">]:</span>
+                    <span class="c1"># video link contains specific videoid</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_content_uris</span><span class="p">(</span><span class="n">video_page_url</span><span class="p">,</span> <span class="n">event_short_date</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">pass</span>
 
         <span class="c1"># at this point video_page_url points to generic video list page like</span>
         <span class="c1"># http://www.seattlechannel.org/BudgetCommittee?Mode2=Video</span>
