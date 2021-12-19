@@ -19,8 +19,8 @@ from ..legistar_utils import (
     LEGISTAR_EV_SITE_URL,
     LEGISTAR_SESSION_DATE,
     LegistarScraper,
-    str_simplified,
 )
+from ..scraper_utils import str_simplified
 from ..types import ContentURIs
 
 ###############################################################################
