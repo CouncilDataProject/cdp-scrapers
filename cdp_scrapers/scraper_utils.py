@@ -65,6 +65,10 @@ def str_simplified(input_str: str) -> str:
 
 
 class IngestionModelScraper:
+    """
+    Base class for events scrapers providing IngestionModels for cdp-backend pipeline
+    """
+
     @staticmethod
     def get_required_attrs(model: IngestionModel) -> List[str]:
         """
