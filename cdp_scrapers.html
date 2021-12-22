@@ -68,6 +68,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-cdp_scrapers.legistar_utils">cdp_scrapers.legistar_utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cdp_scrapers.scraper_utils">cdp_scrapers.scraper_utils module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-cdp_scrapers.types">cdp_scrapers.types module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-cdp_scrapers">Module contents</a></li>
 </ul>
@@ -139,7 +140,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cdp_scrapers.legistar_utils.</span></span><span class="sig-name descname"><span class="pre">LegistarScraper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timezone</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_minutes_item_patterns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_approve_pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'approve|favor|yes'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_abstain_pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'abstain|refuse|refrain'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_reject_pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'reject|oppose|no'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_absent_pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'absent'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_nonvoting_pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'nv|(?:non.*voting)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matter_adopted_pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'approved|confirmed|passed|adopted|consent|(?:voted.*com+it+ee)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matter_in_progress_pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'heard|read|filed|held|(?:in.*com+it+ee)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matter_rejected_pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'rejected|dropped'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minutes_item_decision_passed_pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'pass'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minutes_item_decision_failed_pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'not|fail'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">known_persons</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">cdp_backend.pipeline.ingestion_models.Person</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#cdp_scrapers.scraper_utils.IngestionModelScraper" title="cdp_scrapers.scraper_utils.IngestionModelScraper"><code class="xref py py-class docutils literal notranslate"><span class="pre">cdp_scrapers.scraper_utils.IngestionModelScraper</span></code></a></p>
 <p>Base class for transforming Legistar API data to CDP IngestionModel.</p>
 <p>If get_events() naively fails and raises an error, a given installation must define
 a derived class and implement the get_content_uris() function.</p>
@@ -477,24 +478,6 @@ patterns are no inclusive of the Legistar minutes item decision value.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.get_none_if_empty">
-<span class="sig-name descname"><span class="pre">get_none_if_empty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">cdp_backend.pipeline.ingestion_models.IngestionModel</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.IngestionModel</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.get_none_if_empty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_none_if_empty" title="Permalink to this definition"></a></dt>
-<dd><p>Check required keys in model, return None if any such key has no value.
-i.e. If all required keys have valid value, return as-is.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>model</strong> (<em>IngestionModel</em>) – Person, MinutesItem, etc.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>model</strong> – None or model as-is</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Optional[IngestionModel]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.get_person">
 <span class="sig-name descname"><span class="pre">get_person</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">legistar_person</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.Person</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.get_person"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_person" title="Permalink to this definition"></a></dt>
 <dd><p>Return CDP Person for Legistar Person.</p>
@@ -514,25 +497,6 @@ None if missing information.</p>
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="#cdp_scrapers.legistar_utils.get_legistar_person" title="cdp_scrapers.legistar_utils.get_legistar_person"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_legistar_person</span></code></a></p>
 </div>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.get_required_attrs">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_required_attrs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">cdp_backend.pipeline.ingestion_models.IngestionModel</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.get_required_attrs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_required_attrs" title="Permalink to this definition"></a></dt>
-<dd><p>Return list of keys required in model as specified in IngestionModel class
-definition.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>model</strong> (<em>IngestionModel</em>) – Person, MinutesItem, etc.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>attr_keys</strong> – List of keys (attributes) in model without default value in class
-definition.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>List[str]</p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -761,9 +725,56 @@ and requests person information for any vote.</p>
 <p>known_legistar_persons cache is cleared for every LegistarScraper.get_events() call</p>
 </dd></dl>
 
+</section>
+<section id="module-cdp_scrapers.scraper_utils">
+<span id="cdp-scrapers-scraper-utils-module"></span><h2>cdp_scrapers.scraper_utils module<a class="headerlink" href="#module-cdp_scrapers.scraper_utils" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="cdp_scrapers.scraper_utils.IngestionModelScraper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cdp_scrapers.scraper_utils.</span></span><span class="sig-name descname"><span class="pre">IngestionModelScraper</span></span><a class="reference internal" href="_modules/cdp_scrapers/scraper_utils.html#IngestionModelScraper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.scraper_utils.IngestionModelScraper" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base class for events scrapers providing IngestionModels for cdp-backend pipeline</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cdp_scrapers.scraper_utils.IngestionModelScraper.get_none_if_empty">
+<span class="sig-name descname"><span class="pre">get_none_if_empty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">cdp_backend.pipeline.ingestion_models.IngestionModel</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.IngestionModel</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/scraper_utils.html#IngestionModelScraper.get_none_if_empty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.scraper_utils.IngestionModelScraper.get_none_if_empty" title="Permalink to this definition"></a></dt>
+<dd><p>Check required keys in model, return None if any such key has no value.
+i.e. If all required keys have valid value, return as-is.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>model</strong> (<em>IngestionModel</em>) – Person, MinutesItem, etc.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>model</strong> – None or model as-is</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Optional[IngestionModel]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cdp_scrapers.scraper_utils.IngestionModelScraper.get_required_attrs">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_required_attrs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">cdp_backend.pipeline.ingestion_models.IngestionModel</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/scraper_utils.html#IngestionModelScraper.get_required_attrs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.scraper_utils.IngestionModelScraper.get_required_attrs" title="Permalink to this definition"></a></dt>
+<dd><p>Return list of keys required in model as specified in IngestionModel class
+definition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>model</strong> (<em>IngestionModel</em>) – Person, MinutesItem, etc.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>attr_keys</strong> – List of keys (attributes) in model without default value in class
+definition.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>List[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="py function">
-<dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.reduced_list">
-<span class="sig-prename descclassname"><span class="pre">cdp_scrapers.legistar_utils.</span></span><span class="sig-name descname"><span class="pre">reduced_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collapse</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#reduced_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.reduced_list" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="cdp_scrapers.scraper_utils.reduced_list">
+<span class="sig-prename descclassname"><span class="pre">cdp_scrapers.scraper_utils.</span></span><span class="sig-name descname"><span class="pre">reduced_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collapse</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/scraper_utils.html#reduced_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.scraper_utils.reduced_list" title="Permalink to this definition"></a></dt>
 <dd><p>Remove all None items from input_list.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -783,8 +794,8 @@ None if all items were None and collapse is True.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.str_simplified">
-<span class="sig-prename descclassname"><span class="pre">cdp_scrapers.legistar_utils.</span></span><span class="sig-name descname"><span class="pre">str_simplified</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#str_simplified"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.str_simplified" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="cdp_scrapers.scraper_utils.str_simplified">
+<span class="sig-prename descclassname"><span class="pre">cdp_scrapers.scraper_utils.</span></span><span class="sig-name descname"><span class="pre">str_simplified</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/scraper_utils.html#str_simplified"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.scraper_utils.str_simplified" title="Permalink to this definition"></a></dt>
 <dd><p>Remove leading and trailing whitespaces, simplify multiple whitespaces, unify
 newline characters.</p>
 <dl class="field-list simple">

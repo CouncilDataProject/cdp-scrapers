@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cdp_scrapers.scraper_utils &mdash; cdp-scrapers 0.3.2 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> cdp-scrapers
+          </a>
+              <div class="version">
+                0.3.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#stable-release">Stable release</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#from-sources">From sources</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../finding_legistar_id.html">Searching for your Municipality's Legistar ID</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../legistar_scraper.html">LegistarScraper</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../legistar_scraper.html#filtering">Filtering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../legistar_scraper.html#legistar-to-cdp-ingestionmodel">Legistar to CDP <code class="docutils literal notranslate"><span class="pre">IngestionModel</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../legistar_scraper.html#instance-specific-scraping">Instance-Specific Scraping</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../legistar_scraper.html#scraping-for-session-video-uri">Scraping for <code class="docutils literal notranslate"><span class="pre">Session.video_uri</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../legistar_scraper.html#information-from-other-sources">Information From Other Sources</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../legistar_scraper.html#other-notes">Other Notes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Package Modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../cdp_scrapers.html">cdp_scrapers package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../cdp_scrapers.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.instances.html">cdp_scrapers.instances package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../cdp_scrapers.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../cdp_scrapers.html#module-cdp_scrapers.legistar_utils">cdp_scrapers.legistar_utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../cdp_scrapers.html#module-cdp_scrapers.scraper_utils">cdp_scrapers.scraper_utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../cdp_scrapers.html#module-cdp_scrapers.types">cdp_scrapers.types module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../cdp_scrapers.html#module-cdp_scrapers">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#get-started">Get Started!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#deploying">Deploying</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Core Components:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cdp_scrapers.instances.empty.get_events.html">cdp_scrapers.instances.empty.get_events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cdp_scrapers.legistar_utils.LegistarScraper.html">cdp_scrapers.legistar_utils.LegistarScraper</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">cdp-scrapers</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+          <li><a href="../cdp_scrapers.html">cdp_scrapers</a> &raquo;</li>
+      <li>cdp_scrapers.scraper_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cdp_scrapers.scraper_utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">from</span> <span class="nn">cdp_backend.pipeline.ingestion_models</span> <span class="kn">import</span> <span class="n">IngestionModel</span>
+
+<span class="c1">###############################################################################</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="c1">###############################################################################</span>
+
+
+<div class="viewcode-block" id="reduced_list"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.scraper_utils.reduced_list">[docs]</a><span class="k">def</span> <span class="nf">reduced_list</span><span class="p">(</span><span class="n">input_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">collapse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Remove all None items from input_list.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    input_list: List[Any]</span>
+<span class="sd">        Input list from which to filter out items that are None</span>
+<span class="sd">    collapse: bool, default = True</span>
+<span class="sd">        If True, return None in place of an empty list</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    reduced_list: Optional[List]</span>
+<span class="sd">        All items in the original list except for None values.</span>
+<span class="sd">        None if all items were None and collapse is True.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">filtered</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">input_list</span> <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">collapse</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">filtered</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">filtered</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">return</span> <span class="n">filtered</span></div>
+
+
+<div class="viewcode-block" id="str_simplified"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.scraper_utils.str_simplified">[docs]</a><span class="k">def</span> <span class="nf">str_simplified</span><span class="p">(</span><span class="n">input_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Remove leading and trailing whitespaces, simplify multiple whitespaces, unify</span>
+<span class="sd">    newline characters.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    input_str: str</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    cleaned: str</span>
+<span class="sd">        input_str stripped if it is a string</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_str</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">input_str</span>
+
+    <span class="n">input_str</span> <span class="o">=</span> <span class="n">input_str</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="c1"># unify newline to \n</span>
+    <span class="n">input_str</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[\r\n\f]+&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\n&quot;</span><span class="p">,</span> <span class="n">input_str</span><span class="p">)</span>
+    <span class="c1"># multiple spaces and tabs to 1 space</span>
+    <span class="n">input_str</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[ \t\v]+&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">input_str</span><span class="p">)</span>
+
+    <span class="c1"># Replace utf-8 char encodings with single utf-8 chars themselves</span>
+    <span class="n">input_str</span> <span class="o">=</span> <span class="n">input_str</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">input_str</span></div>
+
+
+<div class="viewcode-block" id="IngestionModelScraper"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.scraper_utils.IngestionModelScraper">[docs]</a><span class="k">class</span> <span class="nc">IngestionModelScraper</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for events scrapers providing IngestionModels for cdp-backend pipeline</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="IngestionModelScraper.get_required_attrs"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.scraper_utils.IngestionModelScraper.get_required_attrs">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_required_attrs</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">IngestionModel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return list of keys required in model as specified in IngestionModel class</span>
+<span class="sd">        definition.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        model: IngestionModel</span>
+<span class="sd">            Person, MinutesItem, etc.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        attr_keys: List[str]</span>
+<span class="sd">            List of keys (attributes) in model without default value in class</span>
+<span class="sd">            definition.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># create an empty one to have python tell us what keys are required</span>
+            <span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="p">()</span>
+            <span class="c1"># all attrs in model have default values</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># e.g. __init__() missing 3 required positional arguments:</span>
+            <span class="c1"># &#39;session_datetime&#39;, &#39;video_uri&#39;, and &#39;session_index&#39;</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+                <span class="sa">r</span><span class="s2">&quot;missing (?P&lt;num_keys&gt;\d+) required.+argument(?:s)?\:\s*(?P&lt;keys&gt;.+)&quot;</span><span class="p">,</span>
+                <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;not able to get required attributes for </span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="n">num_keys</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;num_keys&quot;</span><span class="p">))</span>
+
+        <span class="c1"># &#39;session_datetime&#39;, &#39;video_uri&#39;, and &#39;session_index&#39;</span>
+        <span class="c1"># -&gt; [&quot;session_datetime&quot;, &quot;video_uri&quot;, &quot;session_index&quot;]</span>
+
+        <span class="c1"># SHOULD be able to do this more elegantly using re.split()</span>
+        <span class="c1"># but couldn&#39;t quite get the pattern right</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+            <span class="c1"># TypeError uses</span>
+            <span class="c1"># , and</span>
+            <span class="c1"># and</span>
+            <span class="c1"># ,</span>
+            <span class="c1"># as delimiters for attribute names</span>
+            <span class="sa">r</span><span class="s2">&quot;(\s*,\s*and\s*)|(\s*and\s*)|(\s*,\s*)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;,&quot;</span><span class="p">,</span>
+            <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;keys&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">num_keys</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">keys</span><span class="p">):</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s2"> has </span><span class="si">{</span><span class="n">num_keys</span><span class="si">}</span><span class="s2"> required keys but got </span><span class="si">{</span><span class="n">keys</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">keys</span></div>
+
+<div class="viewcode-block" id="IngestionModelScraper.get_none_if_empty"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.scraper_utils.IngestionModelScraper.get_none_if_empty">[docs]</a>    <span class="k">def</span> <span class="nf">get_none_if_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">IngestionModel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">IngestionModel</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check required keys in model, return None if any such key has no value.</span>
+<span class="sd">        i.e. If all required keys have valid value, return as-is.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        model: IngestionModel</span>
+<span class="sd">            Person, MinutesItem, etc.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        model: Optional[IngestionModel]</span>
+<span class="sd">            None or model as-is</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">min_keys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_ingestion_keys</span><span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="c1"># first time using min_ingestion_keys</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">min_ingestion_keys</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">min_keys</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="c1"># first time checking model.__class__</span>
+            <span class="n">min_keys</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">min_keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">min_keys</span> <span class="o">=</span> <span class="n">IngestionModelScraper</span><span class="o">.</span><span class="n">get_required_attrs</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+            <span class="c1"># cache so we don&#39;t do expensive dynamic checking</span>
+            <span class="c1"># again for this IngestionModel</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">min_ingestion_keys</span><span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="p">]</span> <span class="o">=</span> <span class="n">min_keys</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">min_keys</span><span class="p">:</span>
+            <span class="c1"># no required keys for this model</span>
+            <span class="c1"># this probably never happens</span>
+            <span class="k">return</span> <span class="n">model</span>
+
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">min_keys</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+
+                <span class="c1"># &quot;if not&quot; test to catch all None and None-like values</span>
+                <span class="c1"># e.g. empty string, empty list, ...</span>
+                <span class="c1"># but int(0) is not &quot;empty&quot;</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">val</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                    <span class="c1"># empty value for this key in model</span>
+                    <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># nonempty value for all required keys in model</span>
+        <span class="k">return</span> <span class="n">model</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Jackson Maxfield Brown.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
