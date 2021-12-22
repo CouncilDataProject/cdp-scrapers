@@ -15,8 +15,8 @@ from cdp_backend.pipeline.ingestion_models import Person, Seat
 from ..legistar_utils import (
     LEGISTAR_EV_SITE_URL,
     LegistarScraper,
-    str_simplified,
 )
+from ..scraper_utils import str_simplified
 from ..types import ContentURIs
 
 ###############################################################################
