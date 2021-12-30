@@ -26,7 +26,6 @@ from cdp_backend.pipeline.ingestion_models import (
     Vote,
     Role,
 )
-import pytz
 
 from .types import ContentURIs
 from .scraper_utils import IngestionModelScraper, reduced_list, str_simplified
