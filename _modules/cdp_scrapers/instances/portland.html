@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cdp_scrapers.instances.portland &mdash; cdp-scrapers 0.3.2 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> cdp-scrapers
+          </a>
+              <div class="version">
+                0.3.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#stable-release">Stable release</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#from-sources">From sources</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finding_legistar_id.html">Searching for your Municipality's Legistar ID</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../legistar_scraper.html">LegistarScraper</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../legistar_scraper.html#filtering">Filtering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../legistar_scraper.html#legistar-to-cdp-ingestionmodel">Legistar to CDP <code class="docutils literal notranslate"><span class="pre">IngestionModel</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../legistar_scraper.html#instance-specific-scraping">Instance-Specific Scraping</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../legistar_scraper.html#scraping-for-session-video-uri">Scraping for <code class="docutils literal notranslate"><span class="pre">Session.video_uri</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../legistar_scraper.html#information-from-other-sources">Information From Other Sources</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../legistar_scraper.html#other-notes">Other Notes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Package Modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../cdp_scrapers.html">cdp_scrapers package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../cdp_scrapers.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../cdp_scrapers.instances.html">cdp_scrapers.instances package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../cdp_scrapers.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../cdp_scrapers.html#module-cdp_scrapers.legistar_utils">cdp_scrapers.legistar_utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../cdp_scrapers.html#module-cdp_scrapers.scraper_utils">cdp_scrapers.scraper_utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../cdp_scrapers.html#module-cdp_scrapers.types">cdp_scrapers.types module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../cdp_scrapers.html#module-cdp_scrapers">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../contributing.html#get-started">Get Started!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../contributing.html#deploying">Deploying</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Core Components:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cdp_scrapers.instances.empty.get_events.html">cdp_scrapers.instances.empty.get_events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cdp_scrapers.legistar_utils.LegistarScraper.html">cdp_scrapers.legistar_utils.LegistarScraper</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">cdp-scrapers</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+          <li><a href="../../cdp_scrapers.html">cdp_scrapers</a> &raquo;</li>
+      <li>cdp_scrapers.instances.portland</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cdp_scrapers.instances.portland</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">urllib.error</span> <span class="kn">import</span> <span class="n">HTTPError</span><span class="p">,</span> <span class="n">URLError</span>
+<span class="kn">from</span> <span class="nn">urllib.request</span> <span class="kn">import</span> <span class="n">Request</span><span class="p">,</span> <span class="n">urlopen</span>
+
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="kn">from</span> <span class="nn">cdp_backend.pipeline.ingestion_models</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Body</span><span class="p">,</span>
+    <span class="n">EventIngestionModel</span><span class="p">,</span>
+    <span class="n">EventMinutesItem</span><span class="p">,</span>
+    <span class="n">Matter</span><span class="p">,</span>
+    <span class="n">MinutesItem</span><span class="p">,</span>
+    <span class="n">Person</span><span class="p">,</span>
+    <span class="n">Session</span><span class="p">,</span>
+    <span class="n">SupportingFile</span><span class="p">,</span>
+    <span class="n">Vote</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">..scraper_utils</span> <span class="kn">import</span> <span class="n">IngestionModelScraper</span><span class="p">,</span> <span class="n">reduced_list</span>
+
+<span class="c1">###############################################################################</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="c1">###############################################################################</span>
+
+<span class="n">STATIC_FILE_KEY_PERSONS</span> <span class="o">=</span> <span class="s2">&quot;persons&quot;</span>
+<span class="n">STATIC_FILE_DEFAULT_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;portland-static.json&quot;</span>
+
+<span class="n">known_persons</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Person</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="c1"># load long-term static data at file load-time</span>
+<span class="k">if</span> <span class="n">Path</span><span class="p">(</span><span class="n">STATIC_FILE_DEFAULT_PATH</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">STATIC_FILE_DEFAULT_PATH</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">json_file</span><span class="p">:</span>
+        <span class="n">static_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">json_file</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">person</span> <span class="ow">in</span> <span class="n">static_data</span><span class="p">[</span><span class="n">STATIC_FILE_KEY_PERSONS</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">known_persons</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">Person</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">person</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">known_persons</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;loaded static data for </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">known_persons</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1">###############################################################################</span>
+
+
+<div class="viewcode-block" id="WebPageSoup"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.portland.WebPageSoup">[docs]</a><span class="k">class</span> <span class="nc">WebPageSoup</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+    <span class="n">status</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">soup</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BeautifulSoup</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="load_web_page"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.portland.load_web_page">[docs]</a><span class="k">def</span> <span class="nf">load_web_page</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Request</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">WebPageSoup</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load web page at url and return content soupified</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    url: str | urllib.request.Request</span>
+<span class="sd">        Web page to load</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    result: WebPageSoup</span>
+<span class="sd">        WebPageSoup.status = False if web page at url could not be loaded</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="k">as</span> <span class="n">resp</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">WebPageSoup</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">resp</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="s2">&quot;html.parser&quot;</span><span class="p">))</span>
+    <span class="k">except</span> <span class="n">URLError</span> <span class="ow">or</span> <span class="n">HTTPError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to open </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">WebPageSoup</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PortlandScraper"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper">[docs]</a><span class="k">class</span> <span class="nc">PortlandScraper</span><span class="p">(</span><span class="n">IngestionModelScraper</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">timezone</span><span class="o">=</span><span class="s2">&quot;America/Los_Angeles&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PortlandScraper.get_person"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_person">[docs]</a>    <span class="k">def</span> <span class="nf">get_person</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Person</span><span class="p">]:</span>
+        <span class="k">global</span> <span class="n">known_persons</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">known_persons</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="c1"># TODO: If here means we have incomplete portland-static.json.</span>
+        <span class="c1">#       Get information from the bottom of</span>
+        <span class="c1">#       https://www.portland.gov/council-clerk/engage.</span>
+        <span class="c1">#       Should add to known_persons so we don&#39;t query this same person again.</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="PortlandScraper.get_matter"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_matter">[docs]</a>    <span class="k">def</span> <span class="nf">get_matter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_page</span><span class="p">:</span> <span class="n">BeautifulSoup</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Matter</span><span class="p">]:</span>
+        <span class="c1"># TODO:</span>
+        <span class="c1"># matter_type:</span>
+        <span class="c1">#   Each item listed on agenda page begins with a descriptive phrase,</span>
+        <span class="c1">#   and at the end of this description its type is listed within parentheses.</span>
+        <span class="c1">#   e.g. “Request of the … (Communication)” -&gt; matter_type = “communication”</span>
+        <span class="c1"># name:</span>
+        <span class="c1">#   1. “Document number” if listed. Or, if not listed</span>
+        <span class="c1">#   2. Type + item number? e.g. “Ordinance 862”</span>
+        <span class="c1"># result_status:</span>
+        <span class="c1">#   From same information as for EventMinutesItem.decision, i.e. “Disposition”.</span>
+        <span class="c1">#   e.g. “Passed to second reading” -&gt; IN_PROGRESS</span>
+        <span class="c1"># sponsors:</span>
+        <span class="c1">#   Some items listed on agenda page has “Introduced by” field with name.</span>
+        <span class="c1"># title:</span>
+        <span class="c1">#   The first description phrase in each item on agenda page.</span>
+        <span class="c1">#   This is usually hyperlinked to another page with more details.</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>
+            <span class="n">Matter</span><span class="p">(</span><span class="n">matter_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sponsors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="PortlandScraper.get_supporting_files"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_supporting_files">[docs]</a>    <span class="k">def</span> <span class="nf">get_supporting_files</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">event_page</span><span class="p">:</span> <span class="n">BeautifulSoup</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">SupportingFile</span><span class="p">]]:</span>
+        <span class="c1"># TODO:</span>
+        <span class="c1"># When we follow the link for any item on agenda page,</span>
+        <span class="c1"># there are various documents under “Documents and Exhibits,”</span>
+        <span class="c1"># “Impact Statement,” and others.</span>
+        <span class="c1"># May be simpler to just get all linked pdf files on those web pages.</span>
+
+        <span class="k">return</span> <span class="n">reduced_list</span><span class="p">(</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span><span class="n">SupportingFile</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">uri</span><span class="o">=</span><span class="kc">None</span><span class="p">))],</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="PortlandScraper.get_votes"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_votes">[docs]</a>    <span class="k">def</span> <span class="nf">get_votes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_page</span><span class="p">:</span> <span class="n">BeautifulSoup</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Vote</span><span class="p">]]:</span>
+        <span class="c1"># TODO:</span>
+        <span class="c1"># Voting results are listed on agenda page for some items, like</span>
+        <span class="c1"># Votes: Commissioner Mingus Mapps Yea</span>
+        <span class="c1">#        Commissioner Carmen Rubio Yea</span>
+        <span class="c1">#        Commissioner Dan Ryan Yea</span>
+        <span class="c1">#        Commissioner Jo Ann Hardesty Yea</span>
+        <span class="c1">#        Mayor Ted Wheeler Yea.</span>
+        <span class="c1"># Have only seen “Yea”. We have several constants for Vote.decision.</span>
+        <span class="c1"># Clearly “Yea” -&gt; VoteDecision.APPROVE, but we don’t have enough information</span>
+        <span class="c1"># for what words to map to other constants.</span>
+
+        <span class="k">return</span> <span class="n">reduced_list</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>
+                    <span class="n">Vote</span><span class="p">(</span><span class="n">decision</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">person</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_person</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
+                <span class="p">),</span>
+            <span class="p">],</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="PortlandScraper.get_event_minutes"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_event_minutes">[docs]</a>    <span class="k">def</span> <span class="nf">get_event_minutes</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">event_page</span><span class="p">:</span> <span class="n">BeautifulSoup</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">EventMinutesItem</span><span class="p">]]:</span>
+        <span class="c1"># TODO:</span>
+        <span class="c1"># decision:</span>
+        <span class="c1"># Some items listed on agenda page have “Disposition” like “passed”.</span>
+        <span class="c1"># Have not yet found what they use to mean “failed.”</span>
+
+        <span class="c1"># think we will let MinutesItem.name = Matter.name</span>
+        <span class="c1">#                   MinutesItem.description = Matter.title</span>
+        <span class="k">return</span> <span class="n">reduced_list</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>
+                    <span class="n">EventMinutesItem</span><span class="p">(</span>
+                        <span class="n">decision</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                        <span class="n">matter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_matter</span><span class="p">(</span><span class="n">event_page</span><span class="p">),</span>
+                        <span class="n">minutes_item</span><span class="o">=</span><span class="n">MinutesItem</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span>
+                        <span class="n">supporting_files</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_supporting_files</span><span class="p">(</span><span class="n">event_page</span><span class="p">),</span>
+                        <span class="n">votes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_votes</span><span class="p">(</span><span class="n">event_page</span><span class="p">),</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+            <span class="p">],</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="PortlandScraper.get_sessions"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_sessions">[docs]</a>    <span class="k">def</span> <span class="nf">get_sessions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_page</span><span class="p">:</span> <span class="n">BeautifulSoup</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Session</span><span class="p">]]:</span>
+        <span class="c1"># each session&#39;s meta data is given in &lt;div class=&quot;session-meta&quot;&gt;</span>
+        <span class="c1"># including youtube video url for the session, if available</span>
+        <span class="c1"># &lt;div class=&quot;session-meta&quot;&gt;</span>
+        <span class="c1"># ...</span>
+        <span class="c1"># &lt;time class=&quot;datetime&quot;&gt;Wednesday, December 15, 2021 9:30 am&lt;/time&gt;</span>
+        <span class="c1"># ...</span>
+        <span class="c1"># &lt;iframe src=&quot;https://www.youtube.com/...&quot;&gt;</span>
+
+        <span class="n">sessions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Session</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">session_index</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">session_div</span> <span class="ow">in</span> <span class="n">event_page</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;session-meta&quot;</span><span class="p">):</span>
+            <span class="n">session_time</span> <span class="o">=</span> <span class="n">session_div</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;datetime&quot;</span><span class="p">)</span>
+            <span class="c1"># plenty of sessions have no video listed so must check.</span>
+            <span class="c1"># recall we require video_uri for a valid Session.</span>
+            <span class="n">video_iframe</span> <span class="o">=</span> <span class="n">session_div</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;iframe&quot;</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;.*youtube.*&quot;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">session_time</span> <span class="ow">and</span> <span class="n">video_iframe</span><span class="p">:</span>
+
+                <span class="n">sessions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>
+                        <span class="n">Session</span><span class="p">(</span>
+                            <span class="n">session_datetime</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">localize_datetime</span><span class="p">(</span>
+                                <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span>
+                                    <span class="n">session_time</span><span class="o">.</span><span class="n">string</span><span class="p">,</span>
+                                    <span class="s2">&quot;%A, %B </span><span class="si">%d</span><span class="s2">, %Y %I:%M %p&quot;</span><span class="p">,</span>
+                                <span class="p">)</span>
+                            <span class="p">),</span>
+                            <span class="n">session_index</span><span class="o">=</span><span class="n">session_index</span><span class="p">,</span>
+                            <span class="n">video_uri</span><span class="o">=</span><span class="n">video_iframe</span><span class="p">[</span><span class="s2">&quot;src&quot;</span><span class="p">],</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+
+            <span class="n">session_index</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">reduced_list</span><span class="p">(</span><span class="n">sessions</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PortlandScraper.get_event"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_event">[docs]</a>    <span class="k">def</span> <span class="nf">get_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_time</span><span class="p">:</span> <span class="n">datetime</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Information for council meeting on given date if available</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># try to load https://www.portland.gov/council/agenda/yyyy/mm/dd</span>
+        <span class="n">event_page</span> <span class="o">=</span> <span class="n">load_web_page</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;https://www.portland.gov/council/agenda/</span><span class="si">{</span><span class="n">event_time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y/%m/</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">event_page</span><span class="o">.</span><span class="n">status</span><span class="p">:</span>
+            <span class="c1"># no meeting on requested day</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># TODO:</span>
+        <span class="c1"># agenda_uri:</span>
+        <span class="c1"># 1. URL to *agenda*pdf near the top of agenda page. Or,</span>
+        <span class="c1"># 2. First, follow URL in “disposition agenda” link button near the top</span>
+        <span class="c1">#    page (e.g. https://efiles.portlandoregon.gov/record/14654925).</span>
+        <span class="c1">#    Then get the URL from the “Download” button on that subsequent web page.</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>
+            <span class="n">EventIngestionModel</span><span class="p">(</span>
+                <span class="n">agenda_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="c1"># NOTE: have not seen any specific body/bureau named on any agenda page</span>
+                <span class="n">body</span><span class="o">=</span><span class="n">Body</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;City Council&quot;</span><span class="p">),</span>
+                <span class="n">event_minutes_items</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event_minutes</span><span class="p">(</span><span class="n">event_page</span><span class="o">.</span><span class="n">soup</span><span class="p">),</span>
+                <span class="n">minutes_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">sessions</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_sessions</span><span class="p">(</span><span class="n">event_page</span><span class="o">.</span><span class="n">soup</span><span class="p">),</span>
+            <span class="p">),</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="PortlandScraper.get_events"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_events">[docs]</a>    <span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">begin</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">end</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Portland, OR city council meeting information over given time span</span>
+<span class="sd">        as List[EventIngestionModel]</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        begin: datetime, optional</span>
+<span class="sd">            The timespan beginning datetime to query for events after.</span>
+<span class="sd">            Default is 2 days from UTC now</span>
+<span class="sd">        end: datetime, optional</span>
+<span class="sd">            The timespan end datetime to query for events before.</span>
+<span class="sd">            Default is UTC now</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        events: List[EventIngestionModel]</span>
+
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+<span class="sd">        https://www.portland.gov/council/agenda/all</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">begin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">begin</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">end</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">reduced_list</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_event</span><span class="p">(</span><span class="n">begin</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">day</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">day</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">((</span><span class="n">end</span> <span class="o">-</span> <span class="n">begin</span><span class="p">)</span><span class="o">.</span><span class="n">days</span><span class="p">)</span>
+            <span class="p">],</span>
+            <span class="c1"># prefer to return [] over None to backend pipeline</span>
+            <span class="c1"># for easier iterate there</span>
+            <span class="n">collapse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Jackson Maxfield Brown.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

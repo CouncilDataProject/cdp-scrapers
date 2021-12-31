@@ -20,6 +20,14 @@ cdp\_scrapers.instances.kingcounty module
    :undoc-members:
    :show-inheritance:
 
+cdp\_scrapers.instances.portland module
+---------------------------------------
+
+.. automodule:: cdp_scrapers.instances.portland
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 cdp\_scrapers.instances.seattle module
 --------------------------------------
 
