@@ -110,7 +110,9 @@
            <div itemprop="articleBody">
              
   <h1>Source code for cdp_scrapers.scraper_utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">pytz</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
@@ -179,7 +181,68 @@
 <div class="viewcode-block" id="IngestionModelScraper"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.scraper_utils.IngestionModelScraper">[docs]</a><span class="k">class</span> <span class="nc">IngestionModelScraper</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Base class for events scrapers providing IngestionModels for cdp-backend pipeline</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    timezone: str</span>
+<span class="sd">        The timezone for the target client.</span>
+<span class="sd">        i.e. &quot;America/Los_Angeles&quot; or &quot;America/New_York&quot;</span>
+<span class="sd">        See https://en.wikipedia.org/wiki/List_of_tz_database_time_zones for canonical</span>
+<span class="sd">        timezones.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">timezone</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timezone</span><span class="p">:</span> <span class="n">pytz</span><span class="o">.</span><span class="n">timezone</span> <span class="o">=</span> <span class="n">pytz</span><span class="o">.</span><span class="n">timezone</span><span class="p">(</span><span class="n">timezone</span><span class="p">)</span>
+
+<div class="viewcode-block" id="IngestionModelScraper.find_time_zone"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.scraper_utils.IngestionModelScraper.find_time_zone">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">find_time_zone</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return name for a US time zone matching UTC offset calculated from OS clock.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">utc_now</span> <span class="o">=</span> <span class="n">pytz</span><span class="o">.</span><span class="n">utc</span><span class="o">.</span><span class="n">localize</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">())</span>
+        <span class="n">local_now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">zone_name</span> <span class="ow">in</span> <span class="n">pytz</span><span class="o">.</span><span class="n">country_timezones</span><span class="p">(</span><span class="s2">&quot;us&quot;</span><span class="p">):</span>
+            <span class="n">zone</span> <span class="o">=</span> <span class="n">pytz</span><span class="o">.</span><span class="n">timezone</span><span class="p">(</span><span class="n">zone_name</span><span class="p">)</span>
+            <span class="c1"># if this is my time zone</span>
+            <span class="c1"># utc_now as local time should be VERY close to local_now</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="nb">abs</span><span class="p">(</span>
+                    <span class="p">(</span>
+                        <span class="n">utc_now</span><span class="o">.</span><span class="n">astimezone</span><span class="p">(</span><span class="n">zone</span><span class="p">)</span> <span class="o">-</span> <span class="n">zone</span><span class="o">.</span><span class="n">localize</span><span class="p">(</span><span class="n">local_now</span><span class="p">)</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+                <span class="p">)</span>
+                <span class="o">&lt;</span> <span class="mi">5</span>
+            <span class="p">):</span>
+                <span class="k">return</span> <span class="n">zone_name</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="IngestionModelScraper.localize_datetime"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.scraper_utils.IngestionModelScraper.localize_datetime">[docs]</a>    <span class="k">def</span> <span class="nf">localize_datetime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_time</span><span class="p">:</span> <span class="n">datetime</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return input datetime with time zone information.</span>
+<span class="sd">        This allows for nonambiguous conversions to other zones including UTC.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        local_time: datetime</span>
+<span class="sd">            The datetime to attached timezone information to.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        local_time: datetime</span>
+<span class="sd">            The date and time attributes (year, month, day, hour, ...) remain unchanged.</span>
+<span class="sd">            tzinfo is now provided.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">timezone</span><span class="o">.</span><span class="n">localize</span><span class="p">(</span><span class="n">local_time</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+            <span class="c1"># AttributeError: time_zone or local_time is None</span>
+            <span class="c1"># ValueError: local_time is not navie (has time zone info)</span>
+            <span class="k">return</span> <span class="n">local_time</span></div>
 
 <div class="viewcode-block" id="IngestionModelScraper.get_required_attrs"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.scraper_utils.IngestionModelScraper.get_required_attrs">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">get_required_attrs</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">IngestionModel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>

@@ -256,12 +256,6 @@ that we want to ignore</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.find_time_zone">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">find_time_zone</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.find_time_zone"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.find_time_zone" title="Permalink to this definition"></a></dt>
-<dd><p>Return name for a US time zone matching UTC offset calculated from OS clock.</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.fix_event_minutes">
 <span class="sig-name descname"><span class="pre">fix_event_minutes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ev_minutes_item</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.EventMinutesItem</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legistar_ev_item</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.EventMinutesItem</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.fix_event_minutes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.fix_event_minutes" title="Permalink to this definition"></a></dt>
 <dd><p>Inspect the MinutesItem and Matter in ev_minutes_item.
@@ -614,25 +608,6 @@ or as-is if person not found in known_persons</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.localize_datetime">
-<span class="sig-name descname"><span class="pre">localize_datetime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime.datetime</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">datetime.datetime</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.localize_datetime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.localize_datetime" title="Permalink to this definition"></a></dt>
-<dd><p>Return input datetime with time zone information.
-This allows for nonambiguous conversions to other zones including UTC.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>local_time</strong> (<em>datetime</em>) – The datetime to attached timezone information to.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>local_time</strong> – The date and time attributes (year, month, day, hour, …) remain unchanged.
-tzinfo is now provided.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>datetime</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.LegistarScraper.post_process_ingestion_models">
 <span class="sig-name descname"><span class="pre">post_process_ingestion_models</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.EventIngestionModel</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.EventIngestionModel</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#LegistarScraper.post_process_ingestion_models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.LegistarScraper.post_process_ingestion_models" title="Permalink to this definition"></a></dt>
 <dd><p>Called at the end of get_events() for fully custom site-specific prcessing.
@@ -730,9 +705,23 @@ and requests person information for any vote.</p>
 <span id="cdp-scrapers-scraper-utils-module"></span><h2>cdp_scrapers.scraper_utils module<a class="headerlink" href="#module-cdp_scrapers.scraper_utils" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="cdp_scrapers.scraper_utils.IngestionModelScraper">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cdp_scrapers.scraper_utils.</span></span><span class="sig-name descname"><span class="pre">IngestionModelScraper</span></span><a class="reference internal" href="_modules/cdp_scrapers/scraper_utils.html#IngestionModelScraper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.scraper_utils.IngestionModelScraper" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cdp_scrapers.scraper_utils.</span></span><span class="sig-name descname"><span class="pre">IngestionModelScraper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timezone</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cdp_scrapers/scraper_utils.html#IngestionModelScraper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.scraper_utils.IngestionModelScraper" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Base class for events scrapers providing IngestionModels for cdp-backend pipeline</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>timezone</strong> (<em>str</em>) – The timezone for the target client.
+i.e. “America/Los_Angeles” or “America/New_York”
+See <a class="reference external" href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones">https://en.wikipedia.org/wiki/List_of_tz_database_time_zones</a> for canonical
+timezones.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="cdp_scrapers.scraper_utils.IngestionModelScraper.find_time_zone">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">find_time_zone</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/scraper_utils.html#IngestionModelScraper.find_time_zone"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.scraper_utils.IngestionModelScraper.find_time_zone" title="Permalink to this definition"></a></dt>
+<dd><p>Return name for a US time zone matching UTC offset calculated from OS clock.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.scraper_utils.IngestionModelScraper.get_none_if_empty">
 <span class="sig-name descname"><span class="pre">get_none_if_empty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">cdp_backend.pipeline.ingestion_models.IngestionModel</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.IngestionModel</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/scraper_utils.html#IngestionModelScraper.get_none_if_empty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.scraper_utils.IngestionModelScraper.get_none_if_empty" title="Permalink to this definition"></a></dt>
@@ -766,6 +755,25 @@ definition.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>List[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cdp_scrapers.scraper_utils.IngestionModelScraper.localize_datetime">
+<span class="sig-name descname"><span class="pre">localize_datetime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime.datetime</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">datetime.datetime</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/scraper_utils.html#IngestionModelScraper.localize_datetime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.scraper_utils.IngestionModelScraper.localize_datetime" title="Permalink to this definition"></a></dt>
+<dd><p>Return input datetime with time zone information.
+This allows for nonambiguous conversions to other zones including UTC.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>local_time</strong> (<em>datetime</em>) – The datetime to attached timezone information to.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>local_time</strong> – The date and time attributes (year, month, day, hour, …) remain unchanged.
+tzinfo is now provided.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>datetime</p>
 </dd>
 </dl>
 </dd></dl>
