@@ -26,7 +26,6 @@ from cdp_backend.pipeline.ingestion_models import (
     Vote,
     Role,
 )
-import pytz
 
 from .types import ContentURIs
 from .scraper_utils import IngestionModelScraper, reduced_list, str_simplified
@@ -460,8 +459,9 @@ class LegistarScraper(IngestionModelScraper):
         minutes_item_decision_failed_pattern: str = r"not|fail",
         known_persons: Optional[Dict[str, Person]] = None,
     ):
+        super().__init__(timezone=timezone)
+
         self.client_name: str = client
-        self.timezone: pytz.timezone = pytz.timezone(timezone)
         self.ignore_minutes_item_patterns: List[str] = ignore_minutes_item_patterns
 
         # regex patterns used to infer cdp_backend.database.constants
@@ -1040,53 +1040,6 @@ class LegistarScraper(IngestionModelScraper):
                 for item in legistar_ev_items
             ]
         )
-
-    @staticmethod
-    def find_time_zone() -> str:
-        """
-        Return name for a US time zone matching UTC offset calculated from OS clock.
-        """
-        utc_now = pytz.utc.localize(datetime.utcnow())
-        local_now = datetime.now()
-
-        for zone_name in pytz.country_timezones("us"):
-            zone = pytz.timezone(zone_name)
-            # if this is my time zone
-            # utc_now as local time should be VERY close to local_now
-            if (
-                abs(
-                    (
-                        utc_now.astimezone(zone) - zone.localize(local_now)
-                    ).total_seconds()
-                )
-                < 5
-            ):
-                return zone_name
-
-        return None
-
-    def localize_datetime(self, local_time: datetime) -> datetime:
-        """
-        Return input datetime with time zone information.
-        This allows for nonambiguous conversions to other zones including UTC.
-
-        Parameters
-        ----------
-        local_time: datetime
-            The datetime to attached timezone information to.
-
-        Returns
-        -------
-        local_time: datetime
-            The date and time attributes (year, month, day, hour, ...) remain unchanged.
-            tzinfo is now provided.
-        """
-        try:
-            return self.timezone.localize(local_time)
-        except (AttributeError, ValueError):
-            # AttributeError: time_zone or local_time is None
-            # ValueError: local_time is not navie (has time zone info)
-            return local_time
 
     @staticmethod
     def date_and_time_to_datetime(ev_date: str, ev_time: Optional[str]) -> datetime:
