@@ -6,7 +6,7 @@ from cdp_scrapers.instances.kingcounty import KingCountyScraper
 from cdp_scrapers.instances.portland import PortlandScraper
 from cdp_scrapers.instances.seattle import SeattleScraper
 
-"""
+
 @pytest.mark.parametrize(
     "start_date_time, end_date_time, number_of_events,"
     "number_of_sessions_in_first_event, number_of_event_minute_items,"
@@ -142,7 +142,6 @@ def test_king_county_scraper(
         king_county_events[0].sessions[0].video_uri
         == expected_video_uri_in_first_session
     )
-"""
 
 
 @pytest.mark.parametrize(
