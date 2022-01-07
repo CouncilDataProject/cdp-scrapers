@@ -3,6 +3,7 @@ from datetime import datetime
 import pytest
 
 from cdp_scrapers.instances.kingcounty import KingCountyScraper
+from cdp_scrapers.instances.portland import PortlandScraper
 from cdp_scrapers.instances.seattle import SeattleScraper
 
 
@@ -140,4 +141,33 @@ def test_king_county_scraper(
     assert (
         king_county_events[0].sessions[0].video_uri
         == expected_video_uri_in_first_session
+    )
+
+
+@pytest.mark.parametrize(
+    "start_date_time, end_date_time, number_of_events, number_of_event_minute_items,"
+    "expected_video_uri_in_first_session",
+    [
+        (
+            datetime(2021, 12, 22),
+            datetime(2021, 12, 23),
+            1,
+            1,
+            "https://www.youtube.com/embed/aXKE2u24WKg?autoplay=0&start=0&rel=0",
+        )
+    ],
+)
+def test_portland_scraper(
+    start_date_time: datetime,
+    end_date_time: datetime,
+    number_of_events: int,
+    number_of_event_minute_items: int,
+    expected_video_uri_in_first_session: str,
+) -> None:
+    portland = PortlandScraper()
+    portland_events = portland.get_events(start_date_time, end_date_time)
+    assert len(portland_events) == number_of_events
+    assert len(portland_events[0].event_minutes_items) == number_of_event_minute_items
+    assert (
+        portland_events[0].sessions[0].video_uri == expected_video_uri_in_first_session
     )
