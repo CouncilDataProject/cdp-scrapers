@@ -110,7 +110,7 @@
         },
         "M. Lorena Gonz\u00e1lez": {
             "name": "M. Lorena Gonz\u00e1lez",
-            "is_active": true,
+            "is_active": false,
             "router_string": null,
             "email": null,
             "phone": null,
