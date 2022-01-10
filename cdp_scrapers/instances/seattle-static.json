@@ -110,12 +110,30 @@
         },
         "M. Lorena Gonz\u00e1lez": {
             "name": "M. Lorena Gonz\u00e1lez",
-            "is_active": true,
+            "is_active": false,
             "router_string": null,
             "email": null,
             "phone": null,
             "website": null,
             "picture_uri": "http://www.seattle.gov//assets/Images/Council/Members/Gonzalez/Lorena-González_2020-headshot_225x225.jpg",
+            "seat": {
+                "name": "Position 9",
+                "electoral_area": "Citywide",
+                "electoral_type": null,
+                "image_uri": "https://upload.wikimedia.org/wikipedia/commons/3/36/SeattleI5Skyline.jpg",
+                "external_source_id": null,
+                "roles": null
+            },
+            "external_source_id": null
+        },
+        "Sara Nelson": {
+            "name": "Sara Nelson",
+            "is_active": true,
+            "router_string": null,
+            "email": null,
+            "phone": null,
+            "website": null,
+            "picture_uri": "http://www.seattle.gov//assets/images/Council/Members/Nelson/Councilmember-Sara-Nelson_homepage-banner.jpg",
             "seat": {
                 "name": "Position 9",
                 "electoral_area": "Citywide",
