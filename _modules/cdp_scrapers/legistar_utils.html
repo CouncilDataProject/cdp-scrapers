@@ -1247,9 +1247,13 @@
             <span class="k">return</span> <span class="n">person</span>
 
         <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">person</span><span class="o">.</span><span class="n">__dataclass_fields__</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="c1"># input person has new information so prefer that</span>
-            <span class="c1"># over static long-term information</span>
-            <span class="nb">setattr</span><span class="p">(</span><span class="n">person</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">person</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">known_person</span><span class="p">,</span> <span class="n">attr</span><span class="p">))</span>
+            <span class="n">static_info</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">known_person</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">static_info</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># have long-term information provided in &quot;static*.json&quot;; just use it</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="n">person</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">static_info</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># use dynamically obtained information, which may be None</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="n">person</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">person</span><span class="p">,</span> <span class="n">attr</span><span class="p">))</span>
 
         <span class="c1"># now that we have seat from static hard-coded data</span>
         <span class="c1"># we can bring in seat.roles (OfficeRecords from Legistar API)</span>
