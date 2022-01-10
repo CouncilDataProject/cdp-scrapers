@@ -1135,9 +1135,13 @@ class LegistarScraper(IngestionModelScraper):
             return person
 
         for attr in person.__dataclass_fields__.keys():
-            # input person has new information so prefer that
-            # over static long-term information
-            setattr(person, attr, getattr(person, attr) or getattr(known_person, attr))
+            static_info = getattr(known_person, attr)
+            if static_info is not None:
+                # have long-term information provided in "static*.json"; just use it
+                setattr(person, attr, static_info)
+            else:
+                # use dynamically obtained information, which may be None
+                setattr(person, attr, getattr(person, attr))
 
         # now that we have seat from static hard-coded data
         # we can bring in seat.roles (OfficeRecords from Legistar API)
