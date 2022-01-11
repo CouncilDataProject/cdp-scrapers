@@ -24,7 +24,7 @@
             "router_string": null,
             "email": "girmay.zahilay@kingcounty.gov",
             "phone": "206-477-1002",
-            "website": "https://kingcounty.gov/zahilay",
+            "website": "https://kingcounty.gov/council/zahilay",
             "picture_uri": "https://kingcounty.gov/~/media/council/Zahilay/Zahilay_DSC8834_2x3.ashx",
             "seat": {
                 "name": "Position 2",
@@ -38,12 +38,30 @@
         },
         "Kathy Lambert": {
             "name": "Kathy Lambert",
-            "is_active": true,
+            "is_active": false,
             "router_string": null,
             "email": "kathy.lambert@kingcounty.gov",
             "phone": "206-477-1003",
-            "website": "https://kingcounty.gov/lambert",
+            "website": "https://kingcounty.gov/council/lambert",
             "picture_uri": "https://kingcounty.gov/~/media/Lambert/images/2019/Lambert_2020_2x3.ashx",
+            "seat": {
+                "name": "Position 3",
+                "electoral_area": "Redmond, Sammamish, Snoqualmie",
+                "electoral_type": null,
+                "image_uri": "https://upload.wikimedia.org/wikipedia/commons/1/16/Bicycle_Capital_of_the_Northwest.JPG",
+                "external_source_id": null,
+                "roles": null
+            },
+            "external_source_id": null
+        },
+        "Sarah Perry": {
+            "name": "Sarah Perry",
+            "is_active": true,
+            "router_string": null,
+            "email": "sarah.perry@kingcounty.gov",
+            "phone": "206-477-1003",
+            "website": "https://kingcounty.gov/council/perry.aspx",
+            "picture_uri": "https://kingcounty.gov/council/~/media/council/perry/KCC_SarahPerry.ashx",
             "seat": {
                 "name": "Position 3",
                 "electoral_area": "Redmond, Sammamish, Snoqualmie",
@@ -114,7 +132,7 @@
             "router_string": null,
             "email": "pete.vonreichbauer@kingcounty.gov",
             "phone": "206-477-1007",
-            "website": "https://kingcounty.gov/vonreichbauer",
+            "website": "https://kingcounty.gov/council/vonreichbauer",
             "picture_uri": "https://kingcounty.gov/~/media/council/images/2018/von_Reichbauer_2x3_print.ashx",
             "seat": {
                 "name": "Position 7",
@@ -150,7 +168,7 @@
             "router_string": null,
             "email": "reagan.dunn@kingcounty.gov",
             "phone": "206-477-1009",
-            "website": "https://kingcounty.gov/dunn",
+            "website": "https://kingcounty.gov/council/dunn",
             "picture_uri": "https://kingcounty.gov/~/media/Dunn/images/2019/Dunn_DSC8750_2x3.ashx",
             "seat": {
                 "name": "Position 9",
