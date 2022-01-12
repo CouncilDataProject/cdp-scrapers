@@ -232,7 +232,7 @@ class PortlandScraper(IngestionModelScraper):
 
         return self.get_none_if_empty(
             EventIngestionModel(
-                agenda_uri=None,
+                agenda_uri=self.get_agenda_uri(event_page.soup),
                 # NOTE: have not seen any specific body/bureau named on any agenda page
                 body=Body(name="City Council"),
                 event_minutes_items=self.get_event_minutes(event_page.soup),
@@ -281,3 +281,21 @@ class PortlandScraper(IngestionModelScraper):
             # for easier iterate there
             collapse=False,
         )
+
+    def get_agenda_uri(self, event_page: BeautifulSoup) -> str:
+        """
+        Find the uri for the file containing the agenda at each Portland, OR city
+        council meeting
+
+        Parameters
+        ----------
+        event_page: The page for the meeting
+
+        Returns
+        -------
+        agenda_uri: The uri for the file containing the meeting's agenda
+        """
+        agenda_uri_element = event_page.find("a", {"class": "btn-cta"})
+        if agenda_uri_element is None:
+            return None
+        return agenda_uri_element["href"] + "/File/Document"
