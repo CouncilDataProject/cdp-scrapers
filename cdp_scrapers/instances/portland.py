@@ -49,7 +49,7 @@ if len(known_persons) > 0:
 
 class WebPageSoup(NamedTuple):
     status: bool
-    soup: Optional[BeautifulSoup]
+    soup: Optional[BeautifulSoup] = None
 
 
 def load_web_page(url: Union[str, Request]) -> WebPageSoup:
@@ -215,9 +215,12 @@ class PortlandScraper(IngestionModelScraper):
         """
         Information for council meeting on given date if available
         """
-        # try to load https://www.portland.gov/council/agenda/yyyy/mm/dd
+        # try to load https://www.portland.gov/council/agenda/yyyy/m/d
         event_page = load_web_page(
-            f"https://www.portland.gov/council/agenda/{event_time.strftime('%Y/%m/%d')}"
+            "https://www.portland.gov/council/agenda/"
+            # we actually DON'T want to use strftime() because we must not zero-pad
+            # e.g. for 2022/01/05, we MUST use 2022/1/5
+            f"{event_time.year}/{event_time.month}/{event_time.day}"
         )
         if not event_page.status:
             # no meeting on requested day
