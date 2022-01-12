@@ -161,7 +161,7 @@
 
 <div class="viewcode-block" id="WebPageSoup"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.portland.WebPageSoup">[docs]</a><span class="k">class</span> <span class="nc">WebPageSoup</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
     <span class="n">status</span><span class="p">:</span> <span class="nb">bool</span>
-    <span class="n">soup</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BeautifulSoup</span><span class="p">]</span></div>
+    <span class="n">soup</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BeautifulSoup</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 
 <div class="viewcode-block" id="load_web_page"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.portland.load_web_page">[docs]</a><span class="k">def</span> <span class="nf">load_web_page</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Request</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">WebPageSoup</span><span class="p">:</span>
@@ -327,9 +327,12 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Information for council meeting on given date if available</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># try to load https://www.portland.gov/council/agenda/yyyy/mm/dd</span>
+        <span class="c1"># try to load https://www.portland.gov/council/agenda/yyyy/m/d</span>
         <span class="n">event_page</span> <span class="o">=</span> <span class="n">load_web_page</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;https://www.portland.gov/council/agenda/</span><span class="si">{</span><span class="n">event_time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y/%m/</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;https://www.portland.gov/council/agenda/&quot;</span>
+            <span class="c1"># we actually DON&#39;T want to use strftime() because we must not zero-pad</span>
+            <span class="c1"># e.g. for 2022/01/05, we MUST use 2022/1/5</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">event_time</span><span class="o">.</span><span class="n">year</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">event_time</span><span class="o">.</span><span class="n">month</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">event_time</span><span class="o">.</span><span class="n">day</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">event_page</span><span class="o">.</span><span class="n">status</span><span class="p">:</span>
             <span class="c1"># no meeting on requested day</span>
