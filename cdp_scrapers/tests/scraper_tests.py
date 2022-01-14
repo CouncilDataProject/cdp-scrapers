@@ -155,7 +155,16 @@ def test_king_county_scraper(
             1,
             "https://www.youtube.com/embed/aXKE2u24WKg?autoplay=0&start=0&rel=0",
             "https://efiles.portlandoregon.gov/record/14778119/File/Document",
-        )
+        ),
+        (
+            datetime(2022, 1, 12),
+            datetime(2022, 1, 13),
+            1,
+            1,
+            "https://www.youtube.com/embed/TBrJbm08i0g?autoplay=0&start=0&rel=0",
+            "https://www.portland.gov/sites/default/files/2022/"
+            "january-12-2022-agenda-print-version.pdf",
+        ),
     ],
 )
 def test_portland_scraper(

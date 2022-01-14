@@ -1,8 +1,8 @@
 import json
 import logging
+import re
 from datetime import datetime, timedelta
 from pathlib import Path
-import re
 from typing import Dict, List, NamedTuple, Optional, Union
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -19,6 +19,7 @@ from cdp_backend.pipeline.ingestion_models import (
     SupportingFile,
     Vote,
 )
+
 from ..scraper_utils import IngestionModelScraper, reduced_list
 
 ###############################################################################
@@ -244,6 +245,30 @@ class PortlandScraper(IngestionModelScraper):
             ),
         )
 
+    def get_agenda_uri(self, event_page: BeautifulSoup) -> str:
+        """
+        Find the uri for the file containing the agenda at each Portland, OR city
+        council meeting
+
+        Parameters
+        ----------
+        event_page: The page for the meeting
+
+        Returns
+        -------
+        agenda_uri: The uri for the file containing the meeting's agenda
+        """
+        agenda_uri_element = event_page.find(
+            "a", text=re.compile("Disposition Agenda"), attrs={"class": "btn-cta"}
+        )
+        if agenda_uri_element is not None:
+            return agenda_uri_element["href"] + "/File/Document"
+        parent_agenda_uri_element = event_page.find("div", {"class": "inline-flex"})
+        agenda_uri_element = parent_agenda_uri_element.find("a")
+        if agenda_uri_element is not None:
+            return "https://www.portland.gov" + agenda_uri_element["href"]
+        return None
+
     def get_events(
         self,
         begin: Optional[datetime] = None,
@@ -284,21 +309,3 @@ class PortlandScraper(IngestionModelScraper):
             # for easier iterate there
             collapse=False,
         )
-
-    def get_agenda_uri(self, event_page: BeautifulSoup) -> str:
-        """
-        Find the uri for the file containing the agenda at each Portland, OR city
-        council meeting
-
-        Parameters
-        ----------
-        event_page: The page for the meeting
-
-        Returns
-        -------
-        agenda_uri: The uri for the file containing the meeting's agenda
-        """
-        agenda_uri_element = event_page.find("a", {"class": "btn-cta"})
-        if agenda_uri_element is None:
-            return None
-        return agenda_uri_element["href"] + "/File/Document"
