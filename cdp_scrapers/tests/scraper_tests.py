@@ -146,7 +146,7 @@ def test_king_county_scraper(
 
 @pytest.mark.parametrize(
     "start_date_time, end_date_time, number_of_events, number_of_event_minute_items,"
-    "expected_video_uri_in_first_session",
+    "expected_video_uri_in_first_session, expected_agenda_uri",
     [
         (
             datetime(2021, 12, 22),
@@ -154,7 +154,17 @@ def test_king_county_scraper(
             1,
             1,
             "https://www.youtube.com/embed/aXKE2u24WKg?autoplay=0&start=0&rel=0",
-        )
+            "https://efiles.portlandoregon.gov/record/14778119/File/Document",
+        ),
+        (
+            datetime(2022, 1, 12),
+            datetime(2022, 1, 13),
+            1,
+            1,
+            "https://www.youtube.com/embed/TBrJbm08i0g?autoplay=0&start=0&rel=0",
+            "https://www.portland.gov/sites/default/files/2022/"
+            "january-12-2022-agenda-print-version.pdf",
+        ),
     ],
 )
 def test_portland_scraper(
@@ -163,6 +173,7 @@ def test_portland_scraper(
     number_of_events: int,
     number_of_event_minute_items: int,
     expected_video_uri_in_first_session: str,
+    expected_agenda_uri: str,
 ) -> None:
     portland = PortlandScraper()
     portland_events = portland.get_events(start_date_time, end_date_time)
@@ -171,3 +182,4 @@ def test_portland_scraper(
     assert (
         portland_events[0].sessions[0].video_uri == expected_video_uri_in_first_session
     )
+    assert portland_events[0].agenda_uri == expected_agenda_uri

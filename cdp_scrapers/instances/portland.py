@@ -1,8 +1,8 @@
 import json
 import logging
+import re
 from datetime import datetime, timedelta
 from pathlib import Path
-import re
 from typing import Dict, List, NamedTuple, Optional, Union
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -19,6 +19,7 @@ from cdp_backend.pipeline.ingestion_models import (
     SupportingFile,
     Vote,
 )
+
 from ..scraper_utils import IngestionModelScraper, reduced_list
 
 ###############################################################################
@@ -211,6 +212,30 @@ class PortlandScraper(IngestionModelScraper):
 
         return reduced_list(sessions)
 
+    def get_agenda_uri(self, event_page: BeautifulSoup) -> str:
+        """
+        Find the uri for the file containing the agenda at each Portland, OR city
+        council meeting
+
+        Parameters
+        ----------
+        event_page: The page for the meeting
+
+        Returns
+        -------
+        agenda_uri: The uri for the file containing the meeting's agenda
+        """
+        agenda_uri_element = event_page.find(
+            "a", text=re.compile("Disposition Agenda"), attrs={"class": "btn-cta"}
+        )
+        if agenda_uri_element is not None:
+            return agenda_uri_element["href"] + "/File/Document"
+        parent_agenda_uri_element = event_page.find("div", {"class": "inline-flex"})
+        agenda_uri_element = parent_agenda_uri_element.find("a")
+        if agenda_uri_element is not None:
+            return "https://www.portland.gov" + agenda_uri_element["href"]
+        return None
+
     def get_event(self, event_time: datetime) -> Optional[EventIngestionModel]:
         """
         Information for council meeting on given date if available
@@ -235,7 +260,7 @@ class PortlandScraper(IngestionModelScraper):
 
         return self.get_none_if_empty(
             EventIngestionModel(
-                agenda_uri=None,
+                agenda_uri=self.get_agenda_uri(event_page.soup),
                 # NOTE: have not seen any specific body/bureau named on any agenda page
                 body=Body(name="City Council"),
                 event_minutes_items=self.get_event_minutes(event_page.soup),
