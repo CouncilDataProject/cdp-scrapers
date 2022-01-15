@@ -1,9 +1,12 @@
-from datetime import datetime
 import logging
-import pytz
 import re
-from typing import Any, List, Optional
+from datetime import datetime
+from typing import Any, List, Optional, Set
+from urllib.error import HTTPError, URLError
+from urllib.request import urlopen
 
+import pytz
+from bs4 import BeautifulSoup
 from cdp_backend.pipeline.ingestion_models import IngestionModel
 
 ###############################################################################
@@ -64,6 +67,41 @@ def str_simplified(input_str: str) -> str:
     input_str = input_str.encode("utf-8").decode("utf-8")
 
     return input_str
+
+
+def name_full_forms(name: str) -> Set[str]:
+    name = name.lower()
+    try:
+        # this web page lists all known full-form name variations
+        # e.g. querying with Tom returns names like Tomas, Thomas
+        with urlopen(f"https://www.behindthename.com/name/{name}/related") as resp:
+            soup = BeautifulSoup(resp.read(), "html.parser")
+    except URLError or HTTPError:
+        if not re.search(r"-\d+$", name):
+            # try e.g. tom-1 for tom
+            return name_full_forms(f"{name}-1")
+        return set()
+
+    # all such <a> tags
+    # <a href="/name/thomas" class="nlc">Thomas</a>
+    full_forms = set([i.string for i in soup.find_all("a", class_="nlc")])
+    if not full_forms:
+        # found no names; probably because name (tom) needs further specifications
+        # like tom-1 (English) and tom-2 (Hebrew).
+        # see if there is <a> tag like
+        # <a href="/name/tom-1/related" class="nll">
+        if soup.find("a", class_="nll", href=re.compile(f".*{name}-\\d+.*")):
+            # e.g. try tom-1
+            return name_full_forms(f"{name}-1")
+
+    trail_num = re.search(r"-(\d+)$", name)
+    if not trail_num:
+        return full_forms
+
+    # we queried something like tom-1, try tom-2
+    return full_forms | name_full_forms(
+        f"{name[:trail_num.start(1)]}{int(trail_num.group(1)) + 1}"
+    )
 
 
 class IngestionModelScraper:
