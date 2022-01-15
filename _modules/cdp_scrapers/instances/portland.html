@@ -112,9 +112,9 @@
   <h1>Source code for cdp_scrapers.instances.portland</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 <span class="kn">from</span> <span class="nn">urllib.error</span> <span class="kn">import</span> <span class="n">HTTPError</span><span class="p">,</span> <span class="n">URLError</span>
 <span class="kn">from</span> <span class="nn">urllib.request</span> <span class="kn">import</span> <span class="n">Request</span><span class="p">,</span> <span class="n">urlopen</span>
@@ -131,6 +131,7 @@
     <span class="n">SupportingFile</span><span class="p">,</span>
     <span class="n">Vote</span><span class="p">,</span>
 <span class="p">)</span>
+
 <span class="kn">from</span> <span class="nn">..scraper_utils</span> <span class="kn">import</span> <span class="n">IngestionModelScraper</span><span class="p">,</span> <span class="n">reduced_list</span>
 
 <span class="c1">###############################################################################</span>
@@ -323,6 +324,30 @@
 
         <span class="k">return</span> <span class="n">reduced_list</span><span class="p">(</span><span class="n">sessions</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="PortlandScraper.get_agenda_uri"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_agenda_uri">[docs]</a>    <span class="k">def</span> <span class="nf">get_agenda_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_page</span><span class="p">:</span> <span class="n">BeautifulSoup</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find the uri for the file containing the agenda at each Portland, OR city</span>
+<span class="sd">        council meeting</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        event_page: The page for the meeting</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        agenda_uri: The uri for the file containing the meeting&#39;s agenda</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">agenda_uri_element</span> <span class="o">=</span> <span class="n">event_page</span><span class="o">.</span><span class="n">find</span><span class="p">(</span>
+            <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;Disposition Agenda&quot;</span><span class="p">),</span> <span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;btn-cta&quot;</span><span class="p">}</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">agenda_uri_element</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">agenda_uri_element</span><span class="p">[</span><span class="s2">&quot;href&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;/File/Document&quot;</span>
+        <span class="n">parent_agenda_uri_element</span> <span class="o">=</span> <span class="n">event_page</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;inline-flex&quot;</span><span class="p">})</span>
+        <span class="n">agenda_uri_element</span> <span class="o">=</span> <span class="n">parent_agenda_uri_element</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">agenda_uri_element</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;https://www.portland.gov&quot;</span> <span class="o">+</span> <span class="n">agenda_uri_element</span><span class="p">[</span><span class="s2">&quot;href&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
 <div class="viewcode-block" id="PortlandScraper.get_event"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_event">[docs]</a>    <span class="k">def</span> <span class="nf">get_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_time</span><span class="p">:</span> <span class="n">datetime</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Information for council meeting on given date if available</span>
@@ -347,7 +372,7 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>
             <span class="n">EventIngestionModel</span><span class="p">(</span>
-                <span class="n">agenda_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">agenda_uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_agenda_uri</span><span class="p">(</span><span class="n">event_page</span><span class="o">.</span><span class="n">soup</span><span class="p">),</span>
                 <span class="c1"># NOTE: have not seen any specific body/bureau named on any agenda page</span>
                 <span class="n">body</span><span class="o">=</span><span class="n">Body</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;City Council&quot;</span><span class="p">),</span>
                 <span class="n">event_minutes_items</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event_minutes</span><span class="p">(</span><span class="n">event_page</span><span class="o">.</span><span class="n">soup</span><span class="p">),</span>

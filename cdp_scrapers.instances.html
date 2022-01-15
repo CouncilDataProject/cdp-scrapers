@@ -221,6 +221,24 @@ that contains list of current council members name, position, contact info</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cdp_scrapers.instances.portland.</span></span><span class="sig-name descname"><span class="pre">PortlandScraper</span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/portland.html#PortlandScraper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.portland.PortlandScraper" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.scraper_utils.IngestionModelScraper" title="cdp_scrapers.scraper_utils.IngestionModelScraper"><code class="xref py py-class docutils literal notranslate"><span class="pre">cdp_scrapers.scraper_utils.IngestionModelScraper</span></code></a></p>
 <dl class="py method">
+<dt class="sig sig-object py" id="cdp_scrapers.instances.portland.PortlandScraper.get_agenda_uri">
+<span class="sig-name descname"><span class="pre">get_agenda_uri</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_page</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bs4.BeautifulSoup</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/portland.html#PortlandScraper.get_agenda_uri"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.portland.PortlandScraper.get_agenda_uri" title="Permalink to this definition"></a></dt>
+<dd><p>Find the uri for the file containing the agenda at each Portland, OR city
+council meeting</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>event_page</strong> (<em>The page for the meeting</em>)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>agenda_uri</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>The uri for the file containing the meeting’s agenda</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.instances.portland.PortlandScraper.get_event">
 <span class="sig-name descname"><span class="pre">get_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime.datetime</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.EventIngestionModel</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/portland.html#PortlandScraper.get_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.portland.PortlandScraper.get_event" title="Permalink to this definition"></a></dt>
 <dd><p>Information for council meeting on given date if available</p>
