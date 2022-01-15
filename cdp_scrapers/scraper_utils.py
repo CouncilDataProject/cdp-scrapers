@@ -1,6 +1,9 @@
 import logging
 import re
+import unicodedata
 from datetime import datetime
+from metaphone import doublemetaphone
+from thefuzz import fuzz
 from typing import Any, List, Optional, Set
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
@@ -12,6 +15,12 @@ from cdp_backend.pipeline.ingestion_models import IngestionModel
 ###############################################################################
 
 log = logging.getLogger(__name__)
+
+###############################################################################
+
+# fuzzy matching must score greater than or equal to this number
+# to be decided as being aliases of each other
+NAME_ALIAS_THRESHOLD = 90
 
 ###############################################################################
 
@@ -69,17 +78,17 @@ def str_simplified(input_str: str) -> str:
     return input_str
 
 
-def name_full_forms(name: str) -> Set[str]:
+def name_variants(name: str) -> Set[str]:
     name = name.lower()
     try:
-        # this web page lists all known full-form name variations
+        # this web page lists most name variations
         # e.g. querying with Tom returns names like Tomas, Thomas
         with urlopen(f"https://www.behindthename.com/name/{name}/related") as resp:
             soup = BeautifulSoup(resp.read(), "html.parser")
     except URLError or HTTPError:
         if not re.search(r"-\d+$", name):
             # try e.g. tom-1 for tom
-            return name_full_forms(f"{name}-1")
+            return name_variants(f"{name}-1")
         return set()
 
     # all such <a> tags
@@ -92,16 +101,80 @@ def name_full_forms(name: str) -> Set[str]:
         # <a href="/name/tom-1/related" class="nll">
         if soup.find("a", class_="nll", href=re.compile(f".*{name}-\\d+.*")):
             # e.g. try tom-1
-            return name_full_forms(f"{name}-1")
+            return name_variants(f"{name}-1")
 
     trail_num = re.search(r"-(\d+)$", name)
     if not trail_num:
         return full_forms
 
     # we queried something like tom-1, try tom-2
-    return full_forms | name_full_forms(
+    return full_forms | name_variants(
         f"{name[:trail_num.start(1)]}{int(trail_num.group(1)) + 1}"
     )
+
+
+def alphabets_only(input_str: str) -> str:
+    # clean up whitespace
+    return str_simplified(
+        re.sub(
+            # no punctuations, numbers, etc.
+            r"[^a-zA-Z\s]",
+            "",
+            # canonical unicode
+            unicodedata.normalize("NFKC", input_str)
+            # drop all non-ascii chars
+            .encode("ascii", "ignore").decode("ascii")
+        )
+    )
+
+
+def is_same_person(name: str, query_name: str) -> bool:
+    # for better fuzzy logic, keep just lowercase alphabets and single whitespaces
+    name = alphabets_only(name).lower()
+    query_name = alphabets_only(query_name).lower()
+
+    # don't waste time if obvious
+    if name == query_name:
+        return True
+    if len(name) == 0 or len(query_name) == 0:
+        return False
+
+    # can't always use the first substring as first name
+    # e.g. first_initial middle_name last_name
+    name_parts = name.split()
+    for i in range(len(name_parts)):
+        if len(name_parts[i]) < 2:
+            # not going to do anything with initials
+            continue
+        # Bob, Bobby, Robert, ...
+        for part_variant in (name_variants(name_parts[i]) | set([name_parts[i]])):
+            # deep copy so we keep name_parts untouched
+            name_variant = list(name_parts)
+            # ["Bob", "Doe"] -> ["Bobby", "Doe"]
+            name_variant[i] = part_variant
+            # ["Bobby", "Doe"] -> "Bobby Doe"
+            name_variant = " ".join(name_variant)
+
+            if (
+                fuzz.token_sort_ratio(name_variant, query_name)
+                >= NAME_ALIAS_THRESHOLD
+            ):
+                return True
+
+            # try comparing pronunciations
+            # but sort to take care of sitautions like first, last and last, first
+            syllables = doublemetaphone("".join(sorted(name_variant.split())))
+            query_syllables = doublemetaphone("".join(sorted(query_name.split())))
+            if (
+                # primary == primary -> best
+                syllables[0] == query_syllables[0]
+                # primary == secondary -> good
+                or syllables[0] == query_syllables[1]
+                or syllables[1] == query_syllables[0]
+            ):
+                return True
+
+    return False
 
 
 class IngestionModelScraper:

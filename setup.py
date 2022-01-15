@@ -31,6 +31,9 @@ requirements = [
     "requests~=2.25",
     "beautifulsoup4>=4.9",
     "pytz>=2021.1",
+    "thefuzz>=0.19.0",
+    "metaphone>=0.6",
+    "python-Levenshtein>=0.12.2",
 ]
 
 extra_requirements = {
