@@ -103,7 +103,7 @@ def to_alphabets_only(input_str: str) -> str:
             # canonical unicode
             unicodedata.normalize("NFKC", input_str)
             # drop all non-ascii chars
-            .encode("ascii", "ignore").decode("ascii")
+            .encode("ascii", "ignore").decode("ascii"),
         )
     )
 
@@ -237,10 +237,7 @@ def is_same_person(name: str, query_name: str, check_reverse: bool = True) -> bo
             # ["Bobby", "Doe"] -> "Bobby Doe"
             name_variant = " ".join(name_variant)
 
-            if (
-                fuzz.token_sort_ratio(name_variant, query_name)
-                >= NAME_ALIAS_THRESHOLD
-            ):
+            if fuzz.token_sort_ratio(name_variant, query_name) >= NAME_ALIAS_THRESHOLD:
                 return True
 
             # try comparing pronunciations
