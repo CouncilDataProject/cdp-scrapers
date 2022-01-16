@@ -249,9 +249,9 @@ def is_same_person(name: str, query_name: str, check_reverse: bool = True) -> bo
         for part_variant in name_full_forms(name_parts[i]):
             # deep copy so we keep name_parts untouched
             name_variant = list(name_parts)
-            # ["Tom", "Doe"] -> ["Thomas", "Doe"]
-            name_variant[i] = part_variant
-            # ["Thomas", "Doe"] -> "Thomas Doe"
+            # ["tom", "doe"] -> ["thomas", "doe"]
+            name_variant[i] = to_alphabets_only(part_variant).lower()
+            # ["thomas", "doe"] -> "thomas doe"
             name_variant = " ".join(name_variant)
 
             if fuzz.token_sort_ratio(name_variant, query_name) >= NAME_ALIAS_THRESHOLD:
