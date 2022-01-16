@@ -28,7 +28,12 @@ from cdp_backend.pipeline.ingestion_models import (
 )
 
 from .types import ContentURIs
-from .scraper_utils import IngestionModelScraper, reduced_list, str_simplified
+from .scraper_utils import (
+    IngestionModelScraper,
+    reduced_list,
+    str_simplified,
+    is_same_person,
+)
 
 ###############################################################################
 
@@ -100,6 +105,7 @@ LEGISTAR_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
 
 
 known_legistar_persons: Dict[int, Dict[str, Any]] = {}
+known_legistar_person_ids: Dict[str, int] = {}
 known_legistar_bodies: Dict[int, Dict[str, Any]] = {}
 
 
@@ -182,7 +188,7 @@ def get_legistar_person(
     -----
     known_legistar_persons cache is cleared for every LegistarScraper.get_events() call
     """
-    global known_legistar_persons
+    global known_legistar_persons, known_legistar_person_ids
 
     if use_cache:
         try:
@@ -218,6 +224,9 @@ def get_legistar_person(
         person[LEGISTAR_PERSON_ROLES] = None
         if use_cache:
             known_legistar_persons[person_id] = person
+            known_legistar_person_ids[
+                str_simplified(person[LEGISTAR_PERSON_NAME])
+            ] = person_id
         return person
 
     office_records: List[Dict[str, Any]] = response.json()
@@ -230,6 +239,9 @@ def get_legistar_person(
     person[LEGISTAR_PERSON_ROLES] = office_records
     if use_cache:
         known_legistar_persons[person_id] = person
+        known_legistar_person_ids[
+            str_simplified(person[LEGISTAR_PERSON_NAME])
+        ] = person_id
     return person
 
 
@@ -275,10 +287,11 @@ def get_legistar_events_for_timespan(
     # during the lifetime of this single call is miniscule.
     # use a cache to prevent 10s-100s of web requests
     # for the same person/body
-    global known_legistar_persons, known_legistar_bodies
+    global known_legistar_persons, known_legistar_person_ids, known_legistar_bodies
     # See Also
     # get_legistar_person()
     known_legistar_persons.clear()
+    known_legistar_person_ids.clear()
     # See Also
     # get_legistar_body()
     known_legistar_bodies.clear()
@@ -784,9 +797,27 @@ class LegistarScraper(IngestionModelScraper):
             not legistar_person
             or not legistar_person[LEGISTAR_PERSON_NAME]
             # have seen PersonFullName with something like "no sponsor required"
-            or re.search("no.*required", legistar_person[LEGISTAR_PERSON_NAME], re.I)
+            or re.search("no.*sponsor", legistar_person[LEGISTAR_PERSON_NAME], re.I)
         ):
             return None
+
+        # we have seen clerks enter duplicate entries
+        # e.g. Dan and Daniel for the same person.
+        # this blob handles those situations.
+        name = str_simplified(legistar_person[LEGISTAR_PERSON_NAME])
+        if name not in self.known_persons:
+            # could be real new person or duplicate of existing.
+            # check against the verified list of known persons.
+            for known_name in self.known_persons.keys():
+                if is_same_person(name, known_name):
+                    # is duplicate of known verified person.
+                    # use the legistar entry for the verifyed person instead.
+                    try:
+                        person_id = known_legistar_person_ids[known_name]
+                        legistar_person = known_legistar_persons[person_id]
+                    except KeyError:
+                        pass
+                    break
 
         phone = str_simplified(legistar_person[LEGISTAR_PERSON_PHONE])
         if phone:
