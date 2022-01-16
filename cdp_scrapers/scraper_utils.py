@@ -4,7 +4,7 @@ import unicodedata
 from datetime import datetime
 from metaphone import doublemetaphone
 from thefuzz import fuzz
-from typing import Any, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
 
@@ -21,6 +21,9 @@ log = logging.getLogger(__name__)
 # fuzzy matching must score greater than or equal to this number
 # to be decided as being aliases of each other
 NAME_ALIAS_THRESHOLD = 90
+
+# name alises so we don't duplicate work for the same name
+name_aliases: Dict[str, Set[str]] = {}
 
 ###############################################################################
 
@@ -78,42 +81,19 @@ def str_simplified(input_str: str) -> str:
     return input_str
 
 
-def name_variants(name: str) -> Set[str]:
-    name = name.lower()
-    try:
-        # this web page lists most name variations
-        # e.g. querying with Tom returns names like Tomas, Thomas
-        with urlopen(f"https://www.behindthename.com/name/{name}/related") as resp:
-            soup = BeautifulSoup(resp.read(), "html.parser")
-    except URLError or HTTPError:
-        if not re.search(r"-\d+$", name):
-            # try e.g. tom-1 for tom
-            return name_variants(f"{name}-1")
-        return set()
+def to_alphabets_only(input_str: str) -> str:
+    """
+    Remove non-ascii characeters then apply str_simplified()
 
-    # all such <a> tags
-    # <a href="/name/thomas" class="nlc">Thomas</a>
-    full_forms = set([i.string for i in soup.find_all("a", class_="nlc")])
-    if not full_forms:
-        # found no names; probably because name (tom) needs further specifications
-        # like tom-1 (English) and tom-2 (Hebrew).
-        # see if there is <a> tag like
-        # <a href="/name/tom-1/related" class="nll">
-        if soup.find("a", class_="nll", href=re.compile(f".*{name}-\\d+.*")):
-            # e.g. try tom-1
-            return name_variants(f"{name}-1")
+    Parameters
+    ----------
+    input_str: str
 
-    trail_num = re.search(r"-(\d+)$", name)
-    if not trail_num:
-        return full_forms
-
-    # we queried something like tom-1, try tom-2
-    return full_forms | name_variants(
-        f"{name[:trail_num.start(1)]}{int(trail_num.group(1)) + 1}"
-    )
-
-
-def alphabets_only(input_str: str) -> str:
+    Returns
+    -------
+    cleaned: str
+        Non-ascii characters removed then whitespace cleaned
+    """
     # clean up whitespace
     return str_simplified(
         re.sub(
@@ -128,10 +108,108 @@ def alphabets_only(input_str: str) -> str:
     )
 
 
-def is_same_person(name: str, query_name: str) -> bool:
+def get_name_variants(name: str) -> Set[str]:
+    """
+    Return all common variations of name.
+    List is scraped from behindthename.com
+
+    Parameters
+    ----------
+    name: str
+
+    Returns
+    -------
+    names: Set[str]
+        e.b. Bob, Bobby, Robert, ... for Robert
+
+    See Also
+    --------
+    https://www.behindthename.com/name/{name}/related
+    """
+    global name_aliases
+
+    try:
+        # reuse if work was already done for this name
+        return name_aliases[name.lower()]
+    except KeyError:
+        pass
+
+    try:
+        # this web page lists most name variations
+        # e.g. querying with Tom returns names like Tomas, Thomas
+        with urlopen(
+            f"https://www.behindthename.com/name/{name.lower()}/related"
+        ) as resp:
+            soup = BeautifulSoup(resp.read(), "html.parser")
+
+    except URLError or HTTPError:
+        if not re.search(r"-\d+$", name):
+            # try e.g. tom-1 for tom
+            retval = get_name_variants(f"{name}-1") | set([name])
+            name_aliases[name.lower()] = retval
+            return retval
+
+        # input name should always be part of the returned set
+        return set()
+
+    # all such <a> tags
+    # <a href="/name/thomas" class="nlc">Thomas</a>
+    retval = set([i.string for i in soup.find_all("a", class_="nlc")])
+    if not retval:
+        # always want to include the query name itself in the returned set
+        # but not if we are in recursion and name is something like tom-1
+        if not re.search(r"-\d+$", name):
+            retval |= set([name])
+
+        # found no names; probably because name (tom) needs further specifications
+        # like tom-1 (English) and tom-2 (Hebrew).
+        # see if there is <a> tag like
+        # <a href="/name/tom-1/related" class="nll">
+        if soup.find("a", class_="nll", href=re.compile(f".*{name.lower()}-\\d+.*")):
+            # e.g. try tom-1
+            retval |= get_name_variants(f"{name}-1")
+            name_aliases[name.lower()] = retval
+            return retval
+
+    trail_num = re.search(r"-(\d+)$", name)
+    if not trail_num:
+        retval |= set([name])
+        name_aliases[name.lower()] = retval
+        return retval
+
+    # we queried something like tom-1, try tom-2
+    return retval | get_name_variants(
+        f"{name[:trail_num.start(1)]}{int(trail_num.group(1)) + 1}"
+    )
+
+
+def is_same_person(name: str, query_name: str, check_reverse: bool = True) -> bool:
+    """
+    Return True if name and query_name are determined to be same
+
+    Parameters
+    ----------
+    name: str
+        Variations of name are compared against query_name
+    query_name: str
+        This name is fixed during comparisons
+    check_reverse: bool = True
+        Additionally test with name and query_name swapped
+        if initial test fails
+
+    Returns
+    -------
+    bool
+        True if name == query_name or fuzzy matching passes
+
+    Notes
+    -----
+    FuzzyWuzzy's token_sort_ratio() and Metaphone's doublemetaphone
+    are used to compare the names
+    """
     # for better fuzzy logic, keep just lowercase alphabets and single whitespaces
-    name = alphabets_only(name).lower()
-    query_name = alphabets_only(query_name).lower()
+    name = to_alphabets_only(name).lower()
+    query_name = to_alphabets_only(query_name).lower()
 
     # don't waste time if obvious
     if name == query_name:
@@ -142,12 +220,16 @@ def is_same_person(name: str, query_name: str) -> bool:
     # can't always use the first substring as first name
     # e.g. first_initial middle_name last_name
     name_parts = name.split()
+    query_name_parts = query_name.split()
+
     for i in range(len(name_parts)):
-        if len(name_parts[i]) < 2:
-            # not going to do anything with initials
+        if len(name_parts[i]) <= 1 and len(name_parts) <= 2:
+            # ignore initials if only 1 other non-initial part in name
+            # e.g. same last name only is not good enough
             continue
+
         # Bob, Bobby, Robert, ...
-        for part_variant in (name_variants(name_parts[i]) | set([name_parts[i]])):
+        for part_variant in get_name_variants(name_parts[i]):
             # deep copy so we keep name_parts untouched
             name_variant = list(name_parts)
             # ["Bob", "Doe"] -> ["Bobby", "Doe"]
@@ -164,7 +246,7 @@ def is_same_person(name: str, query_name: str) -> bool:
             # try comparing pronunciations
             # but sort to take care of sitautions like first, last and last, first
             syllables = doublemetaphone("".join(sorted(name_variant.split())))
-            query_syllables = doublemetaphone("".join(sorted(query_name.split())))
+            query_syllables = doublemetaphone("".join(sorted(query_name_parts)))
             if (
                 # primary == primary -> best
                 syllables[0] == query_syllables[0]
@@ -174,6 +256,8 @@ def is_same_person(name: str, query_name: str) -> bool:
             ):
                 return True
 
+    if check_reverse:
+        return is_same_person(query_name, name, False)
     return False
 
 
