@@ -108,9 +108,9 @@ def to_alphabets_only(input_str: str) -> str:
     )
 
 
-def get_name_variants(name: str) -> Set[str]:
+def name_full_forms(name: str) -> Set[str]:
     """
-    Return all common variations of name.
+    Return all common expanded variations of name.
     List is scraped from behindthename.com
 
     Parameters
@@ -120,7 +120,7 @@ def get_name_variants(name: str) -> Set[str]:
     Returns
     -------
     names: Set[str]
-        e.b. Bob, Bobby, Robert, ... for Robert
+        e.g. Thomas, Tomas for Tom
 
     See Also
     --------
@@ -145,16 +145,33 @@ def get_name_variants(name: str) -> Set[str]:
     except URLError or HTTPError:
         if not re.search(r"-\d+$", name):
             # try e.g. tom-1 for tom
-            retval = get_name_variants(f"{name}-1") | set([name])
+            retval = name_full_forms(f"{name}-1") | set([name])
             name_aliases[name.lower()] = retval
             return retval
 
         # input name should always be part of the returned set
         return set()
 
-    # all such <a> tags
+    # <h3 class="related-hdr">Full Forms</h3>
+    # <div class="related-grp">
     # <a href="/name/thomas" class="nlc">Thomas</a>
-    retval = set([i.string for i in soup.find_all("a", class_="nlc")])
+    # first find the <h3> for full forms
+    # second go to the subsequent <div>
+    # third find all <a> tags in <div> with class="nlc"
+
+    try:
+        retval = set(
+            [
+                i.string
+                for i in soup.find(
+                    "h3", class_="related-hdr", string="Full Forms"
+                ).next_sibling.find_all("a", class_="nlc")
+            ]
+        )
+    except AttributeError:
+        # no such <h3> tag
+        retval = set()
+
     if not retval:
         # always want to include the query name itself in the returned set
         # but not if we are in recursion and name is something like tom-1
@@ -167,7 +184,7 @@ def get_name_variants(name: str) -> Set[str]:
         # <a href="/name/tom-1/related" class="nll">
         if soup.find("a", class_="nll", href=re.compile(f".*{name.lower()}-\\d+.*")):
             # e.g. try tom-1
-            retval |= get_name_variants(f"{name}-1")
+            retval |= name_full_forms(f"{name}-1")
             name_aliases[name.lower()] = retval
             return retval
 
@@ -178,7 +195,7 @@ def get_name_variants(name: str) -> Set[str]:
         return retval
 
     # we queried something like tom-1, try tom-2
-    return retval | get_name_variants(
+    return retval | name_full_forms(
         f"{name[:trail_num.start(1)]}{int(trail_num.group(1)) + 1}"
     )
 
@@ -228,13 +245,13 @@ def is_same_person(name: str, query_name: str, check_reverse: bool = True) -> bo
             # e.g. same last name only is not good enough
             continue
 
-        # Bob, Bobby, Robert, ...
-        for part_variant in get_name_variants(name_parts[i]):
+        # Thomas, Tomas
+        for part_variant in name_full_forms(name_parts[i]):
             # deep copy so we keep name_parts untouched
             name_variant = list(name_parts)
-            # ["Bob", "Doe"] -> ["Bobby", "Doe"]
+            # ["Tom", "Doe"] -> ["Thomas", "Doe"]
             name_variant[i] = part_variant
-            # ["Bobby", "Doe"] -> "Bobby Doe"
+            # ["Thomas", "Doe"] -> "Thomas Doe"
             name_variant = " ".join(name_variant)
 
             if fuzz.token_sort_ratio(name_variant, query_name) >= NAME_ALIAS_THRESHOLD:
