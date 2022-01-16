@@ -1,15 +1,16 @@
+from json import JSONDecodeError
 import logging
 import re
+import requests
+import time
 import unicodedata
 from datetime import datetime
 from metaphone import doublemetaphone
+from pathlib import Path
 from thefuzz import fuzz
 from typing import Any, Dict, List, Optional, Set
-from urllib.error import HTTPError, URLError
-from urllib.request import urlopen
 
 import pytz
-from bs4 import BeautifulSoup
 from cdp_backend.pipeline.ingestion_models import IngestionModel
 
 ###############################################################################
@@ -22,8 +23,16 @@ log = logging.getLogger(__name__)
 # to be decided as being aliases of each other
 NAME_ALIAS_THRESHOLD = 90
 
+# API key for behindthename assigned to sung.w.cho@protonmail.com
+NAME_QUERY_API_KEY = "su187998758"
+NAME_QUERY_API_URL = "https://www.behindthename.com/api/related.json"
+NAME_FULL_FORMS_FILE = Path(__file__).parent / "btn_givennames_synonyms.txt"
+# behindthename API requires pacing https://www.behindthename.com/api/
+# this variable is used so we make at most 1 request per second
+name_query_stamp_sec: float = None
+
 # name alises so we don't duplicate work for the same name
-name_aliases: Dict[str, Set[str]] = {}
+known_name_full_forms: Dict[str, Set[str]] = {}
 
 ###############################################################################
 
@@ -108,6 +117,82 @@ def to_alphabets_only(input_str: str) -> str:
     )
 
 
+def query_full_form_names(name: str) -> Set[str]:
+    """
+    Query behindthename API to get full forms for input name
+
+    Parameters
+    ----------
+    name: str
+
+    Returns
+    -------
+    name: Set[str]
+        Full forms for name e.g. ["Tomas", "Thomas", ...] for Tom
+
+    References
+    ----------
+    https://www.behindthename.com/api/help.php
+    """
+    global name_query_stamp_sec
+
+    # 1 query per sec
+    if name_query_stamp_sec is not None:
+        elapsed_sec = time.monotonic() - name_query_stamp_sec
+        if elapsed_sec < 1:
+            time.sleep(elapsed_sec + 0.1)
+    name_query_stamp_sec = time.monotonic()
+
+    # get English full forms
+    params = {"key": "su187998758", "name": name, "usage": "eng"}
+    resp = requests.get("https://www.behindthename.com/api/related.json", params=params)
+
+    if resp.status_code != 200:
+        return set()
+
+    try:
+        # {'names': ['Thom', 'Thomas', 'Tommie', 'Tommy']}
+        return set(resp.json()["names"])
+
+    except (JSONDecodeError, KeyError):
+        # {'error_code': 50, 'error': 'name could not be found'}
+        pass
+    return set()
+
+
+def file_search_full_form_names(name: str) -> Set[str]:
+    """
+    Search names file downloaded from behindthename for full form of input name
+
+    Parameters
+    ----------
+    name: str
+
+    Returns
+    -------
+    name: Set[str]
+        Full form for name if found, e.g. Thomas for Tom
+
+    References
+    ----------
+    NAME_FULL_FORMS_FILE (btn_givennames_synonyms.txt)
+    is available on https://www.behindthename.com/api/
+    under CC BY-SA 4.0 license (https://creativecommons.org/licenses/by-sa/4.0/).
+    The file is used without modification.
+    """
+    try:
+        with open(NAME_FULL_FORMS_FILE) as name_file:
+            for line in name_file:
+                if re.search(f"^{name}", line, re.IGNORECASE) is not None:
+                    # Tom\tmf\tMaas,Tam,Thom,Thomas,Tomas,Tommie,Tommy
+                    return set(line.split()[-1].split(","))
+
+    except OSError:
+        # file not found
+        pass
+    return set()
+
+
 def name_full_forms(name: str) -> Set[str]:
     """
     Return all common expanded variations of name.
@@ -126,78 +211,22 @@ def name_full_forms(name: str) -> Set[str]:
     --------
     https://www.behindthename.com/name/{name}/related
     """
-    global name_aliases
+    global known_name_full_forms
 
     try:
         # reuse if work was already done for this name
-        return name_aliases[name.lower()]
+        return known_name_full_forms[name.lower()]
     except KeyError:
         pass
 
-    try:
-        # this web page lists most name variations
-        # e.g. querying with Tom returns names like Tomas, Thomas
-        with urlopen(
-            f"https://www.behindthename.com/name/{name.lower()}/related"
-        ) as resp:
-            soup = BeautifulSoup(resp.read(), "html.parser")
+    # prefer names file over API; API is quota limited
+    full_forms = file_search_full_form_names(name)
+    if not full_forms:
+        full_forms = query_full_form_names(name)
+    full_forms |= set([name])
 
-    except URLError or HTTPError:
-        if not re.search(r"-\d+$", name):
-            # try e.g. tom-1 for tom
-            retval = name_full_forms(f"{name}-1") | set([name])
-            name_aliases[name.lower()] = retval
-            return retval
-
-        # input name should always be part of the returned set
-        return set()
-
-    # <h3 class="related-hdr">Full Forms</h3>
-    # <div class="related-grp">
-    # <a href="/name/thomas" class="nlc">Thomas</a>
-    # first find the <h3> for full forms
-    # second go to the subsequent <div>
-    # third find all <a> tags in <div> with class="nlc"
-
-    try:
-        retval = set(
-            [
-                i.string
-                for i in soup.find(
-                    "h3", class_="related-hdr", string="Full Forms"
-                ).next_sibling.find_all("a", class_="nlc")
-            ]
-        )
-    except AttributeError:
-        # no such <h3> tag
-        retval = set()
-
-    if not retval:
-        # always want to include the query name itself in the returned set
-        # but not if we are in recursion and name is something like tom-1
-        if not re.search(r"-\d+$", name):
-            retval |= set([name])
-
-        # found no names; probably because name (tom) needs further specifications
-        # like tom-1 (English) and tom-2 (Hebrew).
-        # see if there is <a> tag like
-        # <a href="/name/tom-1/related" class="nll">
-        if soup.find("a", class_="nll", href=re.compile(f".*{name.lower()}-\\d+.*")):
-            # e.g. try tom-1
-            retval |= name_full_forms(f"{name}-1")
-            name_aliases[name.lower()] = retval
-            return retval
-
-    trail_num = re.search(r"-(\d+)$", name)
-    if not trail_num:
-        retval |= set([name])
-        name_aliases[name.lower()] = retval
-        return retval
-
-    # we queried something like tom-1, try tom-2
-    return retval | name_full_forms(
-        f"{name[:trail_num.start(1)]}{int(trail_num.group(1)) + 1}"
-    )
+    known_name_full_forms[name.lower()] = full_forms
+    return full_forms
 
 
 def is_same_person(name: str, query_name: str, check_reverse: bool = True) -> bool:
@@ -251,16 +280,21 @@ def is_same_person(name: str, query_name: str, check_reverse: bool = True) -> bo
             name_variant = list(name_parts)
             # ["tom", "doe"] -> ["thomas", "doe"]
             name_variant[i] = to_alphabets_only(part_variant).lower()
-            # ["thomas", "doe"] -> "thomas doe"
-            name_variant = " ".join(name_variant)
 
-            if fuzz.token_sort_ratio(name_variant, query_name) >= NAME_ALIAS_THRESHOLD:
+            if (
+                fuzz.token_sort_ratio(
+                    # ["thomas", "doe"] -> "thomas doe"
+                    " ".join(name_variant),
+                    query_name,
+                )
+                >= NAME_ALIAS_THRESHOLD
+            ):
                 return True
 
-            # try comparing pronunciations
-            # but sort to take care of sitautions like first, last and last, first
-            syllables = doublemetaphone("".join(sorted(name_variant.split())))
-            query_syllables = doublemetaphone("".join(sorted(query_name_parts)))
+            # try comparing phonetics
+            # but sort to take care of situations like first, last and last, first
+            syllables = doublemetaphone(" ".join(sorted(name_variant)))
+            query_syllables = doublemetaphone(" ".join(sorted(query_name_parts)))
             if (
                 # primary == primary -> best
                 syllables[0] == query_syllables[0]

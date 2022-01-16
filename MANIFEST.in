@@ -3,6 +3,7 @@ include LICENSE
 include README.md
 
 include cdp_scrapers/instances/*.json
+include cdp-scrapers/cdp_scrapers/btn_givennames_synonyms.txt
 
 recursive-include tests *
 recursive-exclude * __pycache__
