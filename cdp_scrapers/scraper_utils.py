@@ -140,7 +140,9 @@ def query_full_form_names(name: str) -> Set[str]:
     if name_query_stamp_sec is not None:
         elapsed_sec = time.monotonic() - name_query_stamp_sec
         if elapsed_sec < 1:
-            time.sleep(elapsed_sec + 0.1)
+            # e.g. if 200 msec since previous query
+            # wait 800 + 100 = 900 msec to be safe
+            time.sleep(1 - elapsed_sec + 0.1)
     name_query_stamp_sec = time.monotonic()
 
     # get English full forms
