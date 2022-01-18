@@ -20,7 +20,7 @@ from cdp_backend.pipeline.ingestion_models import (
     Vote,
 )
 
-from ..scraper_utils import IngestionModelScraper, reduced_list
+from ..scraper_utils import IngestionModelScraper, reduced_list, str_simplified
 
 ###############################################################################
 
@@ -117,7 +117,7 @@ class PortlandScraper(IngestionModelScraper):
         )
 
     def get_supporting_files(
-        self, event_page: BeautifulSoup
+        self, event_page: BeautifulSoup, minutes_item_index: int
     ) -> Optional[List[SupportingFile]]:
         # TODO:
         # When we follow the link for any item on agenda page,
@@ -125,8 +125,52 @@ class PortlandScraper(IngestionModelScraper):
         # “Impact Statement,” and others.
         # May be simpler to just get all linked pdf files on those web pages.
 
+        # minutes_item_index-th <div> tag on the event web page
+        # has <a> with url to the minutes item's details page
+        try:
+            div = event_page.find_all(
+                "div", class_="field--label-hidden council-document__title"
+            )[minutes_item_index]
+            # <a href="/council/documents/communication/placed-file/295-2021">
+            details_url = f'https://www.portland.gov{div.find("a")["href"]}'
+        except (IndexError, TypeError):
+            # find_all() returned list with size <= minutes_item_index
+            # or find("a") did not succeed
+            return None
+
+        # load the mintues item details page that may have links to supporting files
+        details_soup = load_web_page(details_url)
+        if not details_soup.status:
+            return None
+
+        supporting_files: List[SupportingFile] = []
+        # first, try to get Documents and Exhibits and Impact Statement
+        # these will contain links to files
+        for div in details_soup.soup.find_all(
+            "div",
+            class_=re.compile(
+                "field field--label-above field--name-field-"
+                "((documents-and-exhibits)|(file-impact-statement)) field--type-file"
+            ),
+        ):
+            # <a href="/sites/...pdf"><span>Download file</span>
+            # <i class="fas fa-file-alt"></i>Exhibit A</a>
+            link = div.find("a")
+            if link is not None:
+                supporting_files.append(
+                    SupportingFile(
+                        name=str_simplified(
+                            re.sub(r"download\s+file", "", link.text, flags=re.I)
+                        ),
+                        uri=f'https://www.portland.gov{link["href"]}',
+                    )
+                )
+
+        # TODO: now get supporting files that are linked as efiles.
+        #       these links to yet another web page with file download link.
+
         return reduced_list(
-            [self.get_none_if_empty(SupportingFile(name=None, uri=None))],
+            [self.get_none_if_empty(i) for i in supporting_files],
         )
 
     def get_votes(self, event_page: BeautifulSoup) -> Optional[List[Vote]]:
@@ -167,7 +211,11 @@ class PortlandScraper(IngestionModelScraper):
                         index=0,
                         matter=self.get_matter(event_page),
                         minutes_item=MinutesItem(name=None, description=None),
-                        supporting_files=self.get_supporting_files(event_page),
+                        # TODO: need to call get_supporting_files()
+                        # with the minutes item's index on the current event page
+                        # or some similar minutes item differentiator
+                        # from other minutes items on the event page
+                        # supporting_files=self.get_supporting_files(event_page),
                         votes=self.get_votes(event_page),
                     ),
                 ),
