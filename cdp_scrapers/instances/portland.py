@@ -153,21 +153,21 @@ class PortlandScraper(IngestionModelScraper):
                 "((documents-and-exhibits)|(file-impact-statement)) field--type-file"
             ),
         ):
-            # <a href="/sites/...pdf"><span>Download file</span>
-            # <i class="fas fa-file-alt"></i>Exhibit A</a>
-            link = div.find("a")
-            if link is not None:
-                supporting_files.append(
-                    SupportingFile(
-                        name=str_simplified(
-                            re.sub(r"download\s+file", "", link.text, flags=re.I)
-                        ),
-                        uri=f'https://www.portland.gov{link["href"]}',
+            supporting_files.extend(
+                [
+                    self.get_none_if_empty(
+                        SupportingFile(
+                            name=str_simplified(
+                                re.sub(r"download\s+file", "", link.text, flags=re.I)
+                            ),
+                            uri=f'https://www.portland.gov{link["href"]}',
+                        )
                     )
-                )
-
-        # TODO: now get supporting files that are linked as efiles.
-        #       these links to yet another web page with file download link.
+                    # <a href="/sites/...pdf"><span>Download file</span>
+                    # <i class="fas fa-file-alt"></i>Exhibit A</a>
+                    for link in div.find_all("a")
+                ]
+            )
 
         return reduced_list(
             [self.get_none_if_empty(i) for i in supporting_files],
