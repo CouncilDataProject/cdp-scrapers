@@ -77,6 +77,28 @@ def load_web_page(url: Union[str, Request]) -> WebPageSoup:
     return WebPageSoup(False)
 
 
+def make_efile_url(efile_page_url: str) -> str:
+    """
+    Helper function to get file download link
+    on a Portland EFile hosting web page
+
+    Parameters
+    ----------
+    efile_page_url: str
+        URL to Portland efile hosting web page
+        e.g. https://efiles.portlandoregon.gov/record/14803529
+
+    Returns
+    -------
+    efile url: str
+        URL to the file itself
+        e.g. https://efiles.portlandoregon.gov/record/14803529/File/Document
+    """
+    if not efile_page_url.endswith("/"):
+        efile_page_url += "/"
+    return f"{efile_page_url}File/Document"
+
+
 class PortlandScraper(IngestionModelScraper):
     def __init__(self):
         super().__init__(timezone="America/Los_Angeles")
@@ -119,15 +141,27 @@ class PortlandScraper(IngestionModelScraper):
     def get_supporting_files(
         self, event_page: BeautifulSoup, minutes_item_index: int
     ) -> Optional[List[SupportingFile]]:
-        # TODO:
-        # When we follow the link for any item on agenda page,
-        # there are various documents under “Documents and Exhibits,”
-        # “Impact Statement,” and others.
-        # May be simpler to just get all linked pdf files on those web pages.
+        """
+        Return SupportingFiles for a given EventMinutesItems
 
-        # minutes_item_index-th <div> tag on the event web page
-        # has <a> with url to the minutes item's details page
+        Parameters
+        ----------
+        event_page: BeautifulSoup
+            Event web page e.g. https://www.portland.gov/council/agenda/yyyy/m/d
+            loaded in BeautifulSoup
+
+        minutes_item_index: int
+            EventMinutesItem index on event_page
+
+        Returns
+        -------
+        supporting files: Optional[List[SupportingFile]]
+            Supporting files listed on the event minutes item's details page
+        """
         try:
+            # on the event page, event minute item titles are listed
+            # in <div> with a particular class attribute.
+            # so look for the minute_item_index-th such <div> on the event page
             div = event_page.find_all(
                 "div", class_="field--label-hidden council-document__title"
             )[minutes_item_index]
@@ -158,7 +192,12 @@ class PortlandScraper(IngestionModelScraper):
                     self.get_none_if_empty(
                         SupportingFile(
                             name=str_simplified(
-                                re.sub(r"download\s+file", "", link.text, flags=re.I)
+                                re.sub(
+                                    r"\s*download\s+file\s*",
+                                    "",
+                                    link.text,
+                                    flags=re.IGNORECASE,
+                                )
                             ),
                             uri=f'https://www.portland.gov{link["href"]}',
                         )
@@ -169,9 +208,24 @@ class PortlandScraper(IngestionModelScraper):
                 ]
             )
 
-        return reduced_list(
-            [self.get_none_if_empty(i) for i in supporting_files],
+        # finally parse for efile links
+        # these are hosted yet on another web page; always start with https://efiles
+        supporting_files.extend(
+            [
+                self.get_none_if_empty(
+                    SupportingFile(
+                        name=str_simplified(link.string),
+                        uri=make_efile_url(link["href"]),
+                    )
+                )
+                for link in details_soup.soup.find_all(
+                    "a", href=re.compile(r"https:\/\/efiles.+")
+                )
+            ]
         )
+
+        # remove any Nones
+        return reduced_list(supporting_files)
 
     def get_votes(self, event_page: BeautifulSoup) -> Optional[List[Vote]]:
         # TODO:
