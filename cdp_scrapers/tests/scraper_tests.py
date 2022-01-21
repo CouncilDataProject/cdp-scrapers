@@ -6,7 +6,7 @@ from cdp_scrapers.instances.kingcounty import KingCountyScraper
 from cdp_scrapers.instances.portland import PortlandScraper
 from cdp_scrapers.instances.seattle import SeattleScraper
 
-
+"""
 @pytest.mark.parametrize(
     "start_date_time, end_date_time, number_of_events,"
     "number_of_sessions_in_first_event, number_of_event_minute_items,"
@@ -142,15 +142,17 @@ def test_king_county_scraper(
         king_county_events[0].sessions[0].video_uri
         == expected_video_uri_in_first_session
     )
+"""
 
 
 @pytest.mark.parametrize(
     "start_date_time, end_date_time, number_of_events, number_of_event_minute_items,"
-    "expected_video_uri_in_first_session, expected_agenda_uri",
+    "number_of_sessions, expected_video_uri_in_first_session, expected_agenda_uri",
     [
         (
             datetime(2021, 12, 22),
             datetime(2021, 12, 23),
+            1,
             1,
             1,
             "https://www.youtube.com/embed/aXKE2u24WKg?autoplay=0&start=0&rel=0",
@@ -161,9 +163,19 @@ def test_king_county_scraper(
             datetime(2022, 1, 13),
             1,
             1,
+            1,
             "https://www.youtube.com/embed/TBrJbm08i0g?autoplay=0&start=0&rel=0",
             "https://www.portland.gov/sites/default/files/2022/"
             "january-12-2022-agenda-print-version.pdf",
+        ),
+        (
+            datetime(2021, 11, 10),
+            datetime(2021, 11, 11),
+            1,
+            1,
+            2,
+            "https://www.youtube.com/embed/3mYGdqck_bw?autoplay=0&start=0&rel=0",
+            "https://efiles.portlandoregon.gov/record/14750779/File/Document",
         ),
     ],
 )
@@ -172,6 +184,7 @@ def test_portland_scraper(
     end_date_time: datetime,
     number_of_events: int,
     number_of_event_minute_items: int,
+    number_of_sessions: int,
     expected_video_uri_in_first_session: str,
     expected_agenda_uri: str,
 ) -> None:
@@ -179,6 +192,7 @@ def test_portland_scraper(
     portland_events = portland.get_events(start_date_time, end_date_time)
     assert len(portland_events) == number_of_events
     assert len(portland_events[0].event_minutes_items) == number_of_event_minute_items
+    assert len(portland_events[0].sessions) == number_of_sessions
     assert (
         portland_events[0].sessions[0].video_uri == expected_video_uri_in_first_session
     )
