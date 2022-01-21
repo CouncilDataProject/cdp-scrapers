@@ -77,6 +77,7 @@ class SeattleScraper(LegistarScraper):
                 "Pursuant to Washington State",
             ],
             known_persons=known_persons,
+            person_aliases={"Dan Strauss": set(["Daniel Strauss"])},
         )
 
     def parse_content_uris(

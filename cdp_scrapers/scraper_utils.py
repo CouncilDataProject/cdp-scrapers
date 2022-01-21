@@ -2,9 +2,9 @@ from datetime import datetime
 import logging
 import pytz
 import re
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional, Set
 
-from cdp_backend.pipeline.ingestion_models import IngestionModel
+from cdp_backend.pipeline.ingestion_models import IngestionModel, Person
 
 ###############################################################################
 
@@ -77,13 +77,19 @@ class IngestionModelScraper:
         i.e. "America/Los_Angeles" or "America/New_York"
         See https://en.wikipedia.org/wiki/List_of_tz_database_time_zones for canonical
         timezones.
+    person_aliases: Optional[Dict[str, Set[str]]]
+        Dictionary used to catch name aliases
+        and resolve improperly different Persons to the one correct Person.
+        Default: None
     """
 
     def __init__(
         self,
         timezone: str,
+        person_aliases: Optional[Dict[str, Set[str]]] = None,
     ):
         self.timezone: pytz.timezone = pytz.timezone(timezone)
+        self.person_aliases = person_aliases
 
     @staticmethod
     def find_time_zone() -> str:
@@ -240,3 +246,6 @@ class IngestionModelScraper:
 
         # nonempty value for all required keys in model
         return model
+
+    def resolve_person_alias(self, person: Person) -> Person:
+        return person

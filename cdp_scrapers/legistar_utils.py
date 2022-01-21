@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from json import JSONDecodeError
 import logging
 import re
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Set
 from urllib.error import HTTPError, URLError
+from urllib.parse import quote_plus
 from urllib.request import urlopen
 
 import requests
@@ -433,6 +435,10 @@ class LegistarScraper(IngestionModelScraper):
         Dictionary used to inject information into Persons in place of missing
         attributes after dynamic scraping in get_events().
         Default: None
+    person_aliases: Optional[Dict[str, Set[str]]]
+        Dictionary used to catch name aliases
+        and resolve improperly unique Persons to the one correct Person.
+        Default: None
 
     See Also
     --------
@@ -458,8 +464,9 @@ class LegistarScraper(IngestionModelScraper):
         minutes_item_decision_passed_pattern: str = r"pass",
         minutes_item_decision_failed_pattern: str = r"not|fail",
         known_persons: Optional[Dict[str, Person]] = None,
+        person_aliases: Optional[Dict[str, Set[str]]] = None,
     ):
-        super().__init__(timezone=timezone)
+        super().__init__(timezone=timezone, person_aliases=person_aliases)
 
         self.client_name: str = client
         self.ignore_minutes_item_patterns: List[str] = ignore_minutes_item_patterns
@@ -760,6 +767,40 @@ class LegistarScraper(IngestionModelScraper):
                 for record in legistar_office_records
             ]
         )
+
+    def resolve_person_alias(self, person: Person) -> Optional[Person]:
+        if not self.person_aliases:
+            return person
+
+        request_format = (
+            LEGISTAR_PERSON_BASE + "?$filter=PersonFullName+eq+%27{name}%27"
+        )
+
+        for name, aliases in self.person_aliases.items():
+            if person.name in aliases:
+                try:
+                    # query to get PersonId for the reference person we want to use
+                    # in place of the input person
+                    response = requests.get(
+                        request_format.format(
+                            client=self.client_name, name=quote_plus(name)
+                        ),
+                    ).json()
+                    # response is a json list
+                except JSONDecodeError:
+                    response = []
+
+                if len(response) > 0 and LEGISTAR_PERSON_EXT_ID in response[0]:
+                    return self.get_person(
+                        get_legistar_person(
+                            self.client_name,
+                            response[0][LEGISTAR_PERSON_EXT_ID],
+                            use_cache=True,
+                        )
+                    )
+
+        # input person is not an alias of a reference Person
+        return person
 
     def get_person(self, legistar_person: Dict) -> Optional[Person]:
         """
