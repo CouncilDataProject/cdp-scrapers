@@ -854,7 +854,7 @@ class LegistarScraper(IngestionModelScraper):
             phone = phone.replace("(", "").replace(")", "-")
 
         return self.get_none_if_empty(
-            # If applicable, catch mistakenly entered duplicate persons in the Legistar DB.
+            # If applicable, catch [mistakenly] entered duplicate persons.
             # i.e. Don't create unique Person objects for the same real person.
             self.resolve_person_alias(
                 Person(
