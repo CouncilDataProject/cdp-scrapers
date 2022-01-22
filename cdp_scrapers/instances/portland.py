@@ -16,7 +16,7 @@ from cdp_backend.pipeline.ingestion_models import (Body, EventIngestionModel,
                                                    Session, SupportingFile,
                                                    Vote)
 
-from ..scraper_utils import IngestionModelScraper, reduced_list
+from ..scraper_utils import IngestionModelScraper, reduced_list, str_simplified
 
 ###############################################################################
 
@@ -71,6 +71,28 @@ def load_web_page(url: Union[str, Request]) -> WebPageSoup:
         log.error(f"Failed to open {url}: {str(e)}")
 
     return WebPageSoup(False)
+
+
+def make_efile_url(efile_page_url: str) -> str:
+    """
+    Helper function to get file download link
+    on a Portland EFile hosting web page
+
+    Parameters
+    ----------
+    efile_page_url: str
+        URL to Portland efile hosting web page
+        e.g. https://efiles.portlandoregon.gov/record/14803529
+
+    Returns
+    -------
+    efile url: str
+        URL to the file itself
+        e.g. https://efiles.portlandoregon.gov/record/14803529/File/Document
+    """
+    if not efile_page_url.endswith("/"):
+        efile_page_url += "/"
+    return f"{efile_page_url}File/Document"
 
 
 class PortlandScraper(IngestionModelScraper):
@@ -179,13 +201,10 @@ class PortlandScraper(IngestionModelScraper):
         )
 
     def get_supporting_files(
-        self, event_page: BeautifulSoup
+        self, event_page: BeautifulSoup, minutes_item_index: int
     ) -> Optional[List[SupportingFile]]:
-        # TODO:
-        # When we follow the link for any item on agenda page,
-        # there are various documents under “Documents and Exhibits,”
-        # “Impact Statement,” and others.
-        # May be simpler to just get all linked pdf files on those web pages.
+        """
+        Return SupportingFiles for a given EventMinutesItems
 
         # Find title
         title_div = event_page.find("div", class_="council-document__title")
@@ -199,7 +218,89 @@ class PortlandScraper(IngestionModelScraper):
                     SupportingFile(name="Details", uri="https://portland.gov" + href)
                 )
             ],
+
+        Parameters
+        ----------
+        event_page: BeautifulSoup
+            Event web page e.g. https://www.portland.gov/council/agenda/yyyy/m/d
+            loaded in BeautifulSoup
+
+        minutes_item_index: int
+            EventMinutesItem index on event_page
+
+        Returns
+        -------
+        supporting files: Optional[List[SupportingFile]]
+            Supporting files listed on the event minutes item's details page
+        """
+        try:
+            # on the event page, event minute item titles are listed
+            # in <div> with a particular class attribute.
+            # so look for the minute_item_index-th such <div> on the event page
+            div = event_page.find_all(
+                "div", class_="field--label-hidden council-document__title"
+            )[minutes_item_index]
+            # <a href="/council/documents/communication/placed-file/295-2021">
+            details_url = f'https://www.portland.gov{div.find("a")["href"]}'
+        except (IndexError, TypeError):
+            # find_all() returned list with size <= minutes_item_index
+            # or find("a") did not succeed
+            return None
+
+        # load the mintues item details page that may have links to supporting files
+        details_soup = load_web_page(details_url)
+        if not details_soup.status:
+            return None
+
+        supporting_files: List[SupportingFile] = []
+        # first, try to get Documents and Exhibits and Impact Statement
+        # these will contain links to files
+        for div in details_soup.soup.find_all(
+            "div",
+            class_=re.compile(
+                "field field--label-above field--name-field-"
+                "((documents-and-exhibits)|(file-impact-statement)) field--type-file"
+            ),
+        ):
+            supporting_files.extend(
+                [
+                    self.get_none_if_empty(
+                        SupportingFile(
+                            name=str_simplified(
+                                re.sub(
+                                    r"\s*download\s+file\s*",
+                                    "",
+                                    link.text,
+                                    flags=re.IGNORECASE,
+                                )
+                            ),
+                            uri=f'https://www.portland.gov{link["href"]}',
+                        )
+                    )
+                    # <a href="/sites/...pdf"><span>Download file</span>
+                    # <i class="fas fa-file-alt"></i>Exhibit A</a>
+                    for link in div.find_all("a")
+                ]
+            )
+
+        # finally parse for efile links
+        # these are hosted yet on another web page; always start with https://efiles
+        supporting_files.extend(
+            [
+                self.get_none_if_empty(
+                    SupportingFile(
+                        name=str_simplified(link.string),
+                        uri=make_efile_url(link["href"]),
+                    )
+                )
+                for link in details_soup.soup.find_all(
+                    "a", href=re.compile(r"https:\/\/efiles.+")
+                )
+            ]
         )
+
+        # remove any Nones
+        return reduced_list(supporting_files)
 
     def get_votes(self, event_page: BeautifulSoup) -> Optional[List[Vote]]:
         # TODO:
@@ -261,12 +362,13 @@ class PortlandScraper(IngestionModelScraper):
         for minute_section in minute_sections:
             title_div = minute_section.find("div", class_="council-document__title")
             matter_title = title_div.find("a").text.strip()
+            index = int(minute_section.find("h4").text.strip())
             event_minute_item = EventMinutesItem(
                 decision=None,
-                index=0,
+                index=index,
                 matter=self.get_matter(minute_section),
                 minutes_item=MinutesItem(name=None, description=matter_title),
-                supporting_files=self.get_supporting_files(minute_section),
+                supporting_files=self.get_supporting_files(minute_section, index),
                 votes=self.get_votes(minute_section),
             )
             event_minute_items.append(event_minute_item)
