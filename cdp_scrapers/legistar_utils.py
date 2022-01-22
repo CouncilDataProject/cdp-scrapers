@@ -807,6 +807,10 @@ class LegistarScraper(IngestionModelScraper):
                         ),
                     ).json()
                 except JSONDecodeError:
+                    log.error(
+                        f"Found {person.name}, an alias of {name} "
+                        f"but failed get valid JSON for {name} from Legistar API."
+                    )
                     response: List[Dict[str, Any]] = []
 
                 if len(response) > 0 and LEGISTAR_PERSON_EXT_ID in response[0]:
