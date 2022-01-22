@@ -807,20 +807,23 @@ class LegistarScraper(IngestionModelScraper):
                         ),
                     ).json()
                 except JSONDecodeError:
-                    log.error(
-                        f"Found {person.name}, an alias of {name} "
-                        f"but failed get valid JSON for {name} from Legistar API."
-                    )
                     response: List[Dict[str, Any]] = []
 
-                if len(response) > 0 and LEGISTAR_PERSON_EXT_ID in response[0]:
-                    return self.get_person(
-                        get_legistar_person(
-                            self.client_name,
-                            response[0][LEGISTAR_PERSON_EXT_ID],
-                            use_cache=True,
-                        )
+                if len(response) == 0 or LEGISTAR_PERSON_EXT_ID not in response[0]:
+                    log.error(
+                        f"Found {person.name}, an alias of {name} "
+                        f"but failed get valid JSON for {name} from Legistar API. "
+                        f"Keeping this alias {person.name} without resolving."
                     )
+                    return person
+
+                return self.get_person(
+                    get_legistar_person(
+                        self.client_name,
+                        response[0][LEGISTAR_PERSON_EXT_ID],
+                        use_cache=True,
+                    )
+                )
 
         # input person is not an alias of a reference Person
         return person
