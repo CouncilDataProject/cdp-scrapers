@@ -248,4 +248,24 @@ class IngestionModelScraper:
         return model
 
     def resolve_person_alias(self, person: Person) -> Person:
+        """
+        If input person is in fact an alias of a reference known person,
+        return the reference person instead.
+        Else return person as-is.
+
+        Parameters
+        ----------
+        person: Person
+            Person to check whether is an alias or a real unique Person
+
+        Returns
+        -------
+        Person
+            input person, or the correct reference Person if input person is an alias.
+            This base implementation always returns person as-is.
+
+        See Also
+        --------
+        person_aliases in __init__()
+        """
         return person

@@ -769,6 +769,25 @@ class LegistarScraper(IngestionModelScraper):
         )
 
     def resolve_person_alias(self, person: Person) -> Optional[Person]:
+        """
+        If input person is in fact an alias of a reference known person,
+        return the reference person instead.
+        Else return person as-is.
+
+        Parameters
+        ----------
+        person: Person
+            Person to check whether is an alias or a real unique Person
+
+        Returns
+        -------
+        Person
+            input person, or the correct reference Person if input person is an alias.
+
+        See Also
+        --------
+        person_aliases in __init__()
+        """
         if not self.person_aliases:
             return person
 
@@ -778,17 +797,17 @@ class LegistarScraper(IngestionModelScraper):
 
         for name, aliases in self.person_aliases.items():
             if person.name in aliases:
+                # found the reference person with input person.name as an alias
                 try:
                     # query to get PersonId for the reference person we want to use
                     # in place of the input person
-                    response = requests.get(
+                    response: List[Dict[str, Any]] = requests.get(
                         request_format.format(
                             client=self.client_name, name=quote_plus(name)
                         ),
                     ).json()
-                    # response is a json list
                 except JSONDecodeError:
-                    response = []
+                    response: List[Dict[str, Any]] = []
 
                 if len(response) > 0 and LEGISTAR_PERSON_EXT_ID in response[0]:
                     return self.get_person(
@@ -835,13 +854,17 @@ class LegistarScraper(IngestionModelScraper):
             phone = phone.replace("(", "").replace(")", "-")
 
         return self.get_none_if_empty(
-            Person(
-                email=str_simplified(legistar_person[LEGISTAR_PERSON_EMAIL]),
-                external_source_id=str(legistar_person[LEGISTAR_PERSON_EXT_ID]),
-                name=str_simplified(legistar_person[LEGISTAR_PERSON_NAME]),
-                phone=phone,
-                website=str_simplified(legistar_person[LEGISTAR_PERSON_WEBSITE]),
-                is_active=bool(legistar_person[LEGISTAR_PERSON_ACTIVE]),
+            # If applicable, catch mistakenly entered duplicate persons in the Legistar DB.
+            # i.e. Don't create unique Person objects for the same real person.
+            self.resolve_person_alias(
+                Person(
+                    email=str_simplified(legistar_person[LEGISTAR_PERSON_EMAIL]),
+                    external_source_id=str(legistar_person[LEGISTAR_PERSON_EXT_ID]),
+                    name=str_simplified(legistar_person[LEGISTAR_PERSON_NAME]),
+                    phone=phone,
+                    website=str_simplified(legistar_person[LEGISTAR_PERSON_WEBSITE]),
+                    is_active=bool(legistar_person[LEGISTAR_PERSON_ACTIVE]),
+                )
             )
         )
 
