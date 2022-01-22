@@ -6,7 +6,7 @@ from cdp_scrapers.instances.kingcounty import KingCountyScraper
 from cdp_scrapers.instances.portland import PortlandScraper
 from cdp_scrapers.instances.seattle import SeattleScraper
 
-"""
+
 @pytest.mark.parametrize(
     "start_date_time, end_date_time, number_of_events,"
     "number_of_sessions_in_first_event, number_of_event_minute_items,"
@@ -142,12 +142,12 @@ def test_king_county_scraper(
         king_county_events[0].sessions[0].video_uri
         == expected_video_uri_in_first_session
     )
-"""
 
 
 @pytest.mark.parametrize(
     "start_date_time, end_date_time, number_of_events, number_of_event_minute_items,"
-    "number_of_sessions, expected_video_uri_in_first_session, expected_agenda_uri",
+    "number_of_sessions, event_with_votes, event_minute_item_with_votes,"
+    "number_of_votes, expected_video_uri_in_first_session, expected_agenda_uri",
     [
         (
             datetime(2021, 12, 22),
@@ -155,6 +155,9 @@ def test_king_county_scraper(
             1,
             1,
             1,
+            0,
+            2,
+            5,
             "https://www.youtube.com/embed/aXKE2u24WKg?autoplay=0&start=0&rel=0",
             "https://efiles.portlandoregon.gov/record/14778119/File/Document",
         ),
@@ -164,6 +167,9 @@ def test_king_county_scraper(
             1,
             1,
             1,
+            0,
+            5,
+            5,
             "https://www.youtube.com/embed/TBrJbm08i0g?autoplay=0&start=0&rel=0",
             "https://www.portland.gov/sites/default/files/2022/"
             "january-12-2022-agenda-print-version.pdf",
@@ -174,6 +180,9 @@ def test_king_county_scraper(
             1,
             1,
             2,
+            0,
+            6,
+            5,
             "https://www.youtube.com/embed/3mYGdqck_bw?autoplay=0&start=0&rel=0",
             "https://efiles.portlandoregon.gov/record/14750779/File/Document",
         ),
@@ -185,6 +194,9 @@ def test_portland_scraper(
     number_of_events: int,
     number_of_event_minute_items: int,
     number_of_sessions: int,
+    event_with_votes: int,
+    event_minute_item_with_votes: int,
+    number_of_votes: int,
     expected_video_uri_in_first_session: str,
     expected_agenda_uri: str,
 ) -> None:
@@ -195,5 +207,13 @@ def test_portland_scraper(
     assert len(portland_events[0].sessions) == number_of_sessions
     assert (
         portland_events[0].sessions[0].video_uri == expected_video_uri_in_first_session
+    )
+    assert (
+        len(
+            portland_events[event_with_votes]
+            .event_minutes_items[0][event_minute_item_with_votes]
+            .votes
+        )
+        == number_of_votes
     )
     assert portland_events[0].agenda_uri == expected_agenda_uri

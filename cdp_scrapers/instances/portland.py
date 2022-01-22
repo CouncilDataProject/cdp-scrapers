@@ -8,6 +8,8 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 from bs4 import BeautifulSoup
+from cdp_backend.database.constants import (EventMinutesItemDecision,
+                                            MatterStatusDecision, VoteDecision)
 from cdp_backend.pipeline.ingestion_models import (Body, EventIngestionModel,
                                                    EventMinutesItem, Matter,
                                                    MinutesItem, Person,
@@ -89,6 +91,11 @@ class PortlandScraper(IngestionModelScraper):
         return None
 
     def separate_name_from_title(self, title_and_name: str):
+        # title_and_name:
+        #   The title (Mayor of Commissioner) and name of a Portland City Commission
+        #   member.
+        #   e.g., Mayor Ted Wheeler, Commissioner Carmen Rubio
+
         name_index = title_and_name.index(" ")
         return title_and_name[name_index + 1 :]
 
@@ -137,6 +144,12 @@ class PortlandScraper(IngestionModelScraper):
         )
         result_status_element = result_status_element_sibling.next_sibling
         result_status = result_status_element.text
+        if result_status in ["Accepted", "Passed"]:
+            result_status = MatterStatusDecision.ADOPTED
+        elif "Passed to" in result_status:
+            result_status = MatterStatusDecision.IN_PROGRESS
+        else:
+            result_status = None
 
         # Find the sponsors
         sponsor_element_uncle = event_page.find(
@@ -213,6 +226,14 @@ class PortlandScraper(IngestionModelScraper):
 
             i = vote.rfind(" ")
             decision = vote[i:].strip()
+            if decision == "Yea":
+                decision = VoteDecision.APPROVE
+            elif decision == "Nay":
+                decision = VoteDecision.REJECT
+            elif decision == "Absent":
+                decision = VoteDecision.ABSENT_NON_VOTING
+            else:
+                decision = None
             name = self.separate_name_from_title(vote[0:i].strip())
             vote_list.append(
                 self.get_none_if_empty(
