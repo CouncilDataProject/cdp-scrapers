@@ -266,6 +266,6 @@ class IngestionModelScraper:
 
         See Also
         --------
-        person_aliases in __init__()
+        instances.seattle.person_aliases
         """
         return person

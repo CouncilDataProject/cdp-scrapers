@@ -786,9 +786,10 @@ class LegistarScraper(IngestionModelScraper):
 
         See Also
         --------
-        person_aliases in __init__()
+        instances.seattle.person_aliases
         """
-        if not self.person_aliases:
+        # nothing to do if the input person is a reference person itself
+        if not self.person_aliases or person.name in self.person_aliases:
             return person
 
         request_format = (
