@@ -8,8 +8,7 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 from bs4 import BeautifulSoup
-from cdp_backend.database.constants import (EventMinutesItemDecision,
-                                            MatterStatusDecision, VoteDecision)
+from cdp_backend.database.constants import MatterStatusDecision, VoteDecision
 from cdp_backend.pipeline.ingestion_models import (Body, EventIngestionModel,
                                                    EventMinutesItem, Matter,
                                                    MinutesItem, Person,
@@ -145,7 +144,7 @@ class PortlandScraper(IngestionModelScraper):
         )
 
         # If there is no document number, skip this minute item
-        if doc_number_element_sibling == None:
+        if doc_number_element_sibling is None:
             return None
         doc_number_element = doc_number_element_sibling.next_sibling
         doc_number = doc_number_element.find("div", class_="field__item").text.strip()
@@ -178,7 +177,7 @@ class PortlandScraper(IngestionModelScraper):
             "div", text=re.compile("Introduced by"), attrs={"class": "field__label"}
         )
         sponsor_list = None
-        if not sponsor_element_uncle == None:
+        if sponsor_element_uncle is not None:
             sponsor_element_parent = sponsor_element_uncle.next_sibling
             sponsor_elements = sponsor_element_parent.findAll(
                 "div", class_="field__item"
