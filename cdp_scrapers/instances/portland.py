@@ -123,10 +123,10 @@ class PortlandScraper(IngestionModelScraper):
         #   member.
         #   e.g., Mayor Ted Wheeler, Commissioner Carmen Rubio
 
-        name_index = title_and_name.index(" ")
+        name_index = title_and_name.find(" ")
         return title_and_name[name_index + 1 :]
 
-    def get_matter(self, event_page: BeautifulSoup) -> Optional[Matter]:
+    def get_matter(self, minute_section: BeautifulSoup) -> Optional[Matter]:
         # TODO:
         # matter_type:
         #   Each item listed on agenda page begins with a descriptive phrase,
@@ -145,7 +145,7 @@ class PortlandScraper(IngestionModelScraper):
         #   This is usually hyperlinked to another page with more details.
 
         # Find document number
-        doc_number_element_sibling = event_page.find(
+        doc_number_element_sibling = minute_section.find(
             "div", text=re.compile("Document number"), attrs={"class": "field__label"}
         )
 
@@ -156,7 +156,7 @@ class PortlandScraper(IngestionModelScraper):
         doc_number = doc_number_element.find("div", class_="field__item").text.strip()
 
         # Find title
-        title_div = event_page.find("div", class_="council-document__title")
+        title_div = minute_section.find("div", class_="council-document__title")
         matter_title = title_div.find("a").text.strip()
 
         # Find type
@@ -166,7 +166,7 @@ class PortlandScraper(IngestionModelScraper):
             matter_type = matter_type[1:-1]
 
         # Find result status
-        result_status_element_sibling = event_page.find(
+        result_status_element_sibling = minute_section.find(
             "div", text=re.compile("Disposition"), attrs={"class": "field__label"}
         )
         result_status_element = result_status_element_sibling.next_sibling
@@ -179,21 +179,23 @@ class PortlandScraper(IngestionModelScraper):
             result_status = None
 
         # Find the sponsors
-        sponsor_element_uncle = event_page.find(
+        sponsor_element_uncle = minute_section.find(
             "div", text=re.compile("Introduced by"), attrs={"class": "field__label"}
         )
         sponsor_list = None
         if sponsor_element_uncle is not None:
             sponsor_element_parent = sponsor_element_uncle.next_sibling
-            sponsor_elements = sponsor_element_parent.findAll(
+            sponsor_elements = sponsor_element_parent.find_all(
                 "div", class_="field__item"
             )
-            sponsor_list = []
-            for sponsor_element in sponsor_elements:
-                sponsor = sponsor_element.text.strip()
-                sponsor_list.append(
-                    self.get_person(self.separate_name_from_title(sponsor))
-                )
+            sponsor_list = reduced_list(
+                [
+                    self.get_person(
+                        self.separate_name_from_title(sponsor_element.text.strip())
+                    )
+                    for sponsor_element in sponsor_elements
+                ]
+            )
 
         return self.get_none_if_empty(
             Matter(
@@ -307,7 +309,7 @@ class PortlandScraper(IngestionModelScraper):
         # remove any Nones
         return reduced_list(supporting_files)
 
-    def get_votes(self, event_page: BeautifulSoup) -> Optional[List[Vote]]:
+    def get_votes(self, minute_section: BeautifulSoup) -> Optional[List[Vote]]:
         # TODO:
         # Voting results are listed on agenda page for some items, like
         # Votes: Commissioner Mingus Mapps Yea
@@ -319,13 +321,13 @@ class PortlandScraper(IngestionModelScraper):
         # Clearly “Yea” -> VoteDecision.APPROVE, but we don’t have enough information
         # for what words to map to other constants.
 
-        vote_element_uncle = event_page.find(
+        vote_element_uncle = minute_section.find(
             "div", text=re.compile("Votes"), attrs={"class": "field__label"}
         )
         if vote_element_uncle is None:
             return None
         vote_element_parent = vote_element_uncle.next_sibling
-        vote_elements = vote_element_parent.findAll("div", class_="relation--type-")
+        vote_elements = vote_element_parent.find_all("div", class_="relation--type-")
         vote_list = []
         for vote_element in vote_elements:
             vote = vote_element.text.strip()
@@ -347,7 +349,7 @@ class PortlandScraper(IngestionModelScraper):
                 )
             )
 
-        return vote_list
+        return reduced_list(vote_list)
 
     def get_event_minutes(
         self, event_page: BeautifulSoup
@@ -372,11 +374,13 @@ class PortlandScraper(IngestionModelScraper):
                 decision=None,
                 index=index,
                 matter=self.get_matter(minute_section),
-                minutes_item=MinutesItem(name=None, description=matter_title),
-                supporting_files=self.get_supporting_files(minute_section, index),
+                minutes_item=self.get_none_if_empty(
+                    MinutesItem(name=None, description=matter_title)
+                ),
+                # supporting_files=self.get_supporting_files(minute_section, index),
                 votes=self.get_votes(minute_section),
             )
-            event_minute_items.append(event_minute_item)
+            event_minute_items.append(self.get_none_if_empty(event_minute_item))
 
         return reduced_list(
             [event_minute_items],
