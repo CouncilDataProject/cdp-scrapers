@@ -159,6 +159,10 @@
 <span class="k">if</span> <span class="n">known_persons</span><span class="p">:</span>
     <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;loaded static data for </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">known_persons</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
+<span class="c1"># we have discovered the city clerk accidentally entered Daniel Strauss</span>
+<span class="c1"># instead of the correct Dan Strauss for a few events</span>
+<span class="n">PERSON_ALIASES</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Dan Strauss&quot;</span><span class="p">:</span> <span class="nb">set</span><span class="p">([</span><span class="s2">&quot;Daniel Strauss&quot;</span><span class="p">])}</span>
+
 <span class="c1">###############################################################################</span>
 
 
@@ -189,6 +193,7 @@
                 <span class="s2">&quot;Pursuant to Washington State&quot;</span><span class="p">,</span>
             <span class="p">],</span>
             <span class="n">known_persons</span><span class="o">=</span><span class="n">known_persons</span><span class="p">,</span>
+            <span class="n">person_aliases</span><span class="o">=</span><span class="n">PERSON_ALIASES</span><span class="p">,</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="SeattleScraper.parse_content_uris"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.SeattleScraper.parse_content_uris">[docs]</a>    <span class="k">def</span> <span class="nf">parse_content_uris</span><span class="p">(</span>

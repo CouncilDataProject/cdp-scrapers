@@ -113,11 +113,13 @@
 <span></span><span class="ch">#!/usr/bin/env python</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
 
+<span class="kn">from</span> <span class="nn">json</span> <span class="kn">import</span> <span class="n">JSONDecodeError</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span>
 <span class="kn">from</span> <span class="nn">urllib.error</span> <span class="kn">import</span> <span class="n">HTTPError</span><span class="p">,</span> <span class="n">URLError</span>
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">quote_plus</span>
 <span class="kn">from</span> <span class="nn">urllib.request</span> <span class="kn">import</span> <span class="n">urlopen</span>
 
 <span class="kn">import</span> <span class="nn">requests</span>
@@ -545,6 +547,10 @@
 <span class="sd">        Dictionary used to inject information into Persons in place of missing</span>
 <span class="sd">        attributes after dynamic scraping in get_events().</span>
 <span class="sd">        Default: None</span>
+<span class="sd">    person_aliases: Optional[Dict[str, Set[str]]]</span>
+<span class="sd">        Dictionary used to catch name aliases</span>
+<span class="sd">        and resolve improperly unique Persons to the one correct Person.</span>
+<span class="sd">        Default: None</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
@@ -570,8 +576,9 @@
         <span class="n">minutes_item_decision_passed_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;pass&quot;</span><span class="p">,</span>
         <span class="n">minutes_item_decision_failed_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;not|fail&quot;</span><span class="p">,</span>
         <span class="n">known_persons</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Person</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">person_aliases</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">timezone</span><span class="o">=</span><span class="n">timezone</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">timezone</span><span class="o">=</span><span class="n">timezone</span><span class="p">,</span> <span class="n">person_aliases</span><span class="o">=</span><span class="n">person_aliases</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">client_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">client</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ignore_minutes_item_patterns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">ignore_minutes_item_patterns</span>
@@ -873,6 +880,67 @@
             <span class="p">]</span>
         <span class="p">)</span></div>
 
+<div class="viewcode-block" id="LegistarScraper.resolve_person_alias"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.resolve_person_alias">[docs]</a>    <span class="k">def</span> <span class="nf">resolve_person_alias</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">person</span><span class="p">:</span> <span class="n">Person</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Person</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If input person is in fact an alias of a reference known person,</span>
+<span class="sd">        return the reference person instead.</span>
+<span class="sd">        Else return person as-is.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        person: Person</span>
+<span class="sd">            Person to check whether is an alias or a real unique Person</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Person</span>
+<span class="sd">            input person, or the correct reference Person if input person is an alias.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        instances.seattle.person_aliases</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># nothing to do if the input person is a reference person itself</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">person_aliases</span> <span class="ow">or</span> <span class="n">person</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">person_aliases</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">person</span>
+
+        <span class="n">request_format</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">LEGISTAR_PERSON_BASE</span> <span class="o">+</span> <span class="s2">&quot;?$filter=PersonFullName+eq+%27</span><span class="si">{name}</span><span class="s2">%27&quot;</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">aliases</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">person_aliases</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">person</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">aliases</span><span class="p">:</span>
+                <span class="c1"># found the reference person with input person.name as an alias</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="c1"># query to get PersonId for the reference person we want to use</span>
+                    <span class="c1"># in place of the input person</span>
+                    <span class="n">response</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                        <span class="n">request_format</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">client_name</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">quote_plus</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                        <span class="p">),</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+                <span class="k">except</span> <span class="n">JSONDecodeError</span><span class="p">:</span>
+                    <span class="n">response</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">response</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">LEGISTAR_PERSON_EXT_ID</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">response</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="n">person</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, an alias of </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;but failed get valid JSON for </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> from Legistar API. &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;Keeping this alias </span><span class="si">{</span><span class="n">person</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> without resolving.&quot;</span>
+                    <span class="p">)</span>
+                    <span class="k">return</span> <span class="n">person</span>
+
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_person</span><span class="p">(</span>
+                    <span class="n">get_legistar_person</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">client_name</span><span class="p">,</span>
+                        <span class="n">response</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">LEGISTAR_PERSON_EXT_ID</span><span class="p">],</span>
+                        <span class="n">use_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+
+        <span class="c1"># input person is not an alias of a reference Person</span>
+        <span class="k">return</span> <span class="n">person</span></div>
+
 <div class="viewcode-block" id="LegistarScraper.get_person"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_person">[docs]</a>    <span class="k">def</span> <span class="nf">get_person</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_person</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Person</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return CDP Person for Legistar Person.</span>
@@ -906,13 +974,17 @@
             <span class="n">phone</span> <span class="o">=</span> <span class="n">phone</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;(&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;)&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>
-            <span class="n">Person</span><span class="p">(</span>
-                <span class="n">email</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">legistar_person</span><span class="p">[</span><span class="n">LEGISTAR_PERSON_EMAIL</span><span class="p">]),</span>
-                <span class="n">external_source_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">legistar_person</span><span class="p">[</span><span class="n">LEGISTAR_PERSON_EXT_ID</span><span class="p">]),</span>
-                <span class="n">name</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">legistar_person</span><span class="p">[</span><span class="n">LEGISTAR_PERSON_NAME</span><span class="p">]),</span>
-                <span class="n">phone</span><span class="o">=</span><span class="n">phone</span><span class="p">,</span>
-                <span class="n">website</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">legistar_person</span><span class="p">[</span><span class="n">LEGISTAR_PERSON_WEBSITE</span><span class="p">]),</span>
-                <span class="n">is_active</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">legistar_person</span><span class="p">[</span><span class="n">LEGISTAR_PERSON_ACTIVE</span><span class="p">]),</span>
+            <span class="c1"># If applicable, catch [mistakenly] entered duplicate persons.</span>
+            <span class="c1"># i.e. Don&#39;t create unique Person objects for the same real person.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resolve_person_alias</span><span class="p">(</span>
+                <span class="n">Person</span><span class="p">(</span>
+                    <span class="n">email</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">legistar_person</span><span class="p">[</span><span class="n">LEGISTAR_PERSON_EMAIL</span><span class="p">]),</span>
+                    <span class="n">external_source_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">legistar_person</span><span class="p">[</span><span class="n">LEGISTAR_PERSON_EXT_ID</span><span class="p">]),</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">legistar_person</span><span class="p">[</span><span class="n">LEGISTAR_PERSON_NAME</span><span class="p">]),</span>
+                    <span class="n">phone</span><span class="o">=</span><span class="n">phone</span><span class="p">,</span>
+                    <span class="n">website</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">legistar_person</span><span class="p">[</span><span class="n">LEGISTAR_PERSON_WEBSITE</span><span class="p">]),</span>
+                    <span class="n">is_active</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">legistar_person</span><span class="p">[</span><span class="n">LEGISTAR_PERSON_ACTIVE</span><span class="p">]),</span>
+                <span class="p">)</span>
             <span class="p">)</span>
         <span class="p">)</span></div>
 

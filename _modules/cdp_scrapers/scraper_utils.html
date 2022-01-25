@@ -114,9 +114,9 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">pytz</span>
 <span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span>
 
-<span class="kn">from</span> <span class="nn">cdp_backend.pipeline.ingestion_models</span> <span class="kn">import</span> <span class="n">IngestionModel</span>
+<span class="kn">from</span> <span class="nn">cdp_backend.pipeline.ingestion_models</span> <span class="kn">import</span> <span class="n">IngestionModel</span><span class="p">,</span> <span class="n">Person</span>
 
 <span class="c1">###############################################################################</span>
 
@@ -189,13 +189,19 @@
 <span class="sd">        i.e. &quot;America/Los_Angeles&quot; or &quot;America/New_York&quot;</span>
 <span class="sd">        See https://en.wikipedia.org/wiki/List_of_tz_database_time_zones for canonical</span>
 <span class="sd">        timezones.</span>
+<span class="sd">    person_aliases: Optional[Dict[str, Set[str]]]</span>
+<span class="sd">        Dictionary used to catch name aliases</span>
+<span class="sd">        and resolve improperly different Persons to the one correct Person.</span>
+<span class="sd">        Default: None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">timezone</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">person_aliases</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">timezone</span><span class="p">:</span> <span class="n">pytz</span><span class="o">.</span><span class="n">timezone</span> <span class="o">=</span> <span class="n">pytz</span><span class="o">.</span><span class="n">timezone</span><span class="p">(</span><span class="n">timezone</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">person_aliases</span> <span class="o">=</span> <span class="n">person_aliases</span>
 
 <div class="viewcode-block" id="IngestionModelScraper.find_time_zone"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.scraper_utils.IngestionModelScraper.find_time_zone">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">find_time_zone</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -351,7 +357,30 @@
                 <span class="k">return</span> <span class="kc">None</span>
 
         <span class="c1"># nonempty value for all required keys in model</span>
-        <span class="k">return</span> <span class="n">model</span></div></div>
+        <span class="k">return</span> <span class="n">model</span></div>
+
+<div class="viewcode-block" id="IngestionModelScraper.resolve_person_alias"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.scraper_utils.IngestionModelScraper.resolve_person_alias">[docs]</a>    <span class="k">def</span> <span class="nf">resolve_person_alias</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">person</span><span class="p">:</span> <span class="n">Person</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Person</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If input person is in fact an alias of a reference known person,</span>
+<span class="sd">        return the reference person instead.</span>
+<span class="sd">        Else return person as-is.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        person: Person</span>
+<span class="sd">            Person to check whether is an alias or a real unique Person</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Person</span>
+<span class="sd">            input person, or the correct reference Person if input person is an alias.</span>
+<span class="sd">            This base implementation always returns person as-is.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        instances.seattle.person_aliases</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">person</span></div></div>
 </pre></div>
 
            </div>
