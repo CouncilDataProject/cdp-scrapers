@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from json import JSONDecodeError
 import logging
 import re
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Set
 from urllib.error import HTTPError, URLError
+from urllib.parse import quote_plus
 from urllib.request import urlopen
 
 import requests
@@ -433,6 +435,10 @@ class LegistarScraper(IngestionModelScraper):
         Dictionary used to inject information into Persons in place of missing
         attributes after dynamic scraping in get_events().
         Default: None
+    person_aliases: Optional[Dict[str, Set[str]]]
+        Dictionary used to catch name aliases
+        and resolve improperly unique Persons to the one correct Person.
+        Default: None
 
     See Also
     --------
@@ -458,8 +464,9 @@ class LegistarScraper(IngestionModelScraper):
         minutes_item_decision_passed_pattern: str = r"pass",
         minutes_item_decision_failed_pattern: str = r"not|fail",
         known_persons: Optional[Dict[str, Person]] = None,
+        person_aliases: Optional[Dict[str, Set[str]]] = None,
     ):
-        super().__init__(timezone=timezone)
+        super().__init__(timezone=timezone, person_aliases=person_aliases)
 
         self.client_name: str = client
         self.ignore_minutes_item_patterns: List[str] = ignore_minutes_item_patterns
@@ -761,6 +768,67 @@ class LegistarScraper(IngestionModelScraper):
             ]
         )
 
+    def resolve_person_alias(self, person: Person) -> Optional[Person]:
+        """
+        If input person is in fact an alias of a reference known person,
+        return the reference person instead.
+        Else return person as-is.
+
+        Parameters
+        ----------
+        person: Person
+            Person to check whether is an alias or a real unique Person
+
+        Returns
+        -------
+        Person
+            input person, or the correct reference Person if input person is an alias.
+
+        See Also
+        --------
+        instances.seattle.person_aliases
+        """
+        # nothing to do if the input person is a reference person itself
+        if not self.person_aliases or person.name in self.person_aliases:
+            return person
+
+        request_format = (
+            LEGISTAR_PERSON_BASE + "?$filter=PersonFullName+eq+%27{name}%27"
+        )
+
+        for name, aliases in self.person_aliases.items():
+            if person.name in aliases:
+                # found the reference person with input person.name as an alias
+                try:
+                    # query to get PersonId for the reference person we want to use
+                    # in place of the input person
+                    response: List[Dict[str, Any]] = requests.get(
+                        request_format.format(
+                            client=self.client_name, name=quote_plus(name)
+                        ),
+                    ).json()
+                except JSONDecodeError:
+                    response: List[Dict[str, Any]] = []
+
+                if len(response) == 0 or LEGISTAR_PERSON_EXT_ID not in response[0]:
+                    log.error(
+                        f"Found {person.name}, an alias of {name} "
+                        f"but failed get valid JSON for {name} from Legistar API. "
+                        f"Keeping this alias {person.name} without resolving."
+                    )
+                    return person
+
+                return self.get_person(
+                    get_legistar_person(
+                        self.client_name,
+                        response[0][LEGISTAR_PERSON_EXT_ID],
+                        use_cache=True,
+                    )
+                )
+
+        # input person is not an alias of a reference Person
+        return person
+
     def get_person(self, legistar_person: Dict) -> Optional[Person]:
         """
         Return CDP Person for Legistar Person.
@@ -794,13 +862,17 @@ class LegistarScraper(IngestionModelScraper):
             phone = phone.replace("(", "").replace(")", "-")
 
         return self.get_none_if_empty(
-            Person(
-                email=str_simplified(legistar_person[LEGISTAR_PERSON_EMAIL]),
-                external_source_id=str(legistar_person[LEGISTAR_PERSON_EXT_ID]),
-                name=str_simplified(legistar_person[LEGISTAR_PERSON_NAME]),
-                phone=phone,
-                website=str_simplified(legistar_person[LEGISTAR_PERSON_WEBSITE]),
-                is_active=bool(legistar_person[LEGISTAR_PERSON_ACTIVE]),
+            # If applicable, catch [mistakenly] entered duplicate persons.
+            # i.e. Don't create unique Person objects for the same real person.
+            self.resolve_person_alias(
+                Person(
+                    email=str_simplified(legistar_person[LEGISTAR_PERSON_EMAIL]),
+                    external_source_id=str(legistar_person[LEGISTAR_PERSON_EXT_ID]),
+                    name=str_simplified(legistar_person[LEGISTAR_PERSON_NAME]),
+                    phone=phone,
+                    website=str_simplified(legistar_person[LEGISTAR_PERSON_WEBSITE]),
+                    is_active=bool(legistar_person[LEGISTAR_PERSON_ACTIVE]),
+                )
             )
         )
 

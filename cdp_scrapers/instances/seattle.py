@@ -47,6 +47,10 @@ if Path(STATIC_FILE_DEFAULT_PATH).exists():
 if known_persons:
     log.debug(f"loaded static data for {', '.join(known_persons.keys())}")
 
+# we have discovered the city clerk accidentally entered Daniel Strauss
+# instead of the correct Dan Strauss for a few events
+PERSON_ALIASES = {"Dan Strauss": set(["Daniel Strauss"])}
+
 ###############################################################################
 
 
@@ -77,6 +81,7 @@ class SeattleScraper(LegistarScraper):
                 "Pursuant to Washington State",
             ],
             known_persons=known_persons,
+            person_aliases=PERSON_ALIASES,
         )
 
     def parse_content_uris(
