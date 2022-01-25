@@ -49,7 +49,7 @@ if known_persons:
 
 # we have discovered the city clerk accidentally entered Daniel Strauss
 # instead of the correct Dan Strauss for a few events
-person_aliases = {"Dan Strauss": set(["Daniel Strauss"])}
+PERSON_ALIASES = {"Dan Strauss": set(["Daniel Strauss"])}
 
 ###############################################################################
 
@@ -81,7 +81,7 @@ class SeattleScraper(LegistarScraper):
                 "Pursuant to Washington State",
             ],
             known_persons=known_persons,
-            person_aliases=person_aliases,
+            person_aliases=PERSON_ALIASES,
         )
 
     def parse_content_uris(
