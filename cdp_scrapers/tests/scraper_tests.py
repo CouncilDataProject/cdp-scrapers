@@ -153,7 +153,7 @@ def test_king_county_scraper(
             datetime(2021, 12, 22),
             datetime(2021, 12, 23),
             1,
-            1,
+            19,
             1,
             0,
             2,
@@ -165,20 +165,19 @@ def test_king_county_scraper(
             datetime(2022, 1, 12),
             datetime(2022, 1, 13),
             1,
-            1,
+            14,
             1,
             0,
             5,
             5,
             "https://www.youtube.com/embed/TBrJbm08i0g?autoplay=0&start=0&rel=0",
-            "https://www.portland.gov/sites/default/files/2022/"
-            "january-12-2022-agenda-print-version.pdf",
+            "https://efiles.portlandoregon.gov/record/14811424/File/Document",
         ),
         (
             datetime(2021, 11, 10),
             datetime(2021, 11, 11),
             1,
-            1,
+            17,
             2,
             0,
             6,
@@ -211,7 +210,7 @@ def test_portland_scraper(
     assert (
         len(
             portland_events[event_with_votes]
-            .event_minutes_items[0][event_minute_item_with_votes]
+            .event_minutes_items[event_minute_item_with_votes]
             .votes
         )
         == number_of_votes

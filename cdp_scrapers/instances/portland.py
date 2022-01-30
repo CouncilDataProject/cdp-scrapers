@@ -7,7 +7,7 @@ from typing import Dict, List, NamedTuple, Optional, Union
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 from cdp_backend.database.constants import MatterStatusDecision, VoteDecision
 from cdp_backend.pipeline.ingestion_models import (
     Body,
@@ -126,7 +126,7 @@ class PortlandScraper(IngestionModelScraper):
         name_index = title_and_name.find(" ")
         return title_and_name[name_index + 1 :]
 
-    def get_matter(self, minute_section: BeautifulSoup) -> Optional[Matter]:
+    def get_matter(self, minute_section: Tag) -> Optional[Matter]:
         # TODO:
         # matter_type:
         #   Each item listed on agenda page begins with a descriptive phrase,
@@ -309,7 +309,7 @@ class PortlandScraper(IngestionModelScraper):
         # remove any Nones
         return reduced_list(supporting_files)
 
-    def get_votes(self, minute_section: BeautifulSoup) -> Optional[List[Vote]]:
+    def get_votes(self, minute_section: Tag) -> Optional[List[Vote]]:
         # TODO:
         # Voting results are listed on agenda page for some items, like
         # Votes: Commissioner Mingus Mapps Yea
@@ -351,9 +351,7 @@ class PortlandScraper(IngestionModelScraper):
 
         return reduced_list(vote_list)
 
-    def get_event_minutes(
-        self, event_page: BeautifulSoup
-    ) -> Optional[List[EventMinutesItem]]:
+    def get_event_minutes(self, event_page: Tag) -> Optional[List[EventMinutesItem]]:
         # TODO:
         # decision:
         # Some items listed on agenda page have “Disposition” like “passed”.
@@ -375,7 +373,7 @@ class PortlandScraper(IngestionModelScraper):
                 index=index,
                 matter=self.get_matter(minute_section),
                 minutes_item=self.get_none_if_empty(
-                    MinutesItem(name=None, description=matter_title)
+                    MinutesItem(name=index, description=matter_title)
                 ),
                 # supporting_files=self.get_supporting_files(minute_section, index),
                 votes=self.get_votes(minute_section),
@@ -383,7 +381,7 @@ class PortlandScraper(IngestionModelScraper):
             event_minute_items.append(self.get_none_if_empty(event_minute_item))
 
         return reduced_list(
-            [event_minute_items],
+            event_minute_items,
         )
 
     def get_sessions(self, event_page: BeautifulSoup) -> Optional[List[Session]]:
