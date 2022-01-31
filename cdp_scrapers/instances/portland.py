@@ -213,19 +213,6 @@ class PortlandScraper(IngestionModelScraper):
         """
         Return SupportingFiles for a given EventMinutesItems
 
-        # Find title
-        title_div = event_page.find("div", class_="council-document__title")
-
-        # Find related document
-        href = title_div.find("a")["href"]
-
-        return reduced_list(
-            [
-                self.get_none_if_empty(
-                    SupportingFile(name="Details", uri="https://portland.gov" + href)
-                )
-            ],
-
         Parameters
         ----------
         event_page: BeautifulSoup
@@ -351,7 +338,9 @@ class PortlandScraper(IngestionModelScraper):
 
         return reduced_list(vote_list)
 
-    def get_event_minutes(self, event_page: Tag) -> Optional[List[EventMinutesItem]]:
+    def get_event_minutes(
+        self, event_page: BeautifulSoup
+    ) -> Optional[List[EventMinutesItem]]:
         # TODO:
         # decision:
         # Some items listed on agenda page have “Disposition” like “passed”.
