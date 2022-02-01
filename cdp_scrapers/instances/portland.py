@@ -7,7 +7,8 @@ from typing import Dict, List, NamedTuple, Optional, Union
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
+from cdp_backend.database.constants import MatterStatusDecision, VoteDecision
 from cdp_backend.pipeline.ingestion_models import (
     Body,
     EventIngestionModel,
@@ -116,7 +117,16 @@ class PortlandScraper(IngestionModelScraper):
         #       Should add to known_persons so we don't query this same person again.
         return None
 
-    def get_matter(self, event_page: BeautifulSoup) -> Optional[Matter]:
+    def separate_name_from_title(self, title_and_name: str):
+        # title_and_name:
+        #   The title (Mayor of Commissioner) and name of a Portland City Commission
+        #   member.
+        #   e.g., Mayor Ted Wheeler, Commissioner Carmen Rubio
+
+        name_index = title_and_name.find(" ")
+        return title_and_name[name_index + 1 :]
+
+    def get_matter(self, minute_section: Tag) -> Optional[Matter]:
         # TODO:
         # matter_type:
         #   Each item listed on agenda page begins with a descriptive phrase,
@@ -134,8 +144,67 @@ class PortlandScraper(IngestionModelScraper):
         #   The first description phrase in each item on agenda page.
         #   This is usually hyperlinked to another page with more details.
 
+        # Find document number
+        doc_number_element_sibling = minute_section.find(
+            "div", text=re.compile("Document number"), attrs={"class": "field__label"}
+        )
+
+        # If there is no document number, skip this minute item
+        if doc_number_element_sibling is None:
+            return None
+        doc_number_element = doc_number_element_sibling.next_sibling
+        doc_number = doc_number_element.find("div", class_="field__item").text.strip()
+
+        # Find title
+        title_div = minute_section.find("div", class_="council-document__title")
+        matter_title = title_div.find("a").text.strip()
+
+        # Find type
+        title_div.find("a").clear()
+        matter_type = title_div.text.strip()
+        if matter_type[0] == "(" and matter_type[-1] == ")":
+            matter_type = matter_type[1:-1]
+
+        # Find result status
+        result_status_element_sibling = minute_section.find(
+            "div", text=re.compile("Disposition"), attrs={"class": "field__label"}
+        )
+        result_status_element = result_status_element_sibling.next_sibling
+        result_status = result_status_element.text
+        if result_status in ["Accepted", "Passed"]:
+            result_status = MatterStatusDecision.ADOPTED
+        elif "Passed to" in result_status:
+            result_status = MatterStatusDecision.IN_PROGRESS
+        else:
+            result_status = None
+
+        # Find the sponsors
+        sponsor_element_uncle = minute_section.find(
+            "div", text=re.compile("Introduced by"), attrs={"class": "field__label"}
+        )
+        sponsor_list = None
+        if sponsor_element_uncle is not None:
+            sponsor_element_parent = sponsor_element_uncle.next_sibling
+            sponsor_elements = sponsor_element_parent.find_all(
+                "div", class_="field__item"
+            )
+            sponsor_list = reduced_list(
+                [
+                    self.get_person(
+                        self.separate_name_from_title(sponsor_element.text.strip())
+                    )
+                    for sponsor_element in sponsor_elements
+                ]
+            )
+
         return self.get_none_if_empty(
-            Matter(matter_type=None, name=None, sponsors=None, title=None),
+            Matter(
+                matter_type=matter_type,
+                name=doc_number,
+                sponsors=sponsor_list,
+                title=matter_title,
+                result_status=result_status,
+            ),
         )
 
     def get_supporting_files(
@@ -227,7 +296,7 @@ class PortlandScraper(IngestionModelScraper):
         # remove any Nones
         return reduced_list(supporting_files)
 
-    def get_votes(self, event_page: BeautifulSoup) -> Optional[List[Vote]]:
+    def get_votes(self, minute_section: Tag) -> Optional[List[Vote]]:
         # TODO:
         # Voting results are listed on agenda page for some items, like
         # Votes: Commissioner Mingus Mapps Yea
@@ -239,13 +308,35 @@ class PortlandScraper(IngestionModelScraper):
         # Clearly “Yea” -> VoteDecision.APPROVE, but we don’t have enough information
         # for what words to map to other constants.
 
-        return reduced_list(
-            [
-                self.get_none_if_empty(
-                    Vote(decision=None, person=self.get_person(None))
-                ),
-            ],
+        vote_element_uncle = minute_section.find(
+            "div", text=re.compile("Votes"), attrs={"class": "field__label"}
         )
+        if vote_element_uncle is None:
+            return None
+        vote_element_parent = vote_element_uncle.next_sibling
+        vote_elements = vote_element_parent.find_all("div", class_="relation--type-")
+        vote_list = []
+        for vote_element in vote_elements:
+            vote = vote_element.text.strip()
+
+            i = vote.rfind(" ")
+            decision = vote[i:].strip()
+            if decision == "Yea":
+                decision = VoteDecision.APPROVE
+            elif decision == "Nay":
+                decision = VoteDecision.REJECT
+            elif decision == "Absent":
+                decision = VoteDecision.ABSENT_NON_VOTING
+            else:
+                decision = None
+            name = self.separate_name_from_title(vote[0:i].strip())
+            vote_list.append(
+                self.get_none_if_empty(
+                    Vote(decision=decision, person=self.get_person(name))
+                )
+            )
+
+        return reduced_list(vote_list)
 
     def get_event_minutes(
         self, event_page: BeautifulSoup
@@ -257,23 +348,29 @@ class PortlandScraper(IngestionModelScraper):
 
         # think we will let MinutesItem.name = Matter.name
         #                   MinutesItem.description = Matter.title
-        return reduced_list(
-            [
-                self.get_none_if_empty(
-                    EventMinutesItem(
-                        decision=None,
-                        index=0,
-                        matter=self.get_matter(event_page),
-                        minutes_item=MinutesItem(name=None, description=None),
-                        # TODO: need to call get_supporting_files()
-                        # with the minutes item's index on the current event page
-                        # or some similar minutes item differentiator
-                        # from other minutes items on the event page
-                        # supporting_files=self.get_supporting_files(event_page),
-                        votes=self.get_votes(event_page),
-                    ),
+
+        minute_sections = event_page.find_all(
+            "div", class_="relation--type-agenda-item"
+        )
+        event_minute_items = []
+        for minute_section in minute_sections:
+            title_div = minute_section.find("div", class_="council-document__title")
+            matter_title = title_div.find("a").text.strip()
+            index = int(minute_section.find("h4").text.strip())
+            event_minute_item = EventMinutesItem(
+                decision=None,
+                index=index,
+                matter=self.get_matter(minute_section),
+                minutes_item=self.get_none_if_empty(
+                    MinutesItem(name=index, description=matter_title)
                 ),
-            ],
+                # supporting_files=self.get_supporting_files(minute_section, index),
+                votes=self.get_votes(minute_section),
+            )
+            event_minute_items.append(self.get_none_if_empty(event_minute_item))
+
+        return reduced_list(
+            event_minute_items,
         )
 
     def get_sessions(self, event_page: BeautifulSoup) -> Optional[List[Session]]:
