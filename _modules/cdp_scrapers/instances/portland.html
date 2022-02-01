@@ -119,7 +119,8 @@
 <span class="kn">from</span> <span class="nn">urllib.error</span> <span class="kn">import</span> <span class="n">HTTPError</span><span class="p">,</span> <span class="n">URLError</span>
 <span class="kn">from</span> <span class="nn">urllib.request</span> <span class="kn">import</span> <span class="n">Request</span><span class="p">,</span> <span class="n">urlopen</span>
 
-<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span><span class="p">,</span> <span class="n">Tag</span>
+<span class="kn">from</span> <span class="nn">cdp_backend.database.constants</span> <span class="kn">import</span> <span class="n">MatterStatusDecision</span><span class="p">,</span> <span class="n">VoteDecision</span>
 <span class="kn">from</span> <span class="nn">cdp_backend.pipeline.ingestion_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Body</span><span class="p">,</span>
     <span class="n">EventIngestionModel</span><span class="p">,</span>
@@ -228,7 +229,16 @@
         <span class="c1">#       Should add to known_persons so we don&#39;t query this same person again.</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="PortlandScraper.get_matter"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_matter">[docs]</a>    <span class="k">def</span> <span class="nf">get_matter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_page</span><span class="p">:</span> <span class="n">BeautifulSoup</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Matter</span><span class="p">]:</span>
+<div class="viewcode-block" id="PortlandScraper.separate_name_from_title"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.separate_name_from_title">[docs]</a>    <span class="k">def</span> <span class="nf">separate_name_from_title</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title_and_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="c1"># title_and_name:</span>
+        <span class="c1">#   The title (Mayor of Commissioner) and name of a Portland City Commission</span>
+        <span class="c1">#   member.</span>
+        <span class="c1">#   e.g., Mayor Ted Wheeler, Commissioner Carmen Rubio</span>
+
+        <span class="n">name_index</span> <span class="o">=</span> <span class="n">title_and_name</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">title_and_name</span><span class="p">[</span><span class="n">name_index</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span></div>
+
+<div class="viewcode-block" id="PortlandScraper.get_matter"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_matter">[docs]</a>    <span class="k">def</span> <span class="nf">get_matter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">minute_section</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Matter</span><span class="p">]:</span>
         <span class="c1"># TODO:</span>
         <span class="c1"># matter_type:</span>
         <span class="c1">#   Each item listed on agenda page begins with a descriptive phrase,</span>
@@ -246,8 +256,67 @@
         <span class="c1">#   The first description phrase in each item on agenda page.</span>
         <span class="c1">#   This is usually hyperlinked to another page with more details.</span>
 
+        <span class="c1"># Find document number</span>
+        <span class="n">doc_number_element_sibling</span> <span class="o">=</span> <span class="n">minute_section</span><span class="o">.</span><span class="n">find</span><span class="p">(</span>
+            <span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;Document number&quot;</span><span class="p">),</span> <span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;field__label&quot;</span><span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="c1"># If there is no document number, skip this minute item</span>
+        <span class="k">if</span> <span class="n">doc_number_element_sibling</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">doc_number_element</span> <span class="o">=</span> <span class="n">doc_number_element_sibling</span><span class="o">.</span><span class="n">next_sibling</span>
+        <span class="n">doc_number</span> <span class="o">=</span> <span class="n">doc_number_element</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;field__item&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+        <span class="c1"># Find title</span>
+        <span class="n">title_div</span> <span class="o">=</span> <span class="n">minute_section</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;council-document__title&quot;</span><span class="p">)</span>
+        <span class="n">matter_title</span> <span class="o">=</span> <span class="n">title_div</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+        <span class="c1"># Find type</span>
+        <span class="n">title_div</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">matter_type</span> <span class="o">=</span> <span class="n">title_div</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">matter_type</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;(&quot;</span> <span class="ow">and</span> <span class="n">matter_type</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;)&quot;</span><span class="p">:</span>
+            <span class="n">matter_type</span> <span class="o">=</span> <span class="n">matter_type</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># Find result status</span>
+        <span class="n">result_status_element_sibling</span> <span class="o">=</span> <span class="n">minute_section</span><span class="o">.</span><span class="n">find</span><span class="p">(</span>
+            <span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;Disposition&quot;</span><span class="p">),</span> <span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;field__label&quot;</span><span class="p">}</span>
+        <span class="p">)</span>
+        <span class="n">result_status_element</span> <span class="o">=</span> <span class="n">result_status_element_sibling</span><span class="o">.</span><span class="n">next_sibling</span>
+        <span class="n">result_status</span> <span class="o">=</span> <span class="n">result_status_element</span><span class="o">.</span><span class="n">text</span>
+        <span class="k">if</span> <span class="n">result_status</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;Accepted&quot;</span><span class="p">,</span> <span class="s2">&quot;Passed&quot;</span><span class="p">]:</span>
+            <span class="n">result_status</span> <span class="o">=</span> <span class="n">MatterStatusDecision</span><span class="o">.</span><span class="n">ADOPTED</span>
+        <span class="k">elif</span> <span class="s2">&quot;Passed to&quot;</span> <span class="ow">in</span> <span class="n">result_status</span><span class="p">:</span>
+            <span class="n">result_status</span> <span class="o">=</span> <span class="n">MatterStatusDecision</span><span class="o">.</span><span class="n">IN_PROGRESS</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result_status</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Find the sponsors</span>
+        <span class="n">sponsor_element_uncle</span> <span class="o">=</span> <span class="n">minute_section</span><span class="o">.</span><span class="n">find</span><span class="p">(</span>
+            <span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;Introduced by&quot;</span><span class="p">),</span> <span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;field__label&quot;</span><span class="p">}</span>
+        <span class="p">)</span>
+        <span class="n">sponsor_list</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">sponsor_element_uncle</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sponsor_element_parent</span> <span class="o">=</span> <span class="n">sponsor_element_uncle</span><span class="o">.</span><span class="n">next_sibling</span>
+            <span class="n">sponsor_elements</span> <span class="o">=</span> <span class="n">sponsor_element_parent</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span>
+                <span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;field__item&quot;</span>
+            <span class="p">)</span>
+            <span class="n">sponsor_list</span> <span class="o">=</span> <span class="n">reduced_list</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">get_person</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">separate_name_from_title</span><span class="p">(</span><span class="n">sponsor_element</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                    <span class="p">)</span>
+                    <span class="k">for</span> <span class="n">sponsor_element</span> <span class="ow">in</span> <span class="n">sponsor_elements</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>
-            <span class="n">Matter</span><span class="p">(</span><span class="n">matter_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sponsors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span>
+            <span class="n">Matter</span><span class="p">(</span>
+                <span class="n">matter_type</span><span class="o">=</span><span class="n">matter_type</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">doc_number</span><span class="p">,</span>
+                <span class="n">sponsors</span><span class="o">=</span><span class="n">sponsor_list</span><span class="p">,</span>
+                <span class="n">title</span><span class="o">=</span><span class="n">matter_title</span><span class="p">,</span>
+                <span class="n">result_status</span><span class="o">=</span><span class="n">result_status</span><span class="p">,</span>
+            <span class="p">),</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PortlandScraper.get_supporting_files"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_supporting_files">[docs]</a>    <span class="k">def</span> <span class="nf">get_supporting_files</span><span class="p">(</span>
@@ -339,7 +408,7 @@
         <span class="c1"># remove any Nones</span>
         <span class="k">return</span> <span class="n">reduced_list</span><span class="p">(</span><span class="n">supporting_files</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PortlandScraper.get_votes"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_votes">[docs]</a>    <span class="k">def</span> <span class="nf">get_votes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_page</span><span class="p">:</span> <span class="n">BeautifulSoup</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Vote</span><span class="p">]]:</span>
+<div class="viewcode-block" id="PortlandScraper.get_votes"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_votes">[docs]</a>    <span class="k">def</span> <span class="nf">get_votes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">minute_section</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Vote</span><span class="p">]]:</span>
         <span class="c1"># TODO:</span>
         <span class="c1"># Voting results are listed on agenda page for some items, like</span>
         <span class="c1"># Votes: Commissioner Mingus Mapps Yea</span>
@@ -351,13 +420,35 @@
         <span class="c1"># Clearly “Yea” -&gt; VoteDecision.APPROVE, but we don’t have enough information</span>
         <span class="c1"># for what words to map to other constants.</span>
 
-        <span class="k">return</span> <span class="n">reduced_list</span><span class="p">(</span>
-            <span class="p">[</span>
+        <span class="n">vote_element_uncle</span> <span class="o">=</span> <span class="n">minute_section</span><span class="o">.</span><span class="n">find</span><span class="p">(</span>
+            <span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;Votes&quot;</span><span class="p">),</span> <span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;field__label&quot;</span><span class="p">}</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">vote_element_uncle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">vote_element_parent</span> <span class="o">=</span> <span class="n">vote_element_uncle</span><span class="o">.</span><span class="n">next_sibling</span>
+        <span class="n">vote_elements</span> <span class="o">=</span> <span class="n">vote_element_parent</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;relation--type-&quot;</span><span class="p">)</span>
+        <span class="n">vote_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">vote_element</span> <span class="ow">in</span> <span class="n">vote_elements</span><span class="p">:</span>
+            <span class="n">vote</span> <span class="o">=</span> <span class="n">vote_element</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+            <span class="n">i</span> <span class="o">=</span> <span class="n">vote</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+            <span class="n">decision</span> <span class="o">=</span> <span class="n">vote</span><span class="p">[</span><span class="n">i</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">decision</span> <span class="o">==</span> <span class="s2">&quot;Yea&quot;</span><span class="p">:</span>
+                <span class="n">decision</span> <span class="o">=</span> <span class="n">VoteDecision</span><span class="o">.</span><span class="n">APPROVE</span>
+            <span class="k">elif</span> <span class="n">decision</span> <span class="o">==</span> <span class="s2">&quot;Nay&quot;</span><span class="p">:</span>
+                <span class="n">decision</span> <span class="o">=</span> <span class="n">VoteDecision</span><span class="o">.</span><span class="n">REJECT</span>
+            <span class="k">elif</span> <span class="n">decision</span> <span class="o">==</span> <span class="s2">&quot;Absent&quot;</span><span class="p">:</span>
+                <span class="n">decision</span> <span class="o">=</span> <span class="n">VoteDecision</span><span class="o">.</span><span class="n">ABSENT_NON_VOTING</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">decision</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">separate_name_from_title</span><span class="p">(</span><span class="n">vote</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+            <span class="n">vote_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>
-                    <span class="n">Vote</span><span class="p">(</span><span class="n">decision</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">person</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_person</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
-                <span class="p">),</span>
-            <span class="p">],</span>
-        <span class="p">)</span></div>
+                    <span class="n">Vote</span><span class="p">(</span><span class="n">decision</span><span class="o">=</span><span class="n">decision</span><span class="p">,</span> <span class="n">person</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_person</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">reduced_list</span><span class="p">(</span><span class="n">vote_list</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PortlandScraper.get_event_minutes"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_event_minutes">[docs]</a>    <span class="k">def</span> <span class="nf">get_event_minutes</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">event_page</span><span class="p">:</span> <span class="n">BeautifulSoup</span>
@@ -369,23 +460,29 @@
 
         <span class="c1"># think we will let MinutesItem.name = Matter.name</span>
         <span class="c1">#                   MinutesItem.description = Matter.title</span>
-        <span class="k">return</span> <span class="n">reduced_list</span><span class="p">(</span>
-            <span class="p">[</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>
-                    <span class="n">EventMinutesItem</span><span class="p">(</span>
-                        <span class="n">decision</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                        <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-                        <span class="n">matter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_matter</span><span class="p">(</span><span class="n">event_page</span><span class="p">),</span>
-                        <span class="n">minutes_item</span><span class="o">=</span><span class="n">MinutesItem</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span>
-                        <span class="c1"># TODO: need to call get_supporting_files()</span>
-                        <span class="c1"># with the minutes item&#39;s index on the current event page</span>
-                        <span class="c1"># or some similar minutes item differentiator</span>
-                        <span class="c1"># from other minutes items on the event page</span>
-                        <span class="c1"># supporting_files=self.get_supporting_files(event_page),</span>
-                        <span class="n">votes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_votes</span><span class="p">(</span><span class="n">event_page</span><span class="p">),</span>
-                    <span class="p">),</span>
+
+        <span class="n">minute_sections</span> <span class="o">=</span> <span class="n">event_page</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span>
+            <span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;relation--type-agenda-item&quot;</span>
+        <span class="p">)</span>
+        <span class="n">event_minute_items</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">minute_section</span> <span class="ow">in</span> <span class="n">minute_sections</span><span class="p">:</span>
+            <span class="n">title_div</span> <span class="o">=</span> <span class="n">minute_section</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;council-document__title&quot;</span><span class="p">)</span>
+            <span class="n">matter_title</span> <span class="o">=</span> <span class="n">title_div</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">minute_section</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;h4&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+            <span class="n">event_minute_item</span> <span class="o">=</span> <span class="n">EventMinutesItem</span><span class="p">(</span>
+                <span class="n">decision</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
+                <span class="n">matter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_matter</span><span class="p">(</span><span class="n">minute_section</span><span class="p">),</span>
+                <span class="n">minutes_item</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>
+                    <span class="n">MinutesItem</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">matter_title</span><span class="p">)</span>
                 <span class="p">),</span>
-            <span class="p">],</span>
+                <span class="c1"># supporting_files=self.get_supporting_files(minute_section, index),</span>
+                <span class="n">votes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_votes</span><span class="p">(</span><span class="n">minute_section</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="n">event_minute_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span><span class="n">event_minute_item</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">reduced_list</span><span class="p">(</span>
+            <span class="n">event_minute_items</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PortlandScraper.get_sessions"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_sessions">[docs]</a>    <span class="k">def</span> <span class="nf">get_sessions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_page</span><span class="p">:</span> <span class="n">BeautifulSoup</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Session</span><span class="p">]]:</span>
