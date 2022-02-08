@@ -3,7 +3,7 @@ import logging
 import re
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, NamedTuple, Optional, Union
+from typing import Any, Dict, List, NamedTuple, Optional, Union
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
@@ -653,3 +653,35 @@ class PortlandScraper(IngestionModelScraper):
             # for easier iterate there
             collapse=False,
         )
+
+
+def get_portland_events(
+    from_dt: Optional[datetime] = None,
+    to_dt: Optional[datetime] = None,
+    **kwargs: Any,
+) -> List[EventIngestionModel]:
+    """
+    Public API for use in instances.__init__ so that this func can be attached
+    as an attribute to cdp_scrapers.instances module.
+    Thus the outside world like cdp-backend can get at this by asking for
+    "get_portland_events".
+
+    Parameters
+    ----------
+    from_dt: datetime, optional
+        The timespan beginning datetime to query for events after.
+        Default is 2 days from UTC now
+    to_dt: datetime, optional
+        The timespan end datetime to query for events before.
+        Default is UTC now
+
+    Returns
+    -------
+    events: List[EventIngestionModel]
+
+    See Also
+    --------
+    cdp_scrapers.instances.__init__.py
+    """
+    scraper = PortlandScraper()
+    return scraper.get_events(begin=from_dt, end=to_dt, **kwargs)
