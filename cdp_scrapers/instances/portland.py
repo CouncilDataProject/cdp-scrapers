@@ -66,10 +66,13 @@ MATTER_IN_PROG_PATTERNS = [
 ]
 
 MINUTE_ITEM_PASSED_PATTERNS = [
-    "accepted",
+    # NOTE: these words while have positive conotation,
+    # does not mean the legistation was passed.
+    # it indicates the item (or a report, etc.) was accepted to be discussed and voted.
+    # "accepted",
+    # "confirmed",
+    # "adopted",
     "passed$",
-    "adopted",
-    "confirmed",
 ]
 
 ###############################################################################
@@ -270,12 +273,20 @@ class PortlandScraper(IngestionModelScraper):
 
         # Find result status
         result_status = get_disposition(minute_section)
-        if result_status in ["Accepted", "Passed", "Adopted"]:
-            result_status = MatterStatusDecision.ADOPTED
-        elif re.search("(Passed to)|(placed on file)|continued", result_status, re.I):
-            result_status = MatterStatusDecision.IN_PROGRESS
+        # strings like "passed to second reading" is better to catch
+        # before searching for "passed".
+        # so test for IN_PROGRESS first.
+        for pattern in MATTER_IN_PROG_PATTERNS:
+            if re.search(pattern, result_status, re.I):
+                result_status = MatterStatusDecision.IN_PROGRESS
+                break
         else:
-            result_status = None
+            for pattern in MATTER_ADOPTED_PATTERNS:
+                if re.search(pattern, result_status, re.I):
+                    result_status = MatterStatusDecision.ADOPTED
+                    break
+            else:
+                result_status = None
 
         # Find the sponsors
         sponsor_element_uncle = minute_section.find(
