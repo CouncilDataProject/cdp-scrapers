@@ -438,16 +438,16 @@ class PortlandScraper(IngestionModelScraper):
             # at this point vote string is like
             # Commissioner Jo Ann Hardesty Absent
             # Commissioner Mingus Mapps Yea
-            is_absent = "Absent" in vote
-            vote = vote.replace(" Absent", "")
+            is_absent = "absent" in vote.lower()
+            vote = re.sub("absent", "", vote, flags=re.I)
 
-            i = vote.rfind(" ")
-            decision = vote[i:].strip()
-            if decision == "Yea":
+            if "yea" in vote.lower():
+                vote = re.sub("yea", "", vote, flags=re.I)
                 decision = VoteDecision.APPROVE
                 if is_absent:
                     decision = VoteDecision.ABSENT_APPROVE
-            elif decision == "Nay":
+            elif "nay" in vote.lower():
+                vote = re.sub("nay", "", vote, flags=re.I)
                 decision = VoteDecision.REJECT
                 if is_absent:
                     decision = VoteDecision.ABSENT_REJECT
@@ -455,7 +455,9 @@ class PortlandScraper(IngestionModelScraper):
                 decision = VoteDecision.ABSENT_NON_VOTING
             else:
                 decision = None
-            name = separate_name_from_title(vote[0:i].strip())
+
+            # at this point any decision token like yea has been removed from vote
+            name = separate_name_from_title(vote.strip())
             vote_list.append(
                 self.get_none_if_empty(
                     Vote(decision=decision, person=self.get_person(name))
