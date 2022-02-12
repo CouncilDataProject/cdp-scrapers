@@ -1,14 +1,14 @@
-from datetime import datetime
-import logging
+from datetime import datetime, timedelta
+from logging import getLogger
 import pytz
 import re
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, NamedTuple, Optional, Set
 
-from cdp_backend.pipeline.ingestion_models import IngestionModel, Person
+from cdp_backend.pipeline.ingestion_models import IngestionModel, Person, Role
 
 ###############################################################################
 
-log = logging.getLogger(__name__)
+log = getLogger(__name__)
 
 ###############################################################################
 
@@ -269,3 +269,128 @@ class IngestionModelScraper:
         instances.seattle.person_aliases
         """
         return person
+
+    def sanitize_roles(
+        self,
+        roles: Optional[List[Role]],
+        chair_aliases: Optional[List[str]] = None,
+        council_member_aliases: Optional[List[str]] = None,
+        council_president_aliases: Optional[List[str]] = None,
+    ) -> Optional[List[Role]]:
+        """
+        1. Standardize Role.title to preset strings
+        2. Ensure only 1 councilmember Role per term
+
+        Parameters
+        ----------
+        roles: Optional[List[Role]]
+            Person.seat.roles
+
+        chair_aliases: Optional[List[str]]
+            Role.title becomes "Chair" if includes any string in this list
+
+        council_member_aliases: Optional[List[str]]
+            Role.title becomes "Councilmember" if includes any string in this list
+
+        council_president_aliases: Optional[List[str]]
+            Role.title becomes "Council President" if includes any string in this list
+
+        Returns
+        -------
+        roles: Optional[List[Role]]
+            Role.title standardized and Role.end_datetime adjusted as necessary
+            such that "Councilmember" roles have non-overlapping start_/end_datetime
+        """
+        if not roles:
+            return roles
+
+        if not chair_aliases:
+            chair_aliases = "(chair)|(supervisor)"
+        else:
+            # (chair)|(supervisor)|(foo)|(bar)
+            chair_aliases = f"(chair)|(supervisor)|({')|('.join(chair_aliases)})"
+
+        if not council_member_aliases:
+            council_member_aliases = "council.*member"
+        else:
+            council_president_aliases = (
+                f"(council.*member)|({')|('.join(council_president_aliases)})"
+            )
+
+        if not council_president_aliases:
+            council_president_aliases = "president"
+        else:
+            council_president_aliases = (
+                f"(president)|({')|('.join(council_president_aliases)})"
+            )
+
+        class StdTitles(NamedTuple):
+            title: str
+            pattern: str
+
+        # std role names and patterns to use to match
+        # NOTE: TODO: will use cdp_backend.databse.constants.RoleTitle
+        # when we get a new cdp_backend release
+        std_titles: List[StdTitles] = [
+            # search in this order, e.g. look for vice chair before chair
+            # i.e. more specific search tokens first
+            StdTitles("Vice Chair", "vice.*chair"),
+            StdTitles("Chair", chair_aliases),
+            StdTitles("Councilmember", council_member_aliases),
+            StdTitles("Member", "member"),
+            StdTitles("Council President", council_president_aliases),
+            StdTitles("Alternate", "alternate"),
+        ]
+
+        class CouncilMemberTerm(NamedTuple):
+            start_datetime: datetime
+            end_datetime: datetime
+            roles_index: int
+
+        terms: List[CouncilMemberTerm] = []
+
+        for i, role in enumerate(roles):
+            # standardize e.g. "council member" -> "Councilmember"
+            for std_title in std_titles:
+                if re.search(std_title.pattern, str_simplified(roles[i].title), re.I):
+                    roles[i].title = std_title.title
+                    if roles[i].body is None:
+                        break
+
+                    if str_simplified(roles[i].body.name).lower().endswith("council"):
+                        if roles[i].title == "Member":
+                            # use "councilmember" for city council member role
+                            roles[i].title = "Councilmember"
+                    elif roles[i].title == "Councilmember":
+                        # conversely, councilmember for city council body only
+                        # (not some committee)
+                        roles[i].title = "Member"
+                    elif roles[i].title == "Council President":
+                        # for any org besides city council, president -> chair
+                        roles[i].title = "Chair"
+                    break
+            else:
+                log.debug(f"{roles[i].title} for is unrecognized. defaulting to Member")
+                roles[i].title = "Member"
+
+            # get all councilmember terms
+            if (
+                roles[i].title == "Councilmember"
+                and roles[i].start_datetime is not None
+                and roles[i].end_datetime is not None
+            ):
+                terms.append(
+                    CouncilMemberTerm(roles[i].start_datetime, roles[i].end_datetime, i)
+                )
+
+        # sort in asc order of start_datetime and end_datetime.
+        terms.sort()
+        # if term i overlaps with term j, end term i before term j
+        for i, term in enumerate(terms[:-1]):
+            if terms[i].end_datetime > terms[i + 1].start_datetime:
+                # reflect adjusted role end date in the actual roles list
+                roles[terms[i].roles_index].end_datetime = terms[
+                    i + 1
+                ].start_datetime - timedelta(days=1)
+
+        return roles

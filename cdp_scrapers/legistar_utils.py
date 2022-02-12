@@ -743,29 +743,31 @@ class LegistarScraper(IngestionModelScraper):
         if not legistar_office_records:
             return None
 
-        return reduced_list(
-            [
-                self.get_none_if_empty(
-                    Role(
-                        body=self.get_body(record[LEGISTAR_ROLE_BODY]),
-                        # e.g. 2017-11-30T00:00:00
-                        start_datetime=self.localize_datetime(
-                            datetime.strptime(
-                                record[LEGISTAR_ROLE_START],
-                                LEGISTAR_DATETIME_FORMAT,
-                            )
-                        ),
-                        end_datetime=self.localize_datetime(
-                            datetime.strptime(
-                                record[LEGISTAR_ROLE_END], LEGISTAR_DATETIME_FORMAT
-                            )
-                        ),
-                        external_source_id=str(record[LEGISTAR_ROLE_EXT_ID]),
-                        title=str_simplified(record[LEGISTAR_ROLE_TITLE]),
+        return self.sanitize_roles(
+            reduced_list(
+                [
+                    self.get_none_if_empty(
+                        Role(
+                            body=self.get_body(record[LEGISTAR_ROLE_BODY]),
+                            # e.g. 2017-11-30T00:00:00
+                            start_datetime=self.localize_datetime(
+                                datetime.strptime(
+                                    record[LEGISTAR_ROLE_START],
+                                    LEGISTAR_DATETIME_FORMAT,
+                                )
+                            ),
+                            end_datetime=self.localize_datetime(
+                                datetime.strptime(
+                                    record[LEGISTAR_ROLE_END], LEGISTAR_DATETIME_FORMAT
+                                )
+                            ),
+                            external_source_id=str(record[LEGISTAR_ROLE_EXT_ID]),
+                            title=str_simplified(record[LEGISTAR_ROLE_TITLE]),
+                        )
                     )
-                )
-                for record in legistar_office_records
-            ]
+                    for record in legistar_office_records
+                ]
+            )
         )
 
     def resolve_person_alias(self, person: Person) -> Optional[Person]:
