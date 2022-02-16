@@ -16,35 +16,57 @@
                 "external_source_id": null,
                 "roles": [
                     {
-                        "title":  "member",
+                        "title":  "Council President",
+                        "start_datetime": 1483257600,
+                        "end_datetime": 1735632000,
+                        "body": {"name": "City Council"}
+                    },
+                    {
+                        "title":  "Member",
+                        "start_datetime": 1483257600,
+                        "end_datetime": 1735632000,
                         "body": {"name": "City Budget"}
                     },
                     {
-                        "title":  "member",
+                        "title":  "Member",
+                        "start_datetime": 1483257600,
+                        "end_datetime": 1735632000,
                         "body": {"name": "Management and Finance"}
                     },
                     {
-                        "title":  "member",
+                        "title":  "Member",
+                        "start_datetime": 1483257600,
+                        "end_datetime": 1735632000,
                         "body": {"name": "Government Relations"}
                     },
                     {
-                        "title":  "member",
+                        "title":  "Member",
+                        "start_datetime": 1483257600,
+                        "end_datetime": 1735632000,
                         "body": {"name": "City Attorney"}
                     },
                     {
-                        "title":  "member",
+                        "title":  "Member",
+                        "start_datetime": 1483257600,
+                        "end_datetime": 1735632000,
                         "body": {"name": "Police"}
                     },
                     {
-                        "title":  "member",
+                        "title":  "Member",
+                        "start_datetime": 1483257600,
+                        "end_datetime": 1735632000,
                         "body": {"name": "Prosper Portland"}
                     },
                     {
-                        "title":  "member",
+                        "title":  "Member",
+                        "start_datetime": 1483257600,
+                        "end_datetime": 1735632000,
                         "body": {"name": "Emergency Management"}
                     },
                     {
-                        "title":  "member",
+                        "title":  "Member",
+                        "start_datetime": 1483257600,
+                        "end_datetime": 1735632000,
                         "body": {"name": "Equity and Human Rights"}
                     }
                 ]
@@ -67,19 +89,33 @@
                 "external_source_id": null,
                 "roles": [
                     {
-                        "title":  "member",
+                        "title":  "Councilmember",
+                        "start_datetime": 1609488000,
+                        "end_datetime": 1735632000,
+                        "body": {"name": "City Council"}
+                    },
+                    {
+                        "title":  "Member",
+                        "start_datetime": 1609488000,
+                        "end_datetime": 1735632000,
                         "body": {"name": "Parks & Recreation"}
                     },
                     {
-                        "title":  "member",
+                        "title":  "Member",
+                        "start_datetime": 1609488000,
+                        "end_datetime": 1735632000,
                         "body": {"name": "Planning and Sustainability"}
                     },
                     {
-                        "title":  "member",
+                        "title":  "Member",
+                        "start_datetime": 1609488000,
+                        "end_datetime": 1735632000,
                         "body": {"name": "Community Technology"}
                     },
                     {
-                        "title":  "member",
+                        "title":  "Member",
+                        "start_datetime": 1609488000,
+                        "end_datetime": 1735632000,
                         "body": {"name": "Small Donor Elections"}
                     }
                 ]
@@ -102,15 +138,27 @@
                 "external_source_id": null,
                 "roles": [
                     {
-                        "title":  "member",
+                        "title":  "Councilmember",
+                        "start_datetime": 1599721200,
+                        "end_datetime": 1672473600,
+                        "body": {"name": "City Council"}
+                    },
+                    {
+                        "title":  "Member",
+                        "start_datetime": 1599721200,
+                        "end_datetime": 1672473600,
                         "body": {"name": "Development Services (BDS)"}
                     },
                     {
-                        "title":  "member",
+                        "title":  "Member",
+                        "start_datetime": 1599721200,
+                        "end_datetime": 1672473600,
                         "body": {"name": "Housing Bureau"}
                     },
                     {
-                        "title":  "member",
+                        "title":  "Member",
+                        "start_datetime": 1599721200,
+                        "end_datetime": 1672473600,
                         "body": {"name": "Children's Levy"}
                     }
                 ]
@@ -133,19 +181,33 @@
                 "external_source_id": null,
                 "roles": [
                     {
-                        "title":  "member",
+                        "title":  "Councilmember",
+                        "start_datetime": 1546329600,
+                        "end_datetime": 1672473600,
+                        "body": {"name": "City Council"}
+                    },
+                    {
+                        "title":  "Member",
+                        "start_datetime": 1546329600,
+                        "end_datetime": 1672473600,
                         "body": {"name": "Transportation"}
                     },
                     {
-                        "title":  "member",
+                        "title":  "Member",
+                        "start_datetime": 1546329600,
+                        "end_datetime": 1672473600,
                         "body": {"name": "Office of Community & Civic Life"}
                     },
                     {
-                        "title":  "member",
+                        "title":  "Member",
+                        "start_datetime": 1546329600,
+                        "end_datetime": 1672473600,
                         "body": {"name": "Portland Fire & Rescue"}
                     },
                     {
-                        "title":  "member",
+                        "title":  "Member",
+                        "start_datetime": 1546329600,
+                        "end_datetime": 1672473600,
                         "body": {"name": "Fire and Police Disability and Retirement"}
                     }
                 ]
@@ -168,15 +230,27 @@
                 "external_source_id": null,
                 "roles": [
                     {
-                        "title":  "member",
+                        "title":  "Councilmember",
+                        "start_datetime": 1609488000,
+                        "end_datetime": 1735632000,
+                        "body": {"name": "City Council"}
+                    },
+                    {
+                        "title":  "Member",
+                        "start_datetime": 1609488000,
+                        "end_datetime": 1735632000,
                         "body": {"name": "Water"}
                     },
                     {
-                        "title":  "member",
+                        "title":  "Member",
+                        "start_datetime": 1609488000,
+                        "end_datetime": 1735632000,
                         "body": {"name": "Environmental Services"}
                     },
                     {
-                        "title":  "member",
+                        "title":  "Member",
+                        "start_datetime": 1609488000,
+                        "end_datetime": 1735632000,
                         "body": {"name": "Emergency Communications (9-1-1)"}
                     }
                 ]
