@@ -222,18 +222,18 @@ that contains list of current council members name, position, contact info</p>
 <dd><p>Bases: <a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.scraper_utils.IngestionModelScraper" title="cdp_scrapers.scraper_utils.IngestionModelScraper"><code class="xref py py-class docutils literal notranslate"><span class="pre">cdp_scrapers.scraper_utils.IngestionModelScraper</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.instances.portland.PortlandScraper.get_agenda_uri">
-<span class="sig-name descname"><span class="pre">get_agenda_uri</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_page</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bs4.BeautifulSoup</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/portland.html#PortlandScraper.get_agenda_uri"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.portland.PortlandScraper.get_agenda_uri" title="Permalink to this definition"></a></dt>
-<dd><p>Find the uri for the file containing the agenda at each Portland, OR city
+<span class="sig-name descname"><span class="pre">get_agenda_uri</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_page</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bs4.BeautifulSoup</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/portland.html#PortlandScraper.get_agenda_uri"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.portland.PortlandScraper.get_agenda_uri" title="Permalink to this definition"></a></dt>
+<dd><p>Find the uri for the file containing the agenda for a Portland, OR city
 council meeting</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>event_page</strong> (<em>The page for the meeting</em>)</p>
+<dd class="field-odd"><p><strong>event_page</strong> (<em>BeautifulSoup</em>) – Web page for the meeting loaded as a bs4 object</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>agenda_uri</strong></p>
+<dd class="field-even"><p><strong>agenda_uri</strong> – The uri for the file containing the meeting’s agenda</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>The uri for the file containing the meeting’s agenda</p>
+<dd class="field-odd"><p>Optional[str]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -241,13 +241,38 @@ council meeting</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.instances.portland.PortlandScraper.get_event">
 <span class="sig-name descname"><span class="pre">get_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime.datetime</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.EventIngestionModel</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/portland.html#PortlandScraper.get_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.portland.PortlandScraper.get_event" title="Permalink to this definition"></a></dt>
-<dd><p>Information for council meeting on given date if available</p>
+<dd><p>Portland, OR city council meeting information for a specific date</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>event_time</strong> (<em>datetime</em>) – Meeting date</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None if there was no meeting on event_time
+or information for the meeting did not meet minimal CDP requirements.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Optional[EventIngestionModel]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.instances.portland.PortlandScraper.get_event_minutes">
 <span class="sig-name descname"><span class="pre">get_event_minutes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_page</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bs4.BeautifulSoup</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.EventMinutesItem</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/portland.html#PortlandScraper.get_event_minutes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.portland.PortlandScraper.get_event_minutes" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Make EventMinutesItem from each relation–type-agenda-item &lt;div&gt;
+on event_page</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>event_page</strong> (<em>BeautifulSoup</em>) – Web page for the meeting loaded as a bs4 object</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>event minute items</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Optional[List[EventMinutesItem]]</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.instances.portland.PortlandScraper.get_events">
@@ -277,48 +302,99 @@ Default is UTC now</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.instances.portland.PortlandScraper.get_matter">
 <span class="sig-name descname"><span class="pre">get_matter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">minute_section</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bs4.element.Tag</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.Matter</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/portland.html#PortlandScraper.get_matter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.portland.PortlandScraper.get_matter" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cdp_scrapers.instances.portland.PortlandScraper.get_person">
-<span class="sig-name descname"><span class="pre">get_person</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.Person</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/portland.html#PortlandScraper.get_person"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.portland.PortlandScraper.get_person" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cdp_scrapers.instances.portland.PortlandScraper.get_sessions">
-<span class="sig-name descname"><span class="pre">get_sessions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_page</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bs4.BeautifulSoup</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.Session</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/portland.html#PortlandScraper.get_sessions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.portland.PortlandScraper.get_sessions" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cdp_scrapers.instances.portland.PortlandScraper.get_supporting_files">
-<span class="sig-name descname"><span class="pre">get_supporting_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_page</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bs4.BeautifulSoup</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minutes_item_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.SupportingFile</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/portland.html#PortlandScraper.get_supporting_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.portland.PortlandScraper.get_supporting_files" title="Permalink to this definition"></a></dt>
-<dd><p>Return SupportingFiles for a given EventMinutesItems</p>
+<dd><p>Make Matter from information in minute_section</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>event_page</strong> (<em>BeautifulSoup</em>) – Event web page e.g. <a class="reference external" href="https://www.portland.gov/council/agenda/yyyy/m/d">https://www.portland.gov/council/agenda/yyyy/m/d</a>
-loaded in BeautifulSoup</p></li>
-<li><p><strong>minutes_item_index</strong> (<em>int</em>) – EventMinutesItem index on event_page</p></li>
-</ul>
+<dd class="field-odd"><p><strong>minute_section</strong> (<em>Tag</em>) – &lt;div&gt; within event web page for a given event minute item</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>supporting files</strong> – Supporting files listed on the event minutes item’s details page</p>
+<dd class="field-even"><p><strong>matter</strong> – Matter if required information could be parsed from minute_section</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Optional[List[SupportingFile]]</p>
+<dd class="field-odd"><p>Optional[Matter]</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cdp_scrapers.instances.portland.PortlandScraper.get_votes">
-<span class="sig-name descname"><span class="pre">get_votes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">minute_section</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bs4.element.Tag</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.Vote</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/portland.html#PortlandScraper.get_votes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.portland.PortlandScraper.get_votes" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="cdp_scrapers.instances.portland.PortlandScraper.get_person">
+<span class="sig-name descname"><span class="pre">get_person</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.Person</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/portland.html#PortlandScraper.get_person"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.portland.PortlandScraper.get_person" title="Permalink to this definition"></a></dt>
+<dd><p>Return matching Person from portland-static.json</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – Person full name</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>person</strong> – Person if exists in portland-static.json</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Optional[Person]:</p>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<p>portland-static.json</p>
+</dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cdp_scrapers.instances.portland.PortlandScraper.separate_name_from_title">
-<span class="sig-name descname"><span class="pre">separate_name_from_title</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title_and_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cdp_scrapers/instances/portland.html#PortlandScraper.separate_name_from_title"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.portland.PortlandScraper.separate_name_from_title" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="cdp_scrapers.instances.portland.PortlandScraper.get_sessions">
+<span class="sig-name descname"><span class="pre">get_sessions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_page</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bs4.BeautifulSoup</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.Session</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/portland.html#PortlandScraper.get_sessions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.portland.PortlandScraper.get_sessions" title="Permalink to this definition"></a></dt>
+<dd><p>Parse meeting video URIs from event_page,
+return Session for each video found.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>event_page</strong> (<em>BeautifulSoup</em>) – Web page for the meeting loaded as a bs4 object</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>sessions</strong> – Session for each video found on event_page</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Optional[List[Session]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cdp_scrapers.instances.portland.PortlandScraper.get_supporting_files">
+<span class="sig-name descname"><span class="pre">get_supporting_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">minute_section</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bs4.element.Tag</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.SupportingFile</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/portland.html#PortlandScraper.get_supporting_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.portland.PortlandScraper.get_supporting_files" title="Permalink to this definition"></a></dt>
+<dd><p>Return SupportingFiles for a given EventMinutesItem</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>minute_section</strong> (<em>Tag</em>) – &lt;div&gt; within event web page for a given event minute item</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>supporting files</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Optional[List[SupportingFile]]</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Follow hyperlink to go to minutes item details page.
+On the details page look for directly-linked files
+and externally-hosted efiles.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#cdp_scrapers.instances.portland.make_efile_url" title="cdp_scrapers.instances.portland.make_efile_url"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_efile_url</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cdp_scrapers.instances.portland.PortlandScraper.get_votes">
+<span class="sig-name descname"><span class="pre">get_votes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">minute_section</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bs4.element.Tag</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.Vote</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/portland.html#PortlandScraper.get_votes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.portland.PortlandScraper.get_votes" title="Permalink to this definition"></a></dt>
+<dd><p>Look for ‘Votes:’ in minute_section and
+create a Vote object for each line</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>minute_section</strong> (<em>Tag</em>) – &lt;div&gt; within event web page for a given event minute item</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>votes</strong> – Votes for corresponding event minute item if found</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Optional[List[Vote]]</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -339,6 +415,76 @@ loaded in BeautifulSoup</p></li>
 <dd><p>Alias for field number 0</p>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cdp_scrapers.instances.portland.disposition_to_minute_decision">
+<span class="sig-prename descclassname"><span class="pre">cdp_scrapers.instances.portland.</span></span><span class="sig-name descname"><span class="pre">disposition_to_minute_decision</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">disposition</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.database.constants.EventMinutesItemDecision</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/portland.html#disposition_to_minute_decision"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.portland.disposition_to_minute_decision" title="Permalink to this definition"></a></dt>
+<dd><p>Decide EventMinutesItemDecision constant from event minute item disposition</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>disposition</strong> (<em>str</em>) – Disposition event web page for a given item
+e.g. Passed, Continued</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>decision</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Optional[EventMinutesItemDecision]</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">MINUTE_ITEM_PASSED_PATTERNS</span></code></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cdp_scrapers.instances.portland.get_disposition">
+<span class="sig-prename descclassname"><span class="pre">cdp_scrapers.instances.portland.</span></span><span class="sig-name descname"><span class="pre">get_disposition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">minute_section</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bs4.element.Tag</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/portland.html#get_disposition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.portland.get_disposition" title="Permalink to this definition"></a></dt>
+<dd><p>Return disposition string given within minute_section &lt;div&gt;
+on the event web page</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>minute_section</strong> (<em>Tag</em>) – &lt;div&gt; within event web page for a given event minute item</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>disposition</strong> – Disposition string for the event minute item
+e.g. Accepted, Passed, Placed on file</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cdp_scrapers.instances.portland.get_portland_events">
+<span class="sig-prename descclassname"><span class="pre">cdp_scrapers.instances.portland.</span></span><span class="sig-name descname"><span class="pre">get_portland_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">from_dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime.datetime</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime.datetime</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.EventIngestionModel</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/portland.html#get_portland_events"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.portland.get_portland_events" title="Permalink to this definition"></a></dt>
+<dd><p>Public API for use in instances.__init__ so that this func can be attached
+as an attribute to cdp_scrapers.instances module.
+Thus the outside world like cdp-backend can get at this by asking for
+“get_portland_events”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>from_dt</strong> (<em>datetime, optional</em>) – The timespan beginning datetime to query for events after.
+Default is 2 days from UTC now</p></li>
+<li><p><strong>to_dt</strong> (<em>datetime, optional</em>) – The timespan end datetime to query for events before.
+Default is UTC now</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>events</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>List[EventIngestionModel]</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdp_scrapers.instances.__init__.py</span></code></p>
+</div>
 </dd></dl>
 
 <dl class="py function">
@@ -376,6 +522,25 @@ e.g. <a class="reference external" href="https://efiles.portlandoregon.gov/recor
 <dd class="field-odd"><p>str</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cdp_scrapers.instances.portland.separate_name_from_title">
+<span class="sig-prename descclassname"><span class="pre">cdp_scrapers.instances.portland.</span></span><span class="sig-name descname"><span class="pre">separate_name_from_title</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title_and_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/portland.html#separate_name_from_title"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.portland.separate_name_from_title" title="Permalink to this definition"></a></dt>
+<dd><p>Return just name</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>title_and_name</strong> (<em>str</em>) – e.g. Mayor Ted Wheeler</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>name</strong> – tile_name_name with first word removed e.g. Ted Wheeler</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>first word in title_and_name is presumed to be title</p>
 </dd></dl>
 
 </section>
