@@ -136,9 +136,16 @@ class SeattleScraper(LegistarScraper):
         # ...
 
         # entire script tag text that has the video player setup call
-        video_script_text = soup.find(
+        video_script_block = soup.find(
             "script", text=re.compile(r"playerInstance\.setup")
-        ).string
+        )
+        if not video_script_block:
+            log.warning(
+                f"Couldn't find 'playerInstance.setup()' block on {video_page_url}.\n"
+                "seattlechannel.org may have changed their video page html"
+            )
+            return []
+        video_script_text = video_script_block.string
 
         # halt if event date not in video's idstring
         # likely means some change on video web page source / script
