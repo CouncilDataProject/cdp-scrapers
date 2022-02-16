@@ -248,9 +248,16 @@
         <span class="c1"># ...</span>
 
         <span class="c1"># entire script tag text that has the video player setup call</span>
-        <span class="n">video_script_text</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span>
+        <span class="n">video_script_block</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span>
             <span class="s2">&quot;script&quot;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;playerInstance\.setup&quot;</span><span class="p">)</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">string</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">video_script_block</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Couldn&#39;t find &#39;playerInstance.setup()&#39; block on </span><span class="si">{</span><span class="n">video_page_url</span><span class="si">}</span><span class="s2">.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;seattlechannel.org may have changed their video page html&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="n">video_script_text</span> <span class="o">=</span> <span class="n">video_script_block</span><span class="o">.</span><span class="n">string</span>
 
         <span class="c1"># halt if event date not in video&#39;s idstring</span>
         <span class="c1"># likely means some change on video web page source / script</span>
