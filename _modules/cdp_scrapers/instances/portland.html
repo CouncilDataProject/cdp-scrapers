@@ -121,9 +121,9 @@
 
 <span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span><span class="p">,</span> <span class="n">Tag</span>
 <span class="kn">from</span> <span class="nn">cdp_backend.database.constants</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">EventMinutesItemDecision</span><span class="p">,</span>
     <span class="n">MatterStatusDecision</span><span class="p">,</span>
     <span class="n">VoteDecision</span><span class="p">,</span>
-    <span class="n">EventMinutesItemDecision</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">cdp_backend.pipeline.ingestion_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Body</span><span class="p">,</span>
@@ -666,7 +666,7 @@
                                 <span class="p">)</span>
                             <span class="p">),</span>
                             <span class="n">session_index</span><span class="o">=</span><span class="n">session_index</span><span class="p">,</span>
-                            <span class="n">video_uri</span><span class="o">=</span><span class="n">video_iframe</span><span class="p">[</span><span class="s2">&quot;src&quot;</span><span class="p">],</span>
+                            <span class="n">video_uri</span><span class="o">=</span><span class="n">video_iframe</span><span class="p">[</span><span class="s2">&quot;src&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;?&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
                         <span class="p">)</span>
                     <span class="p">)</span>
                 <span class="p">)</span>
