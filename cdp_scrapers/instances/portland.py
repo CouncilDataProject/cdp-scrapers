@@ -9,9 +9,9 @@ from urllib.request import Request, urlopen
 
 from bs4 import BeautifulSoup, Tag
 from cdp_backend.database.constants import (
+    EventMinutesItemDecision,
     MatterStatusDecision,
     VoteDecision,
-    EventMinutesItemDecision,
 )
 from cdp_backend.pipeline.ingestion_models import (
     Body,
@@ -554,7 +554,7 @@ class PortlandScraper(IngestionModelScraper):
                                 )
                             ),
                             session_index=session_index,
-                            video_uri=video_iframe["src"],
+                            video_uri=video_iframe["src"].split("?")[0],
                         )
                     )
                 )
