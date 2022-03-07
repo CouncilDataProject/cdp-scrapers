@@ -158,7 +158,7 @@ def test_king_county_scraper(
             0,
             2,
             5,
-            "https://www.youtube.com/embed/aXKE2u24WKg?autoplay=0&start=0&rel=0",
+            "https://www.youtube.com/embed/aXKE2u24WKg",
             "https://efiles.portlandoregon.gov/record/14778119/File/Document",
         ),
         (
@@ -170,7 +170,7 @@ def test_king_county_scraper(
             0,
             5,
             5,
-            "https://www.youtube.com/embed/TBrJbm08i0g?autoplay=0&start=0&rel=0",
+            "https://www.youtube.com/embed/TBrJbm08i0g",
             "https://efiles.portlandoregon.gov/record/14811424/File/Document",
         ),
         (
@@ -182,7 +182,7 @@ def test_king_county_scraper(
             0,
             6,
             5,
-            "https://www.youtube.com/embed/3mYGdqck_bw?autoplay=0&start=0&rel=0",
+            "https://www.youtube.com/embed/3mYGdqck_bw",
             "https://efiles.portlandoregon.gov/record/14750779/File/Document",
         ),
     ],
