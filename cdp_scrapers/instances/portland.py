@@ -223,6 +223,11 @@ class PortlandScraper(IngestionModelScraper):
         person: Optional[Person]:
             Matching Person from portland-static.json
 
+        Raises
+        ------
+        KeyError
+            If name does not exist in portland-static.json
+
         References
         ----------
         portland-static.json
