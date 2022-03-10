@@ -321,7 +321,7 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">timezone</span><span class="o">=</span><span class="s2">&quot;America/Los_Angeles&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="PortlandScraper.get_person"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_person">[docs]</a>    <span class="k">def</span> <span class="nf">get_person</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Person</span><span class="p">]:</span>
+<div class="viewcode-block" id="PortlandScraper.get_person"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_person">[docs]</a>    <span class="k">def</span> <span class="nf">get_person</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Person</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return matching Person from portland-static.json</span>
 
@@ -332,21 +332,22 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        person: Optional[Person]:</span>
-<span class="sd">            Person if exists in portland-static.json</span>
+<span class="sd">        person: Person</span>
+<span class="sd">            Matching Person from portland-static.json</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        KeyError</span>
+<span class="sd">            If name does not exist in portland-static.json</span>
 
 <span class="sd">        References</span>
 <span class="sd">        ----------</span>
 <span class="sd">        portland-static.json</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">global</span> <span class="n">known_persons</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">known_persons</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
-        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="k">pass</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">known_persons</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> is unknown. Please update portland-static.json&quot;</span><span class="p">)</span>
 
-        <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> is unknown. Please update portland-static.json&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="kc">None</span></div>
+        <span class="k">return</span> <span class="n">known_persons</span><span class="p">[</span><span class="n">name</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="PortlandScraper.get_matter"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_matter">[docs]</a>    <span class="k">def</span> <span class="nf">get_matter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">minute_section</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Matter</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>

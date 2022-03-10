@@ -318,17 +318,20 @@ Default is UTC now</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.instances.portland.PortlandScraper.get_person">
-<span class="sig-name descname"><span class="pre">get_person</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.Person</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/portland.html#PortlandScraper.get_person"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.portland.PortlandScraper.get_person" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_person</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">cdp_backend.pipeline.ingestion_models.Person</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/portland.html#PortlandScraper.get_person"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.portland.PortlandScraper.get_person" title="Permalink to this definition"></a></dt>
 <dd><p>Return matching Person from portland-static.json</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – Person full name</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>person</strong> – Person if exists in portland-static.json</p>
+<dd class="field-even"><p><strong>person</strong> – Matching Person from portland-static.json</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Optional[Person]:</p>
+<dd class="field-odd"><p>Person</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>KeyError</strong> – If name does not exist in portland-static.json</p>
 </dd>
 </dl>
 <p class="rubric">References</p>
