@@ -256,6 +256,31 @@
                 ]
             },
             "external_source_id": null
+        },
+        "Mary Hull Caballero": {
+            "name": "Mary Hull Caballero",
+            "is_active": true,
+            "router_string": null,
+            "email": "auditorhullcaballero@portlandoregon.gov",
+            "phone": "503-823-4078",
+            "website": "https://www.portland.gov/auditor/hull-caballero",
+            "picture_uri": "https://www.portland.gov/sites/default/files/styles/4x5_640w/public/2021/mary-hull-caballero_headshot.jpg",
+            "seat": {
+                "name": "Auditor",
+                "electoral_area": "Citywide",
+                "electoral_type": null,
+                "image_uri": "https://www.portland.gov/sites/default/files/styles/featured_2_1_600w/public/2020-08/environmental-services-program.jpg",
+                "external_source_id": null,
+                "roles": [
+                    {
+                        "title":  "Councilmember",
+                        "start_datetime": 1420099200,
+                        "end_datetime": 1735632000,
+                        "body": {"name": "City Council"}
+                    }
+                ]
+            },
+            "external_source_id": null
         }
     }
 }
