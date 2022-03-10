@@ -273,7 +273,7 @@
                 "external_source_id": null,
                 "roles": [
                     {
-                        "title":  "Member",
+                        "title":  "Councilmember",
                         "start_datetime": 1420099200,
                         "end_datetime": 1735632000,
                         "body": {"name": "City Council"}
