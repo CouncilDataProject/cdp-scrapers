@@ -220,7 +220,7 @@ class PortlandScraper(IngestionModelScraper):
 
         Returns
         -------
-        person: Optional[Person]:
+        person: Person
             Matching Person from portland-static.json
 
         Raises
