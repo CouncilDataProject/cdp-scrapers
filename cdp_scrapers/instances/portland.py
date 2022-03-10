@@ -209,7 +209,7 @@ class PortlandScraper(IngestionModelScraper):
     def __init__(self):
         super().__init__(timezone="America/Los_Angeles")
 
-    def get_person(self, name: str) -> Optional[Person]:
+    def get_person(self, name: str) -> Person:
         """
         Return matching Person from portland-static.json
 
@@ -221,20 +221,16 @@ class PortlandScraper(IngestionModelScraper):
         Returns
         -------
         person: Optional[Person]:
-            Person if exists in portland-static.json
+            Matching Person from portland-static.json
 
         References
         ----------
         portland-static.json
         """
-        global known_persons
-        try:
-            return known_persons[name]
-        except KeyError:
-            pass
+        if name not in known_persons:
+            raise KeyError(f"{name} is unknown. Please update portland-static.json")
 
-        log.warning(f"{name} is unknown. Please update portland-static.json")
-        return None
+        return known_persons[name]
 
     def get_matter(self, minute_section: Tag) -> Optional[Matter]:
         """
