@@ -63,20 +63,19 @@
             "phone": "206-684-8804",
             "website": null,
             "picture_uri": "https://www.seattle.gov/assets/Images/Council/Members/Pedersen/Councilmember-Alex-Pedersen_square-headshot.jpg",
+            "seat": "Position 4",
             "roles": [
                 {
-                    "seat": "Position 4",
                     "body": "City Council",
                     "start_datetime": 1577865600,
                     "end_datetime": 1704009600,
                     "title": "Councilmember"
                 },
                 {
-                    "seat": "Position 4",
                     "body": "Council Briefing",
                     "start_datetime": 1577865600,
                     "end_datetime": 1704009600,
-                    "title": "Member"
+                    "title": "Councilmember"
                 }
             ]
         },
@@ -88,20 +87,19 @@
             "phone": "206-684-8807",
             "website": null,
             "picture_uri": "https://www.seattle.gov/assets/Images/Council/Members/Lewis/Andrew-Lewis-Campaign-Headshot_300x300.jpg",
+            "seat": "Position 7",
             "roles": [
                 {
-                    "seat": "Position 7",
                     "body": "City Council",
                     "start_datetime": 1577865600,
                     "end_datetime": 1704009600,
                     "title": "Councilmember"
                 },
                 {
-                    "seat": "Position 7",
                     "body": "Council Briefing",
                     "start_datetime": 1577865600,
                     "end_datetime": 1704009600,
-                    "title": "Member"
+                    "title": "Councilmember"
                 }
             ]
         },
@@ -113,20 +111,19 @@
             "phone": "206-684-8806",
             "website": null,
             "picture_uri": "https://www.seattle.gov/assets/Images/Council/Members/Strauss/strauss_headshot_300x300.jpg",
+            "seat": "Position 6",
             "roles": [
                 {
-                    "seat": "Position 6",
                     "body": "City Council",
                     "start_datetime": 1577865600,
                     "end_datetime": 1704009600,
                     "title": "Councilmember"
                 },
                 {
-                    "seat": "Position 6",
                     "body": "Council Briefing",
                     "start_datetime": 1577865600,
                     "end_datetime": 1704009600,
-                    "title": "Member"
+                    "title": "Councilmember"
                 }
             ]
         },
@@ -138,34 +135,31 @@
             "phone": "206-684-8805",
             "website": null,
             "picture_uri": "https://www.seattle.gov/assets/Images/Council/Members/Juarez/Debora-Juarez-2018_225x225.jpg",
+            "seat": "Position 5",
             "roles": [
                 {
-                    "seat": "Position 5",
                     "body": "City Council",
                     "start_datetime": 1451635200,
                     "end_datetime": 1640937600,
                     "title": "Councilmember"
                 },
                 {
-                    "seat": "Position 5",
                     "body": "City Council",
                     "start_datetime": 1641024000,
                     "end_datetime": 1704009600,
                     "title": "Council President"
                 },
                 {
-                    "seat": "Position 5",
                     "body": "Council Briefing",
                     "start_datetime": 1451635200,
                     "end_datetime": 1640937600,
-                    "title": "Member"
+                    "title": "Councilmember"
                 },
                 {
-                    "seat": "Position 5",
                     "body": "Council Briefing",
                     "start_datetime": 1641024000,
                     "end_datetime": 1704009600,
-                    "title": "Chair"
+                    "title": "Council President"
                 }
             ]
         },
@@ -177,20 +171,19 @@
             "phone": "206-684-8803",
             "website": null,
             "picture_uri": "https://www.seattle.gov/assets/Images/Council/Members/Sawant/Sawant_225x225.jpg",
+            "seat": "Position 3",
             "roles": [
                 {
-                    "seat": "Position 3",
                     "body": "City Council",
                     "start_datetime": 1388563200,
                     "end_datetime": 1704009600,
                     "title": "Councilmember"
                 },
                 {
-                    "seat": "Position 3",
                     "body": "Council Briefing",
                     "start_datetime": 1388563200,
                     "end_datetime": 1704009600,
-                    "title": "Member"
+                    "title": "Councilmember"
                 }
             ]
         },
@@ -202,54 +195,50 @@
             "phone": null,
             "website": null,
             "picture_uri": "https://www.seattle.gov/assets/Images/Council/Members/Herbold/Herbold_225x225.jpg",
+            "seat": "Position 1",
             "roles": [
                 {
-                    "seat": "Position 1",
                     "body": "City Council",
                     "start_datetime": 1451635200,
                     "end_datetime": 1704009600,
                     "title": "Councilmember"
                 },
                 {
-                    "seat": "Position 1",
                     "body": "Council Briefing",
                     "start_datetime": 1451635200,
                     "end_datetime": 1704009600,
-                    "title": "Member"
+                    "title": "Councilmember"
                 }
             ]
         },
         "M. Lorena Gonz\u00e1lez": {
             "name": "M. Lorena Gonz\u00e1lez",
             "picture_uri": "https://www.seattle.gov/assets/Images/Council/Members/Gonzalez/Lorena-González_2020-headshot_225x225.jpg",
+            "seat": "Position 9",
             "roles": [
                 {
-                    "seat": "Position 9",
                     "body": "City Council",
                     "start_datetime": 1448352000,
                     "end_datetime": 1577779200,
                     "title": "Councilmember"
                 },
                 {
-                    "seat": "Position 9",
                     "body": "City Council",
                     "start_datetime": 1577865600,
                     "end_datetime": 1640937600,
                     "title": "Council President"
                 },
                 {
-                    "seat": "Position 9",
                     "body": "Council Briefing",
                     "start_datetime": 1448352000,
                     "end_datetime": 1577779200,
-                    "title": "Member"
+                    "title": "Councilmember"
                 },
                 {
-                    "seat": "Position 9",
                     "body": "Council Briefing",
                     "start_datetime": 1577865600,
                     "end_datetime": 1640937600,
-                    "title": "Chair"
+                    "title": "Council President"
                 }
             ]
         },
@@ -261,20 +250,19 @@
             "phone": "206-684-8809",
             "website": null,
             "picture_uri": "https://www.seattle.gov/images/Council/Members/Nelson/nelson_300x300.jpg",
+            "seat": "Position 9",
             "roles": [
                 {
-                    "seat": "Position 9",
                     "body": "City Council",
                     "start_datetime": 1641024000,
                     "end_datetime": 1704009600,
                     "title": "Councilmember"
                 },
                 {
-                    "seat": "Position 9",
                     "body": "Council Briefing",
                     "start_datetime": 1641024000,
                     "end_datetime": 1704009600,
-                    "title": "Member"
+                    "title": "Councilmember"
                 }
             ]
         },
@@ -286,20 +274,19 @@
             "phone": "206-684-8802",
             "website": null,
             "picture_uri": "https://www.seattle.gov/assets/Images/Council/Members/Morales/Tammy-Morales_headshot_final_300x300.jpg",
+            "seat": "Position 2",
             "roles": [
                 {
-                    "seat": "Position 2",
                     "body": "City Council",
                     "start_datetime": 1577865600,
                     "end_datetime": 1704009600,
                     "title": "Councilmember"
                 },
                 {
-                    "seat": "Position 2",
                     "body": "Council Briefing",
                     "start_datetime": 1577865600,
                     "end_datetime": 1704009600,
-                    "title": "Member"
+                    "title": "Councilmember"
                 }
             ]
         },
@@ -311,20 +298,19 @@
             "phone": "206-684-8808",
             "website": null,
             "picture_uri": "https://www.seattle.gov/assets/Images/Council/Members/Mosqueda/Mosqueda_225x225.jpg",
+            "seat": "Position 8",
             "roles": [
                 {
-                    "seat": "Position 8",
                     "body": "City Council",
                     "start_datetime": 1511856000,
                     "end_datetime": 1704009600,
                     "title": "Councilmember"
                 },
                 {
-                    "seat": "Position 8",
                     "body": "Council Briefing",
                     "start_datetime": 1511856000,
                     "end_datetime": 1704009600,
-                    "title": "Member"
+                    "title": "Councilmember"
                 }
             ]
         }

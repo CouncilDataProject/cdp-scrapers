@@ -1,10 +1,21 @@
+import json
+import re
+from copy import deepcopy
 from datetime import datetime, timedelta
 from logging import getLogger
-import pytz
-import re
+from pathlib import Path
 from typing import Any, Dict, List, NamedTuple, Optional, Set
 
-from cdp_backend.pipeline.ingestion_models import IngestionModel, Person, Role
+import pytz
+from cdp_backend.database.constants import RoleTitle
+from cdp_backend.pipeline.ingestion_models import (
+    Body,
+    IngestionModel,
+    Person,
+    Role,
+    Seat,
+)
+from cdp_backend.utils.constants_utils import get_all_class_attr_values
 
 ###############################################################################
 
@@ -64,6 +75,90 @@ def str_simplified(input_str: str) -> str:
     input_str = input_str.encode("utf-8").decode("utf-8")
 
     return input_str
+
+
+def parse_static_person(
+    person_json: Dict[str, Any],
+    all_seats: Dict[str, Seat],
+    primary_bodies: Dict[str, Body],
+) -> Person:
+    log.debug(f"Begin parsing static data for {person_json['name']}")
+
+    person: Person = Person.from_dict(
+        {k: v for k, v in person_json.items() if k != "seat" and k != "roles"}
+    )
+    if "seat" not in person_json:
+        log.debug("Seat name not given")
+        return person
+
+    seat_name: str = person_json["seat"]
+    if seat_name not in all_seats:
+        log.error(f"{seat_name} is not defined in top-level 'seats'")
+        return person
+
+    person.seat = deepcopy(all_seats[seat_name])
+    if "roles" not in person_json:
+        log.debug("Roles not given")
+        return person
+
+    role_titles: List[str] = get_all_class_attr_values(RoleTitle)
+    person.seat.roles = []
+
+    for role_json in person_json["roles"]:
+        if role_json["body"] not in primary_bodies:
+            log.error(
+                f"{role_json} is ignored. "
+                f"{role_json['body']} is not defined in top-level 'primary_bodies'"
+            )
+        elif role_json["title"] not in role_titles:
+            log.error(
+                f"{role_json} is ignored. "
+                f"{role_json['title']} is not a RoleTitle constant."
+            )
+        else:
+            body = primary_bodies[role_json["body"]]
+            role: Role = Role.from_dict(
+                {k: v for k, v in role_json.items() if k != "body"}
+            )
+            role.body = body
+            person.seat.roles.append(role)
+
+    return person
+
+
+def parse_static_file(file_path: Path) -> Dict[str, Dict[str, IngestionModel]]:
+    with open(file_path) as static_file:
+        static_json: Dict[str, Dict[str, Any]] = json.load(static_file)
+
+        if "seats" not in static_json:
+            static_data: Dict[str, Dict[str, IngestionModel]] = {"seats": {}}
+        else:
+            static_data: Dict[str, Dict[str, IngestionModel]] = {
+                "seats": {
+                    seat_name: Seat.from_dict(seat)
+                    for seat_name, seat in static_json["seats"].items()
+                }
+            }
+
+        if "primary_bodies" not in static_json:
+            static_data["primary_bodies"] = {}
+        else:
+            static_data["primary_bodies"] = {
+                body_name: Body.from_dict(body)
+                for body_name, body in static_json["primary_bodies"].items()
+            }
+
+        if "persons" not in static_json:
+            static_data["persons"] = {}
+        else:
+            static_data["persons"] = {
+                person_name: parse_static_person(
+                    person, static_data["seats"], static_data["primary_bodies"]
+                )
+                for person_name, person in static_json["persons"].items()
+            }
+
+    return static_data
 
 
 class IngestionModelScraper:
