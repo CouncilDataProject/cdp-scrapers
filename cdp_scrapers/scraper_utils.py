@@ -16,6 +16,7 @@ from cdp_backend.pipeline.ingestion_models import (
     Seat,
 )
 from cdp_backend.utils.constants_utils import get_all_class_attr_values
+from .types import ScraperStaticData
 
 ###############################################################################
 
@@ -126,39 +127,37 @@ def parse_static_person(
     return person
 
 
-def parse_static_file(file_path: Path) -> Dict[str, Dict[str, IngestionModel]]:
+def parse_static_file(file_path: Path) -> ScraperStaticData:
     with open(file_path) as static_file:
         static_json: Dict[str, Dict[str, Any]] = json.load(static_file)
 
         if "seats" not in static_json:
-            static_data: Dict[str, Dict[str, IngestionModel]] = {"seats": {}}
+            seats: Dict[str, Seat] = {}
         else:
-            static_data: Dict[str, Dict[str, IngestionModel]] = {
-                "seats": {
-                    seat_name: Seat.from_dict(seat)
-                    for seat_name, seat in static_json["seats"].items()
-                }
+            seats: Dict[str, Seat] = {
+                seat_name: Seat.from_dict(seat)
+                for seat_name, seat in static_json["seats"].items()
             }
 
         if "primary_bodies" not in static_json:
-            static_data["primary_bodies"] = {}
+            primary_bodies: Dict[str, Body] = {}
         else:
-            static_data["primary_bodies"] = {
+            primary_bodies: Dict[str, Body] = {
                 body_name: Body.from_dict(body)
                 for body_name, body in static_json["primary_bodies"].items()
             }
 
         if "persons" not in static_json:
-            static_data["persons"] = {}
+            known_persons: Dict[str, Person] = {}
         else:
-            static_data["persons"] = {
-                person_name: parse_static_person(
-                    person, static_data["seats"], static_data["primary_bodies"]
-                )
+            known_persons: Dict[str, Person] = {
+                person_name: parse_static_person(person, seats, primary_bodies)
                 for person_name, person in static_json["persons"].items()
             }
 
-    return static_data
+        return ScraperStaticData(
+            seats=seats, primary_bodies=primary_bodies, persons=known_persons
+        )
 
 
 class IngestionModelScraper:
