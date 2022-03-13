@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from json import JSONDecodeError
 import logging
 import re
 from datetime import datetime, timedelta
+from json import JSONDecodeError
 from typing import Any, Dict, List, Optional, Set
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote_plus
@@ -23,14 +23,19 @@ from cdp_backend.pipeline.ingestion_models import (
     Matter,
     MinutesItem,
     Person,
+    Role,
     Session,
     SupportingFile,
     Vote,
-    Role,
 )
 
-from .types import ContentURIs
-from .scraper_utils import IngestionModelScraper, reduced_list, str_simplified
+from .scraper_utils import (
+    IngestionModelScraper,
+    reduced_list,
+    sanitize_roles,
+    str_simplified,
+)
+from .types import ContentURIs, ScraperStaticData
 
 ###############################################################################
 
@@ -431,10 +436,8 @@ class LegistarScraper(IngestionModelScraper):
         Regex pattern used to convert Legistar instance's minutes item failure to CDP
         constant value.
         Default: "not|fail"
-    known_persons: Optional[Dict[str, Person]]
-        Dictionary used to inject information into Persons in place of missing
-        attributes after dynamic scraping in get_events().
-        Default: None
+    known_static_data: Optional[ScraperStaticData]
+        predefined Seats, Bodies and Persons used to provide more accurate Person.seat.
     person_aliases: Optional[Dict[str, Set[str]]]
         Dictionary used to catch name aliases
         and resolve improperly unique Persons to the one correct Person.
@@ -463,7 +466,7 @@ class LegistarScraper(IngestionModelScraper):
         matter_rejected_pattern: str = r"rejected|dropped",
         minutes_item_decision_passed_pattern: str = r"pass",
         minutes_item_decision_failed_pattern: str = r"not|fail",
-        known_persons: Optional[Dict[str, Person]] = None,
+        known_static_data: Optional[ScraperStaticData] = None,
         person_aliases: Optional[Dict[str, Set[str]]] = None,
     ):
         super().__init__(timezone=timezone, person_aliases=person_aliases)
@@ -491,7 +494,7 @@ class LegistarScraper(IngestionModelScraper):
             minutes_item_decision_failed_pattern
         )
 
-        self.known_persons = known_persons
+        self.known_static_data = known_static_data
 
     def get_matter_status(self, legistar_matter_status: str) -> Optional[str]:
         """
@@ -725,7 +728,7 @@ class LegistarScraper(IngestionModelScraper):
         )
 
     def get_roles(
-        self, legistar_office_records: List[Dict[str, Any]]
+        self, person_name: str, legistar_office_records: List[Dict[str, Any]]
     ) -> Optional[List[Role]]:
         """
         Return list of CDP Role from list of legistar OfficeRecord
@@ -741,10 +744,11 @@ class LegistarScraper(IngestionModelScraper):
             From Legistar OfficeRecords. None if missing information.
         """
         if not legistar_office_records:
-            return None
+            legistar_office_records = []
 
-        return self.sanitize_roles(
-            reduced_list(
+        return sanitize_roles(
+            person_name=person_name,
+            roles=reduced_list(
                 [
                     self.get_none_if_empty(
                         Role(
@@ -767,7 +771,8 @@ class LegistarScraper(IngestionModelScraper):
                     )
                     for record in legistar_office_records
                 ]
-            )
+            ),
+            known_static_data=self.known_static_data,
         )
 
     def resolve_person_alias(self, person: Person) -> Optional[Person]:
@@ -1189,43 +1194,44 @@ class LegistarScraper(IngestionModelScraper):
 
     def inject_known_person(self, person: Person) -> Person:
         """
-        Inject information from self.known_persons
-        if person exists in the dictionary for long-term static data
+        Inject information if person exists in known_static_data.persons
 
         Parameters
         ----------
         person: Person
-            Person into which to inject data from known_persons
+            Person into which to inject data from known_static_data
 
         Returns
         -------
         Person
-            Input person updated with more information
-            or as-is if person not found in known_persons
+            Input person updated with information from known_static_data,
+            and seat.roles sanitized.
+
+        See Also
+        --------
+        scraper_utils.sanitize_roles()
         """
         try:
-            known_person = self.known_persons[person.name]
-        except (TypeError, KeyError):
+            known_person = self.known_static_data.persons[person.name]
+        except (AttributeError, KeyError):
             return person
 
         for attr in person.__dataclass_fields__.keys():
             static_info = getattr(known_person, attr)
             if static_info is not None:
-                # have long-term information provided in "static*.json"; just use it
+                # have long-term information provided in "static*.json"
                 setattr(person, attr, static_info)
-            else:
-                # use dynamically obtained information, which may be None
-                setattr(person, attr, getattr(person, attr))
 
         # now that we have seat from static hard-coded data
         # we can bring in seat.roles (OfficeRecords from Legistar API)
-        if person.seat and not person.seat.roles:
+        if person.seat is not None:
             person.seat.roles = self.get_roles(
-                get_legistar_person(
+                person_name=person.name,
+                legistar_office_records=get_legistar_person(
                     client=self.client_name,
                     person_id=person.external_source_id,
                     use_cache=True,
-                )[LEGISTAR_PERSON_ROLES]
+                )[LEGISTAR_PERSON_ROLES],
             )
 
         return person
@@ -1235,7 +1241,7 @@ class LegistarScraper(IngestionModelScraper):
     ) -> List[EventIngestionModel]:
         """
         Augment with long-term static data that changes very infrequently.
-        e.e. self.known_persons which includes Person.picture_uri, Person.seat
+        e.e. self.known_static_data which includes Person.picture_uri, Person.seat
 
         Parameters
         ----------
@@ -1247,8 +1253,8 @@ class LegistarScraper(IngestionModelScraper):
         events: List[EventIngestionModel]
             Input events with static information possibly injected
         """
-        # don't waste time if we don't have any static person info at all
-        if not self.known_persons:
+        # don't waste time if we don't have any info at all
+        if not self.known_static_data:
             return events
 
         for event in events:

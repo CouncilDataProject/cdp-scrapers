@@ -17,7 +17,7 @@ from ..legistar_utils import (
     LegistarScraper,
 )
 from ..scraper_utils import str_simplified
-from ..types import ContentURIs
+from ..types import ContentURIs, ScraperStaticData
 
 ###############################################################################
 
@@ -77,7 +77,7 @@ class KingCountyScraper(LegistarScraper):
                 "This is a mandatory referral to the",
                 "Watch King County TV Channel 22",
             ],
-            known_persons=known_persons,
+            known_static_data=ScraperStaticData(persons=known_persons),
         )
 
     def get_content_uris(self, legistar_ev: Dict) -> List[ContentURIs]:

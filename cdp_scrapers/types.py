@@ -17,6 +17,6 @@ class ContentURIs(NamedTuple):
 
 
 class ScraperStaticData(NamedTuple):
-    seats: Dict[str, Seat] = {}
-    primary_bodies: Dict[str, Body] = {}
-    persons: Dict[str, Person] = {}
+    seats: Dict[str, Seat] = None
+    primary_bodies: Dict[str, Body] = None
+    persons: Dict[str, Person] = None
