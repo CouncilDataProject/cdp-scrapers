@@ -83,9 +83,32 @@ def parse_static_person(
     all_seats: Dict[str, Seat],
     primary_bodies: Dict[str, Body],
 ) -> Person:
+    """
+    Parse Dict[str, Any] for a person in static data file to a Person instance.
+    person_json["seat"] and person_json["roles"] are validated against
+    all_seats and primary_bodies in static data file.
+
+    Parameters
+    ----------
+    person_json: Dict[str, Any]
+        A dictionary in static data file with info for a Person.
+
+    all_seats: Dict[str, Seat]
+        Seats defined as top-level in static data file
+
+    primary_bodies: Dict[str, Body]
+        Bodies defined as top-level in static data file.
+
+
+    See Also
+    --------
+    parse_static_file()
+    sanitize_roles()
+    """
     log.debug(f"Begin parsing static data for {person_json['name']}")
 
     person: Person = Person.from_dict(
+        # "seat" and "roles" are not direct serializations of Seat/Role
         {k: v for k, v in person_json.items() if k != "seat" and k != "roles"}
     )
     if "seat" not in person_json:
@@ -97,16 +120,17 @@ def parse_static_person(
         log.error(f"{seat_name} is not defined in top-level 'seats'")
         return person
 
+    # Keep all_seats unmodified; we will append Roles to this person.seat below
     person.seat = deepcopy(all_seats[seat_name])
     if "roles" not in person_json:
         log.debug("Roles not given")
         return person
 
+    # Role.title must be a RoleTitle constant so get all allowed values
     role_titles: List[str] = get_all_class_attr_values(RoleTitle)
-    person.seat.roles = []
-
     for role_json in person_json["roles"]:
         if (
+            # if str, it is looked-up in primary_bodies
             isinstance(role_json["body"], str)
             and role_json["body"] not in primary_bodies
         ):
@@ -126,14 +150,42 @@ def parse_static_person(
             if isinstance(role_json["body"], str):
                 role.body = primary_bodies[role_json["body"]]
             else:
+                # This role.body is a dictionary and defines a non-primary one
+                # e.g. like a committee such as Transportation
+                # that is not the main/full council
                 role.body = Body.from_dict(role_json["body"])
 
-            person.seat.roles.append(role)
+            if person.seat.roles is None:
+                person.seat.roles = [role]
+            else:
+                person.seat.roles.append(role)
 
     return person
 
 
 def parse_static_file(file_path: Path) -> ScraperStaticData:
+    """
+    Parse Seats, Bodies and Persons from static data JSON
+
+    Parameters
+    ----------
+    file_path: Path
+        Path to file containing static data in JSON
+
+    Returns
+    -------
+    ScraperStaticData:
+        Tuple[Dict[str, Seat], Dict[str, Body], Dict[str, Person]]
+
+    See Also
+    -----
+    parse_static_person()
+    sanitize_roles()
+
+    Notes
+    -----
+    Function looks for "seats", "primary_bodies", "persons" top-level keys
+    """
     with open(file_path) as static_file:
         static_json: Dict[str, Dict[str, Any]] = json.load(static_file)
 
@@ -212,6 +264,7 @@ def sanitize_roles(
         roles = []
 
     if not known_static_data or not known_static_data.primary_bodies:
+        # Primary/full council not defined in static data file
         primary_body_names = ["city council", "city briefing"]
     else:
         primary_body_names = [
@@ -239,6 +292,8 @@ def sanitize_roles(
             and str_simplified(role.body.name).lower() in primary_body_names
         ):
             if have_primary_roles:
+                # Primary roles for council defined in static data file.
+                # Use static information and ignore this scraped info.
                 roles[i] = None
             elif re.search("|".join(president_patterns), role_title, re.I) is not None:
                 role.title = RoleTitle.COUNCILPRESIDENT
@@ -249,6 +304,8 @@ def sanitize_roles(
                     terms.append(
                         CouncilMemberTerm(role.start_datetime, role.end_datetime, i)
                     )
+        # Role is not for a primary/full council
+        # Role.title cannot be Councilmember or Council President
         elif "vice" in role_title:
             role.title = RoleTitle.VICE_CHAIR
         elif re.search("|".join(president_patterns), role_title, re.I) is not None:
@@ -259,8 +316,10 @@ def sanitize_roles(
             role.title = RoleTitle.MEMBER
 
     if have_primary_roles:
+        # don't forget to include info from the static data file
         roles.extend(known_static_data.persons[person_name].seat.roles)
     if len(terms) == 0:
+        # no Councilmember roles dynamically scraped
         return reduced_list(roles)
 
     # sort in asc order of start_datetime and end_datetime.
