@@ -106,7 +106,10 @@ def parse_static_person(
     person.seat.roles = []
 
     for role_json in person_json["roles"]:
-        if role_json["body"] not in primary_bodies:
+        if (
+            isinstance(role_json["body"], str)
+            and role_json["body"] not in primary_bodies
+        ):
             log.error(
                 f"{role_json} is ignored. "
                 f"{role_json['body']} is not defined in top-level 'primary_bodies'"
@@ -117,11 +120,14 @@ def parse_static_person(
                 f"{role_json['title']} is not a RoleTitle constant."
             )
         else:
-            body = primary_bodies[role_json["body"]]
             role: Role = Role.from_dict(
                 {k: v for k, v in role_json.items() if k != "body"}
             )
-            role.body = body
+            if isinstance(role_json["body"], str):
+                role.body = primary_bodies[role_json["body"]]
+            else:
+                role.body = Body.from_dict(role_json["body"])
+
             person.seat.roles.append(role)
 
     return person

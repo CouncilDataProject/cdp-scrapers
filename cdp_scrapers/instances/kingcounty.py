@@ -4,7 +4,7 @@
 import logging
 import re
 import json
-from typing import Dict, List, Optional
+from typing import Dict, List
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
 from pathlib import Path
@@ -17,7 +17,7 @@ from ..legistar_utils import (
     LegistarScraper,
 )
 from ..scraper_utils import str_simplified, parse_static_file
-from ..types import ContentURIs, ScraperStaticData
+from ..types import ContentURIs
 
 ###############################################################################
 

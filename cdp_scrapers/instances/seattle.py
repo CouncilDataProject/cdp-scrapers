@@ -593,5 +593,7 @@ class SeattleScraper(LegistarScraper):
             return False
 
         with open(file_path, "wt") as dump:
-            dump.write(json.dumps({STATIC_FILE_KEY_PERSONS: static_person_info}, indent=4))
+            dump.write(
+                json.dumps({STATIC_FILE_KEY_PERSONS: static_person_info}, indent=4)
+            )
         return True
