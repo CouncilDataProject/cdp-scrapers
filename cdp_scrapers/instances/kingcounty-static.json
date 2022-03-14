@@ -181,7 +181,7 @@
                     "body": "Committee of the Whole",
                     "start_datetime": 1641024000,
                     "end_datetime": 1704009600,
-                    "title": "Chair"
+                    "title": "Council President"
                 }
             ],
             "external_source_id": null
@@ -313,12 +313,6 @@
                     "start_datetime": 1104566400,
                     "end_datetime": 1767168000,
                     "title": "Councilmember"
-                },
-                {
-                    "body": "Committee of the Whole",
-                    "start_datetime": 1641024000,
-                    "end_datetime": 1767168000,
-                    "title": "Vice Chair"
                 }
             ],
             "external_source_id": null
