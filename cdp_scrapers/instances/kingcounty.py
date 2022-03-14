@@ -16,7 +16,7 @@ from ..legistar_utils import (
     LEGISTAR_EV_SITE_URL,
     LegistarScraper,
 )
-from ..scraper_utils import str_simplified
+from ..scraper_utils import str_simplified, parse_static_file
 from ..types import ContentURIs, ScraperStaticData
 
 ###############################################################################
@@ -27,23 +27,6 @@ log = logging.getLogger(__name__)
 
 STATIC_FILE_KEY_PERSONS = "persons"
 STATIC_FILE_DEFAULT_PATH = Path(__file__).parent / "kingcounty-static.json"
-
-# will be passed into LegistarScraper.__init__()
-# to inject data into Persons to fill in information missing in Legistar API
-known_persons: Optional[Dict[str, Person]] = None
-
-# load long-term static data at file load-time, if file exists
-if Path(STATIC_FILE_DEFAULT_PATH).exists():
-    with open(STATIC_FILE_DEFAULT_PATH, "rb") as json_file:
-        static_data = json.load(json_file)
-
-    known_persons = {}
-    for name, person in static_data[STATIC_FILE_KEY_PERSONS].items():
-        known_persons[name] = Person.from_dict(person)
-
-
-if known_persons:
-    log.debug(f"loaded static data for {', '.join(known_persons.keys())}")
 
 ###############################################################################
 
@@ -77,7 +60,7 @@ class KingCountyScraper(LegistarScraper):
                 "This is a mandatory referral to the",
                 "Watch King County TV Channel 22",
             ],
-            known_static_data=ScraperStaticData(persons=known_persons),
+            known_static_data=parse_static_file(STATIC_FILE_DEFAULT_PATH),
         )
 
     def get_content_uris(self, legistar_ev: Dict) -> List[ContentURIs]:

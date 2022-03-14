@@ -227,7 +227,11 @@ def sanitize_roles(
     for i, role in enumerate(roles):
         role_title = str_simplified(role.title).lower()
 
-        if str_simplified(role.body.name).lower() in primary_body_names:
+        if (
+            role.body is not None
+            and role.body.name is not None
+            and str_simplified(role.body.name).lower() in primary_body_names
+        ):
             if have_primary_roles:
                 roles[i] = None
             elif re.search("|".join(president_patterns), role_title, re.I) is not None:

@@ -29,11 +29,9 @@ log = logging.getLogger(__name__)
 
 ###############################################################################
 
+STATIC_FILE_KEY_PERSONS = "persons"
 STATIC_FILE_DEFAULT_PATH = Path(__file__).parent / "seattle-static.json"
-if STATIC_FILE_DEFAULT_PATH.exists():
-    SCRAPER_STATIC_DATA = parse_static_file(STATIC_FILE_DEFAULT_PATH)
-else:
-    SCRAPER_STATIC_DATA = None
+
 # we have discovered the city clerk accidentally entered Daniel Strauss
 # instead of the correct Dan Strauss for a few events
 PERSON_ALIASES = {"Dan Strauss": set(["Daniel Strauss"])}
@@ -67,7 +65,7 @@ class SeattleScraper(LegistarScraper):
                 r".+:$",
                 "Pursuant to Washington State",
             ],
-            known_static_data=SCRAPER_STATIC_DATA,
+            known_static_data=parse_static_file(STATIC_FILE_DEFAULT_PATH),
             person_aliases=PERSON_ALIASES,
         )
 
@@ -595,5 +593,5 @@ class SeattleScraper(LegistarScraper):
             return False
 
         with open(file_path, "wt") as dump:
-            dump.write(json.dumps({"persons": static_person_info}, indent=4))
+            dump.write(json.dumps({STATIC_FILE_KEY_PERSONS: static_person_info}, indent=4))
         return True
