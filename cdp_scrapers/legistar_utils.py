@@ -728,7 +728,7 @@ class LegistarScraper(IngestionModelScraper):
         )
 
     def get_roles(
-        self, person_name: str, legistar_office_records: List[Dict[str, Any]]
+        self, legistar_office_records: List[Dict[str, Any]]
     ) -> Optional[List[Role]]:
         """
         Return list of CDP Role from list of legistar OfficeRecord
@@ -746,33 +746,29 @@ class LegistarScraper(IngestionModelScraper):
         if not legistar_office_records:
             legistar_office_records = []
 
-        return sanitize_roles(
-            person_name=person_name,
-            roles=reduced_list(
-                [
-                    self.get_none_if_empty(
-                        Role(
-                            body=self.get_body(record[LEGISTAR_ROLE_BODY]),
-                            # e.g. 2017-11-30T00:00:00
-                            start_datetime=self.localize_datetime(
-                                datetime.strptime(
-                                    record[LEGISTAR_ROLE_START],
-                                    LEGISTAR_DATETIME_FORMAT,
-                                )
-                            ),
-                            end_datetime=self.localize_datetime(
-                                datetime.strptime(
-                                    record[LEGISTAR_ROLE_END], LEGISTAR_DATETIME_FORMAT
-                                )
-                            ),
-                            external_source_id=str(record[LEGISTAR_ROLE_EXT_ID]),
-                            title=str_simplified(record[LEGISTAR_ROLE_TITLE]),
-                        )
+        return reduced_list(
+            [
+                self.get_none_if_empty(
+                    Role(
+                        body=self.get_body(record[LEGISTAR_ROLE_BODY]),
+                        # e.g. 2017-11-30T00:00:00
+                        start_datetime=self.localize_datetime(
+                            datetime.strptime(
+                                record[LEGISTAR_ROLE_START],
+                                LEGISTAR_DATETIME_FORMAT,
+                            )
+                        ),
+                        end_datetime=self.localize_datetime(
+                            datetime.strptime(
+                                record[LEGISTAR_ROLE_END], LEGISTAR_DATETIME_FORMAT
+                            )
+                        ),
+                        external_source_id=str(record[LEGISTAR_ROLE_EXT_ID]),
+                        title=str_simplified(record[LEGISTAR_ROLE_TITLE]),
                     )
-                    for record in legistar_office_records
-                ]
-            ),
-            known_static_data=self.known_static_data,
+                )
+                for record in legistar_office_records
+            ]
         )
 
     def resolve_person_alias(self, person: Person) -> Optional[Person]:
@@ -1225,13 +1221,16 @@ class LegistarScraper(IngestionModelScraper):
         # now that we have seat from static hard-coded data
         # we can bring in seat.roles (OfficeRecords from Legistar API)
         if person.seat is not None:
-            person.seat.roles = self.get_roles(
+            person.seat.roles = sanitize_roles(
                 person_name=person.name,
-                legistar_office_records=get_legistar_person(
-                    client=self.client_name,
-                    person_id=person.external_source_id,
-                    use_cache=True,
-                )[LEGISTAR_PERSON_ROLES],
+                roles=self.get_roles(
+                    legistar_office_records=get_legistar_person(
+                        client=self.client_name,
+                        person_id=person.external_source_id,
+                        use_cache=True,
+                    )[LEGISTAR_PERSON_ROLES]
+                ),
+                known_static_data=self.known_static_data,
             )
 
         return person
