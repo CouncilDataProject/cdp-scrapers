@@ -5,7 +5,7 @@
             "is_active": true,
             "router_string": null,
             "email": null,
-            "phone": null,
+            "phone": "206-684-8804",
             "website": null,
             "picture_uri": "https://www.seattle.gov/assets/Images/Council/Members/Pedersen/Councilmember-Alex-Pedersen_square-headshot.jpg",
             "seat": {
@@ -23,7 +23,7 @@
             "is_active": true,
             "router_string": null,
             "email": null,
-            "phone": null,
+            "phone": "206-684-8807",
             "website": null,
             "picture_uri": "https://www.seattle.gov/assets/Images/Council/Members/Lewis/Andrew-Lewis-Campaign-Headshot_300x300.jpg",
             "seat": {
@@ -41,7 +41,7 @@
             "is_active": true,
             "router_string": null,
             "email": null,
-            "phone": null,
+            "phone": "206-684-8806",
             "website": null,
             "picture_uri": "https://www.seattle.gov/assets/Images/Council/Members/Strauss/strauss_headshot_300x300.jpg",
             "seat": {
@@ -59,7 +59,7 @@
             "is_active": true,
             "router_string": null,
             "email": null,
-            "phone": null,
+            "phone": "206-684-8805",
             "website": null,
             "picture_uri": "https://www.seattle.gov/assets/Images/Council/Members/Juarez/Debora-Juarez-2018_225x225.jpg",
             "seat": {
@@ -77,7 +77,7 @@
             "is_active": true,
             "router_string": null,
             "email": null,
-            "phone": null,
+            "phone": "206-684-8803",
             "website": null,
             "picture_uri": "https://www.seattle.gov/assets/Images/Council/Members/Sawant/Sawant_225x225.jpg",
             "seat": {
@@ -93,7 +93,7 @@
         "Lisa Herbold": {
             "name": "Lisa Herbold",
             "is_active": true,
-            "router_string": null,
+            "router_string": "206-684-8801",
             "email": null,
             "phone": null,
             "website": null,
@@ -131,7 +131,7 @@
             "is_active": true,
             "router_string": null,
             "email": null,
-            "phone": null,
+            "phone": "206-684-8809",
             "website": null,
             "picture_uri": "https://www.seattle.gov/images/Council/Members/Nelson/nelson_300x300.jpg",
             "seat": {
@@ -149,7 +149,7 @@
             "is_active": true,
             "router_string": null,
             "email": null,
-            "phone": null,
+            "phone": "206-684-8802",
             "website": null,
             "picture_uri": "https://www.seattle.gov/assets/Images/Council/Members/Morales/Tammy-Morales_headshot_final_300x300.jpg",
             "seat": {
@@ -167,7 +167,7 @@
             "is_active": true,
             "router_string": null,
             "email": null,
-            "phone": null,
+            "phone": "206-684-8808",
             "website": null,
             "picture_uri": "https://www.seattle.gov/assets/Images/Council/Members/Mosqueda/Mosqueda_225x225.jpg",
             "seat": {
