@@ -190,9 +190,9 @@
         "Lisa Herbold": {
             "name": "Lisa Herbold",
             "is_active": true,
-            "router_string": "206-684-8801",
+            "router_string": null,
             "email": null,
-            "phone": null,
+            "phone": "206-684-8801",
             "website": null,
             "picture_uri": "https://www.seattle.gov/assets/Images/Council/Members/Herbold/Herbold_225x225.jpg",
             "seat": "Position 1",

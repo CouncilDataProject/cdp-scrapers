@@ -89,10 +89,12 @@ LEGISTAR_MINUTE_NAME = "EventItemTitle"
 LEGISTAR_VOTE_VAL_ID = "VoteValueId"
 LEGISTAR_VOTE_VAL_NAME = "VoteValueName"
 LEGISTAR_ROLE_BODY = "OfficeRecordBodyInfo"
+LEGISTAR_ROLE_BODY_ALT = "OfficeRecordBodyName"
 LEGISTAR_ROLE_START = "OfficeRecordStartDate"
 LEGISTAR_ROLE_END = "OfficeRecordEndDate"
 LEGISTAR_ROLE_EXT_ID = "OfficeRecordId"
 LEGISTAR_ROLE_TITLE = "OfficeRecordTitle"
+LEGISTAR_ROLE_TITLE_ALT = "OfficeRecordMemberType"
 
 LEGISTAR_EV_ITEMS = "EventItems"
 LEGISTAR_EV_ATTACHMENTS = "EventItemMatterAttachments"
@@ -750,7 +752,14 @@ class LegistarScraper(IngestionModelScraper):
             [
                 self.get_none_if_empty(
                     Role(
-                        body=self.get_body(record[LEGISTAR_ROLE_BODY]),
+                        body=(
+                            self.get_body(record[LEGISTAR_ROLE_BODY])
+                            or self.get_none_if_empty(
+                                Body(
+                                    name=str_simplified(record[LEGISTAR_ROLE_BODY_ALT]),
+                                )
+                            )
+                        ),
                         # e.g. 2017-11-30T00:00:00
                         start_datetime=self.localize_datetime(
                             datetime.strptime(
@@ -764,7 +773,10 @@ class LegistarScraper(IngestionModelScraper):
                             )
                         ),
                         external_source_id=str(record[LEGISTAR_ROLE_EXT_ID]),
-                        title=str_simplified(record[LEGISTAR_ROLE_TITLE]),
+                        title=(
+                            str_simplified(record[LEGISTAR_ROLE_TITLE])
+                            or str_simplified(record[LEGISTAR_ROLE_TITLE_ALT])
+                        ),
                     )
                 )
                 for record in legistar_office_records
