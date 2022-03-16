@@ -751,8 +751,10 @@ class LegistarScraper(IngestionModelScraper):
                     Role(
                         body=(
                             self.get_body(record[LEGISTAR_ROLE_BODY])
-                            or Body(
-                                name=str_simplified(record[LEGISTAR_ROLE_BODY_ALT]),
+                            or self.get_none_if_empty(
+                                Body(
+                                    name=str_simplified(record[LEGISTAR_ROLE_BODY_ALT]),
+                                )
                             )
                         ),
                         # e.g. 2017-11-30T00:00:00
