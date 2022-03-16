@@ -196,10 +196,12 @@
 <span class="n">LEGISTAR_VOTE_VAL_ID</span> <span class="o">=</span> <span class="s2">&quot;VoteValueId&quot;</span>
 <span class="n">LEGISTAR_VOTE_VAL_NAME</span> <span class="o">=</span> <span class="s2">&quot;VoteValueName&quot;</span>
 <span class="n">LEGISTAR_ROLE_BODY</span> <span class="o">=</span> <span class="s2">&quot;OfficeRecordBodyInfo&quot;</span>
+<span class="n">LEGISTAR_ROLE_BODY_ALT</span> <span class="o">=</span> <span class="s2">&quot;OfficeRecordBodyName&quot;</span>
 <span class="n">LEGISTAR_ROLE_START</span> <span class="o">=</span> <span class="s2">&quot;OfficeRecordStartDate&quot;</span>
 <span class="n">LEGISTAR_ROLE_END</span> <span class="o">=</span> <span class="s2">&quot;OfficeRecordEndDate&quot;</span>
 <span class="n">LEGISTAR_ROLE_EXT_ID</span> <span class="o">=</span> <span class="s2">&quot;OfficeRecordId&quot;</span>
 <span class="n">LEGISTAR_ROLE_TITLE</span> <span class="o">=</span> <span class="s2">&quot;OfficeRecordTitle&quot;</span>
+<span class="n">LEGISTAR_ROLE_TITLE_ALT</span> <span class="o">=</span> <span class="s2">&quot;OfficeRecordMemberType&quot;</span>
 
 <span class="n">LEGISTAR_EV_ITEMS</span> <span class="o">=</span> <span class="s2">&quot;EventItems&quot;</span>
 <span class="n">LEGISTAR_EV_ATTACHMENTS</span> <span class="o">=</span> <span class="s2">&quot;EventItemMatterAttachments&quot;</span>
@@ -859,7 +861,14 @@
             <span class="p">[</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>
                     <span class="n">Role</span><span class="p">(</span>
-                        <span class="n">body</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_body</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="n">LEGISTAR_ROLE_BODY</span><span class="p">]),</span>
+                        <span class="n">body</span><span class="o">=</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">get_body</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="n">LEGISTAR_ROLE_BODY</span><span class="p">])</span>
+                            <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>
+                                <span class="n">Body</span><span class="p">(</span>
+                                    <span class="n">name</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="n">LEGISTAR_ROLE_BODY_ALT</span><span class="p">]),</span>
+                                <span class="p">)</span>
+                            <span class="p">)</span>
+                        <span class="p">),</span>
                         <span class="c1"># e.g. 2017-11-30T00:00:00</span>
                         <span class="n">start_datetime</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">localize_datetime</span><span class="p">(</span>
                             <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span>
@@ -873,7 +882,10 @@
                             <span class="p">)</span>
                         <span class="p">),</span>
                         <span class="n">external_source_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="n">LEGISTAR_ROLE_EXT_ID</span><span class="p">]),</span>
-                        <span class="n">title</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="n">LEGISTAR_ROLE_TITLE</span><span class="p">]),</span>
+                        <span class="n">title</span><span class="o">=</span><span class="p">(</span>
+                            <span class="n">str_simplified</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="n">LEGISTAR_ROLE_TITLE</span><span class="p">])</span>
+                            <span class="ow">or</span> <span class="n">str_simplified</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="n">LEGISTAR_ROLE_TITLE_ALT</span><span class="p">])</span>
+                        <span class="p">),</span>
                     <span class="p">)</span>
                 <span class="p">)</span>
                 <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">legistar_office_records</span>
