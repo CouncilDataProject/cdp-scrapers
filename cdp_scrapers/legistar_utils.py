@@ -88,6 +88,7 @@ LEGISTAR_ROLE_START = "OfficeRecordStartDate"
 LEGISTAR_ROLE_END = "OfficeRecordEndDate"
 LEGISTAR_ROLE_EXT_ID = "OfficeRecordId"
 LEGISTAR_ROLE_TITLE = "OfficeRecordTitle"
+LEGISTAR_ROLE_ALT_TITLE = "OfficeRecordMemberType"
 
 LEGISTAR_EV_ITEMS = "EventItems"
 LEGISTAR_EV_ATTACHMENTS = "EventItemMatterAttachments"
@@ -761,7 +762,10 @@ class LegistarScraper(IngestionModelScraper):
                             )
                         ),
                         external_source_id=str(record[LEGISTAR_ROLE_EXT_ID]),
-                        title=str_simplified(record[LEGISTAR_ROLE_TITLE]),
+                        title=(
+                            str_simplified(record[LEGISTAR_ROLE_TITLE])
+                            or str_simplified(record[LEGISTAR_ROLE_ALT_TITLE])
+                        ),
                     )
                 )
                 for record in legistar_office_records
