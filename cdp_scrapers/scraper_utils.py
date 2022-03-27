@@ -4,7 +4,7 @@ from copy import deepcopy
 from datetime import datetime, timedelta
 from logging import getLogger
 from pathlib import Path
-from typing import Any, Callable, Dict, List, NamedTuple, Optional, Set
+from typing import Any, Dict, List, NamedTuple, Optional, Set
 
 import pytz
 from cdp_backend.database.constants import RoleTitle
@@ -228,7 +228,7 @@ def sanitize_roles(
     person_name: str,
     roles: Optional[List[Role]] = None,
     known_static_data: Optional[ScraperStaticData] = None,
-    president_patterns: List[str] = ["chair", "pres", "super"],
+    leader_patterns: List[str] = ["chair", "pres", "super"],
 ) -> Optional[List[Role]]:
     """
     1. Standardize roles[i].title to RoleTitle constants
@@ -246,7 +246,7 @@ def sanitize_roles(
         Static data defining primary council bodies and predefined Person.seat.roles.
         See Notes.
 
-    president_patterns: List[str]
+    leader_patterns: List[str]
         roles[i].title = "Council President" or "Chair" if match
 
     Notes
@@ -275,70 +275,109 @@ def sanitize_roles(
         have_primary_roles = len(known_static_data.persons[person_name].seat.roles) > 0
     except (KeyError, AttributeError, TypeError):
         have_primary_roles = False
-    def role_period_is_accepted(role: Role) -> bool:
-        if not role.start_datetime is None or role.end_datetime is None:
+
+    def _is_role_period_ok(role: Role) -> bool:
+        """
+        Test that role.[start | end]_datetime is acceptable
+        """
+        if role.start_datetime is None or role.end_datetime is None:
             return False
         if not have_primary_roles:
-            return role.start_datetime <= datetime.today() and datetime.today() <= role.end_datetime
+            # no roles in static data; accept if this this role is current
+            return (
+                role.start_datetime <= datetime.today()
+                and datetime.today() <= role.end_datetime
+            )
+        # accept if role coincides with one given in static data
         for static_role in known_static_data.persons[person_name].seat.roles:
-            if static_role.start_datetime <= role.start_datetime and role.end_datetime <= static_role.end_datetime:
+            if (
+                static_role.start_datetime <= role.start_datetime
+                and role.end_datetime <= static_role.end_datetime
+            ):
                 return True
         return False
+
+    def _is_primary_body(role: Role) -> bool:
+        """
+        Is role.body one of primary_bodies in static data file
+        """
+        return (
+            role.body is not None
+            and role.body.name is not None
+            and str_simplified(role.body.name).lower() in primary_body_names
+        )
+
+    def _get_primary_title(role: Role) -> str:
+        """
+        Council president or Councilmember
+        """
+        if (
+            re.search("|".join(leader_patterns), str_simplified(role.title), re.I)
+            is not None
+        ):
+            return RoleTitle.COUNCILPRESIDENT
+        return RoleTitle.COUNCILMEMBER
+
+    def _get_nonprimary_title(role: Role) -> str:
+        """
+        Chair, Vice Chair, Alternate or Member
+        """
+        role_title = str_simplified(role.title).lower()
+        # Role is not for a primary/full council
+        # Role.title cannot be Councilmember or Council President
+        if "vice" in role_title:
+            return RoleTitle.VICE_CHAIR
+        if re.search("|".join(leader_patterns), role_title, re.I) is not None:
+            return RoleTitle.CHAIR
+        if "alt" in role_title:
+            return RoleTitle.ALTERNATE
+        return RoleTitle.MEMBER
+
+    def _is_councilmember_term(role: Role) -> bool:
+        return (
+            role.title == RoleTitle.COUNCILMEMBER
+            and role.start_datetime is not None
+            and role.end_datetime is not None
+        )
 
     class CouncilMemberTerm(NamedTuple):
         start_datetime: datetime
         end_datetime: datetime
         roles_index: int
 
-    terms: List[CouncilMemberTerm] = []
+    scraped_terms: List[CouncilMemberTerm] = []
 
     for i, role in enumerate(roles):
-        role_title = str_simplified(role.title).lower()
-
-        if not role_period_is_accepted(role):
+        if not _is_role_period_ok(role):
             roles[i] = None
-        elif (
-            role.body is not None
-            and role.body.name is not None
-            and str_simplified(role.body.name).lower() in primary_body_names
-        ):
-            if have_primary_roles:
-                # Primary roles for council defined in static data file.
-                # Use static information and ignore this scraped info.
-                roles[i] = None
-            elif re.search("|".join(president_patterns), role_title, re.I) is not None:
-                role.title = RoleTitle.COUNCILPRESIDENT
-            else:
-                role.title = RoleTitle.COUNCILMEMBER
-                # get all councilmember terms
-                if role.start_datetime is not None and role.end_datetime is not None:
-                    terms.append(
-                        CouncilMemberTerm(role.start_datetime, role.end_datetime, i)
-                    )
-        # Role is not for a primary/full council
-        # Role.title cannot be Councilmember or Council President
-        elif "vice" in role_title:
-            role.title = RoleTitle.VICE_CHAIR
-        elif re.search("|".join(president_patterns), role_title, re.I) is not None:
-            role.title = RoleTitle.CHAIR
-        elif "alt" in role_title:
-            role.title = RoleTitle.ALTERNATE
+        elif not _is_primary_body(role):
+            # Role is not for a primary/full council
+            # Role.title cannot be Councilmember or Council President
+            role.title = _get_nonprimary_title(role)
+        elif have_primary_roles:
+            # Primary roles for council defined in static data file.
+            # Use static information and ignore this scraped info.
+            roles[i] = None
         else:
-            role.title = RoleTitle.MEMBER
+            role.title = _get_primary_title(role)
+            if _is_councilmember_term(role):
+                scraped_terms.append(
+                    CouncilMemberTerm(role.start_datetime, role.end_datetime, i)
+                )
 
     if have_primary_roles:
         # don't forget to include info from the static data file
         roles.extend(known_static_data.persons[person_name].seat.roles)
-    if len(terms) == 0:
+    if len(scraped_terms) == 0:
         # no Councilmember roles dynamically scraped
         return reduced_list(roles)
 
-    terms.sort(key=lambda t: (t.start_datetime, t.end_datetime))
+    scraped_terms.sort(key=lambda t: (t.start_datetime, t.end_datetime))
     # if term i overlaps with term j, end term i before term j
-    for i, term in enumerate(terms[:-1]):
-        if terms[i].end_datetime > terms[i + 1].start_datetime:
+    for i, term in enumerate(scraped_terms[:-1]):
+        if scraped_terms[i].end_datetime > scraped_terms[i + 1].start_datetime:
             # reflect adjusted role end date in the actual roles list
-            roles[terms[i].roles_index].end_datetime = terms[
+            roles[scraped_terms[i].roles_index].end_datetime = scraped_terms[
                 i + 1
             ].start_datetime - timedelta(days=1)
 
