@@ -4,7 +4,7 @@ from copy import deepcopy
 from datetime import datetime, timedelta
 from logging import getLogger
 from pathlib import Path
-from typing import Any, Dict, List, NamedTuple, Optional, Set
+from typing import Any, Callable, Dict, List, NamedTuple, Optional, Set
 
 import pytz
 from cdp_backend.database.constants import RoleTitle
@@ -275,6 +275,15 @@ def sanitize_roles(
         have_primary_roles = len(known_static_data.persons[person_name].seat.roles) > 0
     except (KeyError, AttributeError, TypeError):
         have_primary_roles = False
+    def role_period_is_accepted(role: Role) -> bool:
+        if not role.start_datetime is None or role.end_datetime is None:
+            return False
+        if not have_primary_roles:
+            return role.start_datetime <= datetime.today() and datetime.today() <= role.end_datetime
+        for static_role in known_static_data.persons[person_name].seat.roles:
+            if static_role.start_datetime <= role.start_datetime and role.end_datetime <= static_role.end_datetime:
+                return True
+        return False
 
     class CouncilMemberTerm(NamedTuple):
         start_datetime: datetime
@@ -286,7 +295,9 @@ def sanitize_roles(
     for i, role in enumerate(roles):
         role_title = str_simplified(role.title).lower()
 
-        if (
+        if not role_period_is_accepted(role):
+            roles[i] = None
+        elif (
             role.body is not None
             and role.body.name is not None
             and str_simplified(role.body.name).lower() in primary_body_names
