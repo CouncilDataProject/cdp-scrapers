@@ -333,8 +333,7 @@ def sanitize_roles(
         # no Councilmember roles dynamically scraped
         return reduced_list(roles)
 
-    # sort in asc order of start_datetime and end_datetime.
-    terms.sort()
+    terms.sort(key=lambda t: (t.start_datetime, t.end_datetime))
     # if term i overlaps with term j, end term i before term j
     for i, term in enumerate(terms[:-1]):
         if terms[i].end_datetime > terms[i + 1].start_datetime:
