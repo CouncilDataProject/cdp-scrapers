@@ -265,7 +265,7 @@ def sanitize_roles(
 
     if not known_static_data or not known_static_data.primary_bodies:
         # Primary/full council not defined in static data file
-        primary_body_names = ["city council", "city briefing"]
+        primary_body_names = ["city council", "council briefing"]
     else:
         primary_body_names = [
             body_name.lower() for body_name in known_static_data.primary_bodies.keys()
