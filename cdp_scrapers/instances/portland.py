@@ -529,7 +529,7 @@ class PortlandScraper(IngestionModelScraper):
             matter = self.get_matter(minute_section)
             if matter is not None:
                 minute_name = self.get_doc_number(minute_section)
-                if minute_name == None:
+                if minute_name is None:
                     minute_name = self.get_section_top_number(minute_section)
                 minutes_item = self.get_none_if_empty(
                     MinutesItem(name=minute_name, description=matter.title)
