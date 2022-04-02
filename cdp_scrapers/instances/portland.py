@@ -291,7 +291,7 @@ class PortlandScraper(IngestionModelScraper):
         matter_type = None
         matter_title = None
 
-        if title_div != None:
+        if title_div is not None:
             matter_title = title_div.find("a").text.strip()
 
             # Find type
