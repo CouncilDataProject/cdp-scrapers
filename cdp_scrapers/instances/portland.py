@@ -237,7 +237,7 @@ class PortlandScraper(IngestionModelScraper):
 
         return known_persons[name]
 
-    def get_doc_number(self, minute_section: Tag) -> str:
+    def get_doc_number(self, minute_section: Tag, event_page: BeautifulSoup) -> str:
         """
         Find the document number in the minute_section.
 
@@ -245,11 +245,14 @@ class PortlandScraper(IngestionModelScraper):
         ----------
         minute_section: Tag
             <div> within event web page for a given event minute item
+        event_page: BeautifulSoup
+            The entire page where the event is found
 
         Returns
         -------
         doc_number: str
             The document number in the minute_section
+            If this is null, return the section top number with the year
         """
         # Find document number
         doc_number_element_sibling = minute_section.find(
@@ -258,12 +261,14 @@ class PortlandScraper(IngestionModelScraper):
 
         # If there is no document number, skip this minute item
         if doc_number_element_sibling is None:
-            return None
+            return self.get_section_top_number(minute_section, event_page)
         doc_number_element = doc_number_element_sibling.next_sibling
         doc_number = doc_number_element.find("div", class_="field__item").text.strip()
         return doc_number
 
-    def get_section_top_number(self, minute_section: Tag) -> str:
+    def get_section_top_number(
+        self, minute_section: Tag, event_page: BeautifulSoup
+    ) -> str:
         """
         Find the top section number in the minute_section.
 
@@ -271,15 +276,28 @@ class PortlandScraper(IngestionModelScraper):
         ----------
         minute_section: Tag
             <div> within event web page for a given event minute item
+        event_page: BeautifulSoup
+            The entire page where the event is found
 
         Returns
         -------
         doc_number: str
-            The top section number in the minute_section
+            The top section number in the minute_section, with the year appended at the
+            end
         """
-        return minute_section.find("h4").text.strip()
+        agenda_name = event_page.find("title").text.strip()
+        base_minute_section = minute_section.find("h4").text.strip()
+        if agenda_name is not None:
+            return (
+                base_minute_section
+                + "-"
+                + agenda_name[agenda_name.index(",") + 2 : agenda_name.index(",") + 6]
+            )
+        return base_minute_section
 
-    def get_matter(self, minute_section: Tag) -> Optional[Matter]:
+    def get_matter(
+        self, minute_section: Tag, event_page: BeautifulSoup
+    ) -> Optional[Matter]:
         """
         Make Matter from information in minute_section
 
@@ -287,6 +305,8 @@ class PortlandScraper(IngestionModelScraper):
         ----------
         minute_section: Tag
             <div> within event web page for a given event minute item
+        event_page: BeautifulSoup
+            The entire page where the event is found
 
         Returns
         -------
@@ -358,7 +378,7 @@ class PortlandScraper(IngestionModelScraper):
         return self.get_none_if_empty(
             Matter(
                 matter_type=matter_type,
-                name=self.get_section_top_number(minute_section),
+                name=self.get_doc_number(minute_section, event_page),
                 sponsors=sponsor_list,
                 title=matter_title,
                 result_status=result_status,
@@ -535,11 +555,11 @@ class PortlandScraper(IngestionModelScraper):
         )
         event_minute_items = []
         for minute_section in minute_sections:
-            matter = self.get_matter(minute_section)
+            matter = self.get_matter(minute_section, event_page)
             if matter is not None:
-                minute_name = self.get_doc_number(minute_section)
+                minute_name = self.get_doc_number(minute_section, event_page)
                 if minute_name is None:
-                    minute_name = self.get_section_top_number(minute_section)
+                    minute_name = self.get_doc_number(minute_section, event_page)
                 minutes_item = self.get_none_if_empty(
                     MinutesItem(name=minute_name, description=matter.title)
                 )
