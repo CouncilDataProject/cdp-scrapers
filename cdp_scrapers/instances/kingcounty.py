@@ -12,7 +12,6 @@ from pathlib import Path
 from bs4 import BeautifulSoup
 
 from cdp_backend.pipeline.ingestion_models import Person, Seat
-from cdp_backend.database.constants import RoleTitle
 from ..legistar_utils import (
     LEGISTAR_EV_SITE_URL,
     LegistarScraper,
