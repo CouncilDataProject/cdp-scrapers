@@ -444,6 +444,11 @@ class LegistarScraper(IngestionModelScraper):
         Dictionary used to catch name aliases
         and resolve improperly unique Persons to the one correct Person.
         Default: None
+    role_replacements: Optional[Dict[str, str]]
+        Dictionary used to replace role titles with CDP standard role titles.
+        The keys should be titles you want to replace and the values should be a
+        CDP standard role.
+        Default: None
 
     See Also
     --------
@@ -470,6 +475,7 @@ class LegistarScraper(IngestionModelScraper):
         minutes_item_decision_failed_pattern: str = r"not|fail",
         known_static_data: Optional[ScraperStaticData] = None,
         person_aliases: Optional[Dict[str, Set[str]]] = None,
+        role_replacements: Optional[Dict[str, str]] = None,
     ):
         super().__init__(timezone=timezone, person_aliases=person_aliases)
 
@@ -497,6 +503,7 @@ class LegistarScraper(IngestionModelScraper):
         )
 
         self.known_static_data = known_static_data
+        self.role_replacements = role_replacements or {}
 
     def get_matter_status(self, legistar_matter_status: str) -> Optional[str]:
         """
@@ -729,6 +736,29 @@ class LegistarScraper(IngestionModelScraper):
             )
         )
 
+    def use_or_replace_role(self, role_title: str) -> str:
+        """
+        Lookup if the provided role title should be replaced with a CDP standard value.
+        If the provided role title should be replaced, then return the proper
+        replacement title, otherwise if the title wasn't found in the role replacement
+        lookup table, return the provided role_title unchanged.
+
+        Parameters
+        ----------
+        role_title: str
+            The role title to check and potentially replace with a CDP standard.
+
+        Returns
+        -------
+        role_title: str
+            The original role title if no replacement was found in the role replacements
+            lookup-table, or the CDP standard title swapped from the lookup-table.
+        """
+        if role_title in self.role_replacements:
+            return self.role_replacements[role_title]
+
+        return role_title
+
     def get_roles(
         self, legistar_office_records: List[Dict[str, Any]]
     ) -> Optional[List[Role]]:
@@ -773,7 +803,7 @@ class LegistarScraper(IngestionModelScraper):
                             )
                         ),
                         external_source_id=str(record[LEGISTAR_ROLE_EXT_ID]),
-                        title=(
+                        title=self.use_or_replace_role(
                             str_simplified(record[LEGISTAR_ROLE_TITLE])
                             or str_simplified(record[LEGISTAR_ROLE_TITLE_ALT])
                         ),
