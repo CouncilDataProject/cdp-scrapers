@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from copy import deepcopy
 import logging
 import re
 from datetime import datetime, timedelta
@@ -1250,7 +1251,7 @@ class LegistarScraper(IngestionModelScraper):
         scraper_utils.sanitize_roles()
         """
         try:
-            known_person = self.known_static_data.persons[person.name]
+            known_person = deepcopy(self.known_static_data.persons[person.name])
         except (AttributeError, KeyError):
             return person
 
