@@ -239,6 +239,27 @@ council meeting</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="cdp_scrapers.instances.portland.PortlandScraper.get_doc_number">
+<span class="sig-name descname"><span class="pre">get_doc_number</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">minute_section</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bs4.element.Tag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_page</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bs4.BeautifulSoup</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/portland.html#PortlandScraper.get_doc_number"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.portland.PortlandScraper.get_doc_number" title="Permalink to this definition"></a></dt>
+<dd><p>Find the document number in the minute_section.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>minute_section</strong> (<em>Tag</em>) – &lt;div&gt; within event web page for a given event minute item</p></li>
+<li><p><strong>event_page</strong> (<em>BeautifulSoup</em>) – The entire page where the event is found</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>doc_number</strong> – The document number in the minute_section
+If this is null, return the section top number with the year</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.instances.portland.PortlandScraper.get_event">
 <span class="sig-name descname"><span class="pre">get_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime.datetime</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.EventIngestionModel</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/portland.html#PortlandScraper.get_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.portland.PortlandScraper.get_event" title="Permalink to this definition"></a></dt>
 <dd><p>Portland, OR city council meeting information for a specific date</p>
@@ -301,11 +322,14 @@ Default is UTC now</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.instances.portland.PortlandScraper.get_matter">
-<span class="sig-name descname"><span class="pre">get_matter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">minute_section</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bs4.element.Tag</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.Matter</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/portland.html#PortlandScraper.get_matter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.portland.PortlandScraper.get_matter" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_matter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">minute_section</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bs4.element.Tag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_page</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bs4.BeautifulSoup</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">cdp_backend.pipeline.ingestion_models.Matter</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/portland.html#PortlandScraper.get_matter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.portland.PortlandScraper.get_matter" title="Permalink to this definition"></a></dt>
 <dd><p>Make Matter from information in minute_section</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>minute_section</strong> (<em>Tag</em>) – &lt;div&gt; within event web page for a given event minute item</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>minute_section</strong> (<em>Tag</em>) – &lt;div&gt; within event web page for a given event minute item</p></li>
+<li><p><strong>event_page</strong> (<em>BeautifulSoup</em>) – The entire page where the event is found</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>matter</strong> – Matter if required information could be parsed from minute_section</p>
@@ -336,6 +360,27 @@ Default is UTC now</p></li>
 </dl>
 <p class="rubric">References</p>
 <p>portland-static.json</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cdp_scrapers.instances.portland.PortlandScraper.get_section_top_number">
+<span class="sig-name descname"><span class="pre">get_section_top_number</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">minute_section</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bs4.element.Tag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_page</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bs4.BeautifulSoup</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/portland.html#PortlandScraper.get_section_top_number"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.portland.PortlandScraper.get_section_top_number" title="Permalink to this definition"></a></dt>
+<dd><p>Find the top section number in the minute_section.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>minute_section</strong> (<em>Tag</em>) – &lt;div&gt; within event web page for a given event minute item</p></li>
+<li><p><strong>event_page</strong> (<em>BeautifulSoup</em>) – The entire page where the event is found</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>doc_number</strong> – The top section number in the minute_section, with the year appended at the
+end</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
