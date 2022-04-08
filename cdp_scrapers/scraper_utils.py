@@ -343,12 +343,13 @@ def sanitize_roles(
     class CouncilMemberTerm(NamedTuple):
         start_datetime: datetime
         end_datetime: datetime
-        roles_index: int
+        index_in_roles: int
 
-    scraped_terms: List[CouncilMemberTerm] = []
+    scraped_terms: Dict[str, List[CouncilMemberTerm]] = {}
 
     for i, role in enumerate(roles):
         if not _is_role_period_ok(role):
+            # Nones get removed below
             roles[i] = None
         elif not _is_primary_body(role):
             # Role is not for a primary/full council
@@ -361,9 +362,14 @@ def sanitize_roles(
         else:
             role.title = _get_primary_title(role)
             if _is_councilmember_term(role):
-                scraped_terms.append(
-                    CouncilMemberTerm(role.start_datetime, role.end_datetime, i)
-                )
+                try:
+                    scraped_terms[role.body.name].append(
+                        CouncilMemberTerm(role.start_datetime, role.end_datetime, i)
+                    )
+                except KeyError:
+                    scraped_terms[role.body.name] = [
+                        CouncilMemberTerm(role.start_datetime, role.end_datetime, i)
+                    ]
 
     if have_primary_roles:
         # don't forget to include info from the static data file
@@ -372,14 +378,19 @@ def sanitize_roles(
         # no Councilmember roles dynamically scraped
         return reduced_list(roles)
 
-    scraped_terms.sort(key=lambda t: (t.start_datetime, t.end_datetime))
-    # if term i overlaps with term j, end term i before term j
-    for i, term in enumerate(scraped_terms[:-1]):
-        if scraped_terms[i].end_datetime > scraped_terms[i + 1].start_datetime:
-            # reflect adjusted role end date in the actual roles list
-            roles[scraped_terms[i].roles_index].end_datetime = scraped_terms[
-                i + 1
-            ].start_datetime - timedelta(days=1)
+    # when checking for overlapping terms, we should do so per body.
+    # e.g. membership during same period of time for city council and council briefing
+    # should not be treated as error
+
+    for body, terms in scraped_terms.items():
+        terms.sort(key=lambda t: (t.start_datetime, t.end_datetime))
+        # if term i overlaps with term j, end term i before term j
+        for i, term in enumerate(terms):
+            if terms[i].end_datetime > terms[i + 1].start_datetime:
+                # reflect adjusted role end date in the actual roles list
+                roles[terms[i].index_in_roles].end_datetime = terms[
+                    i + 1
+                ].start_datetime - timedelta(days=1)
 
     return reduced_list(roles)
 
