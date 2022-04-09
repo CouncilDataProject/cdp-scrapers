@@ -191,7 +191,14 @@
                 <span class="s2">&quot;Watch King County TV Channel 22&quot;</span><span class="p">,</span>
             <span class="p">],</span>
             <span class="n">known_persons</span><span class="o">=</span><span class="n">known_persons</span><span class="p">,</span>
-            <span class="n">role_replacements</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Boardmember&quot;</span><span class="p">:</span> <span class="n">RoleTitle</span><span class="o">.</span><span class="n">MEMBER</span><span class="p">},</span>
+            <span class="n">role_replacements</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;Boardmember&quot;</span><span class="p">:</span> <span class="n">RoleTitle</span><span class="o">.</span><span class="n">MEMBER</span><span class="p">,</span>
+                <span class="s2">&quot;Mr.&quot;</span><span class="p">:</span> <span class="n">RoleTitle</span><span class="o">.</span><span class="n">MEMBER</span><span class="p">,</span>
+                <span class="s2">&quot;Councilmemeber DELETE&quot;</span><span class="p">:</span> <span class="n">RoleTitle</span><span class="o">.</span><span class="n">COUNCILMEMBER</span><span class="p">,</span>
+                <span class="s2">&quot;Vice-Chair&quot;</span><span class="p">:</span> <span class="n">RoleTitle</span><span class="o">.</span><span class="n">VICE_CHAIR</span><span class="p">,</span>
+                <span class="s2">&quot;Council Member&quot;</span><span class="p">:</span> <span class="n">RoleTitle</span><span class="o">.</span><span class="n">COUNCILMEMBER</span><span class="p">,</span>
+                <span class="s2">&quot;Policy Chair&quot;</span><span class="p">:</span> <span class="n">RoleTitle</span><span class="o">.</span><span class="n">CHAIR</span><span class="p">,</span>
+            <span class="p">},</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="KingCountyScraper.get_content_uris"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.kingcounty.KingCountyScraper.get_content_uris">[docs]</a>    <span class="k">def</span> <span class="nf">get_content_uris</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_ev</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ContentURIs</span><span class="p">]:</span>
