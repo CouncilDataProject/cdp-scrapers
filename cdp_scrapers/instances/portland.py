@@ -226,19 +226,22 @@ class PortlandScraper(IngestionModelScraper):
 
         return SCRAPER_STATIC_DATA.persons[name]
 
-    def get_matter(self, minute_section: Tag) -> Optional[Matter]:
+    def get_doc_number(self, minute_section: Tag, event_page: BeautifulSoup) -> str:
         """
-        Make Matter from information in minute_section
+        Find the document number in the minute_section.
 
         Parameters
         ----------
         minute_section: Tag
             <div> within event web page for a given event minute item
+        event_page: BeautifulSoup
+            The entire page where the event is found
 
         Returns
         -------
-        matter: Optional[Matter]
-            Matter if required information could be parsed from minute_section
+        doc_number: str
+            The document number in the minute_section
+            If this is null, return the section top number with the year
         """
         # Find document number
         doc_number_element_sibling = minute_section.find(
@@ -247,19 +250,83 @@ class PortlandScraper(IngestionModelScraper):
 
         # If there is no document number, skip this minute item
         if doc_number_element_sibling is None:
-            return None
+            return self.get_section_top_number(minute_section, event_page)
         doc_number_element = doc_number_element_sibling.next_sibling
         doc_number = doc_number_element.find("div", class_="field__item").text.strip()
+        return doc_number
+
+    def get_section_top_number(
+        self, minute_section: Tag, event_page: BeautifulSoup
+    ) -> str:
+        """
+        Find the top section number in the minute_section.
+
+        Parameters
+        ----------
+        minute_section: Tag
+            <div> within event web page for a given event minute item
+        event_page: BeautifulSoup
+            The entire page where the event is found
+
+        Returns
+        -------
+        doc_number: str
+            The top section number in the minute_section, with the year appended at the
+            end
+        """
+        agenda_name = event_page.find("title").text.strip()
+        base_minute_section = minute_section.find("h4").text.strip()
+        if agenda_name is not None:
+            return (
+                base_minute_section
+                + "-"
+                + agenda_name[agenda_name.index(",") + 2 : agenda_name.index(",") + 6]
+            )
+        return base_minute_section
+
+    def get_matter(
+        self, minute_section: Tag, event_page: BeautifulSoup
+    ) -> Optional[Matter]:
+        """
+        Make Matter from information in minute_section
+
+        Parameters
+        ----------
+        minute_section: Tag
+            <div> within event web page for a given event minute item
+        event_page: BeautifulSoup
+            The entire page where the event is found
+
+        Returns
+        -------
+        matter: Optional[Matter]
+            Matter if required information could be parsed from minute_section
+        """
 
         # Find title
         title_div = minute_section.find("div", class_="council-document__title")
-        matter_title = title_div.find("a").text.strip()
 
-        # Find type
-        title_div.find("a").clear()
-        matter_type = title_div.text.strip()
-        if matter_type[0] == "(" and matter_type[-1] == ")":
-            matter_type = matter_type[1:-1]
+        matter_type = None
+        matter_title = None
+
+        if title_div is not None:
+            matter_title = title_div.find("a").text.strip()
+
+            # Find type
+            title_div.find("a").clear()
+            matter_type = title_div.text.strip()
+            if matter_type[0] == "(" and matter_type[-1] == ")":
+                matter_type = matter_type[1:-1]
+        else:
+            matter_title = (
+                minute_section.find("div", class_="field--name-field-disposition-notes")
+                .children.__next__()
+                .text.strip()
+            )
+            matter_type = matter_title[
+                matter_title.rindex("(") + 1 : matter_title.rindex(")")
+            ]
+            matter_title = matter_title[0 : matter_title.rindex("(") - 1]
 
         # Find result status
         result_status = get_disposition(minute_section)
@@ -300,7 +367,7 @@ class PortlandScraper(IngestionModelScraper):
         return self.get_none_if_empty(
             Matter(
                 matter_type=matter_type,
-                name=doc_number,
+                name=self.get_doc_number(minute_section, event_page),
                 sponsors=sponsor_list,
                 title=matter_title,
                 result_status=result_status,
@@ -477,10 +544,13 @@ class PortlandScraper(IngestionModelScraper):
         )
         event_minute_items = []
         for minute_section in minute_sections:
-            matter = self.get_matter(minute_section)
+            matter = self.get_matter(minute_section, event_page)
             if matter is not None:
+                minute_name = self.get_doc_number(minute_section, event_page)
+                if minute_name is None:
+                    minute_name = self.get_doc_number(minute_section, event_page)
                 minutes_item = self.get_none_if_empty(
-                    MinutesItem(name=matter.name, description=matter.title)
+                    MinutesItem(name=minute_name, description=matter.title)
                 )
             else:
                 minutes_item = None

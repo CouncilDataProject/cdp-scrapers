@@ -150,6 +150,18 @@ def test_king_county_scraper(
     "number_of_votes, expected_video_uri_in_first_session, expected_agenda_uri",
     [
         (
+            datetime(2021, 8, 18),
+            datetime(2021, 8, 19),
+            1,
+            24,
+            2,
+            0,
+            23,
+            5,
+            "https://www.youtube.com/embed/zB5YuC5dz1s",
+            "https://efiles.portlandoregon.gov/record/14645317/File/Document",
+        ),
+        (
             datetime(2021, 12, 22),
             datetime(2021, 12, 23),
             1,
