@@ -4,6 +4,9 @@
 import logging
 import re
 import json
+import requests
+import urllib3
+import warnings
 from typing import Dict, List, Optional
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
@@ -84,6 +87,16 @@ class SeattleScraper(LegistarScraper):
             person_aliases=PERSON_ALIASES,
         )
 
+        try:
+            urlopen("https://seattlechannel.org/")
+        except URLError:
+            pass
+        else:
+            raise Exception(
+                "seattlechannel.org may have fixed their SSL cert. "
+                "Check and fix 'requests.get(*, verify=False)' calls"
+            )
+
     def parse_content_uris(
         self, video_page_url: str, event_short_date: str
     ) -> List[ContentURIs]:
@@ -107,13 +120,16 @@ class SeattleScraper(LegistarScraper):
         --------
         get_content_uris()
         """
-        try:
-            with urlopen(video_page_url) as resp:
-                # now load the page to get the actual video url
-                soup = BeautifulSoup(resp.read(), "html.parser")
-        except URLError or HTTPError:
-            log.error(f"Failed to open {video_page_url}")
-            return []
+        with warnings.catch_warnings():
+            warnings.simplefilter(
+                "ignore",
+                category=urllib3.exceptions.InsecureRequestWarning,
+            )
+            # now load the page to get the actual video url
+            soup = BeautifulSoup(
+                requests.get(video_page_url, verify=False).text,
+                "html.parser",
+            )
 
         # <script>
         # ...
@@ -273,13 +289,18 @@ class SeattleScraper(LegistarScraper):
         --------
         get_content_uris()
         """
-        # request list of videos for this group on this event's date
-        with urlopen(
-            # this is the query sent by the "filter" button on the web page
-            f"{video_list_page_url}&filterTerm={quote_plus(event_short_date)}"
-            "&itemsPerPage=25&toggleDisplay=Thumbnail_Excerpt"
-        ) as resp:
-            response = resp.read()
+        with warnings.catch_warnings():
+            warnings.simplefilter(
+                "ignore",
+                category=urllib3.exceptions.InsecureRequestWarning,
+            )
+            # request list of videos for this group on this event's date
+            response = requests.get(
+                # this is the query sent by the "filter" button on the web page
+                f"{video_list_page_url}&filterTerm={quote_plus(event_short_date)}"
+                "&itemsPerPage=25&toggleDisplay=Thumbnail_Excerpt",
+                verify=False,
+            ).text
 
         # <div class="paginationContainer">
         #     <div class="row borderBottomNone paginationItem">
