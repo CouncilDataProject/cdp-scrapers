@@ -228,7 +228,8 @@ def sanitize_roles(
     person_name: str,
     roles: Optional[List[Role]] = None,
     static_data: Optional[ScraperStaticData] = None,
-    leader_patterns: List[str] = ["chair", "pres", "super"],
+    council_pres_patterns: List[str] = ["chair", "pres", "super"],
+    chair_patterns: List[str] = ["chair", "pres"],
 ) -> Optional[List[Role]]:
     """
     1. Standardize roles[i].title to RoleTitle constants
@@ -246,8 +247,12 @@ def sanitize_roles(
         Static data defining primary council bodies and predefined Person.seat.roles.
         See Notes.
 
-    leader_patterns: List[str]
-        roles[i].title = "Council President" or "Chair" if match
+    council_pres_patterns: List[str]
+        Set roles[i].title as "Council President" if match
+        and roles[i].body is a primary body like City Council
+    chair_patterns: List[str]
+        Set roles[i].title as "Chair" if match
+        and roles[i].body is not a primary body
 
     Notes
     -----
@@ -313,7 +318,7 @@ def sanitize_roles(
         Council president or Councilmember
         """
         if (
-            re.search("|".join(leader_patterns), str_simplified(role.title), re.I)
+            re.search("|".join(council_pres_patterns), str_simplified(role.title), re.I)
             is not None
         ):
             return RoleTitle.COUNCILPRESIDENT
@@ -328,10 +333,12 @@ def sanitize_roles(
         # Role.title cannot be Councilmember or Council President
         if "vice" in role_title:
             return RoleTitle.VICE_CHAIR
-        if re.search("|".join(leader_patterns), role_title, re.I) is not None:
-            return RoleTitle.CHAIR
         if "alt" in role_title:
             return RoleTitle.ALTERNATE
+        if "super" in role_title:
+            return RoleTitle.SUPERVISOR
+        if re.search("|".join(chair_patterns), role_title, re.I) is not None:
+            return RoleTitle.CHAIR
         return RoleTitle.MEMBER
 
     def _is_councilmember_term(role: Role) -> bool:
