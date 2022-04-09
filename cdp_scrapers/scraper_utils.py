@@ -227,7 +227,7 @@ def parse_static_file(file_path: Path) -> ScraperStaticData:
 def sanitize_roles(
     person_name: str,
     roles: Optional[List[Role]] = None,
-    known_static_data: Optional[ScraperStaticData] = None,
+    static_data: Optional[ScraperStaticData] = None,
     leader_patterns: List[str] = ["chair", "pres", "super"],
 ) -> Optional[List[Role]]:
     """
@@ -242,7 +242,7 @@ def sanitize_roles(
     roles: Optional[List[Role]] = None
         target Person's Roles to sanitize
 
-    known_static_data: Optional[ScraperStaticData]
+    static_data: Optional[ScraperStaticData]
         Static data defining primary council bodies and predefined Person.seat.roles.
         See Notes.
 
@@ -252,27 +252,28 @@ def sanitize_roles(
     Notes
     -----
     Remove roles[#] if roles[#].body in static_data.primary_bodies.
-    Use known_static_data.persons[#].seat.roles instead.
+    Use static_data.persons[#].seat.roles instead.
 
     If roles[i].body not in static_data.primary_bodies,
     roles[i].title cannot be "Councilmember" or "Council President".
 
     Use "City Council" and "Council Briefing"
-    if known_static_data.primary_bodies is empty.
+    if static_data.primary_bodies is empty.
     """
     if roles is None:
         roles = []
 
-    if not known_static_data or not known_static_data.primary_bodies:
-        # Primary/full council not defined in static data file
+    if not static_data or not static_data.primary_bodies:
+        # Primary/full council not defined in static data file.
+        # these are reasonably good defaults for most municipalities.
         primary_body_names = ["city council", "council briefing"]
     else:
         primary_body_names = [
-            body_name.lower() for body_name in known_static_data.primary_bodies.keys()
+            body_name.lower() for body_name in static_data.primary_bodies.keys()
         ]
 
     try:
-        have_primary_roles = len(known_static_data.persons[person_name].seat.roles) > 0
+        have_primary_roles = len(static_data.persons[person_name].seat.roles) > 0
     except (KeyError, AttributeError, TypeError):
         have_primary_roles = False
 
@@ -289,7 +290,7 @@ def sanitize_roles(
                 and datetime.today() <= role.end_datetime
             )
         # accept if role coincides with one given in static data
-        for static_role in known_static_data.persons[person_name].seat.roles:
+        for static_role in static_data.persons[person_name].seat.roles:
             if (
                 static_role.start_datetime <= role.start_datetime
                 and role.end_datetime <= static_role.end_datetime
@@ -373,7 +374,7 @@ def sanitize_roles(
 
     if have_primary_roles:
         # don't forget to include info from the static data file
-        roles.extend(known_static_data.persons[person_name].seat.roles)
+        roles.extend(static_data.persons[person_name].seat.roles)
     if len(scraped_terms) == 0:
         # no Councilmember roles dynamically scraped
         return reduced_list(roles)

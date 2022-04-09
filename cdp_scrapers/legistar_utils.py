@@ -439,7 +439,7 @@ class LegistarScraper(IngestionModelScraper):
         Regex pattern used to convert Legistar instance's minutes item failure to CDP
         constant value.
         Default: "not|fail"
-    known_static_data: Optional[ScraperStaticData]
+    static_data: Optional[ScraperStaticData]
         predefined Seats, Bodies and Persons used to provide more accurate Person.seat.
     person_aliases: Optional[Dict[str, Set[str]]]
         Dictionary used to catch name aliases
@@ -474,7 +474,7 @@ class LegistarScraper(IngestionModelScraper):
         matter_rejected_pattern: str = r"rejected|dropped",
         minutes_item_decision_passed_pattern: str = r"pass",
         minutes_item_decision_failed_pattern: str = r"not|fail",
-        known_static_data: Optional[ScraperStaticData] = None,
+        static_data: Optional[ScraperStaticData] = None,
         person_aliases: Optional[Dict[str, Set[str]]] = None,
         role_replacements: Optional[Dict[str, str]] = None,
     ):
@@ -503,7 +503,7 @@ class LegistarScraper(IngestionModelScraper):
             minutes_item_decision_failed_pattern
         )
 
-        self.known_static_data = known_static_data
+        self.static_data = static_data
         self.role_replacements = role_replacements or {}
 
     def get_matter_status(self, legistar_matter_status: str) -> Optional[str]:
@@ -1233,17 +1233,17 @@ class LegistarScraper(IngestionModelScraper):
 
     def inject_known_person(self, person: Person) -> Person:
         """
-        Inject information if person exists in known_static_data.persons
+        Inject information if person exists in static_data.persons
 
         Parameters
         ----------
         person: Person
-            Person into which to inject data from known_static_data
+            Person into which to inject data from static_data
 
         Returns
         -------
         Person
-            Input person updated with information from known_static_data,
+            Input person updated with information from static_data,
             and seat.roles sanitized.
 
         See Also
@@ -1251,7 +1251,7 @@ class LegistarScraper(IngestionModelScraper):
         scraper_utils.sanitize_roles()
         """
         try:
-            known_person = deepcopy(self.known_static_data.persons[person.name])
+            known_person = deepcopy(self.static_data.persons[person.name])
         except (AttributeError, KeyError):
             return person
 
@@ -1273,7 +1273,7 @@ class LegistarScraper(IngestionModelScraper):
                         use_cache=True,
                     )[LEGISTAR_PERSON_ROLES]
                 ),
-                known_static_data=self.known_static_data,
+                static_data=self.static_data,
             )
 
         return person
@@ -1283,7 +1283,7 @@ class LegistarScraper(IngestionModelScraper):
     ) -> List[EventIngestionModel]:
         """
         Augment with long-term static data that changes very infrequently.
-        e.e. self.known_static_data which includes Person.picture_uri, Person.seat
+        e.e. self.static_data which includes Person.picture_uri, Person.seat
 
         Parameters
         ----------
@@ -1296,7 +1296,7 @@ class LegistarScraper(IngestionModelScraper):
             Input events with static information possibly injected
         """
         # don't waste time if we don't have any info at all
-        if not self.known_static_data:
+        if not self.static_data:
             return events
 
         for event in events:
