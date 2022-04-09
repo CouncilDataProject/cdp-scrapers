@@ -79,7 +79,14 @@ class KingCountyScraper(LegistarScraper):
                 "Watch King County TV Channel 22",
             ],
             known_persons=known_persons,
-            role_replacements={"Boardmember": RoleTitle.MEMBER},
+            role_replacements={
+                "Boardmember": RoleTitle.MEMBER,
+                "Mr.": RoleTitle.MEMBER,
+                "Councilmemeber DELETE": RoleTitle.COUNCILMEMBER,
+                "Vice-Chair": RoleTitle.VICE_CHAIR,
+                "Council Member": RoleTitle.COUNCILMEMBER,
+                "Policy Chair": RoleTitle.CHAIR,
+            },
         )
 
     def get_content_uris(self, legistar_ev: Dict) -> List[ContentURIs]:
