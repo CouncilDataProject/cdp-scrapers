@@ -1,8 +1,8 @@
-from itertools import filterfalse, groupby
 import json
 import re
 from copy import deepcopy
 from datetime import datetime, timedelta
+from itertools import filterfalse, groupby
 from logging import getLogger
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, NamedTuple, Optional, Set, Tuple
@@ -17,6 +17,7 @@ from cdp_backend.pipeline.ingestion_models import (
     Seat,
 )
 from cdp_backend.utils.constants_utils import get_all_class_attr_values
+
 from .types import ScraperStaticData
 
 ###############################################################################
