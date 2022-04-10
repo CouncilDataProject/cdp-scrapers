@@ -1,10 +1,11 @@
+from itertools import filterfalse, groupby
 import json
 import re
 from copy import deepcopy
 from datetime import datetime, timedelta
 from logging import getLogger
 from pathlib import Path
-from typing import Any, Dict, List, NamedTuple, Optional, Set
+from typing import Any, Dict, Iterable, List, NamedTuple, Optional, Set, Tuple
 
 import pytz
 from cdp_backend.database.constants import RoleTitle
@@ -313,21 +314,27 @@ def sanitize_roles(
             and str_simplified(role.body.name).lower() in primary_body_names
         )
 
-    def _get_primary_title(role: Role) -> str:
+    def _fix_primary_title(role: Role) -> str:
         """
         Council president or Councilmember
         """
         if (
-            re.search("|".join(council_pres_patterns), str_simplified(role.title), re.I)
-            is not None
+            role.title is None
+            or re.search(
+                "|".join(council_pres_patterns), str_simplified(role.title), re.I
+            )
+            is None
         ):
-            return RoleTitle.COUNCILPRESIDENT
-        return RoleTitle.COUNCILMEMBER
+            return RoleTitle.COUNCILMEMBER
+        return RoleTitle.COUNCILPRESIDENT
 
-    def _get_nonprimary_title(role: Role) -> str:
+    def _fix_nonprimary_title(role: Role) -> str:
         """
         Chair, Vice Chair, Alternate or Member
         """
+        if role.title is None:
+            return RoleTitle.MEMBER
+
         role_title = str_simplified(role.title).lower()
         # Role is not for a primary/full council
         # Role.title cannot be Councilmember or Council President
@@ -348,59 +355,72 @@ def sanitize_roles(
             and role.end_datetime is not None
         )
 
+    # filter out bad start_datetime, end_datetime
+    roles = filter(_is_role_period_ok, roles)
+    # use primary roles from static data; drop scraped primary roles
+    roles = list(
+        filterfalse(lambda role: have_primary_roles and _is_primary_body(role), roles)
+    )
+    # standardize titles
+    for role in filter(_is_primary_body, roles):
+        role.title = _fix_primary_title(role)
+    for role in filterfalse(_is_primary_body, roles):
+        role.title = _fix_nonprimary_title(role)
+
     class CouncilMemberTerm(NamedTuple):
         start_datetime: datetime
         end_datetime: datetime
         index_in_roles: int
 
-    scraped_terms: Dict[str, List[CouncilMemberTerm]] = {}
+    # when checking for overlapping terms, we should do so per body.
+    # e.g. simultaneous councilmember roles in city council and in council briefing
+    # are completely acceptable and common.
 
-    for i, role in enumerate(roles):
-        if not _is_role_period_ok(role):
-            # Nones get removed below
-            roles[i] = None
-        elif not _is_primary_body(role):
-            # Role is not for a primary/full council
-            # Role.title cannot be Councilmember or Council President
-            role.title = _get_nonprimary_title(role)
-        elif have_primary_roles:
-            # Primary roles for council defined in static data file.
-            # Use static information and ignore this scraped info.
-            roles[i] = None
-        else:
-            role.title = _get_primary_title(role)
-            if _is_councilmember_term(role):
-                try:
-                    scraped_terms[role.body.name].append(
-                        CouncilMemberTerm(role.start_datetime, role.end_datetime, i)
-                    )
-                except KeyError:
-                    scraped_terms[role.body.name] = [
-                        CouncilMemberTerm(role.start_datetime, role.end_datetime, i)
-                    ]
+    roles_by_body: Iterable[Tuple[str, Iterable[Role]]] = groupby(
+        sorted(
+            filter(
+                # get all dynamically scraped councilmember terms
+                lambda role: not have_primary_roles and _is_councilmember_term(role),
+                roles,
+            ),
+            # sort from old to new role
+            key=lambda role: (
+                role.body.name,
+                role.start_datetime,
+                role.end_datetime,
+            ),
+        ),
+        # group by body
+        key=lambda role: role.body.name,
+    )
+
+    scraped_terms: Dict[str, List[CouncilMemberTerm]] = {
+        body_name: [
+            CouncilMemberTerm(role.start_datetime, role.end_datetime, roles.index(role))
+            for role in roles_for_body
+        ]
+        for body_name, roles_for_body in roles_by_body
+    }
 
     if have_primary_roles:
         # don't forget to include info from the static data file
         roles.extend(static_data.persons[person_name].seat.roles)
     if len(scraped_terms) == 0:
         # no Councilmember roles dynamically scraped
-        return reduced_list(roles)
+        return roles
 
-    # when checking for overlapping terms, we should do so per body.
-    # e.g. membership during same period of time for city council and council briefing
-    # should not be treated as error
-
-    for body, terms in scraped_terms.items():
-        terms.sort(key=lambda t: (t.start_datetime, t.end_datetime))
+    for terms_for_body in scraped_terms.values():
         # if term i overlaps with term j, end term i before term j
-        for i, term in enumerate(terms):
-            if terms[i].end_datetime > terms[i + 1].start_datetime:
+        for i, term in enumerate(terms_for_body, start=1):
+            prev_term = terms_for_body[i - 1]
+            this_term = terms_for_body[i]
+            if prev_term.end_datetime > this_term.start_datetime:
                 # reflect adjusted role end date in the actual roles list
-                roles[terms[i].index_in_roles].end_datetime = terms[
-                    i + 1
-                ].start_datetime - timedelta(days=1)
+                roles[
+                    prev_term.index_in_roles
+                ].end_datetime = this_term.start_datetime - timedelta(days=1)
 
-    return reduced_list(roles)
+    return roles
 
 
 class IngestionModelScraper:
