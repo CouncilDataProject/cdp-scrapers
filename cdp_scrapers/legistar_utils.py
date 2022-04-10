@@ -1251,7 +1251,7 @@ class LegistarScraper(IngestionModelScraper):
         scraper_utils.sanitize_roles()
         """
         try:
-            known_person = deepcopy(self.static_data.persons[person.name])
+            known_person = self.static_data.persons[person.name]
         except (AttributeError, KeyError):
             return person
 
@@ -1259,7 +1259,7 @@ class LegistarScraper(IngestionModelScraper):
             static_info = getattr(known_person, attr)
             if static_info is not None:
                 # have long-term information provided in "static*.json"
-                setattr(person, attr, static_info)
+                setattr(person, attr, deepcopy(static_info))
 
         # now that we have seat from static hard-coded data
         # we can bring in seat.roles (OfficeRecords from Legistar API)
