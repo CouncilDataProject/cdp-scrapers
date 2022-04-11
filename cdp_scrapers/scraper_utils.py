@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from itertools import filterfalse, groupby
 from logging import getLogger
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, NamedTuple, Optional, Set, Tuple
+from typing import Any, Dict, List, NamedTuple, Optional, Set
 
 import pytz
 from cdp_backend.database.constants import RoleTitle
@@ -292,9 +292,12 @@ def sanitize_roles(
             return False
         if not have_primary_roles:
             # no roles in static data; accept if this this role is current
-            return (
-                role.start_datetime <= datetime.today()
-                and datetime.today() <= role.end_datetime
+            return role.start_datetime.astimezone(
+                pytz.utc
+            ) <= datetime.today().astimezone(pytz.utc) and datetime.today().astimezone(
+                pytz.utc
+            ) <= role.end_datetime.astimezone(
+                pytz.utc
             )
         # accept if role coincides with one given in static data
         for static_role in static_data.persons[person_name].seat.roles:
@@ -331,7 +334,7 @@ def sanitize_roles(
 
     def _fix_nonprimary_title(role: Role) -> str:
         """
-        Chair, Vice Chair, Alternate or Member
+        Not council president or councilmember
         """
         if role.title is None:
             return RoleTitle.MEMBER
@@ -356,11 +359,14 @@ def sanitize_roles(
             and role.end_datetime is not None
         )
 
-    # filter out bad start_datetime, end_datetime
-    roles = filter(_is_role_period_ok, roles)
-    # use primary roles from static data; drop scraped primary roles
     roles = list(
-        filterfalse(lambda role: have_primary_roles and _is_primary_body(role), roles)
+        # drop dynamically scraped primary roles
+        # if primary roles are given in static data
+        filterfalse(
+            lambda role: have_primary_roles and _is_primary_body(role),
+            # filter out bad start_datetime, end_datetime
+            filter(_is_role_period_ok, roles),
+        )
     )
     # standardize titles
     for role in filter(_is_primary_body, roles):
@@ -377,49 +383,45 @@ def sanitize_roles(
     # e.g. simultaneous councilmember roles in city council and in council briefing
     # are completely acceptable and common.
 
-    roles_by_body: Iterable[Tuple[str, Iterable[Role]]] = groupby(
-        sorted(
-            filter(
-                # get all dynamically scraped councilmember terms
-                lambda role: not have_primary_roles and _is_councilmember_term(role),
-                roles,
+    scraped_member_roles_by_body: List[List[Role]] = [
+        list(roles_for_body)
+        for body_name, roles_for_body in groupby(
+            sorted(
+                filter(
+                    # get all dynamically scraped councilmember terms
+                    lambda role: not have_primary_roles
+                    and _is_councilmember_term(role),
+                    roles,
+                ),
+                # sort from old to new role
+                key=lambda role: (
+                    role.body.name,
+                    role.start_datetime,
+                    role.end_datetime,
+                ),
             ),
-            # sort from old to new role
-            key=lambda role: (
-                role.body.name,
-                role.start_datetime,
-                role.end_datetime,
-            ),
-        ),
-        # group by body
-        key=lambda role: role.body.name,
-    )
-
-    scraped_terms: Dict[str, List[CouncilMemberTerm]] = {
-        body_name: [
-            CouncilMemberTerm(role.start_datetime, role.end_datetime, roles.index(role))
-            for role in roles_for_body
-        ]
-        for body_name, roles_for_body in roles_by_body
-    }
+            # group by body
+            key=lambda role: role.body.name,
+        )
+    ]
 
     if have_primary_roles:
         # don't forget to include info from the static data file
         roles.extend(static_data.persons[person_name].seat.roles)
-    if len(scraped_terms) == 0:
+    if len(scraped_member_roles_by_body) == 0:
         # no Councilmember roles dynamically scraped
+        # nothing more to do
         return roles
 
-    for terms_for_body in scraped_terms.values():
-        # if term i overlaps with term j, end term i before term j
-        for i, term in enumerate(terms_for_body, start=1):
-            prev_term = terms_for_body[i - 1]
-            this_term = terms_for_body[i]
-            if prev_term.end_datetime > this_term.start_datetime:
-                # reflect adjusted role end date in the actual roles list
+    for roles_for_body in scraped_member_roles_by_body:
+        for i in [i for i, role in enumerate(roles_for_body) if i > 0]:
+            prev_role = roles_for_body[i - 1]
+            this_role = roles_for_body[i]
+            # if member role i overlaps with member role j, end i before j
+            if prev_role.end_datetime > this_role.start_datetime:
                 roles[
-                    prev_term.index_in_roles
-                ].end_datetime = this_term.start_datetime - timedelta(days=1)
+                    roles.index(prev_role)
+                ].end_datetime = this_role.start_datetime - timedelta(days=1)
 
     return roles
 
