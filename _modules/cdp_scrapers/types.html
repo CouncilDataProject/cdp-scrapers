@@ -113,7 +113,12 @@
 <span></span><span class="ch">#!/usr/bin/env python</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">cdp_backend.pipeline.ingestion_models</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Body</span><span class="p">,</span>
+    <span class="n">Person</span><span class="p">,</span>
+    <span class="n">Seat</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="c1">###############################################################################</span>
 
@@ -121,6 +126,12 @@
 <div class="viewcode-block" id="ContentURIs"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.types.ContentURIs">[docs]</a><span class="k">class</span> <span class="nc">ContentURIs</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
     <span class="n">video_uri</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="n">caption_uri</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="ScraperStaticData"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.types.ScraperStaticData">[docs]</a><span class="k">class</span> <span class="nc">ScraperStaticData</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+    <span class="n">seats</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Seat</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">primary_bodies</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Body</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">persons</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Person</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
 </pre></div>
 
            </div>

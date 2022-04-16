@@ -113,10 +113,11 @@
 <span></span><span class="ch">#!/usr/bin/env python</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
 
-<span class="kn">from</span> <span class="nn">json</span> <span class="kn">import</span> <span class="n">JSONDecodeError</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span> <span class="nn">json</span> <span class="kn">import</span> <span class="n">JSONDecodeError</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span>
 <span class="kn">from</span> <span class="nn">urllib.error</span> <span class="kn">import</span> <span class="n">HTTPError</span><span class="p">,</span> <span class="n">URLError</span>
 <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">quote_plus</span>
@@ -135,14 +136,19 @@
     <span class="n">Matter</span><span class="p">,</span>
     <span class="n">MinutesItem</span><span class="p">,</span>
     <span class="n">Person</span><span class="p">,</span>
+    <span class="n">Role</span><span class="p">,</span>
     <span class="n">Session</span><span class="p">,</span>
     <span class="n">SupportingFile</span><span class="p">,</span>
     <span class="n">Vote</span><span class="p">,</span>
-    <span class="n">Role</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">.types</span> <span class="kn">import</span> <span class="n">ContentURIs</span>
-<span class="kn">from</span> <span class="nn">.scraper_utils</span> <span class="kn">import</span> <span class="n">IngestionModelScraper</span><span class="p">,</span> <span class="n">reduced_list</span><span class="p">,</span> <span class="n">str_simplified</span>
+<span class="kn">from</span> <span class="nn">.scraper_utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">IngestionModelScraper</span><span class="p">,</span>
+    <span class="n">reduced_list</span><span class="p">,</span>
+    <span class="n">sanitize_roles</span><span class="p">,</span>
+    <span class="n">str_simplified</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.types</span> <span class="kn">import</span> <span class="n">ContentURIs</span><span class="p">,</span> <span class="n">ScraperStaticData</span>
 
 <span class="c1">###############################################################################</span>
 
@@ -545,10 +551,8 @@
 <span class="sd">        Regex pattern used to convert Legistar instance&#39;s minutes item failure to CDP</span>
 <span class="sd">        constant value.</span>
 <span class="sd">        Default: &quot;not|fail&quot;</span>
-<span class="sd">    known_persons: Optional[Dict[str, Person]]</span>
-<span class="sd">        Dictionary used to inject information into Persons in place of missing</span>
-<span class="sd">        attributes after dynamic scraping in get_events().</span>
-<span class="sd">        Default: None</span>
+<span class="sd">    static_data: Optional[ScraperStaticData]</span>
+<span class="sd">        predefined Seats, Bodies and Persons used to provide more accurate Person.seat.</span>
 <span class="sd">    person_aliases: Optional[Dict[str, Set[str]]]</span>
 <span class="sd">        Dictionary used to catch name aliases</span>
 <span class="sd">        and resolve improperly unique Persons to the one correct Person.</span>
@@ -582,7 +586,7 @@
         <span class="n">matter_rejected_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;rejected|dropped&quot;</span><span class="p">,</span>
         <span class="n">minutes_item_decision_passed_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;pass&quot;</span><span class="p">,</span>
         <span class="n">minutes_item_decision_failed_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;not|fail&quot;</span><span class="p">,</span>
-        <span class="n">known_persons</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Person</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">static_data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ScraperStaticData</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">person_aliases</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">role_replacements</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
@@ -611,7 +615,7 @@
             <span class="n">minutes_item_decision_failed_pattern</span>
         <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">known_persons</span> <span class="o">=</span> <span class="n">known_persons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">static_data</span> <span class="o">=</span> <span class="n">static_data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">role_replacements</span> <span class="o">=</span> <span class="n">role_replacements</span> <span class="ow">or</span> <span class="p">{}</span></div>
 
 <div class="viewcode-block" id="LegistarScraper.get_matter_status"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_matter_status">[docs]</a>    <span class="k">def</span> <span class="nf">get_matter_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_matter_status</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
@@ -885,7 +889,7 @@
 <span class="sd">            From Legistar OfficeRecords. None if missing information.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">legistar_office_records</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span>
+            <span class="n">legistar_office_records</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">return</span> <span class="n">reduced_list</span><span class="p">(</span>
             <span class="p">[</span>
@@ -1341,43 +1345,47 @@
 
 <div class="viewcode-block" id="LegistarScraper.inject_known_person"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.inject_known_person">[docs]</a>    <span class="k">def</span> <span class="nf">inject_known_person</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">person</span><span class="p">:</span> <span class="n">Person</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Person</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Inject information from self.known_persons</span>
-<span class="sd">        if person exists in the dictionary for long-term static data</span>
+<span class="sd">        Inject information if person exists in static_data.persons</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        person: Person</span>
-<span class="sd">            Person into which to inject data from known_persons</span>
+<span class="sd">            Person into which to inject data from static_data</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        Person</span>
-<span class="sd">            Input person updated with more information</span>
-<span class="sd">            or as-is if person not found in known_persons</span>
+<span class="sd">            Input person updated with information from static_data,</span>
+<span class="sd">            and seat.roles sanitized.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        scraper_utils.sanitize_roles()</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">known_person</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">known_persons</span><span class="p">[</span><span class="n">person</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
-        <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+            <span class="n">known_person</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">static_data</span><span class="o">.</span><span class="n">persons</span><span class="p">[</span><span class="n">person</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">person</span>
 
         <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">person</span><span class="o">.</span><span class="n">__dataclass_fields__</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="n">static_info</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">known_person</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">static_info</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="c1"># have long-term information provided in &quot;static*.json&quot;; just use it</span>
-                <span class="nb">setattr</span><span class="p">(</span><span class="n">person</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">static_info</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="c1"># use dynamically obtained information, which may be None</span>
-                <span class="nb">setattr</span><span class="p">(</span><span class="n">person</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">person</span><span class="p">,</span> <span class="n">attr</span><span class="p">))</span>
+                <span class="c1"># have long-term information provided in &quot;static*.json&quot;</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="n">person</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">static_info</span><span class="p">))</span>
 
         <span class="c1"># now that we have seat from static hard-coded data</span>
         <span class="c1"># we can bring in seat.roles (OfficeRecords from Legistar API)</span>
-        <span class="k">if</span> <span class="n">person</span><span class="o">.</span><span class="n">seat</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">person</span><span class="o">.</span><span class="n">seat</span><span class="o">.</span><span class="n">roles</span><span class="p">:</span>
-            <span class="n">person</span><span class="o">.</span><span class="n">seat</span><span class="o">.</span><span class="n">roles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_roles</span><span class="p">(</span>
-                <span class="n">get_legistar_person</span><span class="p">(</span>
-                    <span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">client_name</span><span class="p">,</span>
-                    <span class="n">person_id</span><span class="o">=</span><span class="n">person</span><span class="o">.</span><span class="n">external_source_id</span><span class="p">,</span>
-                    <span class="n">use_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="p">)[</span><span class="n">LEGISTAR_PERSON_ROLES</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">person</span><span class="o">.</span><span class="n">seat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">person</span><span class="o">.</span><span class="n">seat</span><span class="o">.</span><span class="n">roles</span> <span class="o">=</span> <span class="n">sanitize_roles</span><span class="p">(</span>
+                <span class="n">person_name</span><span class="o">=</span><span class="n">person</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">roles</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_roles</span><span class="p">(</span>
+                    <span class="n">legistar_office_records</span><span class="o">=</span><span class="n">get_legistar_person</span><span class="p">(</span>
+                        <span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">client_name</span><span class="p">,</span>
+                        <span class="n">person_id</span><span class="o">=</span><span class="n">person</span><span class="o">.</span><span class="n">external_source_id</span><span class="p">,</span>
+                        <span class="n">use_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="p">)[</span><span class="n">LEGISTAR_PERSON_ROLES</span><span class="p">]</span>
+                <span class="p">),</span>
+                <span class="n">static_data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">static_data</span><span class="p">,</span>
             <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">person</span></div>
@@ -1387,7 +1395,7 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Augment with long-term static data that changes very infrequently.</span>
-<span class="sd">        e.e. self.known_persons which includes Person.picture_uri, Person.seat</span>
+<span class="sd">        e.e. self.static_data which includes Person.picture_uri, Person.seat</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1399,8 +1407,8 @@
 <span class="sd">        events: List[EventIngestionModel]</span>
 <span class="sd">            Input events with static information possibly injected</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># don&#39;t waste time if we don&#39;t have any static person info at all</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">known_persons</span><span class="p">:</span>
+        <span class="c1"># don&#39;t waste time if we don&#39;t have any info at all</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">static_data</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">events</span>
 
         <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events</span><span class="p">:</span>

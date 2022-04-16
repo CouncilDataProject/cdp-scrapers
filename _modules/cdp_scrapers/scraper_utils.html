@@ -110,17 +110,31 @@
            <div itemprop="articleBody">
              
   <h1>Source code for cdp_scrapers.scraper_utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">pytz</span>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">filterfalse</span><span class="p">,</span> <span class="n">groupby</span>
+<span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span>
 
-<span class="kn">from</span> <span class="nn">cdp_backend.pipeline.ingestion_models</span> <span class="kn">import</span> <span class="n">IngestionModel</span><span class="p">,</span> <span class="n">Person</span>
+<span class="kn">import</span> <span class="nn">pytz</span>
+<span class="kn">from</span> <span class="nn">cdp_backend.database.constants</span> <span class="kn">import</span> <span class="n">RoleTitle</span>
+<span class="kn">from</span> <span class="nn">cdp_backend.pipeline.ingestion_models</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Body</span><span class="p">,</span>
+    <span class="n">IngestionModel</span><span class="p">,</span>
+    <span class="n">Person</span><span class="p">,</span>
+    <span class="n">Role</span><span class="p">,</span>
+    <span class="n">Seat</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">cdp_backend.utils.constants_utils</span> <span class="kn">import</span> <span class="n">get_all_class_attr_values</span>
+
+<span class="kn">from</span> <span class="nn">.types</span> <span class="kn">import</span> <span class="n">ScraperStaticData</span>
 
 <span class="c1">###############################################################################</span>
 
-<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <span class="c1">###############################################################################</span>
 
@@ -176,6 +190,352 @@
     <span class="n">input_str</span> <span class="o">=</span> <span class="n">input_str</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">input_str</span></div>
+
+
+<div class="viewcode-block" id="parse_static_person"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.scraper_utils.parse_static_person">[docs]</a><span class="k">def</span> <span class="nf">parse_static_person</span><span class="p">(</span>
+    <span class="n">person_json</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">all_seats</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Seat</span><span class="p">],</span>
+    <span class="n">primary_bodies</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Body</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Person</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parse Dict[str, Any] for a person in static data file to a Person instance.</span>
+<span class="sd">    person_json[&quot;seat&quot;] and person_json[&quot;roles&quot;] are validated against</span>
+<span class="sd">    all_seats and primary_bodies in static data file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    person_json: Dict[str, Any]</span>
+<span class="sd">        A dictionary in static data file with info for a Person.</span>
+
+<span class="sd">    all_seats: Dict[str, Seat]</span>
+<span class="sd">        Seats defined as top-level in static data file</span>
+
+<span class="sd">    primary_bodies: Dict[str, Body]</span>
+<span class="sd">        Bodies defined as top-level in static data file.</span>
+
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    parse_static_file()</span>
+<span class="sd">    sanitize_roles()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Begin parsing static data for </span><span class="si">{</span><span class="n">person_json</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">person</span><span class="p">:</span> <span class="n">Person</span> <span class="o">=</span> <span class="n">Person</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
+        <span class="c1"># &quot;seat&quot; and &quot;roles&quot; are not direct serializations of Seat/Role</span>
+        <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">person_json</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="s2">&quot;seat&quot;</span> <span class="ow">and</span> <span class="n">k</span> <span class="o">!=</span> <span class="s2">&quot;roles&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;seat&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">person_json</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Seat name not given&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">person</span>
+
+    <span class="n">seat_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">person_json</span><span class="p">[</span><span class="s2">&quot;seat&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">seat_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">all_seats</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">seat_name</span><span class="si">}</span><span class="s2"> is not defined in top-level &#39;seats&#39;&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">person</span>
+
+    <span class="c1"># Keep all_seats unmodified; we will append Roles to this person.seat below</span>
+    <span class="n">person</span><span class="o">.</span><span class="n">seat</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">all_seats</span><span class="p">[</span><span class="n">seat_name</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s2">&quot;roles&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">person_json</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Roles not given&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">person</span>
+
+    <span class="c1"># Role.title must be a RoleTitle constant so get all allowed values</span>
+    <span class="n">role_titles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_all_class_attr_values</span><span class="p">(</span><span class="n">RoleTitle</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">role_json</span> <span class="ow">in</span> <span class="n">person_json</span><span class="p">[</span><span class="s2">&quot;roles&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="c1"># if str, it is looked-up in primary_bodies</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">role_json</span><span class="p">[</span><span class="s2">&quot;body&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">role_json</span><span class="p">[</span><span class="s2">&quot;body&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">primary_bodies</span>
+        <span class="p">):</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">role_json</span><span class="si">}</span><span class="s2"> is ignored. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">role_json</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> is not defined in top-level &#39;primary_bodies&#39;&quot;</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">role_json</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">role_titles</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">role_json</span><span class="si">}</span><span class="s2"> is ignored. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">role_json</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> is not a RoleTitle constant.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">role</span><span class="p">:</span> <span class="n">Role</span> <span class="o">=</span> <span class="n">Role</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
+                <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">role_json</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="s2">&quot;body&quot;</span><span class="p">}</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">role_json</span><span class="p">[</span><span class="s2">&quot;body&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">role</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="n">primary_bodies</span><span class="p">[</span><span class="n">role_json</span><span class="p">[</span><span class="s2">&quot;body&quot;</span><span class="p">]]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># This role.body is a dictionary and defines a non-primary one</span>
+                <span class="c1"># e.g. like a committee such as Transportation</span>
+                <span class="c1"># that is not the main/full council</span>
+                <span class="n">role</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="n">Body</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">role_json</span><span class="p">[</span><span class="s2">&quot;body&quot;</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="n">person</span><span class="o">.</span><span class="n">seat</span><span class="o">.</span><span class="n">roles</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">person</span><span class="o">.</span><span class="n">seat</span><span class="o">.</span><span class="n">roles</span> <span class="o">=</span> <span class="p">[</span><span class="n">role</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">person</span><span class="o">.</span><span class="n">seat</span><span class="o">.</span><span class="n">roles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">role</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">person</span></div>
+
+
+<div class="viewcode-block" id="parse_static_file"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.scraper_utils.parse_static_file">[docs]</a><span class="k">def</span> <span class="nf">parse_static_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ScraperStaticData</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parse Seats, Bodies and Persons from static data JSON</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    file_path: Path</span>
+<span class="sd">        Path to file containing static data in JSON</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ScraperStaticData:</span>
+<span class="sd">        Tuple[Dict[str, Seat], Dict[str, Body], Dict[str, Person]]</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    -----</span>
+<span class="sd">    parse_static_person()</span>
+<span class="sd">    sanitize_roles()</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Function looks for &quot;seats&quot;, &quot;primary_bodies&quot;, &quot;persons&quot; top-level keys</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">static_file</span><span class="p">:</span>
+        <span class="n">static_json</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">static_file</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s2">&quot;seats&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">static_json</span><span class="p">:</span>
+            <span class="n">seats</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Seat</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">seats</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Seat</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">seat_name</span><span class="p">:</span> <span class="n">Seat</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">seat</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">seat_name</span><span class="p">,</span> <span class="n">seat</span> <span class="ow">in</span> <span class="n">static_json</span><span class="p">[</span><span class="s2">&quot;seats&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">}</span>
+
+        <span class="k">if</span> <span class="s2">&quot;primary_bodies&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">static_json</span><span class="p">:</span>
+            <span class="n">primary_bodies</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Body</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">primary_bodies</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Body</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">body_name</span><span class="p">:</span> <span class="n">Body</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">body_name</span><span class="p">,</span> <span class="n">body</span> <span class="ow">in</span> <span class="n">static_json</span><span class="p">[</span><span class="s2">&quot;primary_bodies&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">}</span>
+
+        <span class="k">if</span> <span class="s2">&quot;persons&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">static_json</span><span class="p">:</span>
+            <span class="n">known_persons</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Person</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">known_persons</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Person</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">person_name</span><span class="p">:</span> <span class="n">parse_static_person</span><span class="p">(</span><span class="n">person</span><span class="p">,</span> <span class="n">seats</span><span class="p">,</span> <span class="n">primary_bodies</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">person_name</span><span class="p">,</span> <span class="n">person</span> <span class="ow">in</span> <span class="n">static_json</span><span class="p">[</span><span class="s2">&quot;persons&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">}</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;ScraperStaticData parsed from </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">:</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;    seats: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">seats</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;    primary_bodies: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">primary_bodies</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;    persons: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">known_persons</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">ScraperStaticData</span><span class="p">(</span>
+            <span class="n">seats</span><span class="o">=</span><span class="n">seats</span><span class="p">,</span> <span class="n">primary_bodies</span><span class="o">=</span><span class="n">primary_bodies</span><span class="p">,</span> <span class="n">persons</span><span class="o">=</span><span class="n">known_persons</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="sanitize_roles"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.scraper_utils.sanitize_roles">[docs]</a><span class="k">def</span> <span class="nf">sanitize_roles</span><span class="p">(</span>
+    <span class="n">person_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">roles</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Role</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">static_data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ScraperStaticData</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">council_pres_patterns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;chair&quot;</span><span class="p">,</span> <span class="s2">&quot;pres&quot;</span><span class="p">,</span> <span class="s2">&quot;super&quot;</span><span class="p">],</span>
+    <span class="n">chair_patterns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;chair&quot;</span><span class="p">,</span> <span class="s2">&quot;pres&quot;</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Role</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    1. Standardize roles[i].title to RoleTitle constants</span>
+<span class="sd">    2. Ensure only 1 councilmember Role per term</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    person_name: str</span>
+<span class="sd">        Sanitization target Person.name</span>
+
+<span class="sd">    roles: Optional[List[Role]] = None</span>
+<span class="sd">        target Person&#39;s Roles to sanitize</span>
+
+<span class="sd">    static_data: Optional[ScraperStaticData]</span>
+<span class="sd">        Static data defining primary council bodies and predefined Person.seat.roles.</span>
+<span class="sd">        See Notes.</span>
+
+<span class="sd">    council_pres_patterns: List[str]</span>
+<span class="sd">        Set roles[i].title as &quot;Council President&quot; if match</span>
+<span class="sd">        and roles[i].body is a primary body like City Council</span>
+<span class="sd">    chair_patterns: List[str]</span>
+<span class="sd">        Set roles[i].title as &quot;Chair&quot; if match</span>
+<span class="sd">        and roles[i].body is not a primary body</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Remove roles[#] if roles[#].body in static_data.primary_bodies.</span>
+<span class="sd">    Use static_data.persons[#].seat.roles instead.</span>
+
+<span class="sd">    If roles[i].body not in static_data.primary_bodies,</span>
+<span class="sd">    roles[i].title cannot be &quot;Councilmember&quot; or &quot;Council President&quot;.</span>
+
+<span class="sd">    Use &quot;City Council&quot; and &quot;Council Briefing&quot;</span>
+<span class="sd">    if static_data.primary_bodies is empty.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">roles</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">roles</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">static_data</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">static_data</span><span class="o">.</span><span class="n">primary_bodies</span><span class="p">:</span>
+        <span class="c1"># Primary/full council not defined in static data file.</span>
+        <span class="c1"># these are reasonably good defaults for most municipalities.</span>
+        <span class="n">primary_body_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;city council&quot;</span><span class="p">,</span> <span class="s2">&quot;council briefing&quot;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">primary_body_names</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">body_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">body_name</span> <span class="ow">in</span> <span class="n">static_data</span><span class="o">.</span><span class="n">primary_bodies</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="p">]</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">have_primary_roles</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">static_data</span><span class="o">.</span><span class="n">persons</span><span class="p">[</span><span class="n">person_name</span><span class="p">]</span><span class="o">.</span><span class="n">seat</span><span class="o">.</span><span class="n">roles</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+        <span class="n">have_primary_roles</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">_is_role_period_ok</span><span class="p">(</span><span class="n">role</span><span class="p">:</span> <span class="n">Role</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Test that role.[start | end]_datetime is acceptable</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">role</span><span class="o">.</span><span class="n">start_datetime</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">role</span><span class="o">.</span><span class="n">end_datetime</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">have_primary_roles</span><span class="p">:</span>
+            <span class="c1"># no roles in static data; accept if this this role is current</span>
+            <span class="k">return</span> <span class="n">role</span><span class="o">.</span><span class="n">start_datetime</span><span class="o">.</span><span class="n">astimezone</span><span class="p">(</span>
+                <span class="n">pytz</span><span class="o">.</span><span class="n">utc</span>
+            <span class="p">)</span> <span class="o">&lt;=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">astimezone</span><span class="p">(</span><span class="n">pytz</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span> <span class="ow">and</span> <span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">astimezone</span><span class="p">(</span>
+                <span class="n">pytz</span><span class="o">.</span><span class="n">utc</span>
+            <span class="p">)</span> <span class="o">&lt;=</span> <span class="n">role</span><span class="o">.</span><span class="n">end_datetime</span><span class="o">.</span><span class="n">astimezone</span><span class="p">(</span>
+                <span class="n">pytz</span><span class="o">.</span><span class="n">utc</span>
+            <span class="p">)</span>
+        <span class="c1"># accept if role coincides with one given in static data</span>
+        <span class="k">for</span> <span class="n">static_role</span> <span class="ow">in</span> <span class="n">static_data</span><span class="o">.</span><span class="n">persons</span><span class="p">[</span><span class="n">person_name</span><span class="p">]</span><span class="o">.</span><span class="n">seat</span><span class="o">.</span><span class="n">roles</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">static_role</span><span class="o">.</span><span class="n">start_datetime</span> <span class="o">&lt;=</span> <span class="n">role</span><span class="o">.</span><span class="n">start_datetime</span>
+                <span class="ow">and</span> <span class="n">role</span><span class="o">.</span><span class="n">end_datetime</span> <span class="o">&lt;=</span> <span class="n">static_role</span><span class="o">.</span><span class="n">end_datetime</span>
+            <span class="p">):</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">_is_primary_body</span><span class="p">(</span><span class="n">role</span><span class="p">:</span> <span class="n">Role</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Is role.body one of primary_bodies in static data file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">role</span><span class="o">.</span><span class="n">body</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="n">role</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="n">str_simplified</span><span class="p">(</span><span class="n">role</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">primary_body_names</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_fix_primary_title</span><span class="p">(</span><span class="n">role</span><span class="p">:</span> <span class="n">Role</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Council president or Councilmember</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">role</span><span class="o">.</span><span class="n">title</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="ow">or</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+                <span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">council_pres_patterns</span><span class="p">),</span> <span class="n">str_simplified</span><span class="p">(</span><span class="n">role</span><span class="o">.</span><span class="n">title</span><span class="p">),</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span>
+            <span class="p">)</span>
+            <span class="ow">is</span> <span class="kc">None</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="n">RoleTitle</span><span class="o">.</span><span class="n">COUNCILMEMBER</span>
+        <span class="k">return</span> <span class="n">RoleTitle</span><span class="o">.</span><span class="n">COUNCILPRESIDENT</span>
+
+    <span class="k">def</span> <span class="nf">_fix_nonprimary_title</span><span class="p">(</span><span class="n">role</span><span class="p">:</span> <span class="n">Role</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Not council president or councilmember</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">role</span><span class="o">.</span><span class="n">title</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">RoleTitle</span><span class="o">.</span><span class="n">MEMBER</span>
+
+        <span class="n">role_title</span> <span class="o">=</span> <span class="n">str_simplified</span><span class="p">(</span><span class="n">role</span><span class="o">.</span><span class="n">title</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="c1"># Role is not for a primary/full council</span>
+        <span class="c1"># Role.title cannot be Councilmember or Council President</span>
+        <span class="k">if</span> <span class="s2">&quot;vice&quot;</span> <span class="ow">in</span> <span class="n">role_title</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">RoleTitle</span><span class="o">.</span><span class="n">VICE_CHAIR</span>
+        <span class="k">if</span> <span class="s2">&quot;alt&quot;</span> <span class="ow">in</span> <span class="n">role_title</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">RoleTitle</span><span class="o">.</span><span class="n">ALTERNATE</span>
+        <span class="k">if</span> <span class="s2">&quot;super&quot;</span> <span class="ow">in</span> <span class="n">role_title</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">RoleTitle</span><span class="o">.</span><span class="n">SUPERVISOR</span>
+        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">chair_patterns</span><span class="p">),</span> <span class="n">role_title</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">RoleTitle</span><span class="o">.</span><span class="n">CHAIR</span>
+        <span class="k">return</span> <span class="n">RoleTitle</span><span class="o">.</span><span class="n">MEMBER</span>
+
+    <span class="k">def</span> <span class="nf">_is_councilmember_term</span><span class="p">(</span><span class="n">role</span><span class="p">:</span> <span class="n">Role</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">role</span><span class="o">.</span><span class="n">title</span> <span class="o">==</span> <span class="n">RoleTitle</span><span class="o">.</span><span class="n">COUNCILMEMBER</span>
+            <span class="ow">and</span> <span class="n">role</span><span class="o">.</span><span class="n">start_datetime</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="n">role</span><span class="o">.</span><span class="n">end_datetime</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="p">)</span>
+
+    <span class="n">roles</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+        <span class="c1"># drop dynamically scraped primary roles</span>
+        <span class="c1"># if primary roles are given in static data</span>
+        <span class="n">filterfalse</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">role</span><span class="p">:</span> <span class="n">have_primary_roles</span> <span class="ow">and</span> <span class="n">_is_primary_body</span><span class="p">(</span><span class="n">role</span><span class="p">),</span>
+            <span class="c1"># filter out bad start_datetime, end_datetime</span>
+            <span class="nb">filter</span><span class="p">(</span><span class="n">_is_role_period_ok</span><span class="p">,</span> <span class="n">roles</span><span class="p">),</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="c1"># standardize titles</span>
+    <span class="k">for</span> <span class="n">role</span> <span class="ow">in</span> <span class="nb">filter</span><span class="p">(</span><span class="n">_is_primary_body</span><span class="p">,</span> <span class="n">roles</span><span class="p">):</span>
+        <span class="n">role</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">_fix_primary_title</span><span class="p">(</span><span class="n">role</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">role</span> <span class="ow">in</span> <span class="n">filterfalse</span><span class="p">(</span><span class="n">_is_primary_body</span><span class="p">,</span> <span class="n">roles</span><span class="p">):</span>
+        <span class="n">role</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">_fix_nonprimary_title</span><span class="p">(</span><span class="n">role</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">CouncilMemberTerm</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+        <span class="n">start_datetime</span><span class="p">:</span> <span class="n">datetime</span>
+        <span class="n">end_datetime</span><span class="p">:</span> <span class="n">datetime</span>
+        <span class="n">index_in_roles</span><span class="p">:</span> <span class="nb">int</span>
+
+    <span class="c1"># when checking for overlapping terms, we should do so per body.</span>
+    <span class="c1"># e.g. simultaneous councilmember roles in city council and in council briefing</span>
+    <span class="c1"># are completely acceptable and common.</span>
+
+    <span class="n">scraped_member_roles_by_body</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Role</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="nb">list</span><span class="p">(</span><span class="n">roles_for_body</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">body_name</span><span class="p">,</span> <span class="n">roles_for_body</span> <span class="ow">in</span> <span class="n">groupby</span><span class="p">(</span>
+            <span class="nb">sorted</span><span class="p">(</span>
+                <span class="nb">filter</span><span class="p">(</span>
+                    <span class="c1"># get all dynamically scraped councilmember terms</span>
+                    <span class="k">lambda</span> <span class="n">role</span><span class="p">:</span> <span class="ow">not</span> <span class="n">have_primary_roles</span>
+                    <span class="ow">and</span> <span class="n">_is_councilmember_term</span><span class="p">(</span><span class="n">role</span><span class="p">),</span>
+                    <span class="n">roles</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="c1"># sort from old to new role</span>
+                <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">role</span><span class="p">:</span> <span class="p">(</span>
+                    <span class="n">role</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="n">role</span><span class="o">.</span><span class="n">start_datetime</span><span class="p">,</span>
+                    <span class="n">role</span><span class="o">.</span><span class="n">end_datetime</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">),</span>
+            <span class="c1"># group by body</span>
+            <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">role</span><span class="p">:</span> <span class="n">role</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">have_primary_roles</span><span class="p">:</span>
+        <span class="c1"># don&#39;t forget to include info from the static data file</span>
+        <span class="n">roles</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">static_data</span><span class="o">.</span><span class="n">persons</span><span class="p">[</span><span class="n">person_name</span><span class="p">]</span><span class="o">.</span><span class="n">seat</span><span class="o">.</span><span class="n">roles</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">scraped_member_roles_by_body</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># no Councilmember roles dynamically scraped</span>
+        <span class="c1"># nothing more to do</span>
+        <span class="k">return</span> <span class="n">roles</span>
+
+    <span class="k">for</span> <span class="n">roles_for_body</span> <span class="ow">in</span> <span class="n">scraped_member_roles_by_body</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">role</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">roles_for_body</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]:</span>
+            <span class="n">prev_role</span> <span class="o">=</span> <span class="n">roles_for_body</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">this_role</span> <span class="o">=</span> <span class="n">roles_for_body</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="c1"># if member role i overlaps with member role j, end i before j</span>
+            <span class="k">if</span> <span class="n">prev_role</span><span class="o">.</span><span class="n">end_datetime</span> <span class="o">&gt;</span> <span class="n">this_role</span><span class="o">.</span><span class="n">start_datetime</span><span class="p">:</span>
+                <span class="n">roles</span><span class="p">[</span>
+                    <span class="n">roles</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">prev_role</span><span class="p">)</span>
+                <span class="p">]</span><span class="o">.</span><span class="n">end_datetime</span> <span class="o">=</span> <span class="n">this_role</span><span class="o">.</span><span class="n">start_datetime</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">roles</span></div>
 
 
 <div class="viewcode-block" id="IngestionModelScraper"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.scraper_utils.IngestionModelScraper">[docs]</a><span class="k">class</span> <span class="nc">IngestionModelScraper</span><span class="p">:</span>
