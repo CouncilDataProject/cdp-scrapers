@@ -1,4 +1,59 @@
 {
+    "seats" : {
+        "Position 1": {
+            "name": "Position 1",
+            "electoral_area": "West Seattle",
+            "image_uri": "https://uploads.visitseattle.org/2015/03/AlkiBeach_NickHallPhotography-720x313.jpg"
+        },
+        "Position 2": {
+            "name": "Position 2",
+            "electoral_area": "Southeast Seattle",
+            "image_uri": "https://uploads.visitseattle.org/2015/03/Safeco_DavidNewman-720x313.jpg"
+        },
+        "Position 3": {
+            "name": "Position 3",
+            "electoral_area": "Central Seattle",
+            "image_uri": "https://uploads.visitseattle.org/2015/03/NoguchiNeedle_DavidNewman-2-720x313.jpg"
+        },
+        "Position 4": {
+            "name": "Position 4",
+            "electoral_area": "Northeast Seattle",
+            "image_uri": "https://uploads.visitseattle.org/2015/03/Suzzallo_Reading_Room_NicholasBoos-720x313.jpg"
+        },
+        "Position 5": {
+            "name": "Position 5",
+            "electoral_area": "North Seattle",
+            "image_uri": "https://www.seattle.gov/images/Departments/SDOT/BridgeStairsProgram/AerialRendering_2020.jpg"
+        },
+        "Position 6": {
+            "name": "Position 6",
+            "electoral_area": "Northwest Seattle",
+            "image_uri": "https://uploads.visitseattle.org/2015/03/BallardFarmersMarket_kallu-2-720x313.jpg"
+        },
+        "Position 7": {
+            "name": "Position 7",
+            "electoral_area": "Pioneer Square to Magnolia",
+            "image_uri": "https://uploads.visitseattle.org/2015/03/QueenAnne_LempelZiv-720x313.jpg"
+        },
+        "Position 8": {
+            "name": "Position 8",
+            "electoral_area": "Citywide",
+            "image_uri": "https://upload.wikimedia.org/wikipedia/commons/3/36/SeattleI5Skyline.jpg"
+        },
+        "Position 9": {
+            "name": "Position 9",
+            "electoral_area": "Citywide",
+            "image_uri": "https://upload.wikimedia.org/wikipedia/commons/3/36/SeattleI5Skyline.jpg"
+        }
+    },
+    "primary_bodies": {
+        "City Council": {
+            "name": "City Council"
+        },
+        "Council Briefing": {
+            "name": "Council Briefing"
+        }
+    },
     "persons": {
         "Alex Pedersen": {
             "name": "Alex Pedersen",
@@ -8,15 +63,21 @@
             "phone": "206-684-8804",
             "website": null,
             "picture_uri": "https://www.seattle.gov/assets/Images/Council/Members/Pedersen/Councilmember-Alex-Pedersen_square-headshot.jpg",
-            "seat": {
-                "name": "Position 4",
-                "electoral_area": "Northeast Seattle",
-                "electoral_type": null,
-                "image_uri": "https://uploads.visitseattle.org/2015/03/Suzzallo_Reading_Room_NicholasBoos-720x313.jpg",
-                "external_source_id": null,
-                "roles": null
-            },
-            "external_source_id": null
+            "seat": "Position 4",
+            "roles": [
+                {
+                    "body": "City Council",
+                    "start_datetime": 1577865600,
+                    "end_datetime": 1704009600,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "Council Briefing",
+                    "start_datetime": 1577865600,
+                    "end_datetime": 1704009600,
+                    "title": "Councilmember"
+                }
+            ]
         },
         "Andrew Lewis": {
             "name": "Andrew Lewis",
@@ -26,15 +87,21 @@
             "phone": "206-684-8807",
             "website": null,
             "picture_uri": "https://www.seattle.gov/assets/Images/Council/Members/Lewis/Andrew-Lewis-Campaign-Headshot_300x300.jpg",
-            "seat": {
-                "name": "Position 7",
-                "electoral_area": "Pioneer Square to Magnolia",
-                "electoral_type": null,
-                "image_uri": "https://uploads.visitseattle.org/2015/03/QueenAnne_LempelZiv-720x313.jpg",
-                "external_source_id": null,
-                "roles": null
-            },
-            "external_source_id": null
+            "seat": "Position 7",
+            "roles": [
+                {
+                    "body": "City Council",
+                    "start_datetime": 1577865600,
+                    "end_datetime": 1704009600,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "Council Briefing",
+                    "start_datetime": 1577865600,
+                    "end_datetime": 1704009600,
+                    "title": "Councilmember"
+                }
+            ]
         },
         "Dan Strauss": {
             "name": "Dan Strauss",
@@ -44,15 +111,21 @@
             "phone": "206-684-8806",
             "website": null,
             "picture_uri": "https://www.seattle.gov/assets/Images/Council/Members/Strauss/strauss_headshot_300x300.jpg",
-            "seat": {
-                "name": "Position 6",
-                "electoral_area": "Northwest Seattle",
-                "electoral_type": null,
-                "image_uri": "https://uploads.visitseattle.org/2015/03/BallardFarmersMarket_kallu-2-720x313.jpg",
-                "external_source_id": null,
-                "roles": null
-            },
-            "external_source_id": null
+            "seat": "Position 6",
+            "roles": [
+                {
+                    "body": "City Council",
+                    "start_datetime": 1577865600,
+                    "end_datetime": 1704009600,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "Council Briefing",
+                    "start_datetime": 1577865600,
+                    "end_datetime": 1704009600,
+                    "title": "Councilmember"
+                }
+            ]
         },
         "Debora Juarez": {
             "name": "Debora Juarez",
@@ -62,15 +135,33 @@
             "phone": "206-684-8805",
             "website": null,
             "picture_uri": "https://www.seattle.gov/assets/Images/Council/Members/Juarez/Debora-Juarez-2018_225x225.jpg",
-            "seat": {
-                "name": "Position 5",
-                "electoral_area": "North Seattle",
-                "electoral_type": null,
-                "image_uri": "https://www.seattle.gov/images/Departments/SDOT/BridgeStairsProgram/AerialRendering_2020.jpg",
-                "external_source_id": null,
-                "roles": null
-            },
-            "external_source_id": null
+            "seat": "Position 5",
+            "roles": [
+                {
+                    "body": "City Council",
+                    "start_datetime": 1451635200,
+                    "end_datetime": 1704009600,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "City Council",
+                    "start_datetime": 1641024000,
+                    "end_datetime": 1704009600,
+                    "title": "Council President"
+                },
+                {
+                    "body": "Council Briefing",
+                    "start_datetime": 1451635200,
+                    "end_datetime": 1704009600,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "Council Briefing",
+                    "start_datetime": 1641024000,
+                    "end_datetime": 1704009600,
+                    "title": "Council President"
+                }
+            ]
         },
         "Kshama Sawant": {
             "name": "Kshama Sawant",
@@ -80,15 +171,21 @@
             "phone": "206-684-8803",
             "website": null,
             "picture_uri": "https://www.seattle.gov/assets/Images/Council/Members/Sawant/Sawant_225x225.jpg",
-            "seat": {
-                "name": "Position 3",
-                "electoral_area": "Central Seattle",
-                "electoral_type": null,
-                "image_uri": "https://uploads.visitseattle.org/2015/03/NoguchiNeedle_DavidNewman-2-720x313.jpg",
-                "external_source_id": null,
-                "roles": null
-            },
-            "external_source_id": null
+            "seat": "Position 3",
+            "roles": [
+                {
+                    "body": "City Council",
+                    "start_datetime": 1388563200,
+                    "end_datetime": 1704009600,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "Council Briefing",
+                    "start_datetime": 1388563200,
+                    "end_datetime": 1704009600,
+                    "title": "Councilmember"
+                }
+            ]
         },
         "Lisa Herbold": {
             "name": "Lisa Herbold",
@@ -98,33 +195,52 @@
             "phone": "206-684-8801",
             "website": null,
             "picture_uri": "https://www.seattle.gov/assets/Images/Council/Members/Herbold/Herbold_225x225.jpg",
-            "seat": {
-                "name": "Position 1",
-                "electoral_area": "West Seattle",
-                "electoral_type": null,
-                "image_uri": "https://uploads.visitseattle.org/2015/03/AlkiBeach_NickHallPhotography-720x313.jpg",
-                "external_source_id": null,
-                "roles": null
-            },
-            "external_source_id": null
+            "seat": "Position 1",
+            "roles": [
+                {
+                    "body": "City Council",
+                    "start_datetime": 1451635200,
+                    "end_datetime": 1704009600,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "Council Briefing",
+                    "start_datetime": 1451635200,
+                    "end_datetime": 1704009600,
+                    "title": "Councilmember"
+                }
+            ]
         },
         "M. Lorena Gonz\u00e1lez": {
             "name": "M. Lorena Gonz\u00e1lez",
-            "is_active": false,
-            "router_string": null,
-            "email": null,
-            "phone": null,
-            "website": null,
             "picture_uri": "https://www.seattle.gov/assets/Images/Council/Members/Gonzalez/Lorena-González_2020-headshot_225x225.jpg",
-            "seat": {
-                "name": "Position 9",
-                "electoral_area": "Citywide",
-                "electoral_type": null,
-                "image_uri": "https://upload.wikimedia.org/wikipedia/commons/3/36/SeattleI5Skyline.jpg",
-                "external_source_id": null,
-                "roles": null
-            },
-            "external_source_id": null
+            "seat": "Position 9",
+            "roles": [
+                {
+                    "body": "City Council",
+                    "start_datetime": 1448352000,
+                    "end_datetime": 1640937600,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "City Council",
+                    "start_datetime": 1577865600,
+                    "end_datetime": 1640937600,
+                    "title": "Council President"
+                },
+                {
+                    "body": "Council Briefing",
+                    "start_datetime": 1448352000,
+                    "end_datetime": 1640937600,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "Council Briefing",
+                    "start_datetime": 1577865600,
+                    "end_datetime": 1640937600,
+                    "title": "Council President"
+                }
+            ]
         },
         "Sara Nelson": {
             "name": "Sara Nelson",
@@ -134,15 +250,21 @@
             "phone": "206-684-8809",
             "website": null,
             "picture_uri": "https://www.seattle.gov/images/Council/Members/Nelson/nelson_300x300.jpg",
-            "seat": {
-                "name": "Position 9",
-                "electoral_area": "Citywide",
-                "electoral_type": null,
-                "image_uri": "https://upload.wikimedia.org/wikipedia/commons/3/36/SeattleI5Skyline.jpg",
-                "external_source_id": null,
-                "roles": null
-            },
-            "external_source_id": null
+            "seat": "Position 9",
+            "roles": [
+                {
+                    "body": "City Council",
+                    "start_datetime": 1641024000,
+                    "end_datetime": 1704009600,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "Council Briefing",
+                    "start_datetime": 1641024000,
+                    "end_datetime": 1704009600,
+                    "title": "Councilmember"
+                }
+            ]
         },
         "Tammy J. Morales": {
             "name": "Tammy J. Morales",
@@ -152,15 +274,21 @@
             "phone": "206-684-8802",
             "website": null,
             "picture_uri": "https://www.seattle.gov/assets/Images/Council/Members/Morales/Tammy-Morales_headshot_final_300x300.jpg",
-            "seat": {
-                "name": "Position 2",
-                "electoral_area": "Southeast Seattle",
-                "electoral_type": null,
-                "image_uri": "https://uploads.visitseattle.org/2015/03/Safeco_DavidNewman-720x313.jpg",
-                "external_source_id": null,
-                "roles": null
-            },
-            "external_source_id": null
+            "seat": "Position 2",
+            "roles": [
+                {
+                    "body": "City Council",
+                    "start_datetime": 1577865600,
+                    "end_datetime": 1704009600,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "Council Briefing",
+                    "start_datetime": 1577865600,
+                    "end_datetime": 1704009600,
+                    "title": "Councilmember"
+                }
+            ]
         },
         "Teresa Mosqueda": {
             "name": "Teresa Mosqueda",
@@ -170,15 +298,21 @@
             "phone": "206-684-8808",
             "website": null,
             "picture_uri": "https://www.seattle.gov/assets/Images/Council/Members/Mosqueda/Mosqueda_225x225.jpg",
-            "seat": {
-                "name": "Position 8",
-                "electoral_area": "Citywide",
-                "electoral_type": null,
-                "image_uri": "https://upload.wikimedia.org/wikipedia/commons/3/36/SeattleI5Skyline.jpg",
-                "external_source_id": null,
-                "roles": null
-            },
-            "external_source_id": null
+            "seat": "Position 8",
+            "roles": [
+                {
+                    "body": "City Council",
+                    "start_datetime": 1511856000,
+                    "end_datetime": 1704009600,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "Council Briefing",
+                    "start_datetime": 1511856000,
+                    "end_datetime": 1704009600,
+                    "title": "Councilmember"
+                }
+            ]
         }
     }
 }

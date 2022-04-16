@@ -1,9 +1,8 @@
-import json
 import logging
 import re
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, NamedTuple, Optional, Union
+from typing import Any, List, NamedTuple, Optional, Union
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
@@ -25,7 +24,12 @@ from cdp_backend.pipeline.ingestion_models import (
     Vote,
 )
 
-from ..scraper_utils import IngestionModelScraper, reduced_list, str_simplified
+from ..scraper_utils import (
+    IngestionModelScraper,
+    reduced_list,
+    str_simplified,
+    parse_static_file,
+)
 
 ###############################################################################
 
@@ -33,22 +37,7 @@ log = logging.getLogger(__name__)
 
 ###############################################################################
 
-STATIC_FILE_KEY_PERSONS = "persons"
-STATIC_FILE_DEFAULT_PATH = Path(__file__).parent / "portland-static.json"
-
-known_persons: Dict[str, Person] = {}
-
-# load long-term static data at file load-time
-if Path(STATIC_FILE_DEFAULT_PATH).exists():
-    with open(STATIC_FILE_DEFAULT_PATH, "rb") as json_file:
-        static_data = json.load(json_file)
-
-    for name, person in static_data[STATIC_FILE_KEY_PERSONS].items():
-        known_persons[name] = Person.from_dict(person)
-
-
-if len(known_persons) > 0:
-    log.debug(f"loaded static data for {', '.join(known_persons.keys())}")
+SCRAPER_STATIC_DATA = parse_static_file(Path(__file__).parent / "portland-static.json")
 
 ###############################################################################
 
@@ -232,10 +221,10 @@ class PortlandScraper(IngestionModelScraper):
         ----------
         portland-static.json
         """
-        if name not in known_persons:
+        if name not in SCRAPER_STATIC_DATA.persons:
             raise KeyError(f"{name} is unknown. Please update portland-static.json")
 
-        return known_persons[name]
+        return SCRAPER_STATIC_DATA.persons[name]
 
     def get_doc_number(self, minute_section: Tag, event_page: BeautifulSoup) -> str:
         """

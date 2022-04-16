@@ -1,4 +1,59 @@
 {
+    "seats" : {
+        "Position 1": {
+            "name": "Position 1",
+            "electoral_area": "Bothell, Kenmore, Shoreline, Woodinville",
+            "image_uri": "https://www.shorelinewa.gov/home/showpublishedimage/9678/637006775507230000"
+        },
+        "Position 2": {
+            "name": "Position 2",
+            "electoral_area": "Eastern Seattle",
+            "image_uri": "https://uploads.visitseattle.org/2015/03/NoguchiNeedle_DavidNewman-2-720x313.jpg"
+        },
+        "Position 3": {
+            "name": "Position 3",
+            "electoral_area": "Redmond, Sammamish, Snoqualmie",
+            "image_uri": "https://upload.wikimedia.org/wikipedia/commons/1/16/Bicycle_Capital_of_the_Northwest.JPG"
+        },
+        "Position 4": {
+            "name": "Position 4",
+            "electoral_area": "Western Seattle",
+            "image_uri": "https://uploads.visitseattle.org/2015/03/QueenAnne_LempelZiv-720x313.jpg"
+        },
+        "Position 5": {
+            "name": "Position 5",
+            "electoral_area": "Kent, Renton",
+            "image_uri": "https://assets.atlasobscura.com/media/W1siZiIsInVwbG9hZHMvcGxhY2VfaW1hZ2VzL2ViYTUzOWViLTQ4YWQtNGJkMi04ODU1LWE0OGUxMTJmZjYwZWRmM2FmMjRjNDFjOWYwY2YzMV9JTUdfNjI3MC5KUEciXSxbInAiLCJ0aHVtYiIsIjEyMDB4PiJdLFsicCIsImNvbnZlcnQiLCItcXVhbGl0eSA4MSAtYXV0by1vcmllbnQiXV0/IMG_6270.JPG"
+        },
+        "Position 6": {
+            "name": "Position 6",
+            "electoral_area": "Bellevue, Kirkland",
+            "image_uri": "https://bellevuewa.gov/sites/default/files/styles/header_image/public/media/header_image/2019-06/dtp-1600x400.jpg"
+        },
+        "Position 7": {
+            "name": "Position 7",
+            "electoral_area": "Auburn, Federal Way",
+            "image_uri": "https://i.pinimg.com/originals/7c/f0/62/7cf06219cd2967428d796bcba22313d5.jpg"
+        },
+        "Position 8": {
+            "name": "Position 8",
+            "electoral_area": "Burien, Tukwila, West Seattle",
+            "image_uri": "https://uploads.visitseattle.org/2015/03/AlkiBeach_NickHallPhotography-720x313.jpg"
+        },
+        "Position 9": {
+            "name": "Position 9",
+            "electoral_area": "Covington, Maple Valley",
+            "image_uri": "https://photos.alltrails.com/eyJidWNrZXQiOiJhc3NldHMuYWxsdHJhaWxzLmNvbSIsImtleSI6InVwbG9hZHMvcGhvdG8vaW1hZ2UvMjM5OTA0NTMvN2ZkYWYzNmEyMjY1YTJlMmMwYWU0M2RiZTQxNGIzMmIuanBnIiwiZWRpdHMiOnsidG9Gb3JtYXQiOiJqcGVnIiwicmVzaXplIjp7IndpZHRoIjoyMDQ4LCJoZWlnaHQiOjIwNDgsImZpdCI6Imluc2lkZSJ9LCJyb3RhdGUiOm51bGwsImpwZWciOnsidHJlbGxpc1F1YW50aXNhdGlvbiI6dHJ1ZSwib3ZlcnNob290RGVyaW5naW5nIjp0cnVlLCJvcHRpbWlzZVNjYW5zIjp0cnVlLCJxdWFudGlzYXRpb25UYWJsZSI6M319fQ=="
+        }
+    },
+    "primary_bodies": {
+        "Metropolitan King County Council": {
+            "name": "Metropolitan King County Council"
+        },
+        "Committee of the Whole": {
+            "name": "Committee of the Whole"
+        }
+    },
     "persons": {
         "Rod Dembowski": {
             "name": "Rod Dembowski",
@@ -8,14 +63,21 @@
             "phone": "206-477-1001",
             "website": "https://kingcounty.gov/council/dembowski.aspx",
             "picture_uri": "https://kingcounty.gov/~/media/council/images/2018/Dembowski_2x3_print.ashx",
-            "seat": {
-                "name": "Position 1",
-                "electoral_area": "Bothell, Kenmore, Shoreline, Woodinville",
-                "electoral_type": null,
-                "image_uri": "https://www.shorelinewa.gov/home/showpublishedimage/9678/637006775507230000",
-                "external_source_id": null,
-                "roles": null
-            },
+            "seat": "Position 1",
+            "roles": [
+                {
+                    "body": "Metropolitan King County Council",
+                    "start_datetime": 1357027200,
+                    "end_datetime": 1767168000,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "Committee of the Whole",
+                    "start_datetime": 1357027200,
+                    "end_datetime": 1767168000,
+                    "title": "Councilmember"
+                }
+            ],
             "external_source_id": null
         },
         "Girmay Zahilay": {
@@ -26,14 +88,21 @@
             "phone": "206-477-1002",
             "website": "https://kingcounty.gov/council/zahilay",
             "picture_uri": "https://kingcounty.gov/~/media/council/Zahilay/Zahilay_DSC8834_2x3.ashx",
-            "seat": {
-                "name": "Position 2",
-                "electoral_area": "Eastern Seattle",
-                "electoral_type": null,
-                "image_uri": "https://uploads.visitseattle.org/2015/03/NoguchiNeedle_DavidNewman-2-720x313.jpg",
-                "external_source_id": null,
-                "roles": null
-            },
+            "seat": "Position 2",
+            "roles": [
+                {
+                    "body": "Metropolitan King County Council",
+                    "start_datetime": 1577001600,
+                    "end_datetime": 1704009600,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "Committee of the Whole",
+                    "start_datetime": 1577001600,
+                    "end_datetime": 1704009600,
+                    "title": "Councilmember"
+                }
+            ],
             "external_source_id": null
         },
         "Kathy Lambert": {
@@ -44,14 +113,21 @@
             "phone": "206-477-1003",
             "website": "https://kingcounty.gov/council/lambert",
             "picture_uri": "https://kingcounty.gov/~/media/Lambert/images/2019/Lambert_2020_2x3.ashx",
-            "seat": {
-                "name": "Position 3",
-                "electoral_area": "Redmond, Sammamish, Snoqualmie",
-                "electoral_type": null,
-                "image_uri": "https://upload.wikimedia.org/wikipedia/commons/1/16/Bicycle_Capital_of_the_Northwest.JPG",
-                "external_source_id": null,
-                "roles": null
-            },
+            "seat": "Position 3",
+            "roles": [
+                {
+                    "body": "Metropolitan King County Council",
+                    "start_datetime": 1009872000,
+                    "end_datetime": 1640937600,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "Committee of the Whole",
+                    "start_datetime": 1009872000,
+                    "end_datetime": 1640937600,
+                    "title": "Councilmember"
+                }
+            ],
             "external_source_id": null
         },
         "Sarah Perry": {
@@ -62,14 +138,21 @@
             "phone": "206-477-1003",
             "website": "https://kingcounty.gov/council/perry.aspx",
             "picture_uri": "https://kingcounty.gov/council/~/media/council/perry/KCC_SarahPerry.ashx",
-            "seat": {
-                "name": "Position 3",
-                "electoral_area": "Redmond, Sammamish, Snoqualmie",
-                "electoral_type": null,
-                "image_uri": "https://upload.wikimedia.org/wikipedia/commons/1/16/Bicycle_Capital_of_the_Northwest.JPG",
-                "external_source_id": null,
-                "roles": null
-            },
+            "seat": "Position 3",
+            "roles": [
+                {
+                    "body": "Metropolitan King County Council",
+                    "start_datetime": 1641024000,
+                    "end_datetime": 1767168000,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "Committee of the Whole",
+                    "start_datetime": 1641024000,
+                    "end_datetime": 1767168000,
+                    "title": "Councilmember"
+                }
+            ],
             "external_source_id": null
         },
         "Jeanne Kohl-Welles": {
@@ -80,14 +163,27 @@
             "phone": "206-477-1004",
             "website": "https://kingcounty.gov/council/kohl-welles.aspx",
             "picture_uri": "https://kingcounty.gov/~/media/council/kohl-welles/images/2020/Kohl_Wells_2x3_print.ashx",
-            "seat": {
-                "name": "Position 4",
-                "electoral_area": "Western Seattle",
-                "electoral_type": null,
-                "image_uri": "https://uploads.visitseattle.org/2015/03/QueenAnne_LempelZiv-720x313.jpg",
-                "external_source_id": null,
-                "roles": null
-            },
+            "seat": "Position 4",
+            "roles": [
+                {
+                    "body": "Metropolitan King County Council",
+                    "start_datetime": 1451635200,
+                    "end_datetime": 1704009600,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "Committee of the Whole",
+                    "start_datetime": 1451635200,
+                    "end_datetime": 1704009600,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "Committee of the Whole",
+                    "start_datetime": 1641024000,
+                    "end_datetime": 1704009600,
+                    "title": "Council President"
+                }
+            ],
             "external_source_id": null
         },
         "Dave Upthegrove": {
@@ -98,14 +194,21 @@
             "phone": "206-477-1005",
             "website": "https://kingcounty.gov/council/upthegrove.aspx",
             "picture_uri": "https://kingcounty.gov/~/media/council/images/2018/Upthegove_2x3_print.ashx",
-            "seat": {
-                "name": "Position 5",
-                "electoral_area": "Kent, Renton",
-                "electoral_type": null,
-                "image_uri": "https://assets.atlasobscura.com/media/W1siZiIsInVwbG9hZHMvcGxhY2VfaW1hZ2VzL2ViYTUzOWViLTQ4YWQtNGJkMi04ODU1LWE0OGUxMTJmZjYwZWRmM2FmMjRjNDFjOWYwY2YzMV9JTUdfNjI3MC5KUEciXSxbInAiLCJ0aHVtYiIsIjEyMDB4PiJdLFsicCIsImNvbnZlcnQiLCItcXVhbGl0eSA4MSAtYXV0by1vcmllbnQiXV0/IMG_6270.JPG",
-                "external_source_id": null,
-                "roles": null
-            },
+            "seat": "Position 5",
+            "roles": [
+                {
+                    "body": "Metropolitan King County Council",
+                    "start_datetime": 1388563200,
+                    "end_datetime": 1767168000,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "Committee of the Whole",
+                    "start_datetime": 1388563200,
+                    "end_datetime": 1767168000,
+                    "title": "Councilmember"
+                }
+            ],
             "external_source_id": null
         },
         "Claudia Balducci": {
@@ -116,14 +219,27 @@
             "phone": "206-477-1006",
             "website": "https://kingcounty.gov/council/balducci.aspx",
             "picture_uri": "https://kingcounty.gov/~/media/council/balducci/images/2021/Balducci_highres.ashx",
-            "seat": {
-                "name": "Position 6",
-                "electoral_area": "Bellevue, Kirkland",
-                "electoral_type": null,
-                "image_uri": "https://bellevuewa.gov/sites/default/files/styles/header_image/public/media/header_image/2019-06/dtp-1600x400.jpg",
-                "external_source_id": null,
-                "roles": null
-            },
+            "seat": "Position 6",
+            "roles": [
+                {
+                    "body": "Metropolitan King County Council",
+                    "start_datetime": 1388563200,
+                    "end_datetime": 1767168000,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "Metropolitan King County Council",
+                    "start_datetime": 1577865600,
+                    "end_datetime": 1767168000,
+                    "title": "Council President"
+                },
+                {
+                    "body": "Committee of the Whole",
+                    "start_datetime": 1388563200,
+                    "end_datetime": 1767168000,
+                    "title": "Councilmember"
+                }
+            ],
             "external_source_id": null
         },
         "Pete von Reichbauer": {
@@ -134,14 +250,21 @@
             "phone": "206-477-1007",
             "website": "https://kingcounty.gov/council/vonreichbauer",
             "picture_uri": "https://kingcounty.gov/~/media/council/images/2018/von_Reichbauer_2x3_print.ashx",
-            "seat": {
-                "name": "Position 7",
-                "electoral_area": "Auburn, Federal Way",
-                "electoral_type": null,
-                "image_uri": "https://i.pinimg.com/originals/7c/f0/62/7cf06219cd2967428d796bcba22313d5.jpg",
-                "external_source_id": null,
-                "roles": null
-            },
+            "seat": "Position 7",
+            "roles": [
+                {
+                    "body": "Metropolitan King County Council",
+                    "start_datetime": 757411200,
+                    "end_datetime": 1767168000,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "Committee of the Whole",
+                    "start_datetime": 757411200,
+                    "end_datetime": 1767168000,
+                    "title": "Councilmember"
+                }
+            ],
             "external_source_id": null
         },
         "Joe McDermott": {
@@ -152,14 +275,21 @@
             "phone": "206-477-1008",
             "website": "https://kingcounty.gov/council/mcdermott.aspx",
             "picture_uri": "https://kingcounty.gov/~/media/council/images/joecropped.ashx",
-            "seat": {
-                "name": "Position 8",
-                "electoral_area": "Burien, Tukwila, West Seattle",
-                "electoral_type": null,
-                "image_uri": "https://uploads.visitseattle.org/2015/03/AlkiBeach_NickHallPhotography-720x313.jpg",
-                "external_source_id": null,
-                "roles": null
-            },
+            "seat": "Position 8",
+            "roles": [
+                {
+                    "body": "Metropolitan King County Council",
+                    "start_datetime": 757411200,
+                    "end_datetime": 1704009600,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "Committee of the Whole",
+                    "start_datetime": 757411200,
+                    "end_datetime": 1704009600,
+                    "title": "Councilmember"
+                }
+            ],
             "external_source_id": null
         },
         "Reagan Dunn": {
@@ -170,14 +300,21 @@
             "phone": "206-477-1009",
             "website": "https://kingcounty.gov/council/dunn",
             "picture_uri": "https://kingcounty.gov/~/media/Dunn/images/2019/Dunn_DSC8750_2x3.ashx",
-            "seat": {
-                "name": "Position 9",
-                "electoral_area": "Covington, Maple Valley",
-                "electoral_type": null,
-                "image_uri": "https://photos.alltrails.com/eyJidWNrZXQiOiJhc3NldHMuYWxsdHJhaWxzLmNvbSIsImtleSI6InVwbG9hZHMvcGhvdG8vaW1hZ2UvMjM5OTA0NTMvN2ZkYWYzNmEyMjY1YTJlMmMwYWU0M2RiZTQxNGIzMmIuanBnIiwiZWRpdHMiOnsidG9Gb3JtYXQiOiJqcGVnIiwicmVzaXplIjp7IndpZHRoIjoyMDQ4LCJoZWlnaHQiOjIwNDgsImZpdCI6Imluc2lkZSJ9LCJyb3RhdGUiOm51bGwsImpwZWciOnsidHJlbGxpc1F1YW50aXNhdGlvbiI6dHJ1ZSwib3ZlcnNob290RGVyaW5naW5nIjp0cnVlLCJvcHRpbWlzZVNjYW5zIjp0cnVlLCJxdWFudGlzYXRpb25UYWJsZSI6M319fQ==",
-                "external_source_id": null,
-                "roles": null
-            },
+            "seat": "Position 9",
+            "roles": [
+                {
+                    "body": "Metropolitan King County Council",
+                    "start_datetime": 1104566400,
+                    "end_datetime": 1767168000,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "Committee of the Whole",
+                    "start_datetime": 1104566400,
+                    "end_datetime": 1767168000,
+                    "title": "Councilmember"
+                }
+            ],
             "external_source_id": null
         }
     }
