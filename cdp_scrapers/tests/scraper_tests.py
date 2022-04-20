@@ -150,6 +150,18 @@ def test_king_county_scraper(
     "number_of_votes, expected_video_uri_in_first_session, expected_agenda_uri",
     [
         (
+            datetime(2021, 8, 19),
+            datetime(2021, 8, 31),
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            "",
+            "",
+        ),
+        (
             datetime(2021, 8, 18),
             datetime(2021, 8, 19),
             1,
@@ -214,17 +226,21 @@ def test_portland_scraper(
     portland = PortlandScraper()
     portland_events = portland.get_events(start_date_time, end_date_time)
     assert len(portland_events) == number_of_events
-    assert len(portland_events[0].event_minutes_items) == number_of_event_minute_items
-    assert len(portland_events[0].sessions) == number_of_sessions
-    assert (
-        portland_events[0].sessions[0].video_uri == expected_video_uri_in_first_session
-    )
-    assert (
-        len(
-            portland_events[event_with_votes]
-            .event_minutes_items[event_minute_item_with_votes]
-            .votes
+    if number_of_events > 0:
+        assert (
+            len(portland_events[0].event_minutes_items) == number_of_event_minute_items
         )
-        == number_of_votes
-    )
-    assert portland_events[0].agenda_uri == expected_agenda_uri
+        assert len(portland_events[0].sessions) == number_of_sessions
+        assert (
+            portland_events[0].sessions[0].video_uri
+            == expected_video_uri_in_first_session
+        )
+        assert (
+            len(
+                portland_events[event_with_votes]
+                .event_minutes_items[event_minute_item_with_votes]
+                .votes
+            )
+            == number_of_votes
+        )
+        assert portland_events[0].agenda_uri == expected_agenda_uri

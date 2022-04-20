@@ -8,22 +8,13 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 from bs4 import BeautifulSoup, Tag
-from cdp_backend.database.constants import (
-    EventMinutesItemDecision,
-    MatterStatusDecision,
-    VoteDecision,
-)
-from cdp_backend.pipeline.ingestion_models import (
-    Body,
-    EventIngestionModel,
-    EventMinutesItem,
-    Matter,
-    MinutesItem,
-    Person,
-    Session,
-    SupportingFile,
-    Vote,
-)
+from cdp_backend.database.constants import (EventMinutesItemDecision,
+                                            MatterStatusDecision, VoteDecision)
+from cdp_backend.pipeline.ingestion_models import (Body, EventIngestionModel,
+                                                   EventMinutesItem, Matter,
+                                                   MinutesItem, Person,
+                                                   Session, SupportingFile,
+                                                   Vote)
 
 from ..scraper_utils import IngestionModelScraper, reduced_list, str_simplified
 
@@ -655,7 +646,10 @@ class PortlandScraper(IngestionModelScraper):
         if agenda_uri_element is not None:
             return make_efile_url(agenda_uri_element["href"])
         parent_agenda_uri_element = event_page.find("div", {"class": "inline-flex"})
-        agenda_uri_element = parent_agenda_uri_element.find("a")
+        if parent_agenda_uri_element is not None:
+            agenda_uri_element = parent_agenda_uri_element.find("a")
+        else:
+            return None
         if agenda_uri_element is not None:
             return f"https://www.portland.gov{agenda_uri_element['href']}"
         return None
