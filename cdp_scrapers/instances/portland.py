@@ -644,7 +644,10 @@ class PortlandScraper(IngestionModelScraper):
         if agenda_uri_element is not None:
             return make_efile_url(agenda_uri_element["href"])
         parent_agenda_uri_element = event_page.find("div", {"class": "inline-flex"})
-        agenda_uri_element = parent_agenda_uri_element.find("a")
+        if parent_agenda_uri_element is not None:
+            agenda_uri_element = parent_agenda_uri_element.find("a")
+        else:
+            return None
         if agenda_uri_element is not None:
             return f"https://www.portland.gov{agenda_uri_element['href']}"
         return None
