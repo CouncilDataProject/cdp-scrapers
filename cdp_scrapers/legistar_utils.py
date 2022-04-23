@@ -296,6 +296,26 @@ def get_legistar_matter(
 def find_legister_matters(
     client: str, ingestion_matter_name: str
 ) -> List[Dict[str, Any]]:
+    """
+    Return JSON list of Legistar Matter with name or title == ingestion_matter_name.
+    It is assumed Matter.external_source_id is not available if this is called.
+
+    Parameters
+    ----------
+    client: str
+        Which legistar client to target. Ex: "seattle"
+    ingestion_matter_name: str
+        ingestion_models.Matter.name
+
+    Returns
+    -------
+    matter: List[Dict[str, Any]]
+        list of legistar API Matter JSON
+
+    See Also
+    --------
+    LegistarScraper.get_updated_matter()
+    """
     matter_name_filter = (
         f"MatterName eq '{ingestion_matter_name}' "
         f"or MatterFile eq '{ingestion_matter_name}'"
@@ -304,7 +324,7 @@ def find_legister_matters(
     resp = requests.get(request_format.format(client=client))
     if resp.status_code != 200:
         log.debug(
-            f"{resp.status_code} ({resp.reason}) for querying "
+            f"{resp.status_code} ({resp.reason}) for querying for Matter with"
             f"MatterName or MatterFile = '{ingestion_matter_name}'"
         )
         return []
@@ -1078,16 +1098,46 @@ class LegistarScraper(IngestionModelScraper):
         )
 
     def get_updated_matter(self, matter: Matter) -> Optional[Matter]:
+        """
+        Get latest version of matter from Legistar API endpoint.
+
+        Parameters
+        ----------
+        matter: Matter
+
+        Returns
+        -------
+        matter: Optional[Matter]
+
+        Notes
+        -----
+        First search for Legistar Matter with
+        MatterName==matter.name or MatterFile==mater.name
+        if MatterId (matter.external_source_id) is unknown.
+        """
         matter_id = matter.external_source_id
         if matter_id is None and matter.name is not None:
             matter_matches = [
-                matter
-                for matter in find_legister_matters(self.client_name, matter.name)
-                if isinstance(matter[LEGISTAR_MATTER_EXT_ID], int)
-                and int(matter[LEGISTAR_MATTER_EXT_ID]) > 0
+                legistar_matter
+                for legistar_matter in find_legister_matters(
+                    self.client_name, matter.name
+                )
+                if isinstance(legistar_matter[LEGISTAR_MATTER_EXT_ID], int)
+                and int(legistar_matter[LEGISTAR_MATTER_EXT_ID]) > 0
             ]
+            try:
+                matter_matches.sort(
+                    # just in case we get multiple Matters that same name,
+                    # use the latest one
+                    key=lambda legistar_matter: datetime.fromisoformat(
+                        legistar_matter["MatterLastModifiedUtc"]
+                    ),
+                )
+            except ValueError:
+                # MatterLastModifiedUtc can be ill-formed for fromisoformat()
+                pass
             if any(matter_matches):
-                matter_id = str(matter_matches[0][LEGISTAR_MATTER_EXT_ID])
+                matter_id = matter_matches[-1][LEGISTAR_MATTER_EXT_ID]
 
         if matter_id is None:
             return None
@@ -1510,6 +1560,23 @@ class LegistarScraper(IngestionModelScraper):
     def get_model(
         self, model: IngestionModel, **kwargs: Any
     ) -> Optional[IngestionModel]:
+        """
+        Query Legistar API for latest information for given model
+
+        Parameters
+        ----------
+        model: IngestionModel
+            e.g. ingestion_models.Matter
+
+        Returns
+        -------
+        model: Optional[IngestionModel]
+            None in case of error
+
+        See Also
+        --------
+        get_updated_matter()
+        """
         if isinstance(model, Matter):
             return self.get_updated_matter(model)
 
