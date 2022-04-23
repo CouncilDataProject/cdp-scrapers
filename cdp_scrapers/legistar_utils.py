@@ -71,13 +71,12 @@ LEGISTAR_VOTE_EXT_ID = "VoteId"
 LEGISTAR_FILE_EXT_ID = "MatterAttachmentId"
 LEGISTAR_FILE_NAME = "MatterAttachmentName"
 LEGISTAR_FILE_URI = "MatterAttachmentHyperlink"
-LEGISTAR_MATTER_EXT_ID = "EventItemMatterId"
-LEGISTAR_MATTER_TITLE = "EventItemMatterFile"
-LEGISTAR_MATTER_NAME = "EventItemMatterName"
-LEGISTAR_MATTER_TYPE = "EventItemMatterType"
-LEGISTAR_MATTER_STATUS = "EventItemMatterStatus"
+LEGISTAR_MATTER_EXT_ID = "MatterId"
+LEGISTAR_MATTER_TITLE = "MatterFile"
+LEGISTAR_MATTER_NAME = "MatterName"
+LEGISTAR_MATTER_TYPE = "MatterTypeName"
+LEGISTAR_MATTER_STATUS = "MatterStatusName"
 LEGISTAR_MATTER_SPONSORS = "MatterSponsorInfo"
-LEGISTAR_SPONSOR_PERSON = "SponsorPersonInfo"
 # Session.session_datetime is a combo of EventDate and EventTime
 # TODO: this means same time for all Sessions in a EventIngestionModel.
 #       some other legistar api data that can be used instead
@@ -99,6 +98,8 @@ LEGISTAR_ROLE_TITLE_ALT = "OfficeRecordMemberType"
 
 LEGISTAR_EV_ITEMS = "EventItems"
 LEGISTAR_EV_ATTACHMENTS = "EventItemMatterAttachments"
+LEGISTAR_EV_MATTER_ID = "EventItemMatterId"
+LEGISTAR_EV_MATTER = "EventItemMatterInfo"
 LEGISTAR_EV_VOTES = "EventItemVoteInfo"
 LEGISTAR_VOTE_PERSONS = "PersonInfo"
 LEGISTAR_EV_SITE_URL = "EventInSiteURL"
@@ -270,6 +271,10 @@ def get_legistar_events_for_timespan(
         provided. Additionally, requests and attaches agenda items, minutes items, any
         attachments, called "EventItems", requests votes for any of these "EventItems",
         and requests person information for any vote.
+
+    References
+    ----------
+    https://webapi.legistar.com/Help
     """
     # Set defaults
     if begin is None:
@@ -344,32 +349,42 @@ def get_legistar_events_for_timespan(
                 )
 
             if (
-                not isinstance(event_item["EventItemMatterId"], int)
-                or event_item["EventItemMatterId"] < 0
+                not isinstance(event_item[LEGISTAR_EV_MATTER_ID], int)
+                or event_item[LEGISTAR_EV_MATTER_ID] < 0
             ):
-                event_item[LEGISTAR_MATTER_SPONSORS] = None
-            else:
-                # this matter's sponsors
-                sponsor_request_format = (
-                    LEGISTAR_MATTER_BASE + "/{event_item_matter_id}/Sponsors"
-                )
-                sponsors = requests.get(
-                    sponsor_request_format.format(
-                        client=client,
-                        event_item_matter_id=event_item["EventItemMatterId"],
-                    )
-                ).json()
+                event_item[LEGISTAR_EV_MATTER] = None
+                continue
 
-                # legistar MatterSponsor just has a reference to a Person
-                # so further obtain the actual Person information
-                for sponsor in sponsors:
-                    sponsor[LEGISTAR_SPONSOR_PERSON] = get_legistar_person(
+            # Legistar API Matter JSON
+            matter: Dict[str, Any] = requests.get(
+                (LEGISTAR_MATTER_BASE + "/{event_item_matter_id}").format(
+                    client=client,
+                    event_item_matter_id=event_item[LEGISTAR_EV_MATTER_ID],
+                )
+            ).json()
+
+            # Person JSON for this matter's sponsors
+            matter[LEGISTAR_MATTER_SPONSORS] = reduced_list(
+                [
+                    # legistar MatterSponsor just has a reference to a Person
+                    # need another query to get the Person itself
+                    get_legistar_person(
                         client=client,
                         person_id=sponsor["MatterSponsorNameId"],
                         use_cache=True,
                     )
+                    for sponsor in requests.get(
+                        (
+                            LEGISTAR_MATTER_BASE + "/{event_item_matter_id}/Sponsors"
+                        ).format(
+                            client=client,
+                            event_item_matter_id=matter[LEGISTAR_MATTER_EXT_ID],
+                        )
+                    ).json()
+                ]
+            )
 
-                event_item[LEGISTAR_MATTER_SPONSORS] = sponsors
+            event_item[LEGISTAR_EV_MATTER] = matter
 
     log.debug(f"Collected {len(response)} Legistar events")
     return response
@@ -981,44 +996,43 @@ class LegistarScraper(IngestionModelScraper):
             ]
         )
 
-    def get_sponsors(self, legistar_sponsors: List[Dict]) -> Optional[List[Person]]:
+    def get_sponsors(
+        self, legistar_sponsors: List[Dict[str, Any]]
+    ) -> Optional[List[Person]]:
         if not legistar_sponsors:
             return None
 
-        return reduced_list(
-            [
-                self.get_person(sponsor["SponsorPersonInfo"])
-                for sponsor in legistar_sponsors
-            ]
-        )
+        return reduced_list([self.get_person(sponsor) for sponsor in legistar_sponsors])
 
-    def get_matter(self, legistar_ev: Dict) -> Optional[Matter]:
+    def get_matter(self, legistar_matter: Dict[str, Any]) -> Optional[Matter]:
         """
-        Return Matter from Legistar API EventItem.
+        Return ingestion_models.Matter from Legistar API Matter
 
         Parameters
         ----------
-        legistar_ev: Dict
-            Legistar API EventItem
+        legistar_matter: Dict[str, Any]
+            Legistar API Matter
 
         Returns
         -------
         matter: Optional[Matter]
-            List of converted Legistar matter details to CDP matter objects.
-            None if missing information.
+            None if Legistar Matter is missing
+            information required for ingestion_models.Matter
         """
+        if legistar_matter is None:
+            return None
         return self.get_none_if_empty(
             Matter(
-                external_source_id=str(legistar_ev[LEGISTAR_MATTER_EXT_ID]),
+                external_source_id=str(legistar_matter[LEGISTAR_MATTER_EXT_ID]),
                 # Too often EventItemMatterName is not filled
                 # but EventItemMatterFile is
-                name=str_simplified(legistar_ev[LEGISTAR_MATTER_NAME])
-                or str_simplified(legistar_ev[LEGISTAR_MATTER_TITLE]),
-                matter_type=str_simplified(legistar_ev[LEGISTAR_MATTER_TYPE]),
-                sponsors=self.get_sponsors(legistar_ev[LEGISTAR_MATTER_SPONSORS]),
-                title=str_simplified(legistar_ev[LEGISTAR_MATTER_TITLE]),
+                name=str_simplified(legistar_matter[LEGISTAR_MATTER_NAME])
+                or str_simplified(legistar_matter[LEGISTAR_MATTER_TITLE]),
+                matter_type=str_simplified(legistar_matter[LEGISTAR_MATTER_TYPE]),
+                sponsors=self.get_sponsors(legistar_matter[LEGISTAR_MATTER_SPONSORS]),
+                title=str_simplified(legistar_matter[LEGISTAR_MATTER_TITLE]),
                 result_status=self.get_matter_status(
-                    legistar_ev[LEGISTAR_MATTER_STATUS]
+                    legistar_matter[LEGISTAR_MATTER_STATUS]
                 ),
             )
         )
@@ -1082,7 +1096,10 @@ class LegistarScraper(IngestionModelScraper):
         # matter.result_status is allowed to be null
         # only when no votes or Legistar EventItemMatterStatus is null
         if ev_minutes_item.matter and not ev_minutes_item.matter.result_status:
-            if ev_minutes_item.votes and legistar_ev_item[LEGISTAR_MATTER_STATUS]:
+            if (
+                ev_minutes_item.votes
+                and legistar_ev_item[LEGISTAR_EV_MATTER][LEGISTAR_MATTER_STATUS]
+            ):
                 # means did not find matter_*_pattern in Legistar EventItemMatterStatus.
                 # default to in progress (as opposed to adopted or rejected)
                 # NOTE: if our matter_*_patterns ARE "complete",
@@ -1142,7 +1159,7 @@ class LegistarScraper(IngestionModelScraper):
                                 index=item[LEGISTAR_EV_INDEX],
                                 minutes_item=self.get_minutes_item(item),
                                 votes=self.get_votes(item[LEGISTAR_EV_VOTES]),
-                                matter=self.get_matter(item),
+                                matter=self.get_matter(item[LEGISTAR_EV_MATTER]),
                                 decision=self.get_minutes_item_decision(
                                     item[LEGISTAR_EV_MINUTE_DECISION]
                                 ),
@@ -1307,8 +1324,10 @@ class LegistarScraper(IngestionModelScraper):
             # EventMinutesItem.votes.person
             for minute_item in event.event_minutes_items:
                 if minute_item.matter and minute_item.matter.sponsors:
-                    for sponsor in minute_item.matter.sponsors:
-                        sponsor = self.inject_known_person(sponsor)
+                    minute_item.matter.sponsors = [
+                        self.inject_known_person(sponsor)
+                        for sponsor in minute_item.matter.sponsors
+                    ]
 
                 if minute_item.votes:
                     for vote in minute_item.votes:
