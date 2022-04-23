@@ -6,7 +6,7 @@ import logging
 import re
 from datetime import datetime, timedelta
 from json import JSONDecodeError
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set, Union
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote_plus
 from urllib.request import urlopen
@@ -244,6 +244,54 @@ def get_legistar_person(
     return person
 
 
+def get_legistar_matter(
+    client: str,
+    matter_id: Union[int, str],
+    use_person_cache: bool = False,
+) -> Optional[Dict[str, Any]]:
+    """
+    Return information for a single legistar Matter in JSON.
+
+    Parameters
+    ----------
+    client: str
+        Which legistar client to target. Ex: "seattle"
+    matter_id: Union[int, str]
+        Unique ID for this matter in the legistar municipality
+    use_person_cache: bool
+        Pass to get_legistar_person(use_cache=use_person_cache)
+
+    Returns
+    -------
+    matter: Dict[str, Any]
+        legistar API Matter
+    """
+    matter: Dict[str, Any] = requests.get(
+        (LEGISTAR_MATTER_BASE + "/{matter_id}").format(
+            client=client, matter_id=matter_id
+        )
+    ).json()
+
+    # Person JSON for this matter's sponsors
+    matter[LEGISTAR_MATTER_SPONSORS] = reduced_list(
+        [
+            # legistar MatterSponsor just has a reference to a Person
+            # need another query to get the Person itself
+            get_legistar_person(
+                client=client,
+                person_id=sponsor["MatterSponsorNameId"],
+                use_cache=use_person_cache,
+            )
+            for sponsor in requests.get(
+                (LEGISTAR_MATTER_BASE + "/{matter_id}/Sponsors").format(
+                    client=client, matter_id=matter_id
+                )
+            ).json()
+        ]
+    )
+    return matter
+
+
 def get_legistar_events_for_timespan(
     client: str,
     begin: Optional[datetime] = None,
@@ -348,43 +396,15 @@ def get_legistar_events_for_timespan(
                     use_cache=True,
                 )
 
+            event_item[LEGISTAR_EV_MATTER] = None
             if (
-                not isinstance(event_item[LEGISTAR_EV_MATTER_ID], int)
-                or event_item[LEGISTAR_EV_MATTER_ID] < 0
+                isinstance(event_item[LEGISTAR_EV_MATTER_ID], int)
+                and event_item[LEGISTAR_EV_MATTER_ID] >= 0
             ):
-                event_item[LEGISTAR_EV_MATTER] = None
-                continue
-
-            # Legistar API Matter JSON
-            matter: Dict[str, Any] = requests.get(
-                (LEGISTAR_MATTER_BASE + "/{event_item_matter_id}").format(
-                    client=client,
-                    event_item_matter_id=event_item[LEGISTAR_EV_MATTER_ID],
+                # get Matter and MatterSponsors for this event item
+                event_item[LEGISTAR_EV_MATTER] = get_legistar_matter(
+                    client, event_item[LEGISTAR_EV_MATTER_ID], use_person_cache=True
                 )
-            ).json()
-
-            # Person JSON for this matter's sponsors
-            matter[LEGISTAR_MATTER_SPONSORS] = reduced_list(
-                [
-                    # legistar MatterSponsor just has a reference to a Person
-                    # need another query to get the Person itself
-                    get_legistar_person(
-                        client=client,
-                        person_id=sponsor["MatterSponsorNameId"],
-                        use_cache=True,
-                    )
-                    for sponsor in requests.get(
-                        (
-                            LEGISTAR_MATTER_BASE + "/{event_item_matter_id}/Sponsors"
-                        ).format(
-                            client=client,
-                            event_item_matter_id=matter[LEGISTAR_MATTER_EXT_ID],
-                        )
-                    ).json()
-                ]
-            )
-
-            event_item[LEGISTAR_EV_MATTER] = matter
 
     log.debug(f"Collected {len(response)} Legistar events")
     return response
