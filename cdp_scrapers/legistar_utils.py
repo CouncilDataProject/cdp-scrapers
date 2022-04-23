@@ -267,11 +267,18 @@ def get_legistar_matter(
     matter: Dict[str, Any]
         legistar API Matter
     """
-    matter: Dict[str, Any] = requests.get(
+    resp = requests.get(
         (LEGISTAR_MATTER_BASE + "/{matter_id}").format(
             client=client, matter_id=matter_id
         )
-    ).json()
+    )
+    if resp.status_code != 200:
+        log.debug(
+            f"{resp.status_code} ({resp.reason}) from querying for "
+            f"Legistar Matter with MatterId = {matter_id}"
+        )
+        return None
+    matter: Dict[str, Any] = resp.json()
 
     # Person JSON for this matter's sponsors
     matter[LEGISTAR_MATTER_SPONSORS] = reduced_list(
