@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from copy import deepcopy
 import logging
 import re
+from copy import deepcopy
 from datetime import datetime, timedelta
 from json import JSONDecodeError
 from typing import Any, Dict, List, Optional, Set, Union
@@ -21,6 +21,7 @@ from cdp_backend.pipeline.ingestion_models import (
     Body,
     EventIngestionModel,
     EventMinutesItem,
+    IngestionModel,
     Matter,
     MinutesItem,
     Person,
@@ -290,6 +291,25 @@ def get_legistar_matter(
         ]
     )
     return matter
+
+
+def find_legister_matters(
+    client: str, ingestion_matter_name: str
+) -> List[Dict[str, Any]]:
+    matter_name_filter = (
+        f"MatterName eq '{ingestion_matter_name}' "
+        f"or MatterFile eq '{ingestion_matter_name}'"
+    )
+    request_format = LEGISTAR_MATTER_BASE + f"?$filter={quote_plus(matter_name_filter)}"
+    resp = requests.get(request_format.format(client=client))
+    if resp.status_code != 200:
+        log.debug(
+            f"{resp.status_code} ({resp.reason}) for querying "
+            f"MatterName or MatterFile = '{ingestion_matter_name}'"
+        )
+        return []
+
+    return resp.json()
 
 
 def get_legistar_events_for_timespan(
@@ -1057,6 +1077,22 @@ class LegistarScraper(IngestionModelScraper):
             )
         )
 
+    def get_updated_matter(self, matter: Matter) -> Optional[Matter]:
+        matter_id = matter.external_source_id
+        if matter_id is None and matter.name is not None:
+            matter_matches = [
+                matter
+                for matter in find_legister_matters(self.client_name, matter.name)
+                if isinstance(matter[LEGISTAR_MATTER_EXT_ID], int)
+                and int(matter[LEGISTAR_MATTER_EXT_ID]) > 0
+            ]
+            if any(matter_matches):
+                matter_id = str(matter_matches[0][LEGISTAR_MATTER_EXT_ID])
+
+        if matter_id is None:
+            return None
+        return self.get_matter(get_legistar_matter(self.client_name, matter_id))
+
     def get_minutes_item(self, legistar_ev_item: Dict) -> Optional[MinutesItem]:
         """
         Return MinutesItem from parts of Legistar API EventItem.
@@ -1470,6 +1506,15 @@ class LegistarScraper(IngestionModelScraper):
         events = self.post_process_ingestion_models(events)
 
         return events
+
+    def get_model(
+        self, model: IngestionModel, **kwargs: Any
+    ) -> Optional[IngestionModel]:
+        if isinstance(model, Matter):
+            return self.get_updated_matter(model)
+
+        log.debug(f"IngestionModel scraping function for {type(model)} does not exist.")
+        return None
 
     @property
     def is_legistar_compatible(self) -> bool:
