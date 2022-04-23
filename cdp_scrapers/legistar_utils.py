@@ -1564,7 +1564,7 @@ class LegistarScraper(IngestionModelScraper):
 
         return events
 
-    def get_model(
+    def get_updated_model(
         self, model: IngestionModel, **kwargs: Any
     ) -> Optional[IngestionModel]:
         """
