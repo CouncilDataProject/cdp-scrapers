@@ -1134,7 +1134,7 @@ class LegistarScraper(IngestionModelScraper):
             ]
             try:
                 matter_matches.sort(
-                    # just in case we get multiple Matters that same name,
+                    # just in case we get multiple Matters with same name,
                     # use the latest one
                     key=lambda legistar_matter: datetime.fromisoformat(
                         legistar_matter["MatterLastModifiedUtc"]
