@@ -1152,10 +1152,11 @@ class LegistarScraper(IngestionModelScraper):
         if matter is None:
             return None
 
-        if matter.sponsors is not None:
-            matter.sponsors = [
-                self.inject_known_person(sponsor) for sponsor in matter.sponsors
-            ]
+        matter.sponsors = (
+            [self.inject_known_person(sponsor) for sponsor in matter.sponsors]
+            if matter.sponsors is not None
+            else []
+        )
         return matter
 
     def get_minutes_item(self, legistar_ev_item: Dict) -> Optional[MinutesItem]:
