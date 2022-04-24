@@ -1154,8 +1154,7 @@ class LegistarScraper(IngestionModelScraper):
 
         if matter.sponsors is not None:
             matter.sponsors = [
-                self.inject_known_person(sponsor)
-                for sponsor in matter.sponsors
+                self.inject_known_person(sponsor) for sponsor in matter.sponsors
             ]
         return matter
 
