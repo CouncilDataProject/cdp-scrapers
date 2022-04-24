@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from copy import deepcopy
 import logging
 import re
+from copy import deepcopy
 from datetime import datetime, timedelta
 from json import JSONDecodeError
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set, Union
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote_plus
 from urllib.request import urlopen
@@ -21,6 +21,7 @@ from cdp_backend.pipeline.ingestion_models import (
     Body,
     EventIngestionModel,
     EventMinutesItem,
+    IngestionModel,
     Matter,
     MinutesItem,
     Person,
@@ -71,13 +72,12 @@ LEGISTAR_VOTE_EXT_ID = "VoteId"
 LEGISTAR_FILE_EXT_ID = "MatterAttachmentId"
 LEGISTAR_FILE_NAME = "MatterAttachmentName"
 LEGISTAR_FILE_URI = "MatterAttachmentHyperlink"
-LEGISTAR_MATTER_EXT_ID = "EventItemMatterId"
-LEGISTAR_MATTER_TITLE = "EventItemMatterFile"
-LEGISTAR_MATTER_NAME = "EventItemMatterName"
-LEGISTAR_MATTER_TYPE = "EventItemMatterType"
-LEGISTAR_MATTER_STATUS = "EventItemMatterStatus"
+LEGISTAR_MATTER_EXT_ID = "MatterId"
+LEGISTAR_MATTER_TITLE = "MatterFile"
+LEGISTAR_MATTER_NAME = "MatterName"
+LEGISTAR_MATTER_TYPE = "MatterTypeName"
+LEGISTAR_MATTER_STATUS = "MatterStatusName"
 LEGISTAR_MATTER_SPONSORS = "MatterSponsorInfo"
-LEGISTAR_SPONSOR_PERSON = "SponsorPersonInfo"
 # Session.session_datetime is a combo of EventDate and EventTime
 # TODO: this means same time for all Sessions in a EventIngestionModel.
 #       some other legistar api data that can be used instead
@@ -99,6 +99,8 @@ LEGISTAR_ROLE_TITLE_ALT = "OfficeRecordMemberType"
 
 LEGISTAR_EV_ITEMS = "EventItems"
 LEGISTAR_EV_ATTACHMENTS = "EventItemMatterAttachments"
+LEGISTAR_EV_MATTER_ID = "EventItemMatterId"
+LEGISTAR_EV_MATTER = "EventItemMatterInfo"
 LEGISTAR_EV_VOTES = "EventItemVoteInfo"
 LEGISTAR_VOTE_PERSONS = "PersonInfo"
 LEGISTAR_EV_SITE_URL = "EventInSiteURL"
@@ -243,6 +245,100 @@ def get_legistar_person(
     return person
 
 
+def get_legistar_matter(
+    client: str,
+    matter_id: Union[int, str],
+    use_person_cache: bool = False,
+) -> Optional[Dict[str, Any]]:
+    """
+    Return information for a single legistar Matter in JSON.
+
+    Parameters
+    ----------
+    client: str
+        Which legistar client to target. Ex: "seattle"
+    matter_id: Union[int, str]
+        Unique ID for this matter in the legistar municipality
+    use_person_cache: bool
+        Pass to get_legistar_person(use_cache=use_person_cache)
+
+    Returns
+    -------
+    matter: Dict[str, Any]
+        legistar API Matter
+    """
+    resp = requests.get(
+        (LEGISTAR_MATTER_BASE + "/{matter_id}").format(
+            client=client, matter_id=matter_id
+        )
+    )
+    if resp.status_code != 200:
+        log.debug(
+            f"{resp.status_code} ({resp.reason}) from querying for "
+            f"Legistar Matter with MatterId = {matter_id}"
+        )
+        return None
+    matter: Dict[str, Any] = resp.json()
+
+    # Person JSON for this matter's sponsors
+    matter[LEGISTAR_MATTER_SPONSORS] = reduced_list(
+        [
+            # legistar MatterSponsor just has a reference to a Person
+            # need another query to get the Person itself
+            get_legistar_person(
+                client=client,
+                person_id=sponsor["MatterSponsorNameId"],
+                use_cache=use_person_cache,
+            )
+            for sponsor in requests.get(
+                (LEGISTAR_MATTER_BASE + "/{matter_id}/Sponsors").format(
+                    client=client, matter_id=matter_id
+                )
+            ).json()
+        ]
+    )
+    return matter
+
+
+def find_legister_matters(
+    client: str, ingestion_matter_name: str
+) -> List[Dict[str, Any]]:
+    """
+    Return JSON list of Legistar Matter with name or title == ingestion_matter_name.
+    It is assumed Matter.external_source_id is not available if this is called.
+
+    Parameters
+    ----------
+    client: str
+        Which legistar client to target. Ex: "seattle"
+    ingestion_matter_name: str
+        ingestion_models.Matter.name
+
+    Returns
+    -------
+    matter: List[Dict[str, Any]]
+        list of legistar API Matter JSON
+
+    See Also
+    --------
+    LegistarScraper.get_updated_matter()
+    """
+    matter_name_filter = (
+        f"MatterName eq '{ingestion_matter_name}' "
+        f"or MatterFile eq '{ingestion_matter_name}'"
+    )
+    request_format = LEGISTAR_MATTER_BASE + f"?$filter={quote_plus(matter_name_filter)}"
+    resp = requests.get(request_format.format(client=client))
+    if resp.status_code != 200:
+        log.debug(
+            f"{resp.status_code} ({resp.reason}) for querying for Matter with"
+            f"MatterName or MatterFile = '{ingestion_matter_name}'"
+        )
+        return []
+
+    return resp.json()
+
+
 def get_legistar_events_for_timespan(
     client: str,
     begin: Optional[datetime] = None,
@@ -270,6 +366,10 @@ def get_legistar_events_for_timespan(
         provided. Additionally, requests and attaches agenda items, minutes items, any
         attachments, called "EventItems", requests votes for any of these "EventItems",
         and requests person information for any vote.
+
+    References
+    ----------
+    https://webapi.legistar.com/Help
     """
     # Set defaults
     if begin is None:
@@ -343,33 +443,15 @@ def get_legistar_events_for_timespan(
                     use_cache=True,
                 )
 
+            event_item[LEGISTAR_EV_MATTER] = None
             if (
-                not isinstance(event_item["EventItemMatterId"], int)
-                or event_item["EventItemMatterId"] < 0
+                isinstance(event_item[LEGISTAR_EV_MATTER_ID], int)
+                and event_item[LEGISTAR_EV_MATTER_ID] >= 0
             ):
-                event_item[LEGISTAR_MATTER_SPONSORS] = None
-            else:
-                # this matter's sponsors
-                sponsor_request_format = (
-                    LEGISTAR_MATTER_BASE + "/{event_item_matter_id}/Sponsors"
+                # get Matter and MatterSponsors for this event item
+                event_item[LEGISTAR_EV_MATTER] = get_legistar_matter(
+                    client, event_item[LEGISTAR_EV_MATTER_ID], use_person_cache=True
                 )
-                sponsors = requests.get(
-                    sponsor_request_format.format(
-                        client=client,
-                        event_item_matter_id=event_item["EventItemMatterId"],
-                    )
-                ).json()
-
-                # legistar MatterSponsor just has a reference to a Person
-                # so further obtain the actual Person information
-                for sponsor in sponsors:
-                    sponsor[LEGISTAR_SPONSOR_PERSON] = get_legistar_person(
-                        client=client,
-                        person_id=sponsor["MatterSponsorNameId"],
-                        use_cache=True,
-                    )
-
-                event_item[LEGISTAR_MATTER_SPONSORS] = sponsors
 
     log.debug(f"Collected {len(response)} Legistar events")
     return response
@@ -981,47 +1063,101 @@ class LegistarScraper(IngestionModelScraper):
             ]
         )
 
-    def get_sponsors(self, legistar_sponsors: List[Dict]) -> Optional[List[Person]]:
+    def get_sponsors(
+        self, legistar_sponsors: List[Dict[str, Any]]
+    ) -> Optional[List[Person]]:
         if not legistar_sponsors:
             return None
 
-        return reduced_list(
-            [
-                self.get_person(sponsor["SponsorPersonInfo"])
-                for sponsor in legistar_sponsors
-            ]
-        )
+        return reduced_list([self.get_person(sponsor) for sponsor in legistar_sponsors])
 
-    def get_matter(self, legistar_ev: Dict) -> Optional[Matter]:
+    def get_matter(self, legistar_matter: Dict[str, Any]) -> Optional[Matter]:
         """
-        Return Matter from Legistar API EventItem.
+        Return ingestion_models.Matter from Legistar API Matter
 
         Parameters
         ----------
-        legistar_ev: Dict
-            Legistar API EventItem
+        legistar_matter: Dict[str, Any]
+            Legistar API Matter
 
         Returns
         -------
         matter: Optional[Matter]
-            List of converted Legistar matter details to CDP matter objects.
-            None if missing information.
+            None if Legistar Matter is missing
+            information required for ingestion_models.Matter
         """
+        if legistar_matter is None:
+            return None
         return self.get_none_if_empty(
             Matter(
-                external_source_id=str(legistar_ev[LEGISTAR_MATTER_EXT_ID]),
+                external_source_id=str(legistar_matter[LEGISTAR_MATTER_EXT_ID]),
                 # Too often EventItemMatterName is not filled
                 # but EventItemMatterFile is
-                name=str_simplified(legistar_ev[LEGISTAR_MATTER_NAME])
-                or str_simplified(legistar_ev[LEGISTAR_MATTER_TITLE]),
-                matter_type=str_simplified(legistar_ev[LEGISTAR_MATTER_TYPE]),
-                sponsors=self.get_sponsors(legistar_ev[LEGISTAR_MATTER_SPONSORS]),
-                title=str_simplified(legistar_ev[LEGISTAR_MATTER_TITLE]),
+                name=str_simplified(legistar_matter[LEGISTAR_MATTER_NAME])
+                or str_simplified(legistar_matter[LEGISTAR_MATTER_TITLE]),
+                matter_type=str_simplified(legistar_matter[LEGISTAR_MATTER_TYPE]),
+                sponsors=self.get_sponsors(legistar_matter[LEGISTAR_MATTER_SPONSORS]),
+                title=str_simplified(legistar_matter[LEGISTAR_MATTER_TITLE]),
                 result_status=self.get_matter_status(
-                    legistar_ev[LEGISTAR_MATTER_STATUS]
+                    legistar_matter[LEGISTAR_MATTER_STATUS]
                 ),
             )
         )
+
+    def get_updated_matter(self, matter: Matter) -> Optional[Matter]:
+        """
+        Get latest version of matter from Legistar API endpoint.
+
+        Parameters
+        ----------
+        matter: Matter
+
+        Returns
+        -------
+        matter: Optional[Matter]
+
+        Notes
+        -----
+        First search for Legistar Matter with
+        MatterName==matter.name or MatterFile==mater.name
+        if MatterId (matter.external_source_id) is unknown.
+        """
+        matter_id = matter.external_source_id
+        if matter_id is None and matter.name is not None:
+            matter_matches = [
+                legistar_matter
+                for legistar_matter in find_legister_matters(
+                    self.client_name, matter.name
+                )
+                if isinstance(legistar_matter[LEGISTAR_MATTER_EXT_ID], int)
+                and int(legistar_matter[LEGISTAR_MATTER_EXT_ID]) > 0
+            ]
+            try:
+                matter_matches.sort(
+                    # just in case we get multiple Matters with same name,
+                    # use the latest one
+                    key=lambda legistar_matter: datetime.fromisoformat(
+                        legistar_matter["MatterLastModifiedUtc"]
+                    ),
+                )
+            except ValueError:
+                # MatterLastModifiedUtc can be ill-formed for fromisoformat()
+                pass
+            if any(matter_matches):
+                matter_id = matter_matches[-1][LEGISTAR_MATTER_EXT_ID]
+
+        if matter_id is None:
+            return None
+        matter = self.get_matter(get_legistar_matter(self.client_name, matter_id))
+        if matter is None:
+            return None
+
+        matter.sponsors = (
+            [self.inject_known_person(sponsor) for sponsor in matter.sponsors]
+            if matter.sponsors is not None
+            else None
+        )
+        return matter
 
     def get_minutes_item(self, legistar_ev_item: Dict) -> Optional[MinutesItem]:
         """
@@ -1082,7 +1218,10 @@ class LegistarScraper(IngestionModelScraper):
         # matter.result_status is allowed to be null
         # only when no votes or Legistar EventItemMatterStatus is null
         if ev_minutes_item.matter and not ev_minutes_item.matter.result_status:
-            if ev_minutes_item.votes and legistar_ev_item[LEGISTAR_MATTER_STATUS]:
+            if (
+                ev_minutes_item.votes
+                and legistar_ev_item[LEGISTAR_EV_MATTER][LEGISTAR_MATTER_STATUS]
+            ):
                 # means did not find matter_*_pattern in Legistar EventItemMatterStatus.
                 # default to in progress (as opposed to adopted or rejected)
                 # NOTE: if our matter_*_patterns ARE "complete",
@@ -1142,7 +1281,7 @@ class LegistarScraper(IngestionModelScraper):
                                 index=item[LEGISTAR_EV_INDEX],
                                 minutes_item=self.get_minutes_item(item),
                                 votes=self.get_votes(item[LEGISTAR_EV_VOTES]),
-                                matter=self.get_matter(item),
+                                matter=self.get_matter(item[LEGISTAR_EV_MATTER]),
                                 decision=self.get_minutes_item_decision(
                                     item[LEGISTAR_EV_MINUTE_DECISION]
                                 ),
@@ -1307,8 +1446,10 @@ class LegistarScraper(IngestionModelScraper):
             # EventMinutesItem.votes.person
             for minute_item in event.event_minutes_items:
                 if minute_item.matter and minute_item.matter.sponsors:
-                    for sponsor in minute_item.matter.sponsors:
-                        sponsor = self.inject_known_person(sponsor)
+                    minute_item.matter.sponsors = [
+                        self.inject_known_person(sponsor)
+                        for sponsor in minute_item.matter.sponsors
+                    ]
 
                 if minute_item.votes:
                     for vote in minute_item.votes:
@@ -1431,6 +1572,32 @@ class LegistarScraper(IngestionModelScraper):
         events = self.post_process_ingestion_models(events)
 
         return events
+
+    def get_updated_model(
+        self, model: IngestionModel, **kwargs: Any
+    ) -> Optional[IngestionModel]:
+        """
+        Query Legistar API for latest information for given model
+
+        Parameters
+        ----------
+        model: IngestionModel
+            e.g. ingestion_models.Matter
+
+        Returns
+        -------
+        model: Optional[IngestionModel]
+            None in case of error
+
+        See Also
+        --------
+        get_updated_matter()
+        """
+        if isinstance(model, Matter):
+            return self.get_updated_matter(model)
+
+        log.debug(f"IngestionModel scraping function for {type(model)} does not exist.")
+        return None
 
     @property
     def is_legistar_compatible(self) -> bool:
