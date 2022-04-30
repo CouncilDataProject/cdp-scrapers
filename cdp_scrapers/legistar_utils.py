@@ -376,9 +376,7 @@ def get_legistar_events_for_timespan(
     return response
 
 
-def get_legistar_content_uris(
-    legistar_ev: Dict[str, Any]
-) -> Optional[List[ContentURIs]]:
+def get_legistar_content_uris(legistar_ev: Dict) -> Optional[List[ContentURIs]]:
     """
     Return URLs for videos and captions from a Legistar/Granicus-hosted video web page
 
