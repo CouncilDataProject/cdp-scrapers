@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from copy import deepcopy
 import logging
 import re
+from copy import deepcopy
 from datetime import datetime, timedelta
 from json import JSONDecodeError
 from typing import Any, Dict, List, Optional, Set
@@ -12,6 +12,7 @@ from urllib.parse import quote_plus
 from urllib.request import urlopen
 
 import requests
+from bs4 import BeautifulSoup
 from cdp_backend.database.constants import (
     EventMinutesItemDecision,
     MatterStatusDecision,
@@ -373,6 +374,102 @@ def get_legistar_events_for_timespan(
 
     log.debug(f"Collected {len(response)} Legistar events")
     return response
+
+
+def get_legistar_content_uris(
+    legistar_ev: Dict[str, Any]
+) -> Optional[List[ContentURIs]]:
+    """
+    Return URLs for videos and captions from a Legistar/Granicus-hosted video web page
+
+    Parameters
+    ----------
+    legistar_ev: Dict
+        Data for one Legistar Event.
+
+    Returns
+    -------
+    content_uris: Optional[List[ContentURIs]]
+        None if web page HTML structure does not meet expected Legistar/Granicus format.
+    """
+    # prefer video file path in legistar Event.EventVideoPath
+    if legistar_ev[LEGISTAR_SESSION_VIDEO_URI]:
+        return [
+            ContentURIs(
+                video_uri=str_simplified(legistar_ev[LEGISTAR_SESSION_VIDEO_URI]),
+                caption_uri=None,
+            )
+        ]
+    if not legistar_ev[LEGISTAR_EV_SITE_URL]:
+        return None
+
+    try:
+        # a td tag with a certain id pattern containing url to video
+        with urlopen(legistar_ev[LEGISTAR_EV_SITE_URL]) as resp:
+            soup = BeautifulSoup(resp.read(), "html.parser")
+
+    except URLError or HTTPError:
+        log.debug(f"Failed to open {legistar_ev[LEGISTAR_EV_SITE_URL]}")
+        return None
+
+    # this gets us the url for the web PAGE containing the video
+    # video link is provided in the window.open()command inside onclick event
+    # <a id="ctl00_ContentPlaceHolder1_hypVideo"
+    # data-event-id="75f1e143-6756-496f-911b-d3abe61d64a5"
+    # data-running-text="In&amp;nbsp;progress" class="videolink"
+    # onclick="window.open('Video.aspx?
+    # Mode=Granicus&amp;ID1=8844&amp;G=D64&amp;Mode2=Video','video');
+    # return false;"
+    # href="#" style="color:Blue;font-family:Tahoma;font-size:10pt;">Video</a>
+    extract_url = soup.find(
+        "a",
+        id=re.compile(r"ct\S*_ContentPlaceHolder\S*_hypVideo"),
+        class_="videolink",
+    )
+    if extract_url is None:
+        return None
+
+    try:
+        extract_url = extract_url["onclick"]
+        start = extract_url.find("'") + len("'")
+        end = extract_url.find("',")
+        video_page_url = "https://kingcounty.legistar.com/" + extract_url[start:end]
+
+    # catch if find() didn't find video web page url (no <a id=... href=.../>)
+    except KeyError:
+        log.debug("No URL for video page on {legistar_ev[LEGISTAR_EV_SITE_URL]}")
+        return None
+
+    log.debug(f"{legistar_ev[LEGISTAR_EV_SITE_URL]} -> {video_page_url}")
+
+    try:
+        with urlopen(video_page_url) as resp:
+            # now load the page to get the actual video url
+            soup = BeautifulSoup(resp.read(), "html.parser")
+
+    except URLError or HTTPError:
+        log.error(f"Failed to open {video_page_url}")
+        return None
+
+    # source link for the video is embedded in the script of downloadLinks.
+    # <script type="text/javascript">
+    # var meta_id = '',
+    # currentClipIndex = 0,
+    # clipList = eval([8844]),
+    # downloadLinks = eval([["\/\/69.5.90.100:443\/MediaVault\/Download.aspx?
+    # server=king.granicus.com&clip_id=8844",
+    # "http:\/\/archive-media.granicus.com:443\/OnDemand\/king\/king_e560cf63-5570-416e-a47d-0e1e13652224.mp4",null]]);
+    # </script>
+
+    video_script_text = soup.find("script", text=re.compile(r"downloadLinks")).string
+    # Below two lines of code tries to extract video url from downLoadLinks variable
+    # "http:\/\/archive-media.granicus.com:443\/OnDemand\/king\/king_e560cf63-5570-416e-a47d-0e1e13652224.mp4"
+    downloadLinks = video_script_text.split("[[")[1]
+    video_url = downloadLinks.split('",')[1].strip('"')
+    # Cleans up the video url to remove backward slash(\)
+    video_uri = video_url.replace("\\", "")
+    # caption URIs are not found for kingcounty events.
+    return [ContentURIs(video_uri=video_uri, caption_uri=None)]
 
 
 class LegistarScraper(IngestionModelScraper):
@@ -1381,20 +1478,11 @@ class LegistarScraper(IngestionModelScraper):
                     legistar_ev[LEGISTAR_SESSION_TIME],
                 )
             )
-            # prefer video file path in legistar Event.EventVideoPath
-            if legistar_ev[LEGISTAR_SESSION_VIDEO_URI]:
-                list_uri = [
-                    ContentURIs(
-                        video_uri=str_simplified(
-                            legistar_ev[LEGISTAR_SESSION_VIDEO_URI]
-                        ),
-                        caption_uri=None,
-                    )
-                ]
-            else:
-                list_uri = self.get_content_uris(legistar_ev) or [
-                    ContentURIs(video_uri=None, caption_uri=None)
-                ]
+            list_uri = (
+                get_legistar_content_uris(legistar_ev)
+                or self.get_content_uris(legistar_ev)
+                or [ContentURIs(video_uri=None, caption_uri=None)]
+            )
 
             ingestion_models.append(
                 self.get_none_if_empty(
