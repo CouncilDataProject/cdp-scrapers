@@ -502,7 +502,7 @@ def get_legistar_content_uris(
                 uris = parser(soup)
                 if uris is not None:
                     # remember so we just call this from here on
-                    my_video_page_parser = _parse_format_1
+                    my_video_page_parser = parser
                     break
             else:
                 uris = None
