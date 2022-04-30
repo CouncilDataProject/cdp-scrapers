@@ -1494,8 +1494,10 @@ class LegistarScraper(IngestionModelScraper):
             list_uri = (
                 get_legistar_content_uris(legistar_ev)
                 or self.get_content_uris(legistar_ev)
-                or [ContentURIs(video_uri=None, caption_uri=None)]
             )
+            if list_uri is None:
+                # for easier iteration below; will collapse to None
+                list_uri = [ContentURIs(video_uri=None, caption_uri=None)]
 
             ingestion_models.append(
                 self.get_none_if_empty(

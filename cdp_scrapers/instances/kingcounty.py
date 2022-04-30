@@ -72,9 +72,10 @@ class KingCountyScraper(LegistarScraper):
             },
         )
 
-    def get_content_uris(self, legistar_ev: Dict) -> List[ContentURIs]:
+    def get_content_uris(self, legistar_ev: Dict) -> None:
         """
-        Return URLs for videos and captions parsed from kingcounty.gov web page
+        Simply return None. get_legistar_content_uris() will have retrieved video.
+        If here, means no video.
 
         Parameters
         ----------
@@ -83,79 +84,13 @@ class KingCountyScraper(LegistarScraper):
 
         Returns
         -------
-        content_uris: List[ContentURIs]
-            List of ContentURIs objects for each session found.
+        None
 
         See Also
         --------
-        cdp_scrapers.legistar_utils.get_legistar_events_for_timespan
+        cdp_scrapers.legistar_utils.get_legistar_content_uris
         """
-        try:
-            # a td tag with a certain id pattern containing url to video
-
-            with urlopen(legistar_ev[LEGISTAR_EV_SITE_URL]) as resp:
-                soup = BeautifulSoup(resp.read(), "html.parser")
-
-        except URLError or HTTPError:
-            log.debug(f"Failed to open {legistar_ev[LEGISTAR_EV_SITE_URL]}")
-            return []
-
-        try:
-            # this gets us the url for the web PAGE containing the video
-            # video link is provided in the window.open()command inside onclick event
-            # <a id="ctl00_ContentPlaceHolder1_hypVideo"
-            # data-event-id="75f1e143-6756-496f-911b-d3abe61d64a5"
-            # data-running-text="In&amp;nbsp;progress" class="videolink"
-            # onclick="window.open('Video.aspx?
-            # Mode=Granicus&amp;ID1=8844&amp;G=D64&amp;Mode2=Video','video');
-            # return false;"
-            # href="#" style="color:Blue;font-family:Tahoma;font-size:10pt;">Video</a>
-            extract_url = soup.find(
-                "a",
-                id=re.compile(r"ct\S*_ContentPlaceHolder\S*_hypVideo"),
-                class_="videolink",
-            )["onclick"]
-            start = extract_url.find("'") + len("'")
-            end = extract_url.find("',")
-            video_page_url = "https://kingcounty.legistar.com/" + extract_url[start:end]
-
-        # catch if find() didn't find video web page url (no <a id=... href=.../>)
-        except KeyError:
-            log.debug("No URL for video page on {legistar_ev[LEGISTAR_EV_SITE_URL]}")
-            return []
-
-        log.debug(f"{legistar_ev[LEGISTAR_EV_SITE_URL]} -> {video_page_url}")
-
-        try:
-            with urlopen(video_page_url) as resp:
-                # now load the page to get the actual video url
-                soup = BeautifulSoup(resp.read(), "html.parser")
-
-        except URLError or HTTPError:
-            log.error(f"Failed to open {video_page_url}")
-            return []
-
-        # source link for the video is embedded in the script of downloadLinks.
-        # <script type="text/javascript">
-        # var meta_id = '',
-        # currentClipIndex = 0,
-        # clipList = eval([8844]),
-        # downloadLinks = eval([["\/\/69.5.90.100:443\/MediaVault\/Download.aspx?
-        # server=king.granicus.com&clip_id=8844",
-        # "http:\/\/archive-media.granicus.com:443\/OnDemand\/king\/king_e560cf63-5570-416e-a47d-0e1e13652224.mp4",null]]);
-        # </script>
-
-        video_script_text = soup.find(
-            "script", text=re.compile(r"downloadLinks")
-        ).string
-        # Below two lines of code tries to extract video url from downLoadLinks variable
-        # "http:\/\/archive-media.granicus.com:443\/OnDemand\/king\/king_e560cf63-5570-416e-a47d-0e1e13652224.mp4"
-        downloadLinks = video_script_text.split("[[")[1]
-        video_url = downloadLinks.split('",')[1].strip('"')
-        # Cleans up the video url to remove backward slash(\)
-        video_uri = video_url.replace("\\", "")
-        # caption URIs are not found for kingcounty events.
-        return [ContentURIs(video_uri=video_uri, caption_uri=None)]
+        return None
 
     @staticmethod
     def get_static_person_info() -> Dict[str, Person]:
