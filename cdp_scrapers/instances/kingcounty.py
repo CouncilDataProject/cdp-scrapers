@@ -4,8 +4,7 @@
 import logging
 import re
 import json
-from typing import Dict, List
-from urllib.error import HTTPError, URLError
+from typing import Dict
 from urllib.request import urlopen
 from pathlib import Path
 
@@ -14,11 +13,9 @@ from bs4 import BeautifulSoup
 from cdp_backend.pipeline.ingestion_models import Person, Seat
 from cdp_backend.database.constants import RoleTitle
 from ..legistar_utils import (
-    LEGISTAR_EV_SITE_URL,
     LegistarScraper,
 )
 from ..scraper_utils import str_simplified, parse_static_file
-from ..types import ContentURIs
 
 ###############################################################################
 
@@ -71,26 +68,6 @@ class KingCountyScraper(LegistarScraper):
                 "Policy Chair": RoleTitle.CHAIR,
             },
         )
-
-    def get_content_uris(self, legistar_ev: Dict) -> None:
-        """
-        Simply return None. get_legistar_content_uris() will have retrieved video.
-        If here, means no video.
-
-        Parameters
-        ----------
-        legistar_ev: Dict
-            Data for one Legistar Event.
-
-        Returns
-        -------
-        None
-
-        See Also
-        --------
-        cdp_scrapers.legistar_utils.get_legistar_content_uris
-        """
-        return None
 
     @staticmethod
     def get_static_person_info() -> Dict[str, Person]:
