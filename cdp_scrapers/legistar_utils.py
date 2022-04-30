@@ -449,25 +449,40 @@ def get_legistar_content_uris(legistar_ev: Dict) -> Optional[List[ContentURIs]]:
         log.error(f"Failed to open {video_page_url}")
         return None
 
-    # source link for the video is embedded in the script of downloadLinks.
-    # <script type="text/javascript">
-    # var meta_id = '',
-    # currentClipIndex = 0,
-    # clipList = eval([8844]),
-    # downloadLinks = eval([["\/\/69.5.90.100:443\/MediaVault\/Download.aspx?
-    # server=king.granicus.com&clip_id=8844",
-    # "http:\/\/archive-media.granicus.com:443\/OnDemand\/king\/king_e560cf63-5570-416e-a47d-0e1e13652224.mp4",null]]);
-    # </script>
+    def _parse_format_v1(soup: BeautifulSoup) -> Optional[List[ContentURIs]]:
+        # source link for the video is embedded in the script of downloadLinks.
+        # <script type="text/javascript">
+        # var meta_id = '',
+        # currentClipIndex = 0,
+        # clipList = eval([8844]),
+        # downloadLinks = eval([["\/\/69.5.90.100:443\/MediaVault\/Download.aspx?
+        # server=king.granicus.com&clip_id=8844",
+        # "http:\/\/archive-media.granicus.com:443\/OnDemand\/king\/king_e560cf63-5570-416e-a47d-0e1e13652224.mp4",null]]);
+        # </script>
 
-    video_script_text = soup.find("script", text=re.compile(r"downloadLinks")).string
-    # Below two lines of code tries to extract video url from downLoadLinks variable
-    # "http:\/\/archive-media.granicus.com:443\/OnDemand\/king\/king_e560cf63-5570-416e-a47d-0e1e13652224.mp4"
-    downloadLinks = video_script_text.split("[[")[1]
-    video_url = downloadLinks.split('",')[1].strip('"')
-    # Cleans up the video url to remove backward slash(\)
-    video_uri = video_url.replace("\\", "")
-    # caption URIs are not found for kingcounty events.
-    return [ContentURIs(video_uri=video_uri, caption_uri=None)]
+        video_script_text = soup.find("script", text=re.compile(r"downloadLinks"))
+        if video_script_text is None:
+            return None
+
+        video_script_text = video_script_text.string
+        # Below two lines of code tries to extract video url from downLoadLinks variable
+        # "http:\/\/archive-media.granicus.com:443\/OnDemand\/king\/king_e560cf63-5570-416e-a47d-0e1e13652224.mp4"
+        downloadLinks = video_script_text.split("[[")[1]
+        video_url = downloadLinks.split('",')[1].strip('"')
+        # Cleans up the video url to remove backward slash(\)
+        video_uri = video_url.replace("\\", "")
+        # caption URIs are not found for kingcounty events.
+        return [ContentURIs(video_uri=video_uri, caption_uri=None)]
+
+    def _parse_format_v2(soup: BeautifulSoup) -> Optional[List[ContentURIs]]:
+        # <div id="download-options">
+        # <a href="...mp4">
+        video_url = soup.find("div", id="download-options")
+        if video_url is None:
+            return None
+        return [ContentURIs(str_simplified(video_url.a["href"]))]
+
+    return _parse_format_v1(soup) or _parse_format_v2(soup)
 
 
 class LegistarScraper(IngestionModelScraper):
