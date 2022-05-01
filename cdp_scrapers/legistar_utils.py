@@ -1391,11 +1391,14 @@ class LegistarScraper(IngestionModelScraper):
         --------
         cdp_scrapers.legistar_utils.get_legistar_events_for_timespan
         """
-        log.critical(
-            "get_content_uris() is required because "
-            f"Legistar Event.EventVideoPath is not used by {self.client_name}"
+        # see if our base legistar/granicus video parsing routine will work
+        list_uri = get_legistar_content_uris(self.client_name, legistar_ev)
+        if list_uri is not None:
+            return list_uri
+
+        raise NotImplementedError(
+            f"Please provide get_content_uris() for {self.client_name}"
         )
-        raise NotImplementedError
 
     def inject_known_person(self, person: Person) -> Person:
         """
@@ -1547,12 +1550,9 @@ class LegistarScraper(IngestionModelScraper):
                     legistar_ev[LEGISTAR_SESSION_TIME],
                 )
             )
-            # see if our base legistar/granicus video parsing routine will work
-            list_uri = get_legistar_content_uris(self.client_name, legistar_ev)
-            if list_uri is None:
-                list_uri = self.get_content_uris(legistar_ev)
-            if list_uri is None:
-                list_uri = [ContentURIs(video_uri=None, caption_uri=None)]
+            list_uri = self.get_content_uris(legistar_ev) or [
+                ContentURIs(video_uri=None, caption_uri=None)
+            ]
 
             ingestion_models.append(
                 self.get_none_if_empty(
