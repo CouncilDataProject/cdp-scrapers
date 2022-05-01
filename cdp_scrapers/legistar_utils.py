@@ -112,7 +112,10 @@ LEGISTAR_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
 
 known_legistar_persons: Dict[int, Dict[str, Any]] = {}
 known_legistar_bodies: Dict[int, Dict[str, Any]] = {}
-my_video_page_parser: Optional[Callable] = None
+# video web page parser type per municipality
+video_page_parser: Dict[
+    str, Callable[[BeautifulSoup], Optional[List[ContentURIs]]]
+] = {}
 
 
 def get_legistar_body(
@@ -402,7 +405,7 @@ def get_legistar_content_uris(
         Means the content structure of the web page hosting session video has changed.
         We need explicit review and update the scraping code.
     """
-    global my_video_page_parser
+    global video_page_parser
 
     # prefer video file path in legistar Event.EventVideoPath
     if legistar_ev[LEGISTAR_SESSION_VIDEO_URI]:
@@ -517,15 +520,15 @@ def get_legistar_content_uris(
         # now load the page to get the actual video url
         soup = BeautifulSoup(resp.read(), "html.parser")
 
-        if my_video_page_parser is not None:
+        if client in video_page_parser:
             # we alrady know which format parser to call
-            uris = my_video_page_parser(soup)
+            uris = video_page_parser[client](soup)
         else:
             for parser in [_parse_format_1, _parse_format_2, _parse_format_3]:
                 uris = parser(soup)
                 if uris is not None:
                     # remember so we just call this from here on
-                    my_video_page_parser = parser
+                    video_page_parser[client] = parser
                     break
             else:
                 uris = None
@@ -533,7 +536,7 @@ def get_legistar_content_uris(
     if uris is None:
         raise NotImplementedError(
             "get_legistar_content_uris() needs attention. "
-            f"Video hosting web page has changed. Example: {video_page_url}"
+            f"Unrecognized video web page HTML structure: {video_page_url}"
         )
     return uris
 
