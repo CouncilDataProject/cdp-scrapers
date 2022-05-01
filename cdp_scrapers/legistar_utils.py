@@ -423,8 +423,8 @@ def get_legistar_content_uris(
         with urlopen(legistar_ev[LEGISTAR_EV_SITE_URL]) as resp:
             soup = BeautifulSoup(resp.read(), "html.parser")
 
-    except URLError or HTTPError:
-        log.debug(f"Failed to open {legistar_ev[LEGISTAR_EV_SITE_URL]}")
+    except (URLError, HTTPError) as e:
+        log.debug(f"{legistar_ev[LEGISTAR_EV_SITE_URL]}: {str(e)}")
         return None
 
     # this gets us the url for the web PAGE containing the video
@@ -490,6 +490,29 @@ def get_legistar_content_uris(
             return None
         return [ContentURIs(str_simplified(video_url.a["href"]))]
 
+    def _parse_format_3(soup: BeautifulSoup) -> Optional[List[ContentURIs]]:
+        # <video>
+        # <source src="...">
+        # <track src="...">
+        video_url = soup.find("video")
+        if video_url is None:
+            return None
+        return [
+            ContentURIs(
+                video_uri=f"https:{str_simplified(video_url.source['src'])}",
+                caption_uri=(
+                    (
+                        f"http://{client}.granicus.com/"
+                        f"{str_simplified(video_url.track['src'])}"
+                    )
+                    # transcript is nice to have but not required
+                    if video_url.find("track") is not None
+                    and "src" in video_url.track.attrs
+                    else None
+                ),
+            )
+        ]
+
     with urlopen(video_page_url) as resp:
         # now load the page to get the actual video url
         soup = BeautifulSoup(resp.read(), "html.parser")
@@ -498,7 +521,7 @@ def get_legistar_content_uris(
             # we alrady know which format parser to call
             uris = my_video_page_parser(soup)
         else:
-            for parser in [_parse_format_1, _parse_format_2]:
+            for parser in [_parse_format_1, _parse_format_2, _parse_format_3]:
                 uris = parser(soup)
                 if uris is not None:
                     # remember so we just call this from here on
