@@ -1412,8 +1412,11 @@ class LegistarScraper(IngestionModelScraper):
         """
         # see if our base legistar/granicus video parsing routine will work
         result, uris = get_legistar_content_uris(self.client_name, legistar_ev)
-        if result is ContetUriScrapeResult.Status.Ok:
-            return uris
+        if result in [
+            ContetUriScrapeResult.Status.Ok,
+            ContetUriScrapeResult.Status.ContentNotProvidedError,
+        ]:
+            return uris or []
 
         raise NotImplementedError(
             f"Please provide get_content_uris() for {self.client_name}"
