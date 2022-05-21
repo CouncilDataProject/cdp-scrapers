@@ -411,7 +411,7 @@ def get_legistar_content_uris(client: str, legistar_ev: Dict) -> ContentUriScrap
     -------
     ContentUriScrapeResult
         status: ContentUriScrapeResult.Status
-            StatuS code describing the scraping process. Use uris only if status is Ok
+            Status code describing the scraping process. Use uris only if status is Ok
         uris: Optional[List[ContentURIs]]
             URIs for video and optional caption
 
@@ -420,6 +420,10 @@ def get_legistar_content_uris(client: str, legistar_ev: Dict) -> ContentUriScrap
     NotImplementedError
         Means the content structure of the web page hosting session video has changed.
         We need explicit review and update the scraping code.
+
+    See Also
+    --------
+    LegistarScraper.get_content_uris()
     """
     global video_page_parser
 
