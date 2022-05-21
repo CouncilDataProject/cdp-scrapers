@@ -1,4 +1,3 @@
-import cleantext
 import pytest
 
 from cdp_scrapers.scraper_utils import str_simplified, str_simplified_new
