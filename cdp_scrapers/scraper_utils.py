@@ -10,8 +10,13 @@ from typing import Any, Dict, List, NamedTuple, Optional, Set
 import cleantext
 import pytz
 from cdp_backend.database.constants import RoleTitle
-from cdp_backend.pipeline.ingestion_models import (Body, IngestionModel,
-                                                   Person, Role, Seat)
+from cdp_backend.pipeline.ingestion_models import (
+    Body,
+    IngestionModel,
+    Person,
+    Role,
+    Seat,
+)
 from cdp_backend.utils.constants_utils import get_all_class_attr_values
 
 from .types import ScraperStaticData
