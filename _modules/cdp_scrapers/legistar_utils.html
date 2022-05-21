@@ -523,7 +523,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    ContentUriScrapeResult</span>
 <span class="sd">        status: ContentUriScrapeResult.Status</span>
-<span class="sd">            StatuS code describing the scraping process. Use uris only if status is Ok</span>
+<span class="sd">            Status code describing the scraping process. Use uris only if status is Ok</span>
 <span class="sd">        uris: Optional[List[ContentURIs]]</span>
 <span class="sd">            URIs for video and optional caption</span>
 
@@ -532,6 +532,10 @@
 <span class="sd">    NotImplementedError</span>
 <span class="sd">        Means the content structure of the web page hosting session video has changed.</span>
 <span class="sd">        We need explicit review and update the scraping code.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    LegistarScraper.get_content_uris()</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">video_page_parser</span>
 
