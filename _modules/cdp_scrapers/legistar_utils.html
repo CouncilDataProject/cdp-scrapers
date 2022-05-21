@@ -113,17 +113,19 @@
 <span></span><span class="ch">#!/usr/bin/env python</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
 
-<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">import</span> <span class="nn">enum</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
 <span class="kn">from</span> <span class="nn">json</span> <span class="kn">import</span> <span class="n">JSONDecodeError</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span>
 <span class="kn">from</span> <span class="nn">urllib.error</span> <span class="kn">import</span> <span class="n">HTTPError</span><span class="p">,</span> <span class="n">URLError</span>
 <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">quote_plus</span>
 <span class="kn">from</span> <span class="nn">urllib.request</span> <span class="kn">import</span> <span class="n">urlopen</span>
 
 <span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
 <span class="kn">from</span> <span class="nn">cdp_backend.database.constants</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">EventMinutesItemDecision</span><span class="p">,</span>
     <span class="n">MatterStatusDecision</span><span class="p">,</span>
@@ -223,6 +225,10 @@
 
 <span class="n">known_legistar_persons</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">known_legistar_bodies</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="c1"># video web page parser type per municipality</span>
+<span class="n">video_page_parser</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span>
+    <span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">BeautifulSoup</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">ContentURIs</span><span class="p">]]]</span>
+<span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
 
 <div class="viewcode-block" id="get_legistar_body"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.get_legistar_body">[docs]</a><span class="k">def</span> <span class="nf">get_legistar_body</span><span class="p">(</span>
@@ -485,6 +491,185 @@
 
     <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Collected </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">response</span><span class="p">)</span><span class="si">}</span><span class="s2"> Legistar events&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">response</span></div>
+
+
+<div class="viewcode-block" id="ContentUriScrapeResult"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.ContentUriScrapeResult">[docs]</a><span class="k">class</span> <span class="nc">ContentUriScrapeResult</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+<div class="viewcode-block" id="ContentUriScrapeResult.Status"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.ContentUriScrapeResult.Status">[docs]</a>    <span class="k">class</span> <span class="nc">Status</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span>
+        <span class="c1"># Web page(s) are in unrecognized structure</span>
+        <span class="n">UnrecognizedPatternError</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="c1"># Error in accessing some resource</span>
+        <span class="n">ResourceAccessError</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span>
+        <span class="c1"># Video was not provided for the event</span>
+        <span class="n">ContentNotProvidedError</span> <span class="o">=</span> <span class="o">-</span><span class="mi">3</span>
+        <span class="c1"># Found URIs to video and optional caption</span>
+        <span class="n">Ok</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+    <span class="n">status</span><span class="p">:</span> <span class="n">Status</span>
+    <span class="n">uris</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">ContentURIs</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="get_legistar_content_uris"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.get_legistar_content_uris">[docs]</a><span class="k">def</span> <span class="nf">get_legistar_content_uris</span><span class="p">(</span><span class="n">client</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">legistar_ev</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ContentUriScrapeResult</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return URLs for videos and captions from a Legistar/Granicus-hosted video web page</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    client: str</span>
+<span class="sd">        Which legistar client to target. Ex: &quot;seattle&quot;</span>
+<span class="sd">    legistar_ev: Dict</span>
+<span class="sd">        Data for one Legistar Event.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ContentUriScrapeResult</span>
+<span class="sd">        status: ContentUriScrapeResult.Status</span>
+<span class="sd">            StatuS code describing the scraping process. Use uris only if status is Ok</span>
+<span class="sd">        uris: Optional[List[ContentURIs]]</span>
+<span class="sd">            URIs for video and optional caption</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    NotImplementedError</span>
+<span class="sd">        Means the content structure of the web page hosting session video has changed.</span>
+<span class="sd">        We need explicit review and update the scraping code.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">video_page_parser</span>
+
+    <span class="c1"># prefer video file path in legistar Event.EventVideoPath</span>
+    <span class="k">if</span> <span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_SESSION_VIDEO_URI</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">ContentUriScrapeResult</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">Ok</span><span class="p">,</span>
+            <span class="p">[</span>
+                <span class="n">ContentURIs</span><span class="p">(</span>
+                    <span class="n">video_uri</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_SESSION_VIDEO_URI</span><span class="p">]),</span>
+                    <span class="n">caption_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">],</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_EV_SITE_URL</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">ContentUriScrapeResult</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">UnrecognizedPatternError</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># a td tag with a certain id pattern.</span>
+        <span class="c1"># this is usually something like</span>
+        <span class="c1"># https://somewhere.legistar.com/MeetingDetail.aspx...</span>
+        <span class="c1"># that is a summary-like page for a meeting</span>
+        <span class="k">with</span> <span class="n">urlopen</span><span class="p">(</span><span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_EV_SITE_URL</span><span class="p">])</span> <span class="k">as</span> <span class="n">resp</span><span class="p">:</span>
+            <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">resp</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="s2">&quot;html.parser&quot;</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="p">(</span><span class="n">URLError</span><span class="p">,</span> <span class="n">HTTPError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_EV_SITE_URL</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">ContentUriScrapeResult</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">ResourceAccessError</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="c1"># this gets us the url for the web PAGE containing the video</span>
+    <span class="c1"># video link is provided in the window.open()command inside onclick event</span>
+    <span class="c1"># &lt;a id=&quot;ctl00_ContentPlaceHolder1_hypVideo&quot;</span>
+    <span class="c1"># data-event-id=&quot;75f1e143-6756-496f-911b-d3abe61d64a5&quot;</span>
+    <span class="c1"># data-running-text=&quot;In&amp;amp;nbsp;progress&quot; class=&quot;videolink&quot;</span>
+    <span class="c1"># onclick=&quot;window.open(&#39;Video.aspx?</span>
+    <span class="c1"># Mode=Granicus&amp;amp;ID1=8844&amp;amp;G=D64&amp;amp;Mode2=Video&#39;,&#39;video&#39;);</span>
+    <span class="c1"># return false;&quot;</span>
+    <span class="c1"># href=&quot;#&quot; style=&quot;color:Blue;font-family:Tahoma;font-size:10pt;&quot;&gt;Video&lt;/a&gt;</span>
+    <span class="n">extract_url</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span>
+        <span class="s2">&quot;a&quot;</span><span class="p">,</span>
+        <span class="nb">id</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;ct\S*_ContentPlaceHolder\S*_hypVideo&quot;</span><span class="p">),</span>
+        <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;videolink&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">extract_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">ContentUriScrapeResult</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">UnrecognizedPatternError</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="c1"># the &lt;a&gt; tag will not have this attribute if there is no video</span>
+    <span class="k">if</span> <span class="s2">&quot;onclick&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">extract_url</span><span class="o">.</span><span class="n">attrs</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">ContentUriScrapeResult</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">ContentNotProvidedError</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="c1"># NOTE: after this point, failing to scrape video url should raise an exception.</span>
+    <span class="c1"># we need to be alerted that we probabaly have a new web page structure.</span>
+
+    <span class="n">extract_url</span> <span class="o">=</span> <span class="n">extract_url</span><span class="p">[</span><span class="s2">&quot;onclick&quot;</span><span class="p">]</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">extract_url</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="n">extract_url</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;&#39;,&quot;</span><span class="p">)</span>
+    <span class="n">video_page_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://</span><span class="si">{</span><span class="n">client</span><span class="si">}</span><span class="s2">.legistar.com/</span><span class="si">{</span><span class="n">extract_url</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_EV_SITE_URL</span><span class="p">]</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">video_page_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_parse_format_1</span><span class="p">(</span><span class="n">soup</span><span class="p">:</span> <span class="n">BeautifulSoup</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">ContentURIs</span><span class="p">]]:</span>
+        <span class="c1"># source link for the video is embedded in the script of downloadLinks.</span>
+        <span class="c1"># &lt;script type=&quot;text/javascript&quot;&gt;</span>
+        <span class="c1"># var meta_id = &#39;&#39;,</span>
+        <span class="c1"># currentClipIndex = 0,</span>
+        <span class="c1"># clipList = eval([8844]),</span>
+        <span class="c1"># downloadLinks = eval([[&quot;\/\/69.5.90.100:443\/MediaVault\/Download.aspx?</span>
+        <span class="c1"># server=king.granicus.com&amp;clip_id=8844&quot;,</span>
+        <span class="c1"># &quot;http:\/\/archive-media.granicus.com:443\/OnDemand\/king\/king_e560cf63-5570-416e-a47d-0e1e13652224.mp4&quot;,null]]);</span>
+        <span class="c1"># &lt;/script&gt;</span>
+
+        <span class="n">video_script_text</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;script&quot;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;downloadLinks&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">video_script_text</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">video_script_text</span> <span class="o">=</span> <span class="n">video_script_text</span><span class="o">.</span><span class="n">string</span>
+        <span class="c1"># Below two lines of code tries to extract video url from downLoadLinks variable</span>
+        <span class="c1"># &quot;http:\/\/archive-media.granicus.com:443\/OnDemand\/king\/king_e560cf63-5570-416e-a47d-0e1e13652224.mp4&quot;</span>
+        <span class="n">downloadLinks</span> <span class="o">=</span> <span class="n">video_script_text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;[[&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">video_url</span> <span class="o">=</span> <span class="n">downloadLinks</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;&quot;,&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)</span>
+        <span class="c1"># Cleans up the video url to remove backward slash(\)</span>
+        <span class="n">video_uri</span> <span class="o">=</span> <span class="n">video_url</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="c1"># caption URIs are not found for kingcounty events.</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">ContentURIs</span><span class="p">(</span><span class="n">video_uri</span><span class="o">=</span><span class="n">video_uri</span><span class="p">,</span> <span class="n">caption_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="nf">_parse_format_2</span><span class="p">(</span><span class="n">soup</span><span class="p">:</span> <span class="n">BeautifulSoup</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">ContentURIs</span><span class="p">]]:</span>
+        <span class="c1"># &lt;div id=&quot;download-options&quot;&gt;</span>
+        <span class="c1"># &lt;a href=&quot;...mp4&quot;&gt;</span>
+        <span class="n">video_url</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;download-options&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">video_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">ContentURIs</span><span class="p">(</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">video_url</span><span class="o">.</span><span class="n">a</span><span class="p">[</span><span class="s2">&quot;href&quot;</span><span class="p">]))]</span>
+
+    <span class="k">def</span> <span class="nf">_parse_format_3</span><span class="p">(</span><span class="n">soup</span><span class="p">:</span> <span class="n">BeautifulSoup</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">ContentURIs</span><span class="p">]]:</span>
+        <span class="c1"># &lt;video&gt;</span>
+        <span class="c1"># &lt;source src=&quot;...&quot;&gt;</span>
+        <span class="c1"># &lt;track src=&quot;...&quot;&gt;</span>
+        <span class="n">video_url</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;video&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">video_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">ContentURIs</span><span class="p">(</span>
+                <span class="n">video_uri</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;https:</span><span class="si">{</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">video_url</span><span class="o">.</span><span class="n">source</span><span class="p">[</span><span class="s1">&#39;src&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">caption_uri</span><span class="o">=</span><span class="p">(</span>
+                    <span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;http://</span><span class="si">{</span><span class="n">client</span><span class="si">}</span><span class="s2">.granicus.com/&quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">video_url</span><span class="o">.</span><span class="n">track</span><span class="p">[</span><span class="s1">&#39;src&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                    <span class="c1"># transcript is nice to have but not required</span>
+                    <span class="k">if</span> <span class="n">video_url</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                    <span class="ow">and</span> <span class="s2">&quot;src&quot;</span> <span class="ow">in</span> <span class="n">video_url</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">attrs</span>
+                    <span class="k">else</span> <span class="kc">None</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">]</span>
+
+    <span class="k">with</span> <span class="n">urlopen</span><span class="p">(</span><span class="n">video_page_url</span><span class="p">)</span> <span class="k">as</span> <span class="n">resp</span><span class="p">:</span>
+        <span class="c1"># now load the page to get the actual video url</span>
+        <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">resp</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="s2">&quot;html.parser&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">client</span> <span class="ow">in</span> <span class="n">video_page_parser</span><span class="p">:</span>
+            <span class="c1"># we alrady know which format parser to call</span>
+            <span class="n">uris</span> <span class="o">=</span> <span class="n">video_page_parser</span><span class="p">[</span><span class="n">client</span><span class="p">](</span><span class="n">soup</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">parser</span> <span class="ow">in</span> <span class="p">[</span><span class="n">_parse_format_1</span><span class="p">,</span> <span class="n">_parse_format_2</span><span class="p">,</span> <span class="n">_parse_format_3</span><span class="p">]:</span>
+                <span class="n">uris</span> <span class="o">=</span> <span class="n">parser</span><span class="p">(</span><span class="n">soup</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">uris</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="c1"># remember so we just call this from here on</span>
+                    <span class="n">video_page_parser</span><span class="p">[</span><span class="n">client</span><span class="p">]</span> <span class="o">=</span> <span class="n">parser</span>
+                    <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">uris</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">uris</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s2">&quot;get_legistar_content_uris() needs attention. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Unrecognized video web page HTML structure: </span><span class="si">{</span><span class="n">video_page_url</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">ContentUriScrapeResult</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">Ok</span><span class="p">,</span> <span class="n">uris</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="LegistarScraper"><a class="viewcode-back" href="../../cdp_scrapers.legistar_utils.LegistarScraper.html#cdp_scrapers.legistar_utils.LegistarScraper">[docs]</a><span class="k">class</span> <span class="nc">LegistarScraper</span><span class="p">(</span><span class="n">IngestionModelScraper</span><span class="p">):</span>
@@ -1337,11 +1522,17 @@
 <span class="sd">        --------</span>
 <span class="sd">        cdp_scrapers.legistar_utils.get_legistar_events_for_timespan</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">log</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span>
-            <span class="s2">&quot;get_content_uris() is required because &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;Legistar Event.EventVideoPath is not used by </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">client_name</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+        <span class="c1"># see if our base legistar/granicus video parsing routine will work</span>
+        <span class="n">result</span><span class="p">,</span> <span class="n">uris</span> <span class="o">=</span> <span class="n">get_legistar_content_uris</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client_name</span><span class="p">,</span> <span class="n">legistar_ev</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">result</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="n">ContentUriScrapeResult</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">Ok</span><span class="p">,</span>
+            <span class="n">ContentUriScrapeResult</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">ContentNotProvidedError</span><span class="p">,</span>
+        <span class="p">]:</span>
+            <span class="k">return</span> <span class="n">uris</span> <span class="ow">or</span> <span class="p">[]</span>
+
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Please provide get_content_uris() for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">client_name</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span></div>
 
 <div class="viewcode-block" id="LegistarScraper.inject_known_person"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.inject_known_person">[docs]</a>    <span class="k">def</span> <span class="nf">inject_known_person</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">person</span><span class="p">:</span> <span class="n">Person</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Person</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1493,20 +1684,9 @@
                     <span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_SESSION_TIME</span><span class="p">],</span>
                 <span class="p">)</span>
             <span class="p">)</span>
-            <span class="c1"># prefer video file path in legistar Event.EventVideoPath</span>
-            <span class="k">if</span> <span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_SESSION_VIDEO_URI</span><span class="p">]:</span>
-                <span class="n">list_uri</span> <span class="o">=</span> <span class="p">[</span>
-                    <span class="n">ContentURIs</span><span class="p">(</span>
-                        <span class="n">video_uri</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span>
-                            <span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_SESSION_VIDEO_URI</span><span class="p">]</span>
-                        <span class="p">),</span>
-                        <span class="n">caption_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                    <span class="p">)</span>
-                <span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">list_uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_content_uris</span><span class="p">(</span><span class="n">legistar_ev</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[</span>
-                    <span class="n">ContentURIs</span><span class="p">(</span><span class="n">video_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">caption_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-                <span class="p">]</span>
+            <span class="n">list_uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_content_uris</span><span class="p">(</span><span class="n">legistar_ev</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[</span>
+                <span class="n">ContentURIs</span><span class="p">(</span><span class="n">video_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">caption_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+            <span class="p">]</span>
 
             <span class="n">ingestion_models</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>

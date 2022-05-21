@@ -116,8 +116,7 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
-<span class="kn">from</span> <span class="nn">urllib.error</span> <span class="kn">import</span> <span class="n">HTTPError</span><span class="p">,</span> <span class="n">URLError</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
 <span class="kn">from</span> <span class="nn">urllib.request</span> <span class="kn">import</span> <span class="n">urlopen</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
@@ -126,11 +125,9 @@
 <span class="kn">from</span> <span class="nn">cdp_backend.pipeline.ingestion_models</span> <span class="kn">import</span> <span class="n">Person</span><span class="p">,</span> <span class="n">Seat</span>
 <span class="kn">from</span> <span class="nn">cdp_backend.database.constants</span> <span class="kn">import</span> <span class="n">RoleTitle</span>
 <span class="kn">from</span> <span class="nn">..legistar_utils</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">LEGISTAR_EV_SITE_URL</span><span class="p">,</span>
     <span class="n">LegistarScraper</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">..scraper_utils</span> <span class="kn">import</span> <span class="n">str_simplified</span><span class="p">,</span> <span class="n">parse_static_file</span>
-<span class="kn">from</span> <span class="nn">..types</span> <span class="kn">import</span> <span class="n">ContentURIs</span>
 
 <span class="c1">###############################################################################</span>
 
@@ -183,91 +180,6 @@
                 <span class="s2">&quot;Policy Chair&quot;</span><span class="p">:</span> <span class="n">RoleTitle</span><span class="o">.</span><span class="n">CHAIR</span><span class="p">,</span>
             <span class="p">},</span>
         <span class="p">)</span>
-
-<div class="viewcode-block" id="KingCountyScraper.get_content_uris"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.kingcounty.KingCountyScraper.get_content_uris">[docs]</a>    <span class="k">def</span> <span class="nf">get_content_uris</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_ev</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ContentURIs</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return URLs for videos and captions parsed from kingcounty.gov web page</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        legistar_ev: Dict</span>
-<span class="sd">            Data for one Legistar Event.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        content_uris: List[ContentURIs]</span>
-<span class="sd">            List of ContentURIs objects for each session found.</span>
-
-<span class="sd">        See Also</span>
-<span class="sd">        --------</span>
-<span class="sd">        cdp_scrapers.legistar_utils.get_legistar_events_for_timespan</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="c1"># a td tag with a certain id pattern containing url to video</span>
-
-            <span class="k">with</span> <span class="n">urlopen</span><span class="p">(</span><span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_EV_SITE_URL</span><span class="p">])</span> <span class="k">as</span> <span class="n">resp</span><span class="p">:</span>
-                <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">resp</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="s2">&quot;html.parser&quot;</span><span class="p">)</span>
-
-        <span class="k">except</span> <span class="n">URLError</span> <span class="ow">or</span> <span class="n">HTTPError</span><span class="p">:</span>
-            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to open </span><span class="si">{</span><span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_EV_SITE_URL</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="p">[]</span>
-
-        <span class="k">try</span><span class="p">:</span>
-            <span class="c1"># this gets us the url for the web PAGE containing the video</span>
-            <span class="c1"># video link is provided in the window.open()command inside onclick event</span>
-            <span class="c1"># &lt;a id=&quot;ctl00_ContentPlaceHolder1_hypVideo&quot;</span>
-            <span class="c1"># data-event-id=&quot;75f1e143-6756-496f-911b-d3abe61d64a5&quot;</span>
-            <span class="c1"># data-running-text=&quot;In&amp;amp;nbsp;progress&quot; class=&quot;videolink&quot;</span>
-            <span class="c1"># onclick=&quot;window.open(&#39;Video.aspx?</span>
-            <span class="c1"># Mode=Granicus&amp;amp;ID1=8844&amp;amp;G=D64&amp;amp;Mode2=Video&#39;,&#39;video&#39;);</span>
-            <span class="c1"># return false;&quot;</span>
-            <span class="c1"># href=&quot;#&quot; style=&quot;color:Blue;font-family:Tahoma;font-size:10pt;&quot;&gt;Video&lt;/a&gt;</span>
-            <span class="n">extract_url</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span>
-                <span class="s2">&quot;a&quot;</span><span class="p">,</span>
-                <span class="nb">id</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;ct\S*_ContentPlaceHolder\S*_hypVideo&quot;</span><span class="p">),</span>
-                <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;videolink&quot;</span><span class="p">,</span>
-            <span class="p">)[</span><span class="s2">&quot;onclick&quot;</span><span class="p">]</span>
-            <span class="n">start</span> <span class="o">=</span> <span class="n">extract_url</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)</span>
-            <span class="n">end</span> <span class="o">=</span> <span class="n">extract_url</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;&#39;,&quot;</span><span class="p">)</span>
-            <span class="n">video_page_url</span> <span class="o">=</span> <span class="s2">&quot;https://kingcounty.legistar.com/&quot;</span> <span class="o">+</span> <span class="n">extract_url</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
-
-        <span class="c1"># catch if find() didn&#39;t find video web page url (no &lt;a id=... href=.../&gt;)</span>
-        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;No URL for video page on </span><span class="si">{legistar_ev[LEGISTAR_EV_SITE_URL]}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="p">[]</span>
-
-        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_EV_SITE_URL</span><span class="p">]</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">video_page_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">with</span> <span class="n">urlopen</span><span class="p">(</span><span class="n">video_page_url</span><span class="p">)</span> <span class="k">as</span> <span class="n">resp</span><span class="p">:</span>
-                <span class="c1"># now load the page to get the actual video url</span>
-                <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">resp</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="s2">&quot;html.parser&quot;</span><span class="p">)</span>
-
-        <span class="k">except</span> <span class="n">URLError</span> <span class="ow">or</span> <span class="n">HTTPError</span><span class="p">:</span>
-            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to open </span><span class="si">{</span><span class="n">video_page_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="p">[]</span>
-
-        <span class="c1"># source link for the video is embedded in the script of downloadLinks.</span>
-        <span class="c1"># &lt;script type=&quot;text/javascript&quot;&gt;</span>
-        <span class="c1"># var meta_id = &#39;&#39;,</span>
-        <span class="c1"># currentClipIndex = 0,</span>
-        <span class="c1"># clipList = eval([8844]),</span>
-        <span class="c1"># downloadLinks = eval([[&quot;\/\/69.5.90.100:443\/MediaVault\/Download.aspx?</span>
-        <span class="c1"># server=king.granicus.com&amp;clip_id=8844&quot;,</span>
-        <span class="c1"># &quot;http:\/\/archive-media.granicus.com:443\/OnDemand\/king\/king_e560cf63-5570-416e-a47d-0e1e13652224.mp4&quot;,null]]);</span>
-        <span class="c1"># &lt;/script&gt;</span>
-
-        <span class="n">video_script_text</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span>
-            <span class="s2">&quot;script&quot;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;downloadLinks&quot;</span><span class="p">)</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">string</span>
-        <span class="c1"># Below two lines of code tries to extract video url from downLoadLinks variable</span>
-        <span class="c1"># &quot;http:\/\/archive-media.granicus.com:443\/OnDemand\/king\/king_e560cf63-5570-416e-a47d-0e1e13652224.mp4&quot;</span>
-        <span class="n">downloadLinks</span> <span class="o">=</span> <span class="n">video_script_text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;[[&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">video_url</span> <span class="o">=</span> <span class="n">downloadLinks</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;&quot;,&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)</span>
-        <span class="c1"># Cleans up the video url to remove backward slash(\)</span>
-        <span class="n">video_uri</span> <span class="o">=</span> <span class="n">video_url</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-        <span class="c1"># caption URIs are not found for kingcounty events.</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">ContentURIs</span><span class="p">(</span><span class="n">video_uri</span><span class="o">=</span><span class="n">video_uri</span><span class="p">,</span> <span class="n">caption_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">)]</span></div>
 
 <div class="viewcode-block" id="KingCountyScraper.get_static_person_info"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.kingcounty.KingCountyScraper.get_static_person_info">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">get_static_person_info</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Person</span><span class="p">]:</span>
