@@ -7,15 +7,11 @@ from logging import getLogger
 from pathlib import Path
 from typing import Any, Dict, List, NamedTuple, Optional, Set
 
+import cleantext
 import pytz
 from cdp_backend.database.constants import RoleTitle
-from cdp_backend.pipeline.ingestion_models import (
-    Body,
-    IngestionModel,
-    Person,
-    Role,
-    Seat,
-)
+from cdp_backend.pipeline.ingestion_models import (Body, IngestionModel,
+                                                   Person, Role, Seat)
 from cdp_backend.utils.constants_utils import get_all_class_attr_values
 
 from .types import ScraperStaticData
@@ -73,6 +69,33 @@ def str_simplified(input_str: str) -> str:
     input_str = re.sub(r"[\r\n\f]+", r"\n", input_str)
     # multiple spaces and tabs to 1 space
     input_str = re.sub(r"[ \t\v]+", " ", input_str)
+
+    # Replace utf-8 char encodings with single utf-8 chars themselves
+    input_str = input_str.encode("utf-8").decode("utf-8")
+
+    return input_str
+
+
+def str_simplified_new(input_str: str) -> str:
+    """
+    Remove leading and trailing whitespaces, simplify multiple whitespaces, unify
+    newline characters.
+
+    Parameters
+    ----------
+    input_str: str
+
+    Returns
+    -------
+    cleaned: str
+        input_str stripped if it is a string
+    """
+    if not isinstance(input_str, str):
+        return input_str
+
+    input_str = cleantext.clean(
+        input_str, fix_unicode=True, lower=False, to_ascii=False
+    )
 
     # Replace utf-8 char encodings with single utf-8 chars themselves
     input_str = input_str.encode("utf-8").decode("utf-8")
