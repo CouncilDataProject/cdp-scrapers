@@ -381,7 +381,7 @@ def get_legistar_events_for_timespan(
     return response
 
 
-class ContetUriScrapeResult(NamedTuple):
+class ContentUriScrapeResult(NamedTuple):
     class Status(enum.IntEnum):
         # Web page(s) are in unrecognized structure
         UnrecognizedPatternError = -1
@@ -396,7 +396,7 @@ class ContetUriScrapeResult(NamedTuple):
     uris: Optional[List[ContentURIs]] = None
 
 
-def get_legistar_content_uris(client: str, legistar_ev: Dict) -> ContetUriScrapeResult:
+def get_legistar_content_uris(client: str, legistar_ev: Dict) -> ContentUriScrapeResult:
     """
     Return URLs for videos and captions from a Legistar/Granicus-hosted video web page
 
@@ -409,9 +409,9 @@ def get_legistar_content_uris(client: str, legistar_ev: Dict) -> ContetUriScrape
 
     Returns
     -------
-    ContetUriScrapeResult
-        status: ContetUriScrapeResult.Status
-            Statu code describing the scraping process. Use uris only if status is Ok
+    ContentUriScrapeResult
+        status: ContentUriScrapeResult.Status
+            StatuS code describing the scraping process. Use uris only if status is Ok
         uris: Optional[List[ContentURIs]]
             URIs for video and optional caption
 
@@ -426,7 +426,7 @@ def get_legistar_content_uris(client: str, legistar_ev: Dict) -> ContetUriScrape
     # prefer video file path in legistar Event.EventVideoPath
     if legistar_ev[LEGISTAR_SESSION_VIDEO_URI]:
         return (
-            ContetUriScrapeResult.Status.Ok,
+            ContentUriScrapeResult.Status.Ok,
             [
                 ContentURIs(
                     video_uri=str_simplified(legistar_ev[LEGISTAR_SESSION_VIDEO_URI]),
@@ -435,7 +435,7 @@ def get_legistar_content_uris(client: str, legistar_ev: Dict) -> ContetUriScrape
             ],
         )
     if not legistar_ev[LEGISTAR_EV_SITE_URL]:
-        return (ContetUriScrapeResult.Status.UnrecognizedPatternError, None)
+        return (ContentUriScrapeResult.Status.UnrecognizedPatternError, None)
 
     try:
         # a td tag with a certain id pattern.
@@ -447,7 +447,7 @@ def get_legistar_content_uris(client: str, legistar_ev: Dict) -> ContetUriScrape
 
     except (URLError, HTTPError) as e:
         log.debug(f"{legistar_ev[LEGISTAR_EV_SITE_URL]}: {str(e)}")
-        return (ContetUriScrapeResult.Status.ResourceAccessError, None)
+        return (ContentUriScrapeResult.Status.ResourceAccessError, None)
 
     # this gets us the url for the web PAGE containing the video
     # video link is provided in the window.open()command inside onclick event
@@ -464,10 +464,10 @@ def get_legistar_content_uris(client: str, legistar_ev: Dict) -> ContetUriScrape
         class_="videolink",
     )
     if extract_url is None:
-        return (ContetUriScrapeResult.Status.UnrecognizedPatternError, None)
+        return (ContentUriScrapeResult.Status.UnrecognizedPatternError, None)
     # the <a> tag will not have this attribute if there is no video
     if "onclick" not in extract_url.attrs:
-        return (ContetUriScrapeResult.Status.ContentNotProvidedError, None)
+        return (ContentUriScrapeResult.Status.ContentNotProvidedError, None)
 
     # NOTE: after this point, failing to scrape video url should raise an exception.
     # we need to be alerted that we probabaly have a new web page structure.
@@ -557,7 +557,7 @@ def get_legistar_content_uris(client: str, legistar_ev: Dict) -> ContetUriScrape
             "get_legistar_content_uris() needs attention. "
             f"Unrecognized video web page HTML structure: {video_page_url}"
         )
-    return (ContetUriScrapeResult.Status.Ok, uris)
+    return (ContentUriScrapeResult.Status.Ok, uris)
 
 
 class LegistarScraper(IngestionModelScraper):
@@ -1413,8 +1413,8 @@ class LegistarScraper(IngestionModelScraper):
         # see if our base legistar/granicus video parsing routine will work
         result, uris = get_legistar_content_uris(self.client_name, legistar_ev)
         if result in [
-            ContetUriScrapeResult.Status.Ok,
-            ContetUriScrapeResult.Status.ContentNotProvidedError,
+            ContentUriScrapeResult.Status.Ok,
+            ContentUriScrapeResult.Status.ContentNotProvidedError,
         ]:
             return uris or []
 
