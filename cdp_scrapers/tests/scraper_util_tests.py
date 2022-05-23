@@ -1,6 +1,6 @@
 import pytest
 
-from cdp_scrapers.scraper_utils import str_simplified, str_simplified_new
+from cdp_scrapers.scraper_utils import str_simplified
 
 
 @pytest.mark.parametrize(
@@ -21,4 +21,3 @@ from cdp_scrapers.scraper_utils import str_simplified, str_simplified_new
 def test_str_simplifed(input_string: str, expected_output: str):
     # Validate that both methods work the same
     assert str_simplified(input_string) == expected_output
-    assert str_simplified_new(input_string) == expected_output
