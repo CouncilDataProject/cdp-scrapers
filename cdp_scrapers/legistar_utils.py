@@ -7,7 +7,7 @@ import re
 from copy import deepcopy
 from datetime import datetime, timedelta
 from json import JSONDecodeError
-from typing import Any, Callable, Dict, List, NamedTuple, Optional, Set
+from typing import Any, Dict, List, NamedTuple, Optional, Set
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote_plus
 from urllib.request import urlopen
@@ -38,7 +38,8 @@ from .scraper_utils import (
     sanitize_roles,
     str_simplified,
 )
-from .types import ContentURIs, ScraperStaticData
+from .types import ContentURIs, LegistarContentParser, ScraperStaticData
+from .legistar_content_parsers import all_parsers
 
 ###############################################################################
 
@@ -114,9 +115,7 @@ LEGISTAR_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
 known_legistar_persons: Dict[int, Dict[str, Any]] = {}
 known_legistar_bodies: Dict[int, Dict[str, Any]] = {}
 # video web page parser type per municipality
-video_page_parser: Dict[
-    str, Callable[[BeautifulSoup], Optional[List[ContentURIs]]]
-] = {}
+video_page_parser: Dict[str, LegistarContentParser] = {}
 
 
 def get_legistar_body(
@@ -424,6 +423,7 @@ def get_legistar_content_uris(client: str, legistar_ev: Dict) -> ContentUriScrap
     See Also
     --------
     LegistarScraper.get_content_uris()
+    cdp_scrapers.legistar_content_parsers
     """
     global video_page_parser
 
@@ -483,78 +483,27 @@ def get_legistar_content_uris(client: str, legistar_ev: Dict) -> ContentUriScrap
 
     log.debug(f"{legistar_ev[LEGISTAR_EV_SITE_URL]} -> {video_page_url}")
 
-    def _parse_format_1(soup: BeautifulSoup) -> Optional[List[ContentURIs]]:
-        # source link for the video is embedded in the script of downloadLinks.
-        # <script type="text/javascript">
-        # var meta_id = '',
-        # currentClipIndex = 0,
-        # clipList = eval([8844]),
-        # downloadLinks = eval([["\/\/69.5.90.100:443\/MediaVault\/Download.aspx?
-        # server=king.granicus.com&clip_id=8844",
-        # "http:\/\/archive-media.granicus.com:443\/OnDemand\/king\/king_e560cf63-5570-416e-a47d-0e1e13652224.mp4",null]]);
-        # </script>
+    try:
+        with urlopen(video_page_url) as resp:
+            # now load the page to get the actual video url
+            soup = BeautifulSoup(resp.read(), "html.parser")
 
-        video_script_text = soup.find("script", text=re.compile(r"downloadLinks"))
-        if video_script_text is None:
-            return None
-
-        video_script_text = video_script_text.string
-        # Below two lines of code tries to extract video url from downLoadLinks variable
-        # "http:\/\/archive-media.granicus.com:443\/OnDemand\/king\/king_e560cf63-5570-416e-a47d-0e1e13652224.mp4"
-        downloadLinks = video_script_text.split("[[")[1]
-        video_url = downloadLinks.split('",')[1].strip('"')
-        # Cleans up the video url to remove backward slash(\)
-        video_uri = video_url.replace("\\", "")
-        # caption URIs are not found for kingcounty events.
-        return [ContentURIs(video_uri=video_uri, caption_uri=None)]
-
-    def _parse_format_2(soup: BeautifulSoup) -> Optional[List[ContentURIs]]:
-        # <div id="download-options">
-        # <a href="...mp4">
-        video_url = soup.find("div", id="download-options")
-        if video_url is None:
-            return None
-        return [ContentURIs(str_simplified(video_url.a["href"]))]
-
-    def _parse_format_3(soup: BeautifulSoup) -> Optional[List[ContentURIs]]:
-        # <video>
-        # <source src="...">
-        # <track src="...">
-        video_url = soup.find("video")
-        if video_url is None:
-            return None
-        return [
-            ContentURIs(
-                video_uri=f"https:{str_simplified(video_url.source['src'])}",
-                caption_uri=(
-                    (
-                        f"http://{client}.granicus.com/"
-                        f"{str_simplified(video_url.track['src'])}"
-                    )
-                    # transcript is nice to have but not required
-                    if video_url.find("track") is not None
-                    and "src" in video_url.track.attrs
-                    else None
-                ),
-            )
-        ]
-
-    with urlopen(video_page_url) as resp:
-        # now load the page to get the actual video url
-        soup = BeautifulSoup(resp.read(), "html.parser")
-
-        if client in video_page_parser:
-            # we alrady know which format parser to call
-            uris = video_page_parser[client](soup)
-        else:
-            for parser in [_parse_format_1, _parse_format_2, _parse_format_3]:
-                uris = parser(soup)
-                if uris is not None:
-                    # remember so we just call this from here on
-                    video_page_parser[client] = parser
-                    break
+            if client in video_page_parser:
+                # we alrady know which format parser to call
+                uris = video_page_parser[client](client, soup)
             else:
-                uris = None
+                for parser in all_parsers:
+                    uris = parser(client, soup)
+                    if uris is not None:
+                        # remember so we just call this from here on
+                        video_page_parser[client] = parser
+                        log.debug(f"{parser} for {client}")
+                        break
+                else:
+                    uris = None
+    except HTTPError as e:
+        log.debug(f"Error opening {video_page_url}:\n{str(e)}")
+        return (ContentUriScrapeResult.Status.ResourceAccessError, None)
 
     if uris is None:
         raise NotImplementedError(
@@ -1416,10 +1365,7 @@ class LegistarScraper(IngestionModelScraper):
         """
         # see if our base legistar/granicus video parsing routine will work
         result, uris = get_legistar_content_uris(self.client_name, legistar_ev)
-        if result in [
-            ContentUriScrapeResult.Status.Ok,
-            ContentUriScrapeResult.Status.ContentNotProvidedError,
-        ]:
+        if result != ContentUriScrapeResult.Status.UnrecognizedPatternError:
             return uris or []
 
         raise NotImplementedError(

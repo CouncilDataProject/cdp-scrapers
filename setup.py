@@ -27,10 +27,11 @@ dev_requirements = [
 ]
 
 requirements = [
+    "beautifulsoup4~=4.9",
     "cdp-backend~=3.0",
+    "defusedxml~=0.7.1",
+    "pytz~=2021.1",
     "requests~=2.25",
-    "beautifulsoup4>=4.9",
-    "pytz>=2021.1",
 ]
 
 extra_requirements = {
