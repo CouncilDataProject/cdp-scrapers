@@ -91,7 +91,7 @@ def _parse_format_4(client: str, soup: BeautifulSoup) -> Optional[List[ContentUR
         asx = ElementTree.fromstring(resp.read())
         # one and only one <REF HREF="http://...mp4" />
         ref_tag = asx.find(".//REF")
-        return [ContentURIs(ref_tag.get("HREF") if ref_tag is not None else None)]
+        return [ContentURIs(ref_tag.get("HREF"))] if ref_tag is not None else None
 
 
 # TODO: do dynamically using inspect or something similar
