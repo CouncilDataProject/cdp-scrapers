@@ -9,8 +9,9 @@ from datetime import datetime, timedelta
 from json import JSONDecodeError
 from typing import Any, Callable, Dict, List, NamedTuple, Optional, Set
 from urllib.error import HTTPError, URLError
-from urllib.parse import quote_plus
+from urllib.parse import quote_plus, unquote
 from urllib.request import urlopen
+from xml.etree import ElementTree
 
 import requests
 from bs4 import BeautifulSoup
@@ -501,8 +502,12 @@ def get_legistar_content_uris(client: str, legistar_ev: Dict) -> ContentUriScrap
         video_script_text = video_script_text.string
         # Below two lines of code tries to extract video url from downLoadLinks variable
         # "http:\/\/archive-media.granicus.com:443\/OnDemand\/king\/king_e560cf63-5570-416e-a47d-0e1e13652224.mp4"
-        downloadLinks = video_script_text.split("[[")[1]
-        video_url = downloadLinks.split('",')[1].strip('"')
+        try:
+            downloadLinks = video_script_text.split("[[")[1]
+            video_url = downloadLinks.split('",')[1].strip('"')
+        except IndexError:
+            # split() did not yield expected # items
+            return None
         # Cleans up the video url to remove backward slash(\)
         video_uri = video_url.replace("\\", "")
         # caption URIs are not found for kingcounty events.
@@ -539,6 +544,24 @@ def get_legistar_content_uris(client: str, legistar_ev: Dict) -> ContentUriScrap
             )
         ]
 
+    def _parse_format_4(soup: BeautifulSoup) -> Optional[List[ContentURIs]]:
+        # a long <meta content="...VideoUrl=...&..." />
+        url_regex = re.compile("VideoUrl=([^&]+)")
+        playerMeta = soup.find("meta", property="og:video", content=url_regex)
+        if not playerMeta:
+            return None
+        video_url = f"https:{unquote(url_regex.search(playerMeta['content']).group(1))}"
+        # this makes the server return an xml-like asx
+        # NOTE: changing query from rtmp to http makes it return the video url
+        #       in http as opposed to rtmp, e.g. rtmp://...mp4 -> http://...mp4
+        video_url = video_url.replace("stream_type=rtmp", "stream_type=http")
+
+        with urlopen(video_url) as resp:
+            asx = ElementTree.fromstring(resp.read())
+            # one and only one <REF HREF="http://...mp4" />
+            ref_tag = asx.find(".//REF")
+            return [ContentURIs(ref_tag.get("HREF") if ref_tag is not None else None)]
+
     with urlopen(video_page_url) as resp:
         # now load the page to get the actual video url
         soup = BeautifulSoup(resp.read(), "html.parser")
@@ -547,7 +570,12 @@ def get_legistar_content_uris(client: str, legistar_ev: Dict) -> ContentUriScrap
             # we alrady know which format parser to call
             uris = video_page_parser[client](soup)
         else:
-            for parser in [_parse_format_1, _parse_format_2, _parse_format_3]:
+            for parser in [
+                _parse_format_1,
+                _parse_format_2,
+                _parse_format_3,
+                _parse_format_4,
+            ]:
                 uris = parser(soup)
                 if uris is not None:
                     # remember so we just call this from here on
