@@ -12,6 +12,14 @@ Subpackages
 Submodules
 ----------
 
+cdp\_scrapers.legistar\_content\_parsers module
+-----------------------------------------------
+
+.. automodule:: cdp_scrapers.legistar_content_parsers
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 cdp\_scrapers.legistar\_utils module
 ------------------------------------
 

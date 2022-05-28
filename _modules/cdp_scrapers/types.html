@@ -64,6 +64,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../cdp_scrapers.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../cdp_scrapers.html#module-cdp_scrapers.legistar_content_parsers">cdp_scrapers.legistar_content_parsers module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../cdp_scrapers.html#module-cdp_scrapers.legistar_utils">cdp_scrapers.legistar_utils module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../cdp_scrapers.html#module-cdp_scrapers.scraper_utils">cdp_scrapers.scraper_utils module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../cdp_scrapers.html#module-cdp_scrapers.types">cdp_scrapers.types module</a></li>
@@ -113,7 +114,8 @@
 <span></span><span class="ch">#!/usr/bin/env python</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
 <span class="kn">from</span> <span class="nn">cdp_backend.pipeline.ingestion_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Body</span><span class="p">,</span>
     <span class="n">Person</span><span class="p">,</span>
@@ -132,6 +134,30 @@
     <span class="n">seats</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Seat</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">primary_bodies</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Body</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">persons</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Person</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<span class="n">LegistarContentParser</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">,</span> <span class="n">BeautifulSoup</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">ContentURIs</span><span class="p">]]]</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Function that returns URLs for videos and captions</span>
+<span class="sd">from a Legistar/Granicus-hosted video web page</span>
+
+<span class="sd">Parameters</span>
+<span class="sd">----------</span>
+<span class="sd">client: str</span>
+<span class="sd">    Which legistar client to target. Ex: &quot;seattle&quot;</span>
+<span class="sd">video web page: BeautifulSoup</span>
+<span class="sd">    Video web page loaded into bs4</span>
+
+<span class="sd">Returns</span>
+<span class="sd">-------</span>
+<span class="sd">uris: Optional[List[ContentURIs]]</span>
+<span class="sd">    URIs for video and optional caption</span>
+
+<span class="sd">See Also</span>
+<span class="sd">--------</span>
+<span class="sd">cdp_scrapers.legistar_content_parsers</span>
+<span class="sd">cdp_scrapers.legistar_utils.get_legistar_content_uris()</span>
+<span class="sd">&quot;&quot;&quot;</span>
 </pre></div>
 
            </div>

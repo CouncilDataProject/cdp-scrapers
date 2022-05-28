@@ -67,6 +67,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cdp_scrapers.legistar_content_parsers">cdp_scrapers.legistar_content_parsers module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-cdp_scrapers.legistar_utils">cdp_scrapers.legistar_utils module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-cdp_scrapers.scraper_utils">cdp_scrapers.scraper_utils module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-cdp_scrapers.types">cdp_scrapers.types module</a></li>
@@ -135,6 +136,9 @@
 </section>
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline"></a></h2>
+</section>
+<section id="module-cdp_scrapers.legistar_content_parsers">
+<span id="cdp-scrapers-legistar-content-parsers-module"></span><h2>cdp_scrapers.legistar_content_parsers module<a class="headerlink" href="#module-cdp_scrapers.legistar_content_parsers" title="Permalink to this headline"></a></h2>
 </section>
 <section id="module-cdp_scrapers.legistar_utils">
 <span id="cdp-scrapers-legistar-utils-module"></span><h2>cdp_scrapers.legistar_utils module<a class="headerlink" href="#module-cdp_scrapers.legistar_utils" title="Permalink to this headline"></a></h2>
@@ -779,7 +783,7 @@ lookup-table, or the CDP standard title swapped from the lookup-table.</p>
 </dl>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference internal" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_content_uris" title="cdp_scrapers.legistar_utils.LegistarScraper.get_content_uris"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LegistarScraper.get_content_uris</span></code></a></p>
+<p><a class="reference internal" href="#cdp_scrapers.legistar_utils.LegistarScraper.get_content_uris" title="cdp_scrapers.legistar_utils.LegistarScraper.get_content_uris"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LegistarScraper.get_content_uris</span></code></a>, <a class="reference internal" href="#module-cdp_scrapers.legistar_content_parsers" title="cdp_scrapers.legistar_content_parsers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdp_scrapers.legistar_content_parsers</span></code></a></p>
 </div>
 </dd></dl>
 
@@ -1075,6 +1079,32 @@ newline characters.</p>
 <dd><p>Alias for field number 0</p>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="cdp_scrapers.types.LegistarContentParser">
+<span class="sig-prename descclassname"><span class="pre">cdp_scrapers.types.</span></span><span class="sig-name descname"><span class="pre">LegistarContentParser</span></span><a class="headerlink" href="#cdp_scrapers.types.LegistarContentParser" title="Permalink to this definition"></a></dt>
+<dd><p>Function that returns URLs for videos and captions
+from a Legistar/Granicus-hosted video web page</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>client</strong> (<em>str</em>) – Which legistar client to target. Ex: “seattle”</p></li>
+<li><p><strong>video web page</strong> (<em>BeautifulSoup</em>) – Video web page loaded into bs4</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>uris</strong> – URIs for video and optional caption</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Optional[List[<a class="reference internal" href="#cdp_scrapers.types.ContentURIs" title="cdp_scrapers.types.ContentURIs">ContentURIs</a>]]</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#module-cdp_scrapers.legistar_content_parsers" title="cdp_scrapers.legistar_content_parsers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdp_scrapers.legistar_content_parsers</span></code></a>, <a class="reference internal" href="#cdp_scrapers.legistar_utils.get_legistar_content_uris" title="cdp_scrapers.legistar_utils.get_legistar_content_uris"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdp_scrapers.legistar_utils.get_legistar_content_uris</span></code></a></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code>[[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">bs4.BeautifulSoup</span></code>], <code class="xref py py-obj docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#cdp_scrapers.types.ContentURIs" title="cdp_scrapers.types.ContentURIs"><code class="xref py py-class docutils literal notranslate"><span class="pre">cdp_scrapers.types.ContentURIs</span></code></a>]]]</p>
 </dd></dl>
 
 <dl class="py class">
