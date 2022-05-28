@@ -8,11 +8,30 @@ from urllib.request import urlopen
 from defusedxml import ElementTree
 import re
 
-from .types import ContentURIs
+from .types import ContentURIs, LegistarContentParser
 from .scraper_utils import str_simplified
 
 
 def _parse_format_1(client: str, soup: BeautifulSoup) -> Optional[List[ContentURIs]]:
+    """
+    Works for milwaukee, kingcounty, phoenix
+
+    Parameters
+    ----------
+    client: str
+        Which legistar client to target. Ex: "seattle"
+    video web page: BeautifulSoup
+        Video web page loaded into bs4
+
+    Returns
+    -------
+    uris: Optional[List[ContentURIs]]
+        URIs for video and optional caption
+
+    See Also
+    --------
+    cdp_scrapers.types.LegistarContentParser
+    """
     # source link for the video is embedded in the script of downloadLinks.
     # <script type="text/javascript">
     # var meta_id = '',
@@ -43,6 +62,25 @@ def _parse_format_1(client: str, soup: BeautifulSoup) -> Optional[List[ContentUR
 
 
 def _parse_format_2(client: str, soup: BeautifulSoup) -> Optional[List[ContentURIs]]:
+    """
+    Works for denver
+
+    Parameters
+    ----------
+    client: str
+        Which legistar client to target. Ex: "seattle"
+    video web page: BeautifulSoup
+        Video web page loaded into bs4
+
+    Returns
+    -------
+    uris: Optional[List[ContentURIs]]
+        URIs for video and optional caption
+
+    See Also
+    --------
+    cdp_scrapers.types.LegistarContentParser
+    """
     # <div id="download-options">
     # <a href="...mp4">
     video_url = soup.find("div", id="download-options")
@@ -52,6 +90,25 @@ def _parse_format_2(client: str, soup: BeautifulSoup) -> Optional[List[ContentUR
 
 
 def _parse_format_3(client: str, soup: BeautifulSoup) -> Optional[List[ContentURIs]]:
+    """
+    Works for boston, corpuschristi, elpasotexas
+
+    Parameters
+    ----------
+    client: str
+        Which legistar client to target. Ex: "seattle"
+    video web page: BeautifulSoup
+        Video web page loaded into bs4
+
+    Returns
+    -------
+    uris: Optional[List[ContentURIs]]
+        URIs for video and optional caption
+
+    See Also
+    --------
+    cdp_scrapers.types.LegistarContentParser
+    """
     # <video>
     # <source src="...">
     # <track src="...">
@@ -76,8 +133,29 @@ def _parse_format_3(client: str, soup: BeautifulSoup) -> Optional[List[ContentUR
 
 
 def _parse_format_4(client: str, soup: BeautifulSoup) -> Optional[List[ContentURIs]]:
+    """
+    Works for longbeach, richmondva
+
+    Parameters
+    ----------
+    client: str
+        Which legistar client to target. Ex: "seattle"
+    video web page: BeautifulSoup
+        Video web page loaded into bs4
+
+    Returns
+    -------
+    uris: Optional[List[ContentURIs]]
+        URIs for video and optional caption
+
+    See Also
+    --------
+    cdp_scrapers.types.LegistarContentParser
+    """
     # a long <meta content="...VideoUrl=...&..." />
     url_regex = re.compile("VideoUrl=([^&]+)")
+    # TODO: Also constains ScriptURL but appears to be invalid.
+    # Double-check against more events; scrape if we can.
     player_meta = soup.find("meta", property="og:video", content=url_regex)
     if not player_meta:
         return None
@@ -95,4 +173,9 @@ def _parse_format_4(client: str, soup: BeautifulSoup) -> Optional[List[ContentUR
 
 
 # TODO: do dynamically using inspect or something similar
-all_parsers = [_parse_format_1, _parse_format_2, _parse_format_3, _parse_format_4]
+all_parsers: List[LegistarContentParser] = [
+    _parse_format_1,
+    _parse_format_2,
+    _parse_format_3,
+    _parse_format_4,
+]

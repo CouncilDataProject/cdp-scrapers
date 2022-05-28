@@ -7,7 +7,7 @@ import re
 from copy import deepcopy
 from datetime import datetime, timedelta
 from json import JSONDecodeError
-from typing import Any, Callable, Dict, List, NamedTuple, Optional, Set
+from typing import Any, Dict, List, NamedTuple, Optional, Set
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote_plus
 from urllib.request import urlopen
@@ -38,7 +38,7 @@ from .scraper_utils import (
     sanitize_roles,
     str_simplified,
 )
-from .types import ContentURIs, ScraperStaticData
+from .types import ContentURIs, LegistarContentParser, ScraperStaticData
 from .legistar_content_parsers import all_parsers
 
 ###############################################################################
@@ -115,9 +115,7 @@ LEGISTAR_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
 known_legistar_persons: Dict[int, Dict[str, Any]] = {}
 known_legistar_bodies: Dict[int, Dict[str, Any]] = {}
 # video web page parser type per municipality
-video_page_parser: Dict[
-    str, Callable[[str, BeautifulSoup], Optional[List[ContentURIs]]]
-] = {}
+video_page_parser: Dict[str, LegistarContentParser] = {}
 
 
 def get_legistar_body(
@@ -498,6 +496,7 @@ def get_legistar_content_uris(client: str, legistar_ev: Dict) -> ContentUriScrap
                     if uris is not None:
                         # remember so we just call this from here on
                         video_page_parser[client] = parser
+                        log.debug(f"{parser} for {client}")
                         break
                 else:
                     uris = None
