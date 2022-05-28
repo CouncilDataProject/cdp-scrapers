@@ -547,10 +547,10 @@ def get_legistar_content_uris(client: str, legistar_ev: Dict) -> ContentUriScrap
     def _parse_format_4(soup: BeautifulSoup) -> Optional[List[ContentURIs]]:
         # a long <meta content="...VideoUrl=...&..." />
         url_regex = re.compile("VideoUrl=([^&]+)")
-        playerMeta = soup.find("meta", property="og:video", content=url_regex)
-        if not playerMeta:
+        player_meta = soup.find("meta", property="og:video", content=url_regex)
+        if not player_meta:
             return None
-        video_url = f"https:{unquote(url_regex.search(playerMeta['content']).group(1))}"
+        video_url = f"https:{unquote(url_regex.search(player_meta['content']).group(1))}"
         # this makes the server return an xml-like asx
         # NOTE: changing query from rtmp to http makes it return the video url
         #       in http as opposed to rtmp, e.g. rtmp://...mp4 -> http://...mp4
