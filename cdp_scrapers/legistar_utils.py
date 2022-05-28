@@ -562,27 +562,31 @@ def get_legistar_content_uris(client: str, legistar_ev: Dict) -> ContentUriScrap
             ref_tag = asx.find(".//REF")
             return [ContentURIs(ref_tag.get("HREF") if ref_tag is not None else None)]
 
-    with urlopen(video_page_url) as resp:
-        # now load the page to get the actual video url
-        soup = BeautifulSoup(resp.read(), "html.parser")
+    try:
+        with urlopen(video_page_url) as resp:
+            # now load the page to get the actual video url
+            soup = BeautifulSoup(resp.read(), "html.parser")
 
-        if client in video_page_parser:
-            # we alrady know which format parser to call
-            uris = video_page_parser[client](soup)
-        else:
-            for parser in [
-                _parse_format_1,
-                _parse_format_2,
-                _parse_format_3,
-                _parse_format_4,
-            ]:
-                uris = parser(soup)
-                if uris is not None:
-                    # remember so we just call this from here on
-                    video_page_parser[client] = parser
-                    break
+            if client in video_page_parser:
+                # we alrady know which format parser to call
+                uris = video_page_parser[client](soup)
             else:
-                uris = None
+                for parser in [
+                    _parse_format_1,
+                    _parse_format_2,
+                    _parse_format_3,
+                    _parse_format_4,
+                ]:
+                    uris = parser(soup)
+                    if uris is not None:
+                        # remember so we just call this from here on
+                        video_page_parser[client] = parser
+                        break
+                else:
+                    uris = None
+    except HTTPError as e:
+        log.debug(f"Error opening {video_page_url}:\n{str(e)}")
+        return (ContentUriScrapeResult.Status.ResourceAccessError, None)
 
     if uris is None:
         raise NotImplementedError(
@@ -1444,10 +1448,7 @@ class LegistarScraper(IngestionModelScraper):
         """
         # see if our base legistar/granicus video parsing routine will work
         result, uris = get_legistar_content_uris(self.client_name, legistar_ev)
-        if result in [
-            ContentUriScrapeResult.Status.Ok,
-            ContentUriScrapeResult.Status.ContentNotProvidedError,
-        ]:
+        if result != ContentUriScrapeResult.Status.UnrecognizedPatternError:
             return uris or []
 
         raise NotImplementedError(
