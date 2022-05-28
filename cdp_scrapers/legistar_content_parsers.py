@@ -31,6 +31,7 @@ def _parse_format_1(client: str, soup: BeautifulSoup) -> Optional[List[ContentUR
     See Also
     --------
     cdp_scrapers.types.LegistarContentParser
+    cdp_scrapers.legistar_utils.get_legistar_content_uris()
     """
     # source link for the video is embedded in the script of downloadLinks.
     # <script type="text/javascript">
@@ -80,6 +81,7 @@ def _parse_format_2(client: str, soup: BeautifulSoup) -> Optional[List[ContentUR
     See Also
     --------
     cdp_scrapers.types.LegistarContentParser
+    cdp_scrapers.legistar_utils.get_legistar_content_uris()
     """
     # <div id="download-options">
     # <a href="...mp4">
@@ -108,6 +110,7 @@ def _parse_format_3(client: str, soup: BeautifulSoup) -> Optional[List[ContentUR
     See Also
     --------
     cdp_scrapers.types.LegistarContentParser
+    cdp_scrapers.legistar_utils.get_legistar_content_uris()
     """
     # <video>
     # <source src="...">
@@ -151,6 +154,7 @@ def _parse_format_4(client: str, soup: BeautifulSoup) -> Optional[List[ContentUR
     See Also
     --------
     cdp_scrapers.types.LegistarContentParser
+    cdp_scrapers.legistar_utils.get_legistar_content_uris()
     """
     # a long <meta content="...VideoUrl=...&..." />
     url_regex = re.compile("VideoUrl=([^&]+)")

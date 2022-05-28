@@ -423,6 +423,7 @@ def get_legistar_content_uris(client: str, legistar_ev: Dict) -> ContentUriScrap
     See Also
     --------
     LegistarScraper.get_content_uris()
+    cdp_scrapers.legistar_content_parsers
     """
     global video_page_parser
 
