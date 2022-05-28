@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from typing import Optional, List
 from urllib.parse import unquote
 from urllib.request import urlopen
-from xml.etree import ElementTree
+from defusedxml import ElementTree
 import re
 
 from .types import ContentURIs
