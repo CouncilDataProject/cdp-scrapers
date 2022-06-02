@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to cdp-scrapers’s documentation! &mdash; cdp-scrapers 0.4.0 documentation</title>
+  <title>Welcome to cdp-scrapers’s documentation! &mdash; cdp-scrapers 0.4.1 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -29,7 +30,7 @@
             <a href="#" class="icon icon-home"> cdp-scrapers
           </a>
               <div class="version">
-                0.4.0
+                0.4.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -114,18 +115,18 @@
            <div itemprop="articleBody">
              
   <section id="welcome-to-cdp-scrapers-s-documentation">
-<h1>Welcome to cdp-scrapers’s documentation!<a class="headerlink" href="#welcome-to-cdp-scrapers-s-documentation" title="Permalink to this headline"></a></h1>
+<h1>Welcome to cdp-scrapers’s documentation!<a class="headerlink" href="#welcome-to-cdp-scrapers-s-documentation" title="Permalink to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 </div>
 </section>
 <section id="cdp-scrapers">
-<h1>cdp-scrapers<a class="headerlink" href="#cdp-scrapers" title="Permalink to this headline"></a></h1>
+<h1>cdp-scrapers<a class="headerlink" href="#cdp-scrapers" title="Permalink to this heading"></a></h1>
 <a class="reference external image-reference" href="https://github.com/CouncilDataProject/cdp-scrapers/actions"><img alt="Build Status" src="https://github.com/CouncilDataProject/cdp-scrapers/workflows/Build%20Main/badge.svg" /></a>
 <a class="reference external image-reference" href="https://CouncilDataProject.github.io/cdp-scrapers/"><img alt="Documentation" src="https://github.com/CouncilDataProject/cdp-scrapers/workflows/Documentation/badge.svg" /></a>
 <p>Scratchpad for scraper development and general utilities.</p>
 <hr class="docutils" />
 <section id="council-data-project">
-<h2>Council Data Project<a class="headerlink" href="#council-data-project" title="Permalink to this headline"></a></h2>
+<h2>Council Data Project<a class="headerlink" href="#council-data-project" title="Permalink to this heading"></a></h2>
 <p>Council Data Project is an open-source project dedicated to providing journalists,
 activists, researchers, and all members of each community we serve with the tools they
 need to stay informed and hold their Council Members accountable.</p>
@@ -133,16 +134,16 @@ need to stay informed and hold their Council Members accountable.</p>
 <a class="reference external" href="https://councildataproject.org/">our website</a>.</p>
 </section>
 <section id="about">
-<h2>About<a class="headerlink" href="#about" title="Permalink to this headline"></a></h2>
+<h2>About<a class="headerlink" href="#about" title="Permalink to this heading"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">cdp-scrapers</span></code> is a collection of utilities and in-progress or actively maintained
 CDP instance event scrapers. The purpose of this library is to help new CDP instance
 maintainers have a quick plethora of examples for getting started on developing their
 event scraper functions.</p>
 </section>
 <section id="quick-start">
-<h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline"></a></h2>
+<h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this heading"></a></h2>
 <section id="legistar">
-<h3>Legistar<a class="headerlink" href="#legistar" title="Permalink to this headline"></a></h3>
+<h3>Legistar<a class="headerlink" href="#legistar" title="Permalink to this heading"></a></h3>
 <p>General Legistar utility functions.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cdp_scrapers.legistar_utils</span> <span class="kn">import</span> <span class="n">get_legistar_events_for_timespan</span>
 <span class="kn">from</span> <span class="nn">cdp_scrapers.instances</span> <span class="kn">import</span> <span class="n">get_seattle_events</span>
@@ -167,9 +168,9 @@ event scraper functions.</p>
 </div>
 </section>
 <section id="scrapers">
-<h3>Scrapers<a class="headerlink" href="#scrapers" title="Permalink to this headline"></a></h3>
+<h3>Scrapers<a class="headerlink" href="#scrapers" title="Permalink to this heading"></a></h3>
 <section id="event-scraper-structure">
-<h4>Event Scraper Structure<a class="headerlink" href="#event-scraper-structure" title="Permalink to this headline"></a></h4>
+<h4>Event Scraper Structure<a class="headerlink" href="#event-scraper-structure" title="Permalink to this heading"></a></h4>
 <a class="reference external image-reference" href="./images/get_events.png"><img alt="get_events" src="images/get_events.png" /></a>
 <p>Our current event scraper structure is as shown above. The main function <code class="docutils literal notranslate"><span class="pre">get_events</span></code>
 gets all the required data and it calls the <code class="docutils literal notranslate"><span class="pre">get_content_uris</span></code> function to return the
@@ -193,7 +194,7 @@ method for retrieving formatted legislative data, please feel free to contribute
 custom municipality scraper!</p>
 </section>
 <section id="creating-a-custom-scraper">
-<h4>Creating a Custom Scraper<a class="headerlink" href="#creating-a-custom-scraper" title="Permalink to this headline"></a></h4>
+<h4>Creating a Custom Scraper<a class="headerlink" href="#creating-a-custom-scraper" title="Permalink to this heading"></a></h4>
 <p>If it isn’t possible to use our generalized Legistar tooling to write your scraper,
 you will need to create your own event scraper to proceed with the deployment.</p>
 <ol class="arabic simple">
@@ -215,22 +216,22 @@ tested again afterwards.</p></li>
 </section>
 </section>
 <section id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline"></a></h2>
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h2>
 <p><strong>Stable Release:</strong> <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">cdp-scrapers</span></code><span class="raw-html-m2r"><br></span>
 <strong>Development Head:</strong> <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">git+https://github.com/CouncilDataProject/cdp-scrapers.git</span></code></p>
 </section>
 <section id="documentation">
-<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline"></a></h2>
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this heading"></a></h2>
 <p>For full package documentation please visit <a class="reference external" href="https://councildataproject.org/cdp-scrapers">councildataproject.org/cdp-scrapers</a>.</p>
 </section>
 <section id="development">
-<h2>Development<a class="headerlink" href="#development" title="Permalink to this headline"></a></h2>
+<h2>Development<a class="headerlink" href="#development" title="Permalink to this heading"></a></h2>
 <p>Refer to <a class="reference external" href="CONTRIBUTING.md">CONTRIBUTING.md</a> for information related to developing the code.</p>
 <p><strong>MIT license</strong></p>
 </section>
 </section>
 <section id="specific-doc-pages">
-<h1>Specific Doc Pages<a class="headerlink" href="#specific-doc-pages" title="Permalink to this headline"></a></h1>
+<h1>Specific Doc Pages<a class="headerlink" href="#specific-doc-pages" title="Permalink to this heading"></a></h1>
 <table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
@@ -247,7 +248,7 @@ tested again afterwards.</p></li>
 </table>
 </section>
 <section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline"></a></h1>
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading"></a></h1>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>

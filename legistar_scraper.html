@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Notes on LegistarScraper &mdash; cdp-scrapers 0.4.0 documentation</title>
+  <title>Notes on LegistarScraper &mdash; cdp-scrapers 0.4.1 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -30,7 +31,7 @@
             <a href="index.html" class="icon icon-home"> cdp-scrapers
           </a>
               <div class="version">
-                0.4.0
+                0.4.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -116,9 +117,9 @@
            <div itemprop="articleBody">
              
   <section id="notes-on-legistarscraper">
-<h1>Notes on <code class="docutils literal notranslate"><span class="pre">LegistarScraper</span></code><a class="headerlink" href="#notes-on-legistarscraper" title="Permalink to this headline"></a></h1>
+<h1>Notes on <code class="docutils literal notranslate"><span class="pre">LegistarScraper</span></code><a class="headerlink" href="#notes-on-legistarscraper" title="Permalink to this heading"></a></h1>
 <section id="filtering">
-<h2>Filtering<a class="headerlink" href="#filtering" title="Permalink to this headline"></a></h2>
+<h2>Filtering<a class="headerlink" href="#filtering" title="Permalink to this heading"></a></h2>
 <ul class="simple">
 <li><p>Unimportant <code class="docutils literal notranslate"><span class="pre">EventMinutesItem</span></code></p></li>
 </ul>
@@ -196,7 +197,7 @@ given <code class="docutils literal notranslate"><span class="pre">EventMinutesI
 </div>
 </section>
 <section id="legistar-to-cdp-ingestionmodel">
-<h2>Legistar to CDP <code class="docutils literal notranslate"><span class="pre">IngestionModel</span></code><a class="headerlink" href="#legistar-to-cdp-ingestionmodel" title="Permalink to this headline"></a></h2>
+<h2>Legistar to CDP <code class="docutils literal notranslate"><span class="pre">IngestionModel</span></code><a class="headerlink" href="#legistar-to-cdp-ingestionmodel" title="Permalink to this heading"></a></h2>
 <p>Here are some notes on what Legistar API fields to use for <code class="docutils literal notranslate"><span class="pre">IngestionModel</span></code> fields.</p>
 <ul class="simple">
 <li><p>“Public Comment” isn’t a matter, it is a minutes item. Minutes items
@@ -207,7 +208,7 @@ for 2021-07-28”, for example.</p></li>
 </ul>
 </section>
 <section id="instance-specific-scraping">
-<h2>Instance-Specific Scraping<a class="headerlink" href="#instance-specific-scraping" title="Permalink to this headline"></a></h2>
+<h2>Instance-Specific Scraping<a class="headerlink" href="#instance-specific-scraping" title="Permalink to this heading"></a></h2>
 <p>In an ideal situation, in your <code class="docutils literal notranslate"><span class="pre">LegistarScraper</span></code> class you need to provide just
 the municipality’s Legistar client ID and the time zone. See the <code class="docutils literal notranslate"><span class="pre">MyScraper</span></code> example above.</p>
 <p>You can override and implement your own methods as necessary. For example, the base
@@ -228,7 +229,7 @@ implementation for <code class="docutils literal notranslate"><span class="pre">
 <code class="docutils literal notranslate"><span class="pre">LegistarScraper</span></code>-derived class to use a completely different mapping for
 <code class="docutils literal notranslate"><span class="pre">SupportingFile</span></code>.</p>
 <section id="scraping-for-session-video-uri">
-<h3>Scraping for <code class="docutils literal notranslate"><span class="pre">Session.video_uri</span></code><a class="headerlink" href="#scraping-for-session-video-uri" title="Permalink to this headline"></a></h3>
+<h3>Scraping for <code class="docutils literal notranslate"><span class="pre">Session.video_uri</span></code><a class="headerlink" href="#scraping-for-session-video-uri" title="Permalink to this heading"></a></h3>
 <p>The “big” scraping that an instance will probably have to provide is
 <code class="docutils literal notranslate"><span class="pre">get_content_uris()</span></code>. The base class will try to use Legistar “EventVideoPath” but
 it is likely that information is not filled. In these situations Legistar might
@@ -236,7 +237,7 @@ point to some external resource, such as a web page hosted somewhere else, that
 does have URI for the video from the given event. See <code class="docutils literal notranslate"><span class="pre">SeattleScraper.get_content_uris()</span></code>.</p>
 </section>
 <section id="information-from-other-sources">
-<h3>Information From Other Sources<a class="headerlink" href="#information-from-other-sources" title="Permalink to this headline"></a></h3>
+<h3>Information From Other Sources<a class="headerlink" href="#information-from-other-sources" title="Permalink to this heading"></a></h3>
 <p>In the event that you have information for <code class="docutils literal notranslate"><span class="pre">IngestionModel</span></code> from some source other than your municipality’s Legistar API, <code class="docutils literal notranslate"><span class="pre">LegistarScraper</span></code> provides two ways that you can implement completely to your preference. Both are called at the end of <code class="docutils literal notranslate"><span class="pre">get_events()</span></code> after <code class="docutils literal notranslate"><span class="pre">List[EventIngestionModel]</span></code> have been scraped for the given time range.</p>
 <ol class="arabic simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">known_persons</span></code><span class="raw-html-m2r"><br></span>
@@ -246,7 +247,7 @@ This is a final, fully-custom method where you can augment and insert any inform
 </ol>
 </section>
 <section id="other-notes">
-<h3>Other Notes<a class="headerlink" href="#other-notes" title="Permalink to this headline"></a></h3>
+<h3>Other Notes<a class="headerlink" href="#other-notes" title="Permalink to this heading"></a></h3>
 <ul class="simple">
 <li><p>Recommend calling <code class="docutils literal notranslate"><span class="pre">legistar_utils.str_simplified()</span></code> on string fields to remove
 leading/trailing whitespace and simplify consecutive whitespace.</p></li>
