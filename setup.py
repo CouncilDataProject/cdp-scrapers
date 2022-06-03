@@ -27,10 +27,11 @@ dev_requirements = [
 ]
 
 requirements = [
+    "beautifulsoup4~=4.9",
     "cdp-backend~=3.0",
+    "defusedxml~=0.7.1",
+    "pytz~=2021.1",
     "requests~=2.25",
-    "beautifulsoup4>=4.9",
-    "pytz>=2021.1",
     "clean-text~=0.6.0"
 ]
 
@@ -73,6 +74,6 @@ setup(
     url="https://github.com/CouncilDataProject/cdp-scrapers",
     # Do not edit this string manually, always use bumpversion
     # Details in CONTRIBUTING.rst
-    version="0.3.11",
+    version="0.4.1",
     zip_safe=False,
 )

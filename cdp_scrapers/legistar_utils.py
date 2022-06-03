@@ -1,17 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from copy import deepcopy
+import enum
 import logging
 import re
+from copy import deepcopy
 from datetime import datetime, timedelta
 from json import JSONDecodeError
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, NamedTuple, Optional, Set
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote_plus
 from urllib.request import urlopen
 
 import requests
+from bs4 import BeautifulSoup
 from cdp_backend.database.constants import (
     EventMinutesItemDecision,
     MatterStatusDecision,
@@ -36,7 +38,8 @@ from .scraper_utils import (
     sanitize_roles,
     str_simplified,
 )
-from .types import ContentURIs, ScraperStaticData
+from .types import ContentURIs, LegistarContentParser, ScraperStaticData
+from .legistar_content_parsers import all_parsers
 
 ###############################################################################
 
@@ -111,6 +114,8 @@ LEGISTAR_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
 
 known_legistar_persons: Dict[int, Dict[str, Any]] = {}
 known_legistar_bodies: Dict[int, Dict[str, Any]] = {}
+# video web page parser type per municipality
+video_page_parser: Dict[str, LegistarContentParser] = {}
 
 
 def get_legistar_body(
@@ -373,6 +378,139 @@ def get_legistar_events_for_timespan(
 
     log.debug(f"Collected {len(response)} Legistar events")
     return response
+
+
+class ContentUriScrapeResult(NamedTuple):
+    class Status(enum.IntEnum):
+        # Web page(s) are in unrecognized structure
+        UnrecognizedPatternError = -1
+        # Error in accessing some resource
+        ResourceAccessError = -2
+        # Video was not provided for the event
+        ContentNotProvidedError = -3
+        # Found URIs to video and optional caption
+        Ok = 0
+
+    status: Status
+    uris: Optional[List[ContentURIs]] = None
+
+
+def get_legistar_content_uris(client: str, legistar_ev: Dict) -> ContentUriScrapeResult:
+    """
+    Return URLs for videos and captions from a Legistar/Granicus-hosted video web page
+
+    Parameters
+    ----------
+    client: str
+        Which legistar client to target. Ex: "seattle"
+    legistar_ev: Dict
+        Data for one Legistar Event.
+
+    Returns
+    -------
+    ContentUriScrapeResult
+        status: ContentUriScrapeResult.Status
+            Status code describing the scraping process. Use uris only if status is Ok
+        uris: Optional[List[ContentURIs]]
+            URIs for video and optional caption
+
+    Raises
+    ------
+    NotImplementedError
+        Means the content structure of the web page hosting session video has changed.
+        We need explicit review and update the scraping code.
+
+    See Also
+    --------
+    LegistarScraper.get_content_uris()
+    cdp_scrapers.legistar_content_parsers
+    """
+    global video_page_parser
+
+    # prefer video file path in legistar Event.EventVideoPath
+    if legistar_ev[LEGISTAR_SESSION_VIDEO_URI]:
+        return (
+            ContentUriScrapeResult.Status.Ok,
+            [
+                ContentURIs(
+                    video_uri=str_simplified(legistar_ev[LEGISTAR_SESSION_VIDEO_URI]),
+                    caption_uri=None,
+                )
+            ],
+        )
+    if not legistar_ev[LEGISTAR_EV_SITE_URL]:
+        return (ContentUriScrapeResult.Status.UnrecognizedPatternError, None)
+
+    try:
+        # a td tag with a certain id pattern.
+        # this is usually something like
+        # https://somewhere.legistar.com/MeetingDetail.aspx...
+        # that is a summary-like page for a meeting
+        with urlopen(legistar_ev[LEGISTAR_EV_SITE_URL]) as resp:
+            soup = BeautifulSoup(resp.read(), "html.parser")
+
+    except (URLError, HTTPError) as e:
+        log.debug(f"{legistar_ev[LEGISTAR_EV_SITE_URL]}: {str(e)}")
+        return (ContentUriScrapeResult.Status.ResourceAccessError, None)
+
+    # this gets us the url for the web PAGE containing the video
+    # video link is provided in the window.open()command inside onclick event
+    # <a id="ctl00_ContentPlaceHolder1_hypVideo"
+    # data-event-id="75f1e143-6756-496f-911b-d3abe61d64a5"
+    # data-running-text="In&amp;nbsp;progress" class="videolink"
+    # onclick="window.open('Video.aspx?
+    # Mode=Granicus&amp;ID1=8844&amp;G=D64&amp;Mode2=Video','video');
+    # return false;"
+    # href="#" style="color:Blue;font-family:Tahoma;font-size:10pt;">Video</a>
+    extract_url = soup.find(
+        "a",
+        id=re.compile(r"ct\S*_ContentPlaceHolder\S*_hypVideo"),
+        class_="videolink",
+    )
+    if extract_url is None:
+        return (ContentUriScrapeResult.Status.UnrecognizedPatternError, None)
+    # the <a> tag will not have this attribute if there is no video
+    if "onclick" not in extract_url.attrs:
+        return (ContentUriScrapeResult.Status.ContentNotProvidedError, None)
+
+    # NOTE: after this point, failing to scrape video url should raise an exception.
+    # we need to be alerted that we probabaly have a new web page structure.
+
+    extract_url = extract_url["onclick"]
+    start = extract_url.find("'") + len("'")
+    end = extract_url.find("',")
+    video_page_url = f"https://{client}.legistar.com/{extract_url[start:end]}"
+
+    log.debug(f"{legistar_ev[LEGISTAR_EV_SITE_URL]} -> {video_page_url}")
+
+    try:
+        with urlopen(video_page_url) as resp:
+            # now load the page to get the actual video url
+            soup = BeautifulSoup(resp.read(), "html.parser")
+
+            if client in video_page_parser:
+                # we alrady know which format parser to call
+                uris = video_page_parser[client](client, soup)
+            else:
+                for parser in all_parsers:
+                    uris = parser(client, soup)
+                    if uris is not None:
+                        # remember so we just call this from here on
+                        video_page_parser[client] = parser
+                        log.debug(f"{parser} for {client}")
+                        break
+                else:
+                    uris = None
+    except HTTPError as e:
+        log.debug(f"Error opening {video_page_url}:\n{str(e)}")
+        return (ContentUriScrapeResult.Status.ResourceAccessError, None)
+
+    if uris is None:
+        raise NotImplementedError(
+            "get_legistar_content_uris() needs attention. "
+            f"Unrecognized video web page HTML structure: {video_page_url}"
+        )
+    return (ContentUriScrapeResult.Status.Ok, uris)
 
 
 class LegistarScraper(IngestionModelScraper):
@@ -1225,11 +1363,14 @@ class LegistarScraper(IngestionModelScraper):
         --------
         cdp_scrapers.legistar_utils.get_legistar_events_for_timespan
         """
-        log.critical(
-            "get_content_uris() is required because "
-            f"Legistar Event.EventVideoPath is not used by {self.client_name}"
+        # see if our base legistar/granicus video parsing routine will work
+        result, uris = get_legistar_content_uris(self.client_name, legistar_ev)
+        if result != ContentUriScrapeResult.Status.UnrecognizedPatternError:
+            return uris or []
+
+        raise NotImplementedError(
+            f"Please provide get_content_uris() for {self.client_name}"
         )
-        raise NotImplementedError
 
     def inject_known_person(self, person: Person) -> Person:
         """
@@ -1381,20 +1522,9 @@ class LegistarScraper(IngestionModelScraper):
                     legistar_ev[LEGISTAR_SESSION_TIME],
                 )
             )
-            # prefer video file path in legistar Event.EventVideoPath
-            if legistar_ev[LEGISTAR_SESSION_VIDEO_URI]:
-                list_uri = [
-                    ContentURIs(
-                        video_uri=str_simplified(
-                            legistar_ev[LEGISTAR_SESSION_VIDEO_URI]
-                        ),
-                        caption_uri=None,
-                    )
-                ]
-            else:
-                list_uri = self.get_content_uris(legistar_ev) or [
-                    ContentURIs(video_uri=None, caption_uri=None)
-                ]
+            list_uri = self.get_content_uris(legistar_ev) or [
+                ContentURIs(video_uri=None, caption_uri=None)
+            ]
 
             ingestion_models.append(
                 self.get_none_if_empty(
