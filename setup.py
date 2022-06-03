@@ -31,6 +31,7 @@ requirements = [
     "requests~=2.25",
     "beautifulsoup4>=4.9",
     "pytz>=2021.1",
+    "clean-text~=0.6.0"
 ]
 
 extra_requirements = {
