@@ -32,6 +32,7 @@ requirements = [
     "defusedxml~=0.7.1",
     "pytz~=2021.1",
     "requests~=2.25",
+    "clean-text~=0.6.0",
 ]
 
 extra_requirements = {

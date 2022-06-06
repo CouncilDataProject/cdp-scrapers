@@ -7,6 +7,7 @@ from logging import getLogger
 from pathlib import Path
 from typing import Any, Dict, List, NamedTuple, Optional, Set
 
+import cleantext
 import pytz
 from cdp_backend.database.constants import RoleTitle
 from cdp_backend.pipeline.ingestion_models import (
@@ -68,11 +69,9 @@ def str_simplified(input_str: str) -> str:
     if not isinstance(input_str, str):
         return input_str
 
-    input_str = input_str.strip()
-    # unify newline to \n
-    input_str = re.sub(r"[\r\n\f]+", r"\n", input_str)
-    # multiple spaces and tabs to 1 space
-    input_str = re.sub(r"[ \t\v]+", " ", input_str)
+    input_str = cleantext.clean(
+        input_str, fix_unicode=True, lower=False, to_ascii=False
+    )
 
     # Replace utf-8 char encodings with single utf-8 chars themselves
     input_str = input_str.encode("utf-8").decode("utf-8")
