@@ -121,6 +121,7 @@
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span>
 
+<span class="kn">import</span> <span class="nn">cleantext</span>
 <span class="kn">import</span> <span class="nn">pytz</span>
 <span class="kn">from</span> <span class="nn">cdp_backend.database.constants</span> <span class="kn">import</span> <span class="n">RoleTitle</span>
 <span class="kn">from</span> <span class="nn">cdp_backend.pipeline.ingestion_models</span> <span class="kn">import</span> <span class="p">(</span>
@@ -182,11 +183,9 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_str</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">input_str</span>
 
-    <span class="n">input_str</span> <span class="o">=</span> <span class="n">input_str</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-    <span class="c1"># unify newline to \n</span>
-    <span class="n">input_str</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[\r\n\f]+&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\n&quot;</span><span class="p">,</span> <span class="n">input_str</span><span class="p">)</span>
-    <span class="c1"># multiple spaces and tabs to 1 space</span>
-    <span class="n">input_str</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[ \t\v]+&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">input_str</span><span class="p">)</span>
+    <span class="n">input_str</span> <span class="o">=</span> <span class="n">cleantext</span><span class="o">.</span><span class="n">clean</span><span class="p">(</span>
+        <span class="n">input_str</span><span class="p">,</span> <span class="n">fix_unicode</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">to_ascii</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span>
 
     <span class="c1"># Replace utf-8 char encodings with single utf-8 chars themselves</span>
     <span class="n">input_str</span> <span class="o">=</span> <span class="n">input_str</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
