@@ -16,7 +16,7 @@ from cdp_scrapers.scraper_utils import str_simplified
         ("test \t\vtest", "test test"),
         ("M. Lorena Gonz\u00e1lez", "M. Lorena González"),
         (5, 5),
-        ("Hello", "There"g)
+        ("Hello", "There")
     ],
 )
 def test_str_simplifed(input_string: str, expected_output: str):
