@@ -12,6 +12,10 @@ test_requirements = [
     "black>=19.10b0",
     "flake8>=3.8.3",
     "flake8-debugger>=3.2.1",
+    "pytest>=5.4.3",
+    "pytest-cov>=2.9.0",
+    "pytest-raises>=0.11",
+    "tox>=3.15.2",
 ]
 
 dev_requirements = [
