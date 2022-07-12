@@ -7,22 +7,24 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
+# Q & To do
+# How to put matter to json, put functions in for loop as well?
+# Style requirements
+# Remove all the held from the minutes item
+# Put the matters in the minutes along with the Titles
+# Decision Constant
+# Person In the same script or ?
+# get different meetings in the wannted time period
 
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
-# PATH = "/Users/fpw/Desktop/CDP/chromedriver"
-# driver = webdriver.Chrome(PATH)
 
 driver.get("https://atlantacityga.iqm2.com/Citizens/SplitView.aspx?Mode=Video&MeetingID=3587&Format=Minutes")
-#print(driver.title)
-#print(driver.page_source)
 
-# driver.close()
-body_name = driver.find_element(By.ID, "ContentPlaceHolder1_lblMeetingGroup").text
-print(body_name)
-video_link = driver.find_element(By.ID, "MediaPlayer1_html5_api").get_attribute("src")
-print(video_link)
+body_name = driver.find_element(By.ID, "ContentPlaceHolder1_lblMeetingGroup").text #body name 
+video_link = driver.find_element(By.ID, "MediaPlayer1_html5_api").get_attribute("src") # video link (mp4)
 
 titles = driver.find_elements(By.CSS_SELECTOR,"td[class='Title'][colspan='10']")
+minute = "" # minutes name
 for title in titles:
     try:
         if (len(title.text)!= 0):
@@ -31,12 +33,13 @@ for title in titles:
     except selenium.common.exceptions.NoSuchElementException:
         pass
 
-# for title in titles:
-#     try:
-#         minute = title.find_element(By.TAG_NAME, 'strong').text
-#         print(minute)
-#     except selenium.common.exceptions.NoSuchElementException:
-#         pass
+matter_type = "" # matter type
+matter_name = "" # matter name 
+matter_title = "" # matter title
+sponsor = "" #sponsor for the matter not done yet
+decision = "" # decsion for the matter
+v_yes = "" # people voted yes
+v_no = "" # people voted no
 
 matters = driver.find_elements(By.CSS_SELECTOR,"td[class='Title'][colspan='9']")
 for matter in matters:
@@ -49,31 +52,30 @@ for matter in matters:
             print(matter_type)
             link = driver.find_element("link text", item)
             link.click()
-            dates = WebDriverWait(driver,10).until(
+            s_matter = WebDriverWait(driver,10).until(
                 #EC.presence_of_all_elements_located((By.CLASS_NAME,"Date"))
-                EC.presence_of_all_elements_located((By.XPATH, "/html/body/form/table/tbody/tr/td[2]/div[2]/div/div/div[4]/div[7]/div/table/tbody"))
-                #EC.presence_of_all_elements_located((By.XPATH,"//*[@id="ContentPlaceHolder1_divHistory"]/div/table/tbody/tr[9]/td[1]/a[contains(text(),'Apr 18, 2022 11:00 AM')]"))
+                #EC.presence_of_all_elements_located((By.XPATH, "/html/body/form/table/tbody/tr/td[2]/div[2]/div/div/div[4]/div[7]/div/table/tbody"))
+                EC.presence_of_all_elements_located((By.XPATH,
+                "//*[@id=\"ContentPlaceHolder1_divHistory\"]/div/table/tbody/tr"))
             )
-            for date in dates:
-                print(date)
-                # try:
-                #     decision = date.find_element(By.CLASS_NAME, 'Result').text
-                #     print(decision)
-                # except selenium.common.exceptions.NoSuchElementException:
-                #     pass
+            sponsor = driver.find_element(By.XPATH, "//*[@id=\"tblLegiFileInfo\"]/tbody/tr[1]/td[2]").text
+            s_rows = (len(s_matter))
+            for i in range(1, s_rows+1, 2):
+                header =  driver.find_element(By.XPATH,"//*[@id=\"ContentPlaceHolder1_divHistory\"]/div/table/tbody/tr[" + str(i) + "]")
+                date = header.find_element(By.CLASS_NAME, "Date").text
+                s_word = "Apr 18, 2022 11:00 AM"
+                if s_word in date:
+                    result =  driver.find_element(By.XPATH, "//*[@id=\"ContentPlaceHolder1_divHistory\"]/div/table/tbody/tr[" + str(i+1) + "]/td/table")
+                    decision = result.find_element(By.CLASS_NAME, "Result").text # vote result
+                    sub_sections = result.find_elements(By.XPATH, "//*[@id=\"ContentPlaceHolder1_divHistory\"]/div/table/tbody/tr[" + str(i+1) + "]/td/table/tbody/tr")
+                    for j in range(1, len(sub_sections)+1):
+                        sub_content =  driver.find_element(By.XPATH,"//*[@id=\"ContentPlaceHolder1_divHistory\"]/div/table/tbody/tr[" + str(i+1) + "]/td/table/tbody/tr[" + str(j) + "]")
+                        sub_content_role = sub_content.find_element(By.CLASS_NAME, "Role").text
+                        if "AYES" in sub_content_role:
+                            v_yes = driver.find_element(By.XPATH,"//*[@id=\"ContentPlaceHolder1_divHistory\"]/div/table/tbody/tr[" + str(i+1) + "]/td/table/tbody/tr[" + str(j) + "]/td[2]").text
+                        if "NAYS" in sub_content_role:
+                            v_no = driver.find_element(By.XPATH,"//*[@id=\"ContentPlaceHolder1_divHistory\"]/div/table/tbody/tr[" + str(i+1) + "]/td/table/tbody/tr[" + str(j) + "]/td[2]").text
 
-            # link = driver.find_element("link text", item)
-            # link.click()
-            # results = WebDriverWait(driver,10).until(
-            #     EC.presence_of_all_elements_located((By.CLASS_NAME,"VoteResultRow"))
-            # )
-            # print(len(results))
-            # for result in results:
-            #     try:
-            #         decision = result.find_element(By.CLASS_NAME, 'Result').text
-            #         print(decision)
-            #     except selenium.common.exceptions.NoSuchElementException:
-            #         pass
     except selenium.common.exceptions.NoSuchElementException:
         pass
 
