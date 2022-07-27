@@ -36,11 +36,12 @@ event = ingestion_models.EventIngestionModel(
         ),
         ingestion_models.EventMinutesItem(
             minutes_item = ingestion_models.MinutesItem("ORDINANCES - NUMBERS 10 through 26"),
-            matter = #How to add more matters
+            matter = #don't care about the title, just the link title
                 ingestion_models.Matter(
+                # a string of number
                 "ORDINANCE approving and authorizing third amendment to contract between City of Houston and BRENTWOOD ECONOMIC COMMUNITY DEVELOPMENT CORPORATION, d/b/a BRENTWOOD COMMUNITY FOUNDATION, to extend term of contract and provide additional Housing Opportunities for Persons With AIDS Funds for the continuing administration and operation of a Community Residence and an Emergency Rental Assistance Program with Supportive Services - $892,634.00 - Grant Fund - DISTRICT K - CASTEX-TATUM", 
                 matter_type = "ORDINANCES - NUMBERS 10 through 26",
-                # title??
+                # title: summary
                 title = "ORDINANCE approving and authorizing Subrecipient Agreement between City of Houston and CATHOLIC CHARITIES OF THE ARCHDIOCESE OF GALVESTON-HOUSTON to provide Emergency Solutions Grant (ESG), and Emergency Solutions Grant Coronavirus (ESG-CV) Funds for administration and related services in connection with the City’s Emergency Rental Assistance Program, for households that have been affected by COVID-19 - $3,058,423.79 - Grant Fund"
                 ),
             decision = "ADOPTED",
