@@ -41,15 +41,28 @@ def get_date_mainlink(time) -> str:
     #all events in a specific year
     main_year = main.find('div', id = 'city-council-2022').find('table', id = 'video-table').find('tbody').find_all('tr')
     #time = datetime.strptime(time, '%Y-%m-%d').date() #may need to delete when actually pass datetime
-    link = 'https://houstontx.new.swagit.com/'
+    link = ''
     for year in main_year:
         cells = year.find_all('td')
         date = cells[1].text.replace(',', '').strip()
         date = datetime.strptime(date, '%b %d %Y').date()
         if (date == time):
             link_post = cells[3].find('a')['href']
-            link = link + link_post
+            link = 'https://houstontx.new.swagit.com/' + link_post
     return link
+
+# check if the date is in the time range we want
+def check_in_range(time):
+    main_year = main.find('div', id = 'city-council-2022').find('table', id = 'video-table').find('tbody').find_all('tr')
+    #time = datetime.strptime(time, '%Y-%m-%d').date() #may need to delete when actually pass datetime
+    in_range = False
+    for year in main_year:
+        cells = year.find_all('td')
+        date = cells[1].text.replace(',', '').strip()
+        date = datetime.strptime(date, '%b %d %Y').date()
+        if (date == time):
+            in_range = True
+    return in_range
 
 #agenda url: agenda = link + '/agenda'
 #video url: video = link + '/embed'
@@ -87,10 +100,11 @@ def get_events(begin, end) -> list:
     end = datetime.strptime(end, '%Y-%m-%d').date()
     for day in range((end - begin).days + 1): 
         date = begin + timedelta(days=day)
-        event = get_event(date)
-        events.append(event)
+        if check_in_range(date) == True:
+            event = get_event(date)
+            events.append(event)
     return events
 
 
-#print(get_date_mainlink('2022-07-26'))
-print(get_events('2022-05-10', '2022-05-10'))
+#print(check_in_range('2022-07-26'))
+print(get_events('2022-05-10', '2022-05-17'))
