@@ -31,6 +31,14 @@ main_URL = "https://houstontx.new.swagit.com/views/408"
 main_page = requests.get(main_URL)
 main = BeautifulSoup(main_page.content, "html.parser")
 
+
+# get different year
+def get_diff_yearid(time):
+    #time = datetime.strptime(time, '%Y-%m-%d').date()
+    year = str(time.year)
+    year_id = 'city-council-' + year
+    return year_id
+
 # get date from main page
 #only find a specific year. different year by div id = 'city-council-2022', later do get_diff_year
 # 1)loop through all date, 2)change each into datetime format, 3)if match, get the 3rd td
@@ -39,7 +47,7 @@ main = BeautifulSoup(main_page.content, "html.parser")
 # need to change format
 def get_date_mainlink(time) -> str:
     #all events in a specific year
-    main_year = main.find('div', id = 'city-council-2022').find('table', id = 'video-table').find('tbody').find_all('tr')
+    main_year = main.find('div', id = get_diff_yearid(time)).find('table', id = 'video-table').find('tbody').find_all('tr')
     #time = datetime.strptime(time, '%Y-%m-%d').date() #may need to delete when actually pass datetime
     link = ''
     for year in main_year:
@@ -53,7 +61,7 @@ def get_date_mainlink(time) -> str:
 
 # check if the date is in the time range we want
 def check_in_range(time):
-    main_year = main.find('div', id = 'city-council-2022').find('table', id = 'video-table').find('tbody').find_all('tr')
+    main_year = main.find('div', id = get_diff_yearid(time)).find('table', id = 'video-table').find('tbody').find_all('tr')
     #time = datetime.strptime(time, '%Y-%m-%d').date() #may need to delete when actually pass datetime
     in_range = False
     for year in main_year:
@@ -106,5 +114,6 @@ def get_events(begin, end) -> list:
     return events
 
 
-#print(check_in_range('2022-07-26'))
-print(get_events('2022-05-10', '2022-05-17'))
+#print(get_event('2021-12-14'))
+print(get_events('2020-12-15', '2021-01-12'))
+#print(get_events('2022-07-26', '2022-07-26'))
