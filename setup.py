@@ -7,6 +7,11 @@ from setuptools import find_packages, setup
 
 with open("README.md") as readme_file:
     readme = readme_file.read()
+    
+atlanta_reqs = [
+    "selenium~=4.3",
+    "webdriver-manager~=3.8",
+]
 
 test_requirements = [
     "black>=19.10b0",
