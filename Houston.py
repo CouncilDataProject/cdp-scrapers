@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup, Tag
 import requests
+import bs4
 from cdp_backend.pipeline import ingestion_models
 from datetime import datetime, timedelta
 from typing import Optional, List
@@ -23,6 +24,49 @@ def get_bodyName(event: Tag):
         return bodyTable.find_all('span')[3].text
 
 
+#def get_role() ->
+
+def get_seat(name: str):  #add event: Tag
+    peopleTable = form1.find_all('table')[1].find_all('table')[1].table.table #event.find_all('table')[1].find_all('table')[1].table.table
+    membersTable = peopleTable.find_all('tr')[1]
+    districtTable = membersTable.find('table').find('tr').find_all('td')
+    seat = ''
+    #left and right district
+    for td in districtTable:
+        text = td.find('span').find_all('br')
+        for br in text:
+            content = br.previousSibling
+            if type(content) is bs4.element.NavigableString:
+                if content.text.strip() == name:
+                    seat = content.nextSibling.nextSibling.strip()
+    #lower district
+    underDistrict = membersTable.find('p').find('span').find('br')
+    underDName = underDistrict.previousSibling
+    if underDName.text.strip() == name:
+        seat = underDName.nextSibling.nextSibling.strip()
+    #left and right position
+    positionTable = membersTable.find_all('table')[1].find('tr').find_all('td')
+    for td in positionTable:
+        textP = td.find('span').find_all('br')
+        for br in textP:
+            contentP = br.previousSibling
+            if type(contentP) is bs4.element.NavigableString:
+                if contentP.text.strip() == name:
+                    seat = contentP.nextSibling.nextSibling.strip()
+    #lower position
+    underPosition = membersTable.find_all('span')[-1].find('br')
+    underPName = underPosition.previousSibling
+    if underPName.text.strip() == name:
+        seat = underPName.nextSibling.nextSibling.strip()
+    return seat
+
+#def get_person ->
+#missing: get_votes()
+
+#def get_matter()    #if contain PULLED don't include
+#def get_minutesItem()
+
+#def get_eventMinutesItem()
 
 
 
@@ -95,8 +139,8 @@ def get_event(event_time: datetime) -> ingestion_models.EventIngestionModel:
                 session_datetime = event_time,
                 video_uri = get_date_mainlink(event_time) + '/embed',
                 session_index = 0
-        )
-        ]
+        )],
+        agenda_uri = get_date_mainlink(event_time) + '/agenda',
     )
     return event
 
@@ -114,6 +158,15 @@ def get_events(begin, end) -> list:
     return events
 
 
-#print(get_event('2021-12-14'))
-print(get_events('2020-12-15', '2021-01-12'))
+print(get_seat('Abbie Kamin'))
+#print(get_events('2020-12-15', '2021-01-12'))
 #print(get_events('2022-07-26', '2022-07-26'))
+
+
+#Question:
+#1. seat: position, district    
+#role: scrape from other page for 2022, other years just do default members(taken pic)
+#2. matter: all consent agenda link  minute: link not under consent and presentation stuff
+#ignore matters held and pulled
+#3. what to do with votes?   wait till get more info
+#4. 2019 has minutes name? email the city council for more info
