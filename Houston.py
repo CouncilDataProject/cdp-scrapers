@@ -74,17 +74,19 @@ def get_matter():#if contain PULLED don't include
             if 'CONSENT AGENDA NUMBERS' in td.text:
                 all_Link = table.find_all_next('table')
                 for table_link in all_Link:
-                    for td in table_link:
-                        if td.text == 'END OF CONSENT AGENDA':
+                    #for td in table_link:
+                        if table_link.text == 'END OF CONSENT AGENDA':
                             break
                         else:
-                            links = table_link.find('a', href=True)
-                            if links is not None:
-                                link = links['href']
-                                matter = get_matter_link(link)
-                    else:
-                        continue
-                    break
+                            all_links = table_link.find_all('a', href=True)
+                            for links in all_links:
+                                if links is not None:
+                                    link = 'https://houston.novusagenda.com/agendapublic//' + links['href']
+                                    matter = get_matter_link(link)
+                                    #print(link)
+                    #else:
+                       # continue
+                    #break
                 else:
                     continue
                 break
