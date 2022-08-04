@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from typing import Optional, List
 
 #For individual function test
-URL = "https://houston.novusagenda.com/agendapublic//MeetingView.aspx?doctype=Agenda&MinutesMeetingID=0&meetingid=549"
+URL = "https://houston.novusagenda.com/agendapublic//MeetingView.aspx?doctype=Agenda&MinutesMeetingID=0&meetingid=549" #same till 2017
 video_URL = "https://houstontx.new.swagit.com/videos/177384"
 page = requests.get(URL)
 event = BeautifulSoup(page.content, "html.parser")
@@ -63,7 +63,38 @@ def get_seat(name: str):  #add event: Tag
 #def get_person ->
 #missing: get_votes()
 
-#def get_matter()    #if contain PULLED don't include
+#def get_matter_link(link:str):
+    
+
+#Aug 3: can get every matter's link, need to parse every matter page to get matter info
+def get_matter():#if contain PULLED don't include
+    allTable = event.find_all('table')[1].find_all('table')
+    for table in allTable:
+        for td in table.find_all('td', id = 'column2'):
+            if 'CONSENT AGENDA NUMBERS' in td.text:
+                all_Link = table.find_all_next('table')
+                for table_link in all_Link:
+                    for td in table_link:
+                        if td.text == 'END OF CONSENT AGENDA':
+                            break
+                        else:
+                            links = table_link.find('a', href=True)
+                            if links is not None:
+                                link = links['href']
+                                matter = get_matter_link(link)
+                    else:
+                        continue
+                    break
+                else:
+                    continue
+                break
+        else:
+            continue
+        break
+
+
+
+print(get_matter())
 #def get_minutesItem()
 
 #def get_eventMinutesItem()
@@ -158,7 +189,6 @@ def get_events(begin, end) -> list:
     return events
 
 
-print(get_seat('Abbie Kamin'))
 #print(get_events('2020-12-15', '2021-01-12'))
 #print(get_events('2022-07-26', '2022-07-26'))
 
