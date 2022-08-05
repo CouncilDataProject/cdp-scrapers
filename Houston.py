@@ -63,12 +63,34 @@ def get_seat(name: str):  #add event: Tag
 #def get_person ->
 #missing: get_votes()
 
-#def get_matter_link(link:str):
-    
+def get_matter_name(link):
+    matter_page = requests.get(link)
+    matter = BeautifulSoup(matter_page.content, "html.parser")
+    matter_name = matter.find('table').find('table').find('table').find_all('td')[1].find('div').find('div').find('br').previousSibling
+    return matter_name
+
+#if contain PULLED don't include
+def get_matter_title(link):
+    matter_page = requests.get(link)
+    matter = BeautifulSoup(matter_page.content, "html.parser")
+    matter_title = matter.find('table').find_all('table')[2].text.replace('Summary:', '').strip()
+    return matter_title
+
+#def get_matter_type(): #event:Tag
+ #   agenda_titles = form1.find_all('td', id = 'column2', class_ = 'style1')
+  #  for agenda_title in agenda_titles:
+   #     print(agenda_title.text)
+
+
+#print(get_matter_type())
 
 #Aug 3: can get every matter's link, need to parse every matter page to get matter info
-def get_matter():#if contain PULLED don't include
+#need to ignor video link!!!! like http://houstontx.swagit.com/mini/11282017-1376/#12
+#if contain PULLED don't include
+#return a list of matters(eventminutesitem)??????????????????
+def get_matter():#event: Tag 
     allTable = event.find_all('table')[1].find_all('table')
+    matter = []
     for table in allTable:
         for td in table.find_all('td', id = 'column2'):
             if 'CONSENT AGENDA NUMBERS' in td.text:
@@ -79,11 +101,23 @@ def get_matter():#if contain PULLED don't include
                             break
                         else:
                             all_links = table_link.find_all('a', href=True)
-                            for links in all_links:
-                                if links is not None:
+                            for links in all_links: #links: one matter
+                                if links is not None and links.text != 'VIDEO':
                                     link = 'https://houston.novusagenda.com/agendapublic//' + links['href']
-                                    matter = get_matter_link(link)
-                                    #print(link)
+                                    if '**PULLED' not in get_matter_title(link):
+                                        matter_types = links.find_all_previous('td', id = 'column2', class_ = 'style1')
+                                        one_matter_type = ''
+                                        for matter_type in matter_types:
+                                            if '-' in matter_type.text:
+                                                one_matter_type = matter_type.text.split('-')[0].strip()
+                                                break
+                                        matter.append(
+                                            ingestion_models.Matter(
+                                            name = get_matter_name(link),
+                                            matter_type = one_matter_type,
+                                            title = get_matter_title(link)
+                                        )
+                                        )
                     #else:
                        # continue
                     #break
@@ -93,11 +127,11 @@ def get_matter():#if contain PULLED don't include
         else:
             continue
         break
-
-
+    return matter
 
 print(get_matter())
-#def get_minutesItem()
+
+#def get_minutesItem() starting from matters held, check if the nextsibling is a link, if is then ignore
 
 #def get_eventMinutesItem()
 
