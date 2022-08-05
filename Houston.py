@@ -26,6 +26,7 @@ def get_bodyName(event: Tag):
 #for each department(ul), search whether the name is in the department text, if is, append to role
 #list.
 def get_role(name: str):
+    name = name.split(' ')[-1].strip()
     role_url = 'http://www.houstontx.gov/council/committees/'
     role_page = BeautifulSoup(requests.get(role_url).content, "html.parser")
     roles = []
@@ -40,13 +41,18 @@ def get_role(name: str):
                     if 'Agenda' not in role_member.text:
                         role_and_member = role_member.text.split(':')
                         role_name = role_and_member[0].strip() #role_name: chair, vice chair, member, etc
-                        member_names = role_and_member[1].split(',')
-                        #for member_name in member_names:
-                            #if name in member_name.strip():
-                                #print(member_name)
-                        print(role_and_member)
+                        if len(role_and_member) > 2:
+                            member_names = role_and_member[2].split(',')
+                        else:
+                            member_names = role_and_member[1].split(',')
+                        for member_name in member_names:
+                            if name in member_name.strip():
+                                roles.append(title.text + ': ' + role_name)            
+    return roles
 
-print(get_role('Gallegos'))
+# if can find role in get_role, true; if can't find, false
+def get_role_status
+#print(get_role('Letitia Plummer'))
 
 def get_seat(name: str):  #add event: Tag
     peopleTable = form1.find_all('table')[1].find_all('table')[1].table.table #event.find_all('table')[1].find_all('table')[1].table.table
@@ -88,7 +94,9 @@ def get_person(name:str):
         is_active = "true",
         seat = ingestion_models.Seat(
             name = get_seat(name),
-            #roles = get_role(name)
+            roles = ingestion_models.Role(
+                title = get_role(name)
+            )
         )
     )
 
@@ -123,7 +131,7 @@ def get_matter_title(link):
 def get_matter():#event: Tag 
     allTable = event.find_all('table')[1].find_all('table')
     matter = []
-    for table in allTable:
+    for table in allTable:  
         for td in table.find_all('td', id = 'column2'):
             if 'CONSENT AGENDA NUMBERS' in td.text:
                 all_Link = table.find_all_next('table')
