@@ -23,8 +23,9 @@ def get_bodyName(event: Tag):
     else:
         return bodyTable.find_all('span')[3].text
 
-
-#def get_role() ->
+#for each department(ul), search whether the name is in the department text, if is, append to role
+#list.
+#def get_role() 
 
 def get_seat(name: str):  #add event: Tag
     peopleTable = form1.find_all('table')[1].find_all('table')[1].table.table #event.find_all('table')[1].find_all('table')[1].table.table
@@ -60,7 +61,18 @@ def get_seat(name: str):  #add event: Tag
         seat = underPName.nextSibling.nextSibling.strip()
     return seat
 
-#def get_person ->
+def get_person(name:str):
+    return ingestion_models.Person(
+        name = name,
+        is_active = "true",
+        seat = ingestion_models.Seat(
+            name = get_seat(name),
+            #roles = get_role(name)
+        )
+    )
+
+print(get_person('Martha Castex-Tatum'))
+
 #missing: get_votes()
 
 def get_matter_name(link):
@@ -69,7 +81,6 @@ def get_matter_name(link):
     matter_name = matter.find('table').find('table').find('table').find_all('td')[1].find('div').find('div').find('br').previousSibling
     return matter_name
 
-#if contain PULLED don't include
 def get_matter_title(link):
     matter_page = requests.get(link)
     matter = BeautifulSoup(matter_page.content, "html.parser")
@@ -84,9 +95,9 @@ def get_matter_title(link):
 
 #print(get_matter_type())
 
-#Aug 3: can get every matter's link, need to parse every matter page to get matter info
-#need to ignor video link!!!! like http://houstontx.swagit.com/mini/11282017-1376/#12
-#if contain PULLED don't include
+#Aug 3: can get every matter's link, need to parse every matter page to get matter info √
+#need to ignor video link!!!! like http://houstontx.swagit.com/mini/11282017-1376/#12 √
+#if contain PULLED don't include √
 #return a list of matters(eventminutesitem)??????????????????
 def get_matter():#event: Tag 
     allTable = event.find_all('table')[1].find_all('table')
@@ -128,8 +139,6 @@ def get_matter():#event: Tag
             continue
         break
     return matter
-
-print(get_matter())
 
 #def get_minutesItem() starting from matters held, check if the nextsibling is a link, if is then ignore
 
@@ -229,10 +238,11 @@ def get_events(begin, end) -> list:
 #print(get_events('2022-07-26', '2022-07-26'))
 
 
-#Question:
-#1. seat: position, district    
+#Aug2:
 #role: scrape from other page for 2022, other years just do default members(taken pic)
-#2. matter: all consent agenda link  minute: link not under consent and presentation stuff
 #ignore matters held and pulled
 #3. what to do with votes?   wait till get more info
 #4. 2019 has minutes name? email the city council for more info
+
+#Question:
+#1. if people not in the current member list, is_active = False?
