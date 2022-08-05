@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from typing import Optional, List
 
 #For individual function test
-URL = "https://houston.novusagenda.com/agendapublic//MeetingView.aspx?doctype=Agenda&MinutesMeetingID=0&meetingid=549" #same till 2017
+URL = "https://houston.novusagenda.com/agendapublic//MeetingView.aspx?doctype=Agenda&MinutesMeetingID=0&meetingid=263" #same till 2017
 video_URL = "https://houstontx.new.swagit.com/videos/177384"
 page = requests.get(URL)
 event = BeautifulSoup(page.content, "html.parser")
@@ -29,7 +29,8 @@ def get_role(name: str):
     name = name.split(' ')[-1].strip()
     role_url = 'http://www.houstontx.gov/council/committees/'
     role_page = BeautifulSoup(requests.get(role_url).content, "html.parser")
-    roles = []
+    roles = ['City Council: Member']
+    status = False
     role_list = role_page.find('div', class_ = '8u 12u(mobile)')
     role_titles = role_list.find_all('p')
     for role_title in role_titles:
@@ -47,11 +48,11 @@ def get_role(name: str):
                             member_names = role_and_member[1].split(',')
                         for member_name in member_names:
                             if name in member_name.strip():
-                                roles.append(title.text + ': ' + role_name)            
-    return roles
+                                roles.append(title.text + ': ' + role_name)
+                                status = True
 
-# if can find role in get_role, true; if can't find, false
-def get_role_status
+    return (roles, status)
+
 #print(get_role('Letitia Plummer'))
 
 def get_seat(name: str):  #add event: Tag
@@ -91,16 +92,16 @@ def get_seat(name: str):  #add event: Tag
 def get_person(name:str):
     return ingestion_models.Person(
         name = name,
-        is_active = "true",
+        is_active = get_role(name)[1],
         seat = ingestion_models.Seat(
             name = get_seat(name),
             roles = ingestion_models.Role(
-                title = get_role(name)
+                title = get_role(name)[0]
             )
         )
     )
 
-#print(get_person('Martha Castex-Tatum'))
+print(get_person('Amy Peck'))
 
 #missing: get_votes()
 
