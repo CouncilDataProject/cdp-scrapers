@@ -25,7 +25,28 @@ def get_bodyName(event: Tag):
 
 #for each department(ul), search whether the name is in the department text, if is, append to role
 #list.
-#def get_role() 
+def get_role(name: str):
+    role_url = 'http://www.houstontx.gov/council/committees/'
+    role_page = BeautifulSoup(requests.get(role_url).content, "html.parser")
+    roles = []
+    role_list = role_page.find('div', class_ = '8u 12u(mobile)')
+    role_titles = role_list.find_all('p')
+    for role_title in role_titles:
+        titles = role_title.find_all('strong')
+        for title in titles:
+            if title is not None and title.text != '': #title: eg.PUBLIC SAFETY & HOMELAND SECURITY (PSHS)
+                role_members = title.find_next('ul').find_all('li')
+                for role_member in role_members:
+                    if 'Agenda' not in role_member.text:
+                        role_and_member = role_member.text.split(':')
+                        role_name = role_and_member[0].strip() #role_name: chair, vice chair, member, etc
+                        member_names = role_and_member[1].split(',')
+                        #for member_name in member_names:
+                            #if name in member_name.strip():
+                                #print(member_name)
+                        print(role_and_member)
+
+print(get_role('Gallegos'))
 
 def get_seat(name: str):  #add event: Tag
     peopleTable = form1.find_all('table')[1].find_all('table')[1].table.table #event.find_all('table')[1].find_all('table')[1].table.table
@@ -71,7 +92,7 @@ def get_person(name:str):
         )
     )
 
-print(get_person('Martha Castex-Tatum'))
+#print(get_person('Martha Castex-Tatum'))
 
 #missing: get_votes()
 
@@ -141,6 +162,7 @@ def get_matter():#event: Tag
     return matter
 
 #def get_minutesItem() starting from matters held, check if the nextsibling is a link, if is then ignore
+#check if the link has title matters held, if is, not include
 
 #def get_eventMinutesItem()
 
@@ -246,3 +268,6 @@ def get_events(begin, end) -> list:
 
 #Question:
 #1. if people not in the current member list, is_active = False?
+#2. can't make next Fri meeting
+#3. must the eventminutes item in order? now return a list of matter, can i just return a list of
+#eventsminutesitem in get_matter?
