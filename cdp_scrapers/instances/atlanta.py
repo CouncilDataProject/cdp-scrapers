@@ -1,3 +1,4 @@
+from ast import For
 from http.client import CONTINUE
 from typing import Tuple
 from xml.dom.minidom import Element
@@ -14,10 +15,13 @@ from cdp_backend.database import constants as db_constants
 from datetime import datetime
 from dateutil.parser import parse
 
+MINUTE_INDEX = [chr(i) for i in range(ord('A'),ord('Z')+1)]
+
 def convert_decision_constant(decision:str) -> db_constants:
+    d_constant = ''
     if 'FAVORABLE' in decision:
-        decision_constant = db_constants.VoteDecision.APPROVE
-    return decision_constant
+        d_constant = db_constants.VoteDecision.APPROVE
+    return d_constant
 
 def get_voting_result(driver:webdriver, sub_sections:Element, i:int) -> dict:
     for j in range(1, len(sub_sections)+1):
@@ -88,8 +92,6 @@ def parse_single_matter(driver:webdriver, matter:Element) -> ingestion_models.Ev
 def parse_event(url: str) -> ingestion_models.EventIngestionModel:
 
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
-    #driver.get("https://atlantacityga.iqm2.com/Citizens/SplitView.aspx?Mode=Video&MeetingID=3588&Format=Minutes")
-    #driver.get("https://atlantacityga.iqm2.com/Citizens/SplitView.aspx?Mode=Video&MeetingID=3587&Format=Minutes")
     driver.get(url)
 
     body_name = driver.find_element(By.ID, "ContentPlaceHolder1_lblMeetingGroup").text #body name 
@@ -97,15 +99,18 @@ def parse_event(url: str) -> ingestion_models.EventIngestionModel:
 
     event_minutes_items = []
     i = 1
+
     while len(driver.find_elements(By.XPATH, "//*[@id=\"MeetingDetail\"]/tbody/tr["+str(i)+"]")) != 0 :
         try:
-            if len(driver.find_elements(By.XPATH, "//*[@id=\"MeetingDetail\"]/tbody/tr["+str(i)+"]/td[2]/a")) != 0:
-                minute_title = driver.find_element(By.XPATH, "//*[@id=\"MeetingDetail\"]/tbody/tr["+str(i)+"]/td[2]").text
-                minute_model = ingestion_models.EventMinutesItem(
-                minutes_item = ingestion_models.MinutesItem(minute_title)
-                )
-                event_minutes_items.append(minute_model)
-            elif (driver.find_element(By.XPATH, "//*[@id=\"MeetingDetail\"]/tbody/tr[" + str(i) + "]/td[3]").get_attribute("colspan") == "9"):
+            if (len(driver.find_elements(By.XPATH, "//*[@id=\"MeetingDetail\"]/tbody/tr["+str(i)+"]/td[1]/strong"))) != 0 and (len(driver.find_element(By.XPATH, "//*[@id=\"MeetingDetail\"]/tbody/tr["+str(i)+"]/td[1]/strong").text)) != 0:
+                if (driver.find_element(By.XPATH, "//*[@id=\"MeetingDetail\"]/tbody/tr["+str(i)+"]/td[1]/strong").text)[0] in MINUTE_INDEX:
+                    if len(driver.find_elements(By.XPATH, "//*[@id=\"MeetingDetail\"]/tbody/tr[" + str(i+1) + "]/td[3]/span")) == 0:
+                        minute_title = driver.find_element(By.XPATH, "//*[@id=\"MeetingDetail\"]/tbody/tr["+str(i)+"]/td[2]").text
+                        minute_model = ingestion_models.EventMinutesItem(
+                        minutes_item = ingestion_models.MinutesItem(minute_title)
+                        )
+                        event_minutes_items.append(minute_model)
+            elif (len(driver.find_elements(By.XPATH, "//*[@id=\"MeetingDetail\"]/tbody/tr[" + str(i) + "]/td[3]/span"))) != 0 :
                 matter = driver.find_element(By.XPATH, "//*[@id=\"MeetingDetail\"]/tbody/tr[" + str(i) + "]/td[3]")
                 matter_model = parse_single_matter(driver, matter)
                 event_minutes_items.append(matter_model)
@@ -116,6 +121,8 @@ def parse_event(url: str) -> ingestion_models.EventIngestionModel:
 
     agenda_link = driver.find_element(By.ID, "ContentPlaceHolder1_hlPublicAgendaFile").get_attribute("oldhref")
     minutes_link = driver.find_element(By.ID, "ContentPlaceHolder1_hlPublicMinutesFile").get_attribute("oldhref")
+
+    driver.quit()
 
     return ingestion_models.EventIngestionModel(
         body = ingestion_models.Body(body_name, is_active=True),
@@ -156,20 +163,12 @@ def get_events(from_dt: datetime, to_dt: datetime):
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
     web_url = "https://atlantacityga.iqm2.com/Citizens/Calendar.aspx?Frame=Yes"
     driver.get(web_url)
-    if from_dt.year != 2022:  
+    if from_dt.year != datetime.date.today().year:  
         web_url = get_year(driver, web_url, from_dt)
     get_date(driver, web_url, from_dt, to_dt)
 
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
-web_url = "https://atlantacityga.iqm2.com/Citizens/Calendar.aspx?Frame=Yes"
-get_date(driver, web_url, datetime.fromisoformat('2022-05-10'), datetime.fromisoformat('2022-05-17'))
-
-
-
-# return list, call url and parse for each 
-# drive.close()
-
-# event = parse_event('https://atlantacityga.iqm2.com/Citizens/SplitView.aspx?Mode=Video&MeetingID=3588&Format=Minutes')
+event = parse_event('https://atlantacityga.iqm2.com/Citizens/SplitView.aspx?Mode=Video&MeetingID=3588&Format=Minutes')
 # # event = parse_event('https://atlantacityga.iqm2.com/Citizens/SplitView.aspx?Mode=Video&MeetingID=3587&Format=Minutes')
-# with open("april-26th-auto", "w") as open_f:
-#     open_f.write(event.to_json(indent=4))
+with open("april-26th-auto", "w") as open_f:
+    open_f.write(event.to_json(indent=4))
+
