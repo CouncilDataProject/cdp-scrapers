@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from typing import Optional, List
 
 #For individual function test
-URL = "https://houston.novusagenda.com/agendapublic//MeetingView.aspx?doctype=Agenda&MinutesMeetingID=0&meetingid=263" #same till 2017
+URL = "https://houston.novusagenda.com/agendapublic//MeetingView.aspx?doctype=Agenda&MinutesMeetingID=0&meetingid=549" #same till 2017
 video_URL = "https://houstontx.new.swagit.com/videos/177384"
 page = requests.get(URL)
 event = BeautifulSoup(page.content, "html.parser")
@@ -101,7 +101,7 @@ def get_person(name:str):
         )
     )
 
-print(get_person('Amy Peck'))
+#print(get_person('Amy Peck'))
 
 #missing: get_votes()
 
@@ -173,7 +173,95 @@ def get_matter():#event: Tag
 #def get_minutesItem() starting from matters held, check if the nextsibling is a link, if is then ignore
 #check if the link has title matters held, if is, not include
 
-#def get_eventMinutesItem()
+#is_matter = False  if under consent agenda, is_matter = True
+def get_eventMinutesItem():
+    event_minutes_items = []
+    # get minutes on the first day, done, don't delete!
+    #firstday_minutes = form1.find_all('td', id = 'column1', class_ = 'style1') #change form1 to event
+    #for firstday_minute in firstday_minutes:
+     #   event_minutes_items.append(ingestion_models.EventMinutesItem(
+      #      minutes_item = ingestion_models.MinutesItem(firstday_minute.text.strip())
+       # ))
+    
+    # get minutes before matter, done, don't delete!
+    #all_tables = form1.find_all('table')[1].find_all('table')
+    #for all_table in all_tables:
+     #   if 'DESCRIPTIONS OR CAPTIONS OF AGENDA ITEMS WILL BE READ BY THE' in all_table.text:
+      #      all_prematter_tables = all_table.find_all_next('table')
+       #     for all_prematter_table in all_prematter_tables:
+        #        if 'CONSENT AGENDA NUMBERS' in all_prematter_table.text:
+         #           break
+          #      else:
+           #         minutes_names = all_prematter_table.find_all('td', id = 'column2')
+            #        for minutes_name in minutes_names:
+             #           if minutes_name is not None and minutes_name.text != '' and '.' not in minutes_name.text:
+              #              event_minutes_items.append(ingestion_models.EventMinutesItem(
+               #                 minutes_item = ingestion_models.MinutesItem(minutes_name.text.strip())
+                #            ))
+    
+    # get minutes before matter, test
+    all_tables = form1.find_all('table')[1].find_all('table')
+    for all_table in all_tables:
+        if 'DESCRIPTIONS OR CAPTIONS OF AGENDA ITEMS WILL BE READ BY THE' in all_table.text:
+            all_prematter_tables = all_table.find_all_next('table')
+            for all_prematter_table in all_prematter_tables:
+                # get matter
+                if 'CONSENT AGENDA NUMBERS' in all_prematter_table.text:
+                    all_Link = all_prematter_table.find_all_next('table')
+                    for table_link in all_Link:
+                        #for td in table_link:
+                            if table_link.text == 'END OF CONSENT AGENDA':
+                                break
+                            else:
+                                all_links = table_link.find_all('a', href=True)
+                                for links in all_links: #links: one matter
+                                    if links is not None and links.text != 'VIDEO':
+                                        link = 'https://houston.novusagenda.com/agendapublic//' + links['href']
+                                        if '**PULLED' not in get_matter_title(link):
+                                            matter_types = links.find_all_previous('td', id = 'column2', class_ = 'style1')
+                                            one_matter_type = ''
+                                            for matter_type in matter_types:
+                                                if '-' in matter_type.text:
+                                                    one_matter_type = matter_type.text.split('-')[0].strip()
+                                                    break
+                                            print(get_matter_name(link)) #
+                                            #event_minutes_items.append(
+                                             #   ingestion_models.EventMinutesItem(
+                                              #  minutes_item = ingestion_models.MinutesItem(get_matter_name(link)),
+                                               # matter = ingestion_models.Matter(
+                                                #            name = get_matter_name(link),
+                                                 #           matter_type = one_matter_type,
+                                                  #          title = get_matter_title(link)
+                                                   #         )
+                                                #)
+                                            #)
+                    #else:
+                     #   continue
+                    #break                       
+                                            
+
+                elif 'END OF CONSENT AGENDA' in all_prematter_table.text:
+                    break
+
+                # get minutes before matter
+                else:
+                    minutes_names = all_prematter_table.find_all('td', id = 'column2')
+                    for minutes_name in minutes_names:
+                        if minutes_name is not None and minutes_name.text != '' and '.' not in minutes_name.text:
+                            print(minutes_name.text.strip()) #
+                            #event_minutes_items.append(ingestion_models.EventMinutesItem(
+                             #   minutes_item = ingestion_models.MinutesItem(minutes_name.text.strip())
+                            #))
+    
+    
+    
+    #return event_minutes_items
+print(get_eventMinutesItem())
+
+
+
+
+
 
 
 
