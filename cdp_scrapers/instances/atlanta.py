@@ -1,4 +1,4 @@
-from ast import For
+from ast import For, Store
 from http.client import CONTINUE
 from typing import Tuple
 from xml.dom.minidom import Element
@@ -14,12 +14,15 @@ from cdp_backend.pipeline import ingestion_models
 from cdp_backend.database import constants as db_constants
 from datetime import datetime
 from dateutil.parser import parse
+# Q: return multiple events how to Store
+# two more link to handle 
+# people dict 
 
 MINUTE_INDEX = [chr(i) for i in range(ord('A'),ord('Z')+1)]
 
 def convert_decision_constant(decision:str) -> db_constants:
-    d_constant = ''
-    if 'FAVORABLE' in decision:
+    d_constant = decision
+    if ('FAVORABLE' in decision) or ('ADOPTED'in decision) or ('REFERRED' in decision) or ('ACCEPTED' in decision):
         d_constant = db_constants.VoteDecision.APPROVE
     return d_constant
 
@@ -53,7 +56,7 @@ def get_matter_decision(driver:webdriver, i:int)-> Tuple[Element,Element]: #unsu
 def parse_single_matter(driver:webdriver, matter:Element) -> ingestion_models.EventIngestionModel:
     try:
         test = matter.find_element(By.CLASS_NAME, 'ItemVoteResult').text
-        if "Held in Committee" not in test: # remove the matters that are not mentioned in the meeting
+        if ("Held in Committee" not in test) and ("held" not in test): # remove the matters that are not mentioned in the meeting
             item = matter.find_element(By.CLASS_NAME, 'AgendaOutlineLink').text
             if (len(item)!=0):
                 matter_name = item[0:9] # name of the matter eg. "22-C-5024", "22-R-3404"
@@ -89,10 +92,13 @@ def parse_single_matter(driver:webdriver, matter:Element) -> ingestion_models.Ev
     except (selenium.common.exceptions.NoSuchElementException, selenium.common.exceptions.TimeoutException):
         pass
 
-def parse_event(url: str) -> ingestion_models.EventIngestionModel:
-
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+def parse_event(driver:webdriver, url:str) -> ingestion_models.EventIngestionModel:
+    # driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
     driver.get(url)
+
+    WebDriverWait(driver,10).until(
+        EC.presence_of_all_elements_located((By.XPATH, "//*[@id=\"MeetingDetail\"]/tbody/tr"))
+    )
 
     body_name = driver.find_element(By.ID, "ContentPlaceHolder1_lblMeetingGroup").text #body name 
     video_link = driver.find_element(By.ID, "MediaPlayer1_html5_api").get_attribute("src") # video link (mp4)
@@ -110,15 +116,19 @@ def parse_event(url: str) -> ingestion_models.EventIngestionModel:
                         minutes_item = ingestion_models.MinutesItem(minute_title)
                         )
                         event_minutes_items.append(minute_model)
-            elif (len(driver.find_elements(By.XPATH, "//*[@id=\"MeetingDetail\"]/tbody/tr[" + str(i) + "]/td[3]/span"))) != 0 :
+            elif (len(driver.find_elements(By.XPATH, "//*[@id=\"MeetingDetail\"]/tbody/tr[" + str(i) + "]/td[3]/span"))) != 0:
                 matter = driver.find_element(By.XPATH, "//*[@id=\"MeetingDetail\"]/tbody/tr[" + str(i) + "]/td[3]")
+                matter_model = parse_single_matter(driver, matter)
+                event_minutes_items.append(matter_model)
+            elif (len(driver.find_elements(By.XPATH, "//*[@id=\"MeetingDetail\"]/tbody/tr[" + str(i) + "]/td[6]/span"))) != 0:
+                matter = driver.find_element(By.XPATH, "//*[@id=\"MeetingDetail\"]/tbody/tr[" + str(i) + "]/td[6]")
                 matter_model = parse_single_matter(driver, matter)
                 event_minutes_items.append(matter_model)
             i +=1
         except (selenium.common.exceptions.NoSuchElementException, selenium.common.exceptions.TimeoutException) : #except(A,B)
             i+=1
             continue
-
+    
     agenda_link = driver.find_element(By.ID, "ContentPlaceHolder1_hlPublicAgendaFile").get_attribute("oldhref")
     minutes_link = driver.find_element(By.ID, "ContentPlaceHolder1_hlPublicMinutesFile").get_attribute("oldhref")
 
@@ -145,30 +155,36 @@ def get_year(driver:webdriver, url: str, from_dt: datetime):
     link = ("https://atlantacityga.iqm2.com" +link_temp)
     return link
 
-def get_date(driver:webdriver, url:str, from_dt: datetime, to_dt: datetime):
+def get_date(driver:webdriver, url:str, from_dt: datetime, to_dt: datetime)-> list:
     driver.get(url)
     dates = driver.find_elements(By.CLASS_NAME,"RowTop")
+    events = []
     for current_date in dates:
         current_meeting_date = current_date.find_element(By.CLASS_NAME,"RowLink")
         current_meeting_time = datetime.strptime(current_meeting_date.text, "%b %d, %Y %I:%M %p")
         if from_dt <= current_meeting_time <= to_dt:
             link_temp = current_date.find_element(By.CSS_SELECTOR, '.WithoutSeparator a').get_attribute("onclick")
             link = ("\"https://atlantacityga.iqm2.com" +link_temp[23:-2])
-            parse_event(link)
+            event = parse_event(driver, link)
+            events.append(event)
         else:
             continue
+    return events
 
 
-def get_events(from_dt: datetime, to_dt: datetime):
+def get_events(from_dt: datetime, to_dt: datetime) -> list:
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
     web_url = "https://atlantacityga.iqm2.com/Citizens/Calendar.aspx?Frame=Yes"
     driver.get(web_url)
-    if from_dt.year != datetime.date.today().year:  
+    if from_dt.year != datetime.today().year:  
         web_url = get_year(driver, web_url, from_dt)
-    get_date(driver, web_url, from_dt, to_dt)
+    events = get_date(driver, web_url, from_dt, to_dt)
+    return events
 
-event = parse_event('https://atlantacityga.iqm2.com/Citizens/SplitView.aspx?Mode=Video&MeetingID=3588&Format=Minutes')
-# # event = parse_event('https://atlantacityga.iqm2.com/Citizens/SplitView.aspx?Mode=Video&MeetingID=3587&Format=Minutes')
-with open("april-26th-auto", "w") as open_f:
-    open_f.write(event.to_json(indent=4))
+# event = parse_event('https://atlantacityga.iqm2.com/Citizens/SplitView.aspx?Mode=Video&MeetingID=3588&Format=Minutes')
+# driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+# web_url = "https://atlantacityga.iqm2.com/Citizens/Calendar.aspx?Frame=Yes"
+# events = get_events(datetime.fromisoformat('2022-04-18'), datetime.fromisoformat('2022-04-26'))
+# with open("april-18th-auto", "w") as open_f:
+#     open_f.write(event.to_json(indent=4))
 
