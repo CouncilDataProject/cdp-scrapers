@@ -14,9 +14,6 @@ from cdp_backend.pipeline import ingestion_models
 from cdp_backend.database import constants as db_constants
 from datetime import datetime
 from dateutil.parser import parse
-# Q: return multiple events how to Store
-# two more link to handle 
-# people dict 
 
 MINUTE_INDEX = [chr(i) for i in range(ord('A'),ord('Z')+1)]
 
@@ -33,16 +30,11 @@ def get_voting_result(driver:webdriver, sub_sections:Element, i:int) -> dict:
         sub_content =  driver.find_element(By.XPATH,"//*[@id=\"ContentPlaceHolder1_divHistory\"]/div/table/tbody/tr[" + str(i+1) + "]/td/table/tbody/tr[" + str(j) + "]")
         sub_content_role = sub_content.find_element(By.CLASS_NAME, "Role").text
         if "AYES" in sub_content_role: 
-            # people voted yes
             v_yes = driver.find_element(By.XPATH,"//*[@id=\"ContentPlaceHolder1_divHistory\"]/div/table/tbody/tr[" + str(i+1) + "]/td/table/tbody/tr[" + str(j) + "]/td[2]").text
             Yes_list = v_yes.split(",")
-            #print("yes:" + v_yes)
         if "NAYS" in sub_content_role:
-            # people voted no
             v_no = driver.find_element(By.XPATH,"//*[@id=\"ContentPlaceHolder1_divHistory\"]/div/table/tbody/tr[" + str(i+1) + "]/td/table/tbody/tr[" + str(j) + "]/td[2]").text
             No_list = v_no.split(",")
-            #print("no:" + v_no)
-        # ABSENT 
     voting_result_dict = {"AYES" : Yes_list, "NAYS": No_list}
     return voting_result_dict
 
@@ -92,8 +84,8 @@ def parse_single_matter(driver:webdriver, matter:Element) -> ingestion_models.Ev
     except (selenium.common.exceptions.NoSuchElementException, selenium.common.exceptions.TimeoutException):
         pass
 
-def parse_event(driver:webdriver, url:str) -> ingestion_models.EventIngestionModel:
-    # driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+def parse_event(url:str) -> ingestion_models.EventIngestionModel:
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
     driver.get(url)
 
     WebDriverWait(driver,10).until(
@@ -164,13 +156,13 @@ def get_date(driver:webdriver, url:str, from_dt: datetime, to_dt: datetime)-> li
         current_meeting_time = datetime.strptime(current_meeting_date.text, "%b %d, %Y %I:%M %p")
         if from_dt <= current_meeting_time <= to_dt:
             link_temp = current_date.find_element(By.CSS_SELECTOR, '.WithoutSeparator a').get_attribute("onclick")
-            link = ("\"https://atlantacityga.iqm2.com" +link_temp[23:-2])
-            event = parse_event(driver, link)
+            link = ("https://atlantacityga.iqm2.com" +link_temp[23:-3])
+            event = parse_event(link)
             events.append(event)
         else:
             continue
+    driver.quit()
     return events
-
 
 def get_events(from_dt: datetime, to_dt: datetime) -> list:
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -180,11 +172,4 @@ def get_events(from_dt: datetime, to_dt: datetime) -> list:
         web_url = get_year(driver, web_url, from_dt)
     events = get_date(driver, web_url, from_dt, to_dt)
     return events
-
-# event = parse_event('https://atlantacityga.iqm2.com/Citizens/SplitView.aspx?Mode=Video&MeetingID=3588&Format=Minutes')
-# driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
-# web_url = "https://atlantacityga.iqm2.com/Citizens/Calendar.aspx?Frame=Yes"
-# events = get_events(datetime.fromisoformat('2022-04-18'), datetime.fromisoformat('2022-04-26'))
-# with open("april-18th-auto", "w") as open_f:
-#     open_f.write(event.to_json(indent=4))
 
