@@ -126,61 +126,61 @@ def get_matter_title(link):
 #print(get_matter_type())
 
 #Aug 3: can get every matter's link, need to parse every matter page to get matter info √
-#need to ignor video link!!!! like http://houstontx.swagit.com/mini/11282017-1376/#12 √
+#need to ignor video link like http://houstontx.swagit.com/mini/11282017-1376/#12 √
 #if contain PULLED don't include √
-#return a list of matters(eventminutesitem)??????????????????
-def get_matter():#event: Tag 
-    allTable = event.find_all('table')[1].find_all('table')
-    matter = []
-    for table in allTable:  
-        for td in table.find_all('td', id = 'column2'):
-            if 'CONSENT AGENDA NUMBERS' in td.text:
-                all_Link = table.find_all_next('table')
-                for table_link in all_Link:
-                    #for td in table_link:
-                        if table_link.text == 'END OF CONSENT AGENDA':
-                            break
-                        else:
-                            all_links = table_link.find_all('a', href=True)
-                            for links in all_links: #links: one matter
-                                if links is not None and links.text != 'VIDEO':
-                                    link = 'https://houston.novusagenda.com/agendapublic//' + links['href']
-                                    if '**PULLED' not in get_matter_title(link):
-                                        matter_types = links.find_all_previous('td', id = 'column2', class_ = 'style1')
-                                        one_matter_type = ''
-                                        for matter_type in matter_types:
-                                            if '-' in matter_type.text:
-                                                one_matter_type = matter_type.text.split('-')[0].strip()
-                                                break
-                                        matter.append(
-                                            ingestion_models.EventMinutesItem(
-                                                minutes_item = ingestion_models.MinutesItem(get_matter_name(link)),
-                                                matter = ingestion_models.Matter(
-                                                            name = get_matter_name(link),
-                                                            matter_type = one_matter_type,
-                                                            title = get_matter_title(link)
-                                                            )
-                                            )
-                                        )
-                    #else:
-                       # continue
-                    #break
-                else:
-                    continue
-                break
-        else:
-            continue
-        break
-    return matter
+# MAY DELETE EVENTUALLY!!!!!!!!!!!!!!!!!
+# def get_matter():#event: Tag 
+#     allTable = event.find_all('table')[1].find_all('table')
+#     matter = []
+#     for table in allTable:  
+#         for td in table.find_all('td', id = 'column2'):
+#             if 'CONSENT AGENDA NUMBERS' in td.text:
+#                 all_Link = table.find_all_next('table')
+#                 for table_link in all_Link:
+#                     #for td in table_link:
+#                         if table_link.text == 'END OF CONSENT AGENDA':
+#                             break
+#                         else:
+#                             all_links = table_link.find_all('a', href=True)
+#                             for links in all_links: #links: one matter
+#                                 if links is not None and links.text != 'VIDEO':
+#                                     link = 'https://houston.novusagenda.com/agendapublic//' + links['href']
+#                                     if '**PULLED' not in get_matter_title(link):
+#                                         matter_types = links.find_all_previous('td', id = 'column2', class_ = 'style1')
+#                                         one_matter_type = ''
+#                                         for matter_type in matter_types:
+#                                             if '-' in matter_type.text:
+#                                                 one_matter_type = matter_type.text.split('-')[0].strip()
+#                                                 break
+#                                         matter.append(
+#                                             ingestion_models.EventMinutesItem(
+#                                                 minutes_item = ingestion_models.MinutesItem(get_matter_name(link)),
+#                                                 matter = ingestion_models.Matter(
+#                                                             name = get_matter_name(link),
+#                                                             matter_type = one_matter_type,
+#                                                             title = get_matter_title(link)
+#                                                             )
+#                                             )
+#                                         )
+#                     #else:
+#                        # continue
+#                     #break
+#                 else:
+#                     continue
+#                 break
+#         else:
+#             continue
+#         break
+#     return matter
 
 #def get_minutesItem() starting from matters held, check if the nextsibling is a link, if is then ignore
 #check if the link has title matters held, if is, not include
 
 #is_matter = False  if under consent agenda, is_matter = True
-def get_eventMinutesItem(): #event: Tag
+def get_eventMinutesItem(event: Tag): #event: Tag
     event_minutes_items = []
     # get minutes on the first day, done, don't delete!
-    firstday_minutes = form1.find_all('td', id = 'column1', class_ = 'style1') #change form1 to event
+    firstday_minutes = event.find_all('td', id = 'column1', class_ = 'style1') #change form1 to event
     for firstday_minute in firstday_minutes:
         #print(firstday_minute.text.strip())
        event_minutes_items.append(ingestion_models.EventMinutesItem(
@@ -188,7 +188,7 @@ def get_eventMinutesItem(): #event: Tag
        ))
     
     # get minutes before matter, done, don't delete!
-    all_tables = form1.find_all('table')[1].find_all('table')
+    all_tables = event.find_all('table')[1].find_all('table')
     for all_table in all_tables:
        if 'DESCRIPTIONS OR CAPTIONS OF AGENDA ITEMS WILL BE READ BY THE' in all_table.text:
            all_prematter_tables = all_table.find_all_next('table')
@@ -336,7 +336,8 @@ def get_agenda(event_time: datetime):
     return form1
 
 # parse one event at a specific date, done
-def get_event(event_time: datetime) -> ingestion_models.EventIngestionModel:
+def get_event(event_time) -> ingestion_models.EventIngestionModel:
+    event_time = datetime.strptime(event_time, '%Y-%m-%d').date() #
     agenda = get_agenda(event_time)
     # just basic body and sessions for now, add more after get_events done
     event = ingestion_models.EventIngestionModel(
@@ -347,6 +348,7 @@ def get_event(event_time: datetime) -> ingestion_models.EventIngestionModel:
                 video_uri = get_date_mainlink(event_time) + '/embed',
                 session_index = 0
         )],
+        event_minutes_items = get_eventMinutesItem(agenda),
         agenda_uri = get_date_mainlink(event_time) + '/agenda',
     )
     return event
@@ -366,11 +368,12 @@ def get_events(begin, end) -> list:
 
 
 #print(get_events('2020-12-15', '2021-01-12'))
-#print(get_events('2022-07-26', '2022-07-26'))
+#print(get_events('2019-10-29', '2019-10-29'))
 
-# one_event_minutes_item = get_eventMinutesItem()
-# with open("test-cdp-event-minutesitem.json", "w") as open_f:
-#     open_f.write(one_event_minutes_item.to_json(indent=4))
+one_event_minutes_item = get_event('2019-10-29')
+# need event ingestion model to do to_json
+with open("test-cdp-event-minutesitem.json", "w") as open_f:
+    open_f.write(one_event_minutes_item.to_json(indent=4))
 
 
 #Aug2:
