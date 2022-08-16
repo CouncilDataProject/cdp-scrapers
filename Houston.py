@@ -3,14 +3,14 @@ import requests
 import bs4
 from cdp_backend.pipeline import ingestion_models
 from datetime import datetime, timedelta
-from typing import Optional, List
+from typing import Optional, List, Tuple
 
 #For individual function test
-URL = "https://houston.novusagenda.com/agendapublic//MeetingView.aspx?doctype=Agenda&MinutesMeetingID=0&meetingid=383" #same till 2017
-video_URL = "https://houstontx.new.swagit.com/videos/177384"
-page = requests.get(URL)
-event = BeautifulSoup(page.content, "html.parser")
-form1 = event.find('form', id = 'Form1')
+# URL = "https://houston.novusagenda.com/agendapublic//MeetingView.aspx?doctype=Agenda&MinutesMeetingID=0&meetingid=383" #same till 2017
+# video_URL = "https://houstontx.new.swagit.com/videos/177384"
+# page = requests.get(URL)
+# event = BeautifulSoup(page.content, "html.parser")
+# form1 = event.find('form', id = 'Form1')
 #
 
 #Individual Get Functions
@@ -37,7 +37,7 @@ def get_bodyName(event: Tag) -> str:
 
 #for each department(ul), search whether the name is in the department text, if is, append to role
 #list.
-def get_role(name: str) -> str:
+def get_role(name: str) -> Tuple[list[str], bool]:
     """
     Get the role name for one person
 
@@ -255,7 +255,26 @@ def get_matter_title(link:str) -> str:
 #is_matter = False  if under consent agenda, is_matter = True
 def get_eventMinutesItem(event: Tag) -> list[ingestion_models.EventMinutesItem]: #event: Tag
     """
+    Loop through the whole agenda and get both the minutes item and matter. 
+
+    The first block of code:
+    * get minutes item on the first day of the meeting
+    The second block of code:
+    * get minutes item before the matter items in the second day of meeting.
+    The third block of code:
+    * get all matter items
+    The fourth block of code:
+    * get minutes items after the matter items
+
+    Parameter:
+    --------------
+    event: Tag
+        The web page of agenda that we are parsing
     
+    Returns:
+    --------------
+    list[ingestion_models.EventMinutesItem]
+        A list of EventMinutesItem
     """
     event_minutes_items = []
     # get minutes on the first day, done, don't delete!
@@ -363,7 +382,22 @@ main = BeautifulSoup(main_page.content, "html.parser")
 
 
 # get different year
-def get_diff_yearid(time:datetime) -> str:
+def get_diff_yearid(time: datetime) -> str:
+    """
+    Get the events in different years as the events for different
+    years are stored in different tabs. Can get multiple events
+    across years.
+
+    Parameters:
+    ---------------
+    time: datetime
+        The date of the event we are trying to parse
+    
+    Returns:
+    ---------------
+    str
+        The year id that can locate the year tab where the event is stored
+    """
     #time = datetime.strptime(time, '%Y-%m-%d').date()
     year = str(time.year)
     year_id = 'city-council-' + year
@@ -376,6 +410,23 @@ def get_diff_yearid(time:datetime) -> str:
 # return the link, make agenda and video url in other function
 # need to change format
 def get_date_mainlink(time: datetime) -> str:
+    """
+    Find the main link for one event.
+    * 1)loop through all date
+    * 2)change each into datetime format
+    * 3)if match, get the 3rd td
+    * 4)get the href in first a
+
+    Parameters:
+    --------------
+    time: datetime
+        The date of one event
+    
+    Returns:
+    --------------
+    str
+        The main link
+    """
     #all events in a specific year
     main_year = main.find('div', id = get_diff_yearid(time)).find('table', id = 'video-table').find('tbody').find_all('tr')
     #time = datetime.strptime(time, '%Y-%m-%d').date() #may need to delete when actually pass datetime
@@ -391,6 +442,19 @@ def get_date_mainlink(time: datetime) -> str:
 
 # check if the date is in the time range we want
 def check_in_range(time: datetime) -> bool:
+    """
+    Check if the date is in the time range we want
+    
+    Parameters:
+    --------------
+    time: datetime
+        The date of one event
+    
+    Returns:
+    --------------
+    bool
+        True if the event is in the time range we want; false otherwise
+    """
     main_year = main.find('div', id = get_diff_yearid(time)).find('table', id = 'video-table').find('tbody').find_all('tr')
     #time = datetime.strptime(time, '%Y-%m-%d').date() #may need to delete when actually pass datetime
     in_range = False
@@ -407,6 +471,19 @@ def check_in_range(time: datetime) -> bool:
 
 # get agenda for a specific date, done
 def get_agenda(event_time: datetime) -> Tag:
+    """
+    Get event agenda for a specific date
+
+    Parameters:
+    ----------------
+    event_time: datetime
+        The date we want to get agenda
+    
+    Returns:
+    ----------------
+    Tag
+        The agenda web page we want parse
+    """
     link = get_date_mainlink(event_time)
     agenda_link = link + "/agenda"
     page = requests.get(agenda_link)
@@ -416,6 +493,19 @@ def get_agenda(event_time: datetime) -> Tag:
 
 # parse one event at a specific date, done
 def get_event(event_time: datetime) -> ingestion_models.EventIngestionModel:
+    """
+    Parse one event at a specific date. City council meeting information for a specific date
+
+    Parameters:
+    --------------
+    event_time: datetime
+        Meeting date
+    
+    Returns:
+    --------------
+    ingestion_models.EventIngestionModel
+        EventIngestionModel for one meeting date
+    """
     #event_time = datetime.strptime(event_time, '%Y-%m-%d').date() #
     agenda = get_agenda(event_time)
     # just basic body and sessions for now, add more after get_events done
@@ -434,19 +524,38 @@ def get_event(event_time: datetime) -> ingestion_models.EventIngestionModel:
 
 # get all events within time range
 #now need to deal with cases with no events on that date
-def get_events(begin: str, end: str) -> list[ingestion_models.EventIngestionModel]:
+def get_events(
+    from_dt: datetime,
+    to_dt: datetime
+) -> list[ingestion_models.EventIngestionModel]:
+    """
+    Get all city council meetings information within a specific time range
+
+    Parameters:
+    --------------
+    from_dt: datetime
+        The start date of the time range
+    to_dt: datetime
+        The end date of the time range
+    
+    Returns:
+    --------------
+    list[ingestion_models.EventIngestionModel]
+        A list of EventIngestionModel that contains all city council
+        meetings information within a specific time range
+    """
     events = []
-    begin = datetime.strptime(begin, '%Y-%m-%d').date()
-    end = datetime.strptime(end, '%Y-%m-%d').date()
-    for day in range((end - begin).days + 1): 
-        date = begin + timedelta(days=day)
+    #begin = datetime.strptime(begin, '%Y-%m-%d').date()
+    #end = datetime.strptime(end, '%Y-%m-%d').date()
+    for day in range((to_dt - from_dt).days + 1): 
+        date = from_dt + timedelta(days=day)
         if check_in_range(date) == True:
             event = get_event(date)
             events.append(event)
     return events
 
 
-print(get_events('2019-10-29', '2019-10-29'))
+#print(get_events(datetime(2022, 2, 1).date(), datetime(2022,2,8).date()))
 #print(get_events('2019-10-29', '2019-10-29'))
 
 #one_event_minutes_item = get_event('2019-10-29')
@@ -466,3 +575,9 @@ print(get_events('2019-10-29', '2019-10-29'))
 #2. can't make next Fri meeting
 #3. must the eventminutes item in order? now return a list of matter, can i just return a list of
 #eventsminutesitem in get_matter?
+
+
+
+#python standard function name
+#flake8 lint
+#mypy 
