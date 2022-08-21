@@ -3,8 +3,8 @@ import requests
 from cdp_backend.pipeline import ingestion_models
 from datetime import datetime, timedelta
 from typing import List, Union
+import bs4
 
-# import bs4
 # from typing import Tuple, Optional
 
 
@@ -131,6 +131,12 @@ from typing import List, Union
 # missing: get_votes()
 
 
+def remove_extra_type(element: Union[Tag, NavigableString, None]) -> Tag:
+    if isinstance(element, NavigableString) or element is None:
+        raise ValueError(f"Wrong Type {type(element)}")
+    return element
+
+
 def get_body_name(event: Union[Tag, NavigableString, None]) -> str:
     """
     Get the body name for an event
@@ -145,10 +151,8 @@ def get_body_name(event: Union[Tag, NavigableString, None]) -> str:
     str
         The body name
     """
-    if event is None:
-        raise ValueError("Incorrect variable type none")
-    if event is NavigableString:
-        raise ValueError("Incorrect variable type string")
+    print("start get body name")
+    event = remove_extra_type(event)
     bodyTable = event.find_all("table")[1].find("table")
     if "CITY COUNCIL" in bodyTable.text:
         return "City Council"
@@ -171,24 +175,20 @@ def get_matter_name(link: str) -> str:
         The matter numbers for one matter
     """
     matter_page = requests.get(link)
-    matter = BeautifulSoup(matter_page.content, "html.parser")
-    if matter is None:
-        raise ValueError("Incorrect variable type none")
-    if matter is NavigableString:
-        raise ValueError("Incorrect variable type string")
-    if matter is int:
-        raise ValueError("Incorrect variable type int")
-    matter_name = (
-        matter.find("table")
-        .find("table")
-        .find("table")
-        .find_all("td")[1]
-        .find("div")
-        .find("div")
-        .find("br")
-        .previousSibling
-    )
-    return matter_name
+    matter = BeautifulSoup(matter_page.content, "html.parser").body
+    matter = remove_extra_type(matter)
+    matter_table = remove_extra_type(matter.find("table"))
+    matter_table1 = remove_extra_type(matter_table.find("table"))
+    matter_table2 = remove_extra_type(matter_table1.find("table"))
+    matter_td = remove_extra_type(matter_table2.find_all("td")[1])
+    matter_div = remove_extra_type(matter_td.find("div"))
+    matter_div1 = remove_extra_type(matter_div.find("div"))
+    matter_br = remove_extra_type(matter_div1.find("br"))
+    matter_name = matter_br.previousSibling
+    name_return = ""
+    if type(matter_name) is bs4.element.NavigableString:
+        name_return = matter_name
+    return name_return
 
 
 def get_matter_title(link: str) -> str:
@@ -205,13 +205,13 @@ def get_matter_title(link: str) -> str:
     str: Title for one matter, which is the summary for one matter
     """
     matter_page = requests.get(link)
-    matter = BeautifulSoup(matter_page.content, "html.parser")
-    if matter is None:
-        raise ValueError("Incorrect variable type none")
-    if matter is NavigableString:
-        raise ValueError("Incorrect variable type string")
+    matter = BeautifulSoup(matter_page.content, "html.parser").body
+    matter = remove_extra_type(matter)
     matter_title = (
-        matter.find("table").find_all("table")[2].text.replace("Summary:", "").strip()
+        remove_extra_type(matter.find("table"))
+        .find_all("table")[2]
+        .text.replace("Summary:", "")
+        .strip()
     )
     return matter_title
 
@@ -241,13 +241,12 @@ def get_eventMinutesItem(
     list[ingestion_models.EventMinutesItem]
         A list of EventMinutesItem
     """
+    print("start get items")
     event_minutes_items = []
     # get minutes on the first day
-    if event is None:
-        raise ValueError("Incorrect variable type none")
-    if event is NavigableString:
-        raise ValueError("Incorrect variable type string")
-    firstday_minutes = event.find_all("td", id="column1", class_="style1")
+    firstday_minutes = remove_extra_type(event).find_all(
+        "td", id="column1", class_="style1"
+    )
     for firstday_minute in firstday_minutes:
         event_minutes_items.append(
             ingestion_models.EventMinutesItem(
@@ -256,7 +255,7 @@ def get_eventMinutesItem(
         )
 
     # get minutes before matter
-    all_tables = event.find_all("table")[1].find_all("table")
+    all_tables = remove_extra_type(event).find_all("table")[1].find_all("table")
     for all_table in all_tables:
         if (
             "DESCRIPTIONS OR CAPTIONS OF AGENDA ITEMS WILL BE READ BY THE"
@@ -283,7 +282,7 @@ def get_eventMinutesItem(
                             )
 
     # get matter
-    allTable = event.find_all("table")[1].find_all("table")
+    allTable = remove_extra_type(event).find_all("table")[1].find_all("table")
     for table in allTable:
         for td in table.find_all("td", id="column2"):
             if "CONSENT AGENDA NUMBERS" in td.text:
@@ -330,7 +329,7 @@ def get_eventMinutesItem(
         break
 
     # get minutes after matter
-    allTable = event.find_all("table")[1].find_all("table")
+    allTable = remove_extra_type(event).find_all("table")[1].find_all("table")
     for table in allTable:
         for td in table.find_all("td", id="column2"):
             if "END OF CONSENT AGENDA" in td.text:
@@ -357,6 +356,7 @@ def get_eventMinutesItem(
                                     )
                                 )
                             )
+    print("end get items")
     return event_minutes_items
 
 
@@ -406,12 +406,10 @@ def get_date_mainlink(time: datetime) -> str:
         The main link, make agenda and video url in other function
     """
     # all events in a specific year
-    main_year = (
-        main.find("div", id=get_diff_yearid(time))
-        .find("table", id="video-table")
-        .find("tbody")
-        .find_all("tr")
-    )
+    main_div = remove_extra_type(main.find("div", id=get_diff_yearid(time)))
+    main_table = remove_extra_type(main_div.find("table", id="video-table"))
+    main_tbody = remove_extra_type(main_table.find("tbody"))
+    main_year = main_tbody.find_all("tr")
     link = ""
     for year in main_year:
         cells = year.find_all("td")
@@ -437,12 +435,10 @@ def check_in_range(time: datetime) -> bool:
     bool
         True if the event is in the time range we want; false otherwise
     """
-    main_year = (
-        main.find("div", id=get_diff_yearid(time))
-        .find("table", id="video-table")
-        .find("tbody")
-        .find_all("tr")
-    )
+    main_div = remove_extra_type(main.find("div", id=get_diff_yearid(time)))
+    main_table = remove_extra_type(main_div.find("table", id="video-table"))
+    main_tbody = remove_extra_type(main_table.find("tbody"))
+    main_year = main_tbody.find_all("tr")
     in_range = False
     for year in main_year:
         cells = year.find_all("td")
@@ -490,6 +486,7 @@ def get_event(event_time: datetime) -> ingestion_models.EventIngestionModel:
     ingestion_models.EventIngestionModel
         EventIngestionModel for one meeting date
     """
+    print("start get one event")
     agenda = get_agenda(event_time)
     event = ingestion_models.EventIngestionModel(
         body=ingestion_models.Body(name=get_body_name(agenda), is_active=True),
@@ -532,11 +529,3 @@ def get_events(
             event = get_event(date)
             events.append(event)
     return events
-
-
-# python standard function name
-# flake8 lint
-# mypy
-
-print(get_events(datetime(2022, 2, 1).date(), datetime(2022, 2, 1).date()))
-# print(datetime(2022, 2, 1))
