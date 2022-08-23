@@ -143,7 +143,7 @@ def get_body_name(event: Union[Tag, NavigableString, None]) -> str:
 
     Parameter:
     ----------------
-    event: Tag
+    event: Union[Tag, NavigableString, None]
         All elements in the page that we want to scrape
 
     Returns:
@@ -233,7 +233,7 @@ def get_eventMinutesItem(
 
     Parameter:
     --------------
-    event: Tag
+    event: Union[Tag, NavigableString, None]
         The web page of agenda that we are parsing
 
     Returns:
