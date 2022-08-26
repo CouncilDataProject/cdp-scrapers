@@ -1,9 +1,4 @@
-from asyncio import constants
-from asyncio.windows_events import NULL
-from lib2to3.pgen2.driver import Driver
-from tkinter import Frame
-from typing import Sized, Tuple
-import webbrowser
+from typing import Dict, Optional, Sized, Tuple
 from xml.dom.minidom import Element
 import selenium
 import re
@@ -20,7 +15,7 @@ from dateutil.parser import parse
 
 # global variables
 MINUTE_INDEX = []
-PERSONS: dict[str, ingestion_models.Person] 
+PERSONS: Dict[str, ingestion_models.Person] = {}
 
 
 def get_single_person(
@@ -115,7 +110,10 @@ def get_person() -> dict:
             current_name = re.match(
                 r"([a-zA-Z]+)((\ {0,1}[a-zA-Z]+\.{0,1}\ )|(\ ))([a-zA-Z]+)", member_name
             )
-            member_name = f"{current_name.group(1)} {current_name.group(5)}"
+            if current_name is not None:
+                member_name = f"{current_name.group(1)} {current_name.group(5)}"
+            else:
+                raise ValueError("Person name could not be constructed.")
         member_model = get_single_person(driver, member_name)
         driver.quit()
         person_dict[member_name] = member_model
@@ -140,7 +138,7 @@ def get_new_person(name: str) -> ingestion_models.Person:
     return ingestion_models.Person(name=name, is_active=False)
 
 
-def convert_mdecision_constant(decision: str) -> constants:
+def convert_mdecision_constant(decision: str) -> str:
     """
     Converts the matter decisions to the exsiting constants 
 
@@ -170,7 +168,7 @@ def convert_mdecision_constant(decision: str) -> constants:
     return d_constant
 
 
-def get_voting_result(driver: ChromeDriverManager, sub_sections: Element, i: int) -> list:
+def get_voting_result(driver: ChromeDriverManager, sub_sections_len: int, i: int) -> list:
     """
     Scrapes and converts the voting decisions to the exsiting constants 
 
@@ -178,8 +176,8 @@ def get_voting_result(driver: ChromeDriverManager, sub_sections: Element, i: int
     ----------------
     driver:webdriver
         webdriver of the matter page 
-    sub_sections: element 
-        the block under the matter for the current date
+    sub_sections_len: int 
+        the row number in the block under the matter for the current date
     i: int
         tr[i] is the matter we are looking at
 
@@ -189,7 +187,7 @@ def get_voting_result(driver: ChromeDriverManager, sub_sections: Element, i: int
         contains the Vote ingestion model for each person
     """
     voting_list = []
-    for j in range(1, len(sub_sections) + 1):
+    for j in range(1, sub_sections_len + 1):
         sub_content = driver.find_element(
             By.XPATH,
             '//*[@id="ContentPlaceHolder1_divHistory"]/div/table/tbody/tr['
@@ -209,6 +207,7 @@ def get_voting_result(driver: ChromeDriverManager, sub_sections: Element, i: int
                 + "]/td[2]",
             ).text
             Yes_list = v_yes.split(", ")
+            n : str = ""
             for p in Yes_list:
                 if "President" in p:
                     n = p.split("President ")[1]
@@ -216,21 +215,19 @@ def get_voting_result(driver: ChromeDriverManager, sub_sections: Element, i: int
                     n_temp = re.match(
                         r"([a-zA-Z]+)((\ {0,1}[a-zA-Z]+\.{0,1}\ )|(\ ))([a-zA-Z]+)", p
                     )
-                    n = f"{n_temp.group(1)} {n_temp.group(5)}"
+                    if n_temp is not None:
+                        n = f"{n_temp.group(1)} {n_temp.group(5)}"
+                    else:
+                        raise ValueError("Person name could not be constructed.")
+                person = get_new_person(n)
                 if n in PERSONS:
-                    voting_list.append(
-                        ingestion_models.Vote(
-                            person=PERSONS.get(n),
-                            decision=db_constants.VoteDecision.APPROVE,
-                        )
+                    person = PERSONS.get(n)
+                voting_list.append(
+                    ingestion_models.Vote(
+                        person = person,
+                        decision = db_constants.VoteDecision.APPROVE,
                     )
-                else:
-                    voting_list.append(
-                        ingestion_models.Vote(
-                            person = get_new_person(n),
-                            decision=db_constants.VoteDecision.APPROVE,
-                        )
-                    )
+                )
         if "NAYS" in sub_content_role:
             v_no = driver.find_element(
                 By.XPATH,
@@ -248,7 +245,10 @@ def get_voting_result(driver: ChromeDriverManager, sub_sections: Element, i: int
                     n_temp = re.match(
                         r"([a-zA-Z]+)((\ {0,1}[a-zA-Z]+\.{0,1}\ )|(\ ))([a-zA-Z]+)", p
                     )
-                    n = f"{n_temp.group(1)} {n_temp.group(5)}"
+                    if n_temp is not None:
+                        n = f"{n_temp.group(1)} {n_temp.group(5)}"
+                    else:
+                        raise ValueError("Person name could not be constructed.")
                 if n in PERSONS:
                     voting_list.append(
                         ingestion_models.Vote(
@@ -280,7 +280,10 @@ def get_voting_result(driver: ChromeDriverManager, sub_sections: Element, i: int
                     n_temp = re.match(
                         r"([a-zA-Z]+)((\ {0,1}[a-zA-Z]+\.{0,1}\ )|(\ ))([a-zA-Z]+)", p
                     )
-                    n = f"{n_temp.group(1)} {n_temp.group(5)}"
+                    if n_temp is not None:
+                        n = f"{n_temp.group(1)} {n_temp.group(5)}"
+                    else:
+                        raise ValueError("Person name could not be constructed.")
                 if n in PERSONS:
                     voting_list.append(
                         ingestion_models.Vote(
@@ -312,7 +315,10 @@ def get_voting_result(driver: ChromeDriverManager, sub_sections: Element, i: int
                     n_temp = re.match(
                         r"([a-zA-Z]+)((\ {0,1}[a-zA-Z]+\.{0,1}\ )|(\ ))([a-zA-Z]+)", p
                     )
-                    n = f"{n_temp.group(1)} {n_temp.group(5)}"
+                    if n_temp is not None:
+                        n = f"{n_temp.group(1)} {n_temp.group(5)}"
+                    else:
+                        raise ValueError("Person name could not be constructed.")
                 if n in PERSONS:
                     voting_list.append(
                         ingestion_models.Vote(
@@ -344,7 +350,10 @@ def get_voting_result(driver: ChromeDriverManager, sub_sections: Element, i: int
                     n_temp = re.match(
                         r"([a-zA-Z]+)((\ {0,1}[a-zA-Z]+\.{0,1}\ )|(\ ))([a-zA-Z]+)", p
                     )
-                    n = f"{n_temp.group(1)} {n_temp.group(5)}"
+                    if n_temp is not None:
+                        n = f"{n_temp.group(1)} {n_temp.group(5)}"
+                    else:
+                        raise ValueError("Person name could not be constructed.")
                 if n in PERSONS:
                     voting_list.append(
                         ingestion_models.Vote(
@@ -376,7 +385,10 @@ def get_voting_result(driver: ChromeDriverManager, sub_sections: Element, i: int
                     n_temp = re.match(
                         r"([a-zA-Z]+)((\ {0,1}[a-zA-Z]+\.{0,1}\ )|(\ ))([a-zA-Z]+)", p
                     )
-                    n = f"{n_temp.group(1)} {n_temp.group(5)}"
+                    if n_temp is not None:
+                        n = f"{n_temp.group(1)} {n_temp.group(5)}"
+                    else:
+                        raise ValueError("Person name could not be constructed.")
                 if n in PERSONS:
                     voting_list.append(
                         ingestion_models.Vote(
@@ -394,7 +406,7 @@ def get_voting_result(driver: ChromeDriverManager, sub_sections: Element, i: int
     return voting_list
 
 
-def get_matter_decision(driver: ChromeDriverManager, i: int) -> Tuple[Element, str]:
+def get_matter_decision(driver: ChromeDriverManager, i: int) -> Tuple[list, str]:
     """
     Find the matter decisions
 
@@ -430,7 +442,7 @@ def get_matter_decision(driver: ChromeDriverManager, i: int) -> Tuple[Element, s
 
 
 def parse_single_matter(
-    driver: ChromeDriverManager, matter: ChromeDriverManager
+    driver: ChromeDriverManager, test: str, item:str
 ) -> ingestion_models.EventMinutesItem:
     """
     Get the minute items that contains a matter
@@ -447,118 +459,123 @@ def parse_single_matter(
     ingestion model
         minutes ingestion model with the matters information
     """
-    try:
-        voting_list = []
-        test = matter.find_element(By.CLASS_NAME, "ItemVoteResult").text
-        item = matter.find_element(By.CLASS_NAME, "AgendaOutlineLink").text
-        if len(item) != 0:
-            matter_name = item[0:9]  # name of the matter eg. "22-C-5024", "22-R-3404"
-            matter_title = item[
-                12:
-            ]  # the paragraph the describes the matter eg. "A COMMUNICATION FROM ..."
-            matter_type = " ".join(
-                re.split("BY |FROM", matter_title)[0].split(" ")[1:-1]
-            )  # the type of the matter eg. "COMMUNICATION", "SUBSTITUTE ORDINANCE"
-            link = driver.find_element("link text", item)
-            link.click()
-            # get to the specific page for each matter
-            s_matter = WebDriverWait(driver, 10).until(
-                EC.presence_of_all_elements_located(
-                    (
-                        By.XPATH,
-                        '//*[@id="ContentPlaceHolder1_divHistory"]/div/table/tbody/tr',
-                    )
-                )
+    # try:
+    voting_list = []
+    matter_name = item[0:9]  # name of the matter eg. "22-C-5024", "22-R-3404"
+    matter_title = item[
+        12:
+    ]  # the paragraph the describes the matter eg. "A COMMUNICATION FROM ..."
+    matter_type = " ".join(
+        re.split("BY |FROM", matter_title)[0].split(" ")[1:-1]
+    )  # the type of the matter eg. "COMMUNICATION", "SUBSTITUTE ORDINANCE"
+    link = driver.find_element("link text", item)
+    link.click()
+    # get to the specific page for each matter
+    s_matter = WebDriverWait(driver, 10).until(
+        EC.presence_of_all_elements_located(
+            (
+                By.XPATH,
+                '//*[@id="ContentPlaceHolder1_divHistory"]/div/table/tbody/tr',
             )
-            sponsor_raw = driver.find_element(
-                By.XPATH, '//*[@id="tblLegiFileInfo"]/tbody/tr[1]/td[2]'
-            ).text
-            sponsor_list = sponsor_raw.split(", ")
-            if len(sponsor_list) != 0:
-                sponsors = []
-                for s in sponsor_list:
-                    if "District" in s:
-                        current_temp = s.split(" ")[2:]
-                        current_temp2 = " ".join(current_temp)
-                        current_name = re.match(
-                            r"([a-zA-Z]+)((\ {0,1}[a-zA-Z]+\.{0,1}\ )|(\ ))([a-zA-Z]+)",
-                            current_temp2,
-                        )
-                        current = f"{current_name.group(1)} {current_name.group(5)}"
-                        if current in PERSONS:
-                            sponsors.append(PERSONS.get(current))
-                        else:
-                            sponsors.append(get_new_person(current))
-                    elif "Post" in s:
-                        current_temp = s.split("Large ")[1]
-                        current_name = re.match(
-                            r"([a-zA-Z]+)((\ {0,1}[a-zA-Z]+\.{0,1}\ )|(\ ))([a-zA-Z]+)",
-                            current_temp,
-                        )
-                        current = f"{current_name.group(1)} {current_name.group(5)}"
-                        if current in PERSONS:
-                            sponsors.append(PERSONS.get(current))
-                        else:
-                            sponsors.append(get_new_person(current))
-                    elif "President" in s:
-                        current_temp = s.split("President ")[1]
-                        current_name = re.match(
-                            r"([a-zA-Z]+)((\ {0,1}[a-zA-Z]+\.{0,1}\ )|(\ ))([a-zA-Z]+)",
-                            current_temp,
-                        )
-                        current = f"{current_name.group(1)} {current_name.group(5)}"
-                        if current in PERSONS:
-                            sponsors.append(PERSONS.get(current))
-                        else:
-                            sponsors.append(get_new_person(current))
-                s_rows = len(s_matter)
-                for i in range(1, s_rows + 1, 2):
-                    header = driver.find_element(
-                        By.XPATH,
-                        '//*[@id="ContentPlaceHolder1_divHistory"]/div/table/tbody/tr['
-                        + str(i)
-                        + "]",
-                    )
-                    date = header.find_element(By.CLASS_NAME, "Date").text
-                    s_word = driver.find_element(
-                        By.ID, "ContentPlaceHolder1_lblMeetingDate"
-                    ).text
-                    if parse(s_word) == parse(date[:-6]):  # match the current meeting date
-                        sub_sections, decision = get_matter_decision(
-                            driver, i
-                        )  # get the decision of the matter
-                        if "[" in test:
-                            voting_list = get_voting_result(driver, sub_sections, i)
-                return ingestion_models.EventMinutesItem(
-                    minutes_item=ingestion_models.MinutesItem(matter_name),
-                    matter=ingestion_models.Matter(
-                        matter_name,
-                        matter_type=matter_type,
-                        title=matter_title,
-                        result_status=decision,
-                        sponsors=sponsors,
-                    ),
-                    decision=decision,
-                    votes=voting_list,
+        )
+    )
+    sponsor_raw = driver.find_element(
+        By.XPATH, '//*[@id="tblLegiFileInfo"]/tbody/tr[1]/td[2]'
+    ).text
+    sponsor_list = sponsor_raw.split(", ")
+    sponsors: Optional[list[ingestion_models.Person]] = []
+    if sponsors is not None:
+        for s in sponsor_list:
+            if "District" in s:
+                current_temp = s.split(" ")[2:]
+                current_temp2 = " ".join(current_temp)
+                current_name = re.match(
+                    r"([a-zA-Z]+)((\ {0,1}[a-zA-Z]+\.{0,1}\ )|(\ ))([a-zA-Z]+)",
+                    current_temp2,
                 )
-        else:
+                if current_name is not None:
+                    current = f"{current_name.group(1)} {current_name.group(5)}"
+                else:
+                    raise ValueError("Person name could not be constructed.")
+                if current in PERSONS:
+                    sponsors.append(PERSONS.get(current))
+                else:
+                    sponsors.append(get_new_person(current))
+            elif "Post" in s:
+                current_temp = s.split("Large ")[1]
+                current_name = re.match(
+                    r"([a-zA-Z]+)((\ {0,1}[a-zA-Z]+\.{0,1}\ )|(\ ))([a-zA-Z]+)",
+                    current_temp,
+                )
+                if current_name is not None:
+                    current = f"{current_name.group(1)} {current_name.group(5)}"
+                else:
+                    raise ValueError("Person name could not be constructed.")
+                if current in PERSONS:
+                    sponsors.append(PERSONS.get(current))
+                else:
+                    sponsors.append(get_new_person(current))
+            elif "President" in s:
+                current_temp = s.split("President ")[1]
+                current_name = re.match(
+                    r"([a-zA-Z]+)((\ {0,1}[a-zA-Z]+\.{0,1}\ )|(\ ))([a-zA-Z]+)",
+                    current_temp,
+                )
+                if current_name is not None:
+                    current = f"{current_name.group(1)} {current_name.group(5)}"
+                else:
+                    raise ValueError("Person name could not be constructed.")
+                if current in PERSONS:
+                    sponsors.append(PERSONS.get(current))
+                else:
+                    sponsors.append(get_new_person(current))
+        s_rows = len(s_matter)
+        for i in range(1, s_rows + 1, 2):
+            header = driver.find_element(
+                By.XPATH,
+                '//*[@id="ContentPlaceHolder1_divHistory"]/div/table/tbody/tr['
+                + str(i)
+                + "]",
+            )
+            date = header.find_element(By.CLASS_NAME, "Date").text
+            s_word = driver.find_element(
+                By.ID, "ContentPlaceHolder1_lblMeetingDate"
+            ).text
+            if parse(s_word) == parse(date[:-6]):  # match the current meeting date
+                sub_sections, decision = get_matter_decision(
+                    driver, i
+                )  # get the decision of the matter
+                if "[" in test:
+                    voting_list = get_voting_result(driver, len(sub_sections), i)
+        if len(sponsors) != 0:
             return ingestion_models.EventMinutesItem(
                 minutes_item=ingestion_models.MinutesItem(matter_name),
                 matter=ingestion_models.Matter(
                     matter_name,
                     matter_type=matter_type,
                     title=matter_title,
-                    result_status=decision
+                    result_status=decision,
+                    sponsors=sponsors,
                 ),
                 decision=decision,
                 votes=voting_list,
             )
-    except (
-        selenium.common.exceptions.NoSuchElementException,
-        selenium.common.exceptions.TimeoutException,
-    ):
-        pass
-
+    return ingestion_models.EventMinutesItem(
+        minutes_item=ingestion_models.MinutesItem(matter_name),
+        matter=ingestion_models.Matter(
+            matter_name,
+            matter_type=matter_type,
+            title=matter_title,
+            result_status=decision
+        ),
+        decision=decision,
+        votes=voting_list,
+    )
+    # except (
+    #     selenium.common.exceptions.NoSuchElementException,
+    #     selenium.common.exceptions.TimeoutException,
+    # ):
+    #     pass
 
 def parse_event(url: str) -> ingestion_models.EventIngestionModel:
     """
@@ -664,8 +681,11 @@ def parse_event(url: str) -> ingestion_models.EventIngestionModel:
                 matter = driver.find_element(
                     By.XPATH, '//*[@id="MeetingDetail"]/tbody/tr[' + str(i) + "]/td[3]"
                 )
-                matter_model = parse_single_matter(driver, matter)
-                event_minutes_items.append(matter_model)
+                test = matter.find_element(By.CLASS_NAME, "ItemVoteResult").text
+                item = matter.find_element(By.CLASS_NAME, "AgendaOutlineLink").text
+                if len(item) != 0:
+                    matter_model = parse_single_matter(driver, test, item)
+                    event_minutes_items.append(matter_model)
             elif (
                 len(
                     driver.find_elements(
@@ -677,13 +697,16 @@ def parse_event(url: str) -> ingestion_models.EventIngestionModel:
                 matter = driver.find_element(
                     By.XPATH, '//*[@id="MeetingDetail"]/tbody/tr[' + str(i) + "]/td[6]"
                 )
-                matter_model = parse_single_matter(driver, matter)
-                event_minutes_items.append(matter_model)
+                test = matter.find_element(By.CLASS_NAME, "ItemVoteResult").text
+                item = matter.find_element(By.CLASS_NAME, "AgendaOutlineLink").text
+                if len(item) != 0:
+                    matter_model = parse_single_matter(driver, test, item)
+                    event_minutes_items.append(matter_model)
             i += 1
         except (
             selenium.common.exceptions.NoSuchElementException,
             selenium.common.exceptions.TimeoutException,
-        ):  # except(A,B)
+        ): 
             i += 1
             continue
 
@@ -805,3 +828,8 @@ def get_events(from_dt: datetime, to_dt: datetime) -> list:
         web_url = get_year(driver, web_url, from_dt)
     events = get_date(driver, web_url, from_dt, to_dt)
     return events
+# event = parse_event('https://atlantacityga.iqm2.com/Citizens/SplitView.aspx?Mode=Video&MeetingID=3588&Format=Minutes')
+# # web_url = "https://atlantacityga.iqm2.com/Citizens/Calendar.aspx?Frame=Yes"
+# # events = get_events(datetime.fromisoformat('2022-04-18'), datetime.fromisoformat('2022-04-26'))
+# with open("april-18th-auto", "w") as open_f:
+#     open_f.write(event.to_json(indent=4))
