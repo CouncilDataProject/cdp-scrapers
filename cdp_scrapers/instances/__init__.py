@@ -19,6 +19,7 @@ from cdp_backend.pipeline.mock_get_events import (
 
 from cdp_scrapers.legistar_utils import LegistarScraper
 from cdp_scrapers.instances.portland import get_portland_events
+from cdp_scrapers.instances.atlanta import get_atlanta_events
 
 ###############################################################################
 
@@ -56,6 +57,7 @@ for submodule in iter_modules(__path__):
 # SCRAPER_FUNCTIONS[{python_municipality_slug}] = {function_callable}
 SCRAPER_FUNCTIONS["test_deployment"] = get_test_deployment_events
 SCRAPER_FUNCTIONS["portland"] = get_portland_events
+SCRAPER_FUNCTIONS["atlanta"] = get_atlanta_events
 
 # Set all scraper functions as exports of this module
 for python_municipality_slug, func in SCRAPER_FUNCTIONS.items():
