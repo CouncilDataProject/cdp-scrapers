@@ -531,8 +531,8 @@ def get_events(
         meetings information within a specific time range
     """
     events = []
-    for day in range((to_dt - from_dt).days + 1):
-        date = from_dt + timedelta(days=day)
+    for day in range((to_dt.date() - from_dt.date()).days + 1):
+        date = from_dt.date() + timedelta(days=day)
         if check_in_range(date):
             event = get_event(date)
             events.append(event)
