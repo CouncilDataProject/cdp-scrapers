@@ -14,6 +14,7 @@ atlanta_reqs = [
 ]
 
 test_requirements = [
+    *atlanta_reqs,
     "black>=19.10b0",
     "flake8>=3.8.3",
     "flake8-debugger>=3.2.1",
