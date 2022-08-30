@@ -38,7 +38,7 @@ def get_single_person(
     ingestion_models
         the ingestion model for the person's part
     """
-    log.info("start get person ingestion model")
+    log.info("start get active person ingestion model")
     seat_role = driver.find_element(By.CLASS_NAME, "titlewidget-subtitle").text
     member_role = "Member"
     member_seat_name = "District"
@@ -97,6 +97,7 @@ def get_person() -> dict:
         key: person's name
         value: person's ingestion model
     """
+    log.info("start get all the person ingestion model")
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
     driver.get("https://citycouncil.atlantaga.gov/council-members")
     members = driver.find_elements(By.XPATH, '//*[@id="leftNav_2_0_12"]/ul/li')
@@ -137,6 +138,7 @@ def get_new_person(name: str) -> ingestion_models.Person:
     ingestion model
         the person ingestion model for the newly appeared person 
     """
+    log.info("start get inactive person ingestion model")
     return ingestion_models.Person(name=name, is_active=False)
 
 
@@ -154,6 +156,7 @@ def convert_status_constant(decision: str) -> str:
     db_constants
         result status constants 
     """
+    log.info("start convert result status for vote ingestion model")
     d_constant = decision
     if ("FAVORABLE" in decision) or ("ADOPTED" in decision) or ("ACCEPTED" in decision):
         d_constant = db_constants.MatterStatusDecision.ADOPTED
@@ -189,6 +192,7 @@ def assign_constant(
     voting_list: list
         the list that contains vote ingestion models 
     """
+    log.info("start get vote ingestion model for one type of decision")
     v_res = driver.find_element(
         By.XPATH,
         '//*[@id="ContentPlaceHolder1_divHistory"]/div/table/tbody/tr['
@@ -239,6 +243,7 @@ def get_voting_result(
     list
         contains the Vote ingestion model for each person
     """
+    log.info("start get the vote ingestion model for a matter")
     voting_list: list[ingestion_models.Vote] = []
     for j in range(1, sub_sections_len + 1):
         sub_content = driver.find_element(
@@ -287,6 +292,7 @@ def get_matter_status(driver: ChromeDriverManager, i: int) -> Tuple[list, str]:
     decision_constant: element
         the matter decision constant
     """
+    log.info("start get reslut status for a matter")
     result = driver.find_element(
         By.XPATH,
         '//*[@id="ContentPlaceHolder1_divHistory"]/div/table/tbody/tr['
@@ -322,6 +328,7 @@ def parse_single_matter(
     ingestion model
         minutes ingestion model with the matters information
     """
+    log.info("start get ingestion model for a matter")
     voting_list = []
     matter_name = item[0:9]  # name of the matter eg. "22-C-5024", "22-R-3404"
     matter_title = item[
@@ -455,6 +462,7 @@ def parse_event(url: str) -> ingestion_models.EventIngestionModel:
     ingestion model
         the ingestion model for the meeting
     """
+    log.info("start get ingestion model for a event")
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
     driver.get(url)
 
@@ -614,6 +622,7 @@ def get_year(driver: ChromeDriverManager, url: str, from_dt: datetime) -> str:
     link:str
         the link to the calender of the year that we are looking for 
     """
+    log.info("start get the current year's calender page")
     driver.get(url)
     dates = driver.find_element(By.ID, "ContentPlaceHolder1_lblCalendarRange")
     link_temp = dates.find_element(
@@ -645,6 +654,7 @@ def get_date(
     list
         all the ingestion models for the selected date range
     """
+    log.info("start calling parse_event for a signle meeting")
     driver.get(url)
     dates = driver.find_elements(By.CLASS_NAME, "RowTop")
     events = []
@@ -683,6 +693,7 @@ def get_events(from_dt: datetime, to_dt: datetime) -> list:
     list
         all the ingestion models for the selected date range
     """
+    log.info("start a date range and run all the functions")
     global MINUTE_INDEX
     MINUTE_INDEX = [chr(i) for i in range(ord("A"), ord("Z") + 1)]
     global PERSONS
@@ -694,12 +705,3 @@ def get_events(from_dt: datetime, to_dt: datetime) -> list:
         web_url = get_year(driver, web_url, from_dt)
     events = get_date(driver, web_url, from_dt, to_dt)
     return events
-
-
-event = parse_event(
-    "https://atlantacityga.iqm2.com/Citizens/SplitView.aspx?Mode=Video&MeetingID=3588&Format=Minutes"
-)
-# # web_url = "https://atlantacityga.iqm2.com/Citizens/Calendar.aspx?Frame=Yes"
-# # events = get_events(datetime.fromisoformat('2022-04-18'), datetime.fromisoformat('2022-04-26'))
-with open("april-18th-auto", "w") as open_f:
-    open_f.write(event.to_json(indent=4))
