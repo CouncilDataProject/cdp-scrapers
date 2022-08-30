@@ -4,9 +4,14 @@ from cdp_backend.pipeline import ingestion_models
 from datetime import datetime, timedelta
 from typing import List, Union
 import bs4
+import logging
+
+log = logging.getLogger(__name__)
+
+# Houston has no person info currently
+# but these functions are ready whenever we do have person data
 
 # from typing import Tuple, Optional
-
 
 # def get_role(name: str) -> Tuple[List[str], bool]:
 #     """
@@ -151,13 +156,13 @@ def get_body_name(event: Union[Tag, NavigableString, None]) -> str:
     str
         The body name
     """
-    print("start get body name")
+    log.info("start get body name")
     event = remove_extra_type(event)
     bodyTable = event.find_all("table")[1].find("table")
     if "CITY COUNCIL" in bodyTable.text:
         return "City Council"
     else:
-        return bodyTable.find_all("span")[3].text
+        return bodyTable.find_all("span")[3].text.title()
 
 
 def get_matter_name(link: str) -> str:
@@ -216,7 +221,7 @@ def get_matter_title(link: str) -> str:
     return matter_title
 
 
-def get_eventMinutesItem(
+def get_event_Minutes_Item(
     event: Union[Tag, NavigableString, None],
 ) -> List[ingestion_models.EventMinutesItem]:
     """
@@ -241,7 +246,7 @@ def get_eventMinutesItem(
     list[ingestion_models.EventMinutesItem]
         A list of EventMinutesItem
     """
-    print("start get items")
+    log.info("start get items")
     event_minutes_items = []
     # get minutes on the first day
     firstday_minutes = remove_extra_type(event).find_all(
@@ -356,14 +361,11 @@ def get_eventMinutesItem(
                                     )
                                 )
                             )
-    print("end get items")
+    log.info("end get items")
     return event_minutes_items
 
 
 # Big Functions
-main_URL = "https://houstontx.new.swagit.com/views/408"
-main_page = requests.get(main_URL)
-main = BeautifulSoup(main_page.content, "html.parser")
 
 
 def get_diff_yearid(time: datetime) -> str:
@@ -405,6 +407,9 @@ def get_date_mainlink(time: datetime) -> str:
     str
         The main link, make agenda and video url in other function
     """
+    main_URL = "https://houstontx.new.swagit.com/views/408"
+    main_page = requests.get(main_URL)
+    main = BeautifulSoup(main_page.content, "html.parser")
     # all events in a specific year
     main_div = remove_extra_type(main.find("div", id=get_diff_yearid(time)))
     main_table = remove_extra_type(main_div.find("table", id="video-table"))
@@ -417,7 +422,7 @@ def get_date_mainlink(time: datetime) -> str:
         date = datetime.strptime(date, "%b %d %Y").date()
         if date == time:
             link_post = cells[3].find("a")["href"]
-            link = "https://houstontx.new.swagit.com/" + link_post
+            link = f"https://houstontx.new.swagit.com/{link_post}"
     return link
 
 
@@ -435,6 +440,9 @@ def check_in_range(time: datetime) -> bool:
     bool
         True if the event is in the time range we want; false otherwise
     """
+    main_URL = "https://houstontx.new.swagit.com/views/408"
+    main_page = requests.get(main_URL)
+    main = BeautifulSoup(main_page.content, "html.parser")
     main_div = remove_extra_type(main.find("div", id=get_diff_yearid(time)))
     main_table = remove_extra_type(main_div.find("table", id="video-table"))
     main_tbody = remove_extra_type(main_table.find("tbody"))
@@ -486,7 +494,7 @@ def get_event(event_time: datetime) -> ingestion_models.EventIngestionModel:
     ingestion_models.EventIngestionModel
         EventIngestionModel for one meeting date
     """
-    print("start get one event")
+    log.info("start get one event")
     agenda = get_agenda(event_time)
     event = ingestion_models.EventIngestionModel(
         body=ingestion_models.Body(name=get_body_name(agenda), is_active=True),
@@ -497,7 +505,7 @@ def get_event(event_time: datetime) -> ingestion_models.EventIngestionModel:
                 session_index=0,
             )
         ],
-        event_minutes_items=get_eventMinutesItem(agenda),
+        event_minutes_items=get_event_Minutes_Item(agenda),
         agenda_uri=get_date_mainlink(event_time) + "/agenda",
     )
     return event
