@@ -1,5 +1,4 @@
-from typing import Dict, Optional, Sized, Tuple
-from xml.dom.minidom import Element
+from typing import Dict, Optional, Tuple
 import selenium
 import re
 from selenium import webdriver
@@ -167,6 +166,38 @@ def convert_mdecision_constant(decision: str) -> str:
         raise ValueError("New Type")
     return d_constant
 
+def assign_constant(driver: ChromeDriverManager, i: int, j: int, vote_decision: str, voting_list: list):
+    v_res = driver.find_element(
+                    By.XPATH,
+                    '//*[@id="ContentPlaceHolder1_divHistory"]/div/table/tbody/tr['
+                    + str(i + 1)
+                    + "]/td/table/tbody/tr["
+                    + str(j)
+                    + "]/td[2]",
+                ).text
+    res_list = v_res.split(", ")
+    n : str = ""
+    for p in res_list:
+        if "President" in p:
+            n = p.split("President ")[1]
+        else:
+            n_temp = re.match(
+                r"([a-zA-Z]+)((\ {0,1}[a-zA-Z]+\.{0,1}\ )|(\ ))([a-zA-Z]+)", p
+            )
+            if n_temp is not None:
+                n = f"{n_temp.group(1)} {n_temp.group(5)}"
+            else:
+                raise ValueError("Person name could not be constructed.")
+        person = get_new_person(n)
+        if n in PERSONS:
+            person = PERSONS.get(n)
+        voting_list.append(
+            ingestion_models.Vote(
+                person = person,
+                decision = vote_decision,
+            )
+        )
+    return voting_list
 
 def get_voting_result(driver: ChromeDriverManager, sub_sections_len: int, i: int) -> list:
     """
@@ -198,211 +229,17 @@ def get_voting_result(driver: ChromeDriverManager, sub_sections_len: int, i: int
         )
         sub_content_role = sub_content.find_element(By.CLASS_NAME, "Role").text
         if "AYES" in sub_content_role:
-            v_yes = driver.find_element(
-                By.XPATH,
-                '//*[@id="ContentPlaceHolder1_divHistory"]/div/table/tbody/tr['
-                + str(i + 1)
-                + "]/td/table/tbody/tr["
-                + str(j)
-                + "]/td[2]",
-            ).text
-            Yes_list = v_yes.split(", ")
-            n : str = ""
-            for p in Yes_list:
-                if "President" in p:
-                    n = p.split("President ")[1]
-                else:
-                    n_temp = re.match(
-                        r"([a-zA-Z]+)((\ {0,1}[a-zA-Z]+\.{0,1}\ )|(\ ))([a-zA-Z]+)", p
-                    )
-                    if n_temp is not None:
-                        n = f"{n_temp.group(1)} {n_temp.group(5)}"
-                    else:
-                        raise ValueError("Person name could not be constructed.")
-                person = get_new_person(n)
-                if n in PERSONS:
-                    person = PERSONS.get(n)
-                voting_list.append(
-                    ingestion_models.Vote(
-                        person = person,
-                        decision = db_constants.VoteDecision.APPROVE,
-                    )
-                )
+            vote_decision = db_constants.VoteDecision.APPROVE
+            assign_constant(driver, i, j, vote_decision, voting_list)
         if "NAYS" in sub_content_role:
-            v_no = driver.find_element(
-                By.XPATH,
-                '//*[@id="ContentPlaceHolder1_divHistory"]/div/table/tbody/tr['
-                + str(i + 1)
-                + "]/td/table/tbody/tr["
-                + str(j)
-                + "]/td[2]",
-            ).text
-            No_list = v_no.split(", ")
-            for p in No_list:
-                if "President" in p:
-                    n = p.split("President ")[1]
-                else:
-                    n_temp = re.match(
-                        r"([a-zA-Z]+)((\ {0,1}[a-zA-Z]+\.{0,1}\ )|(\ ))([a-zA-Z]+)", p
-                    )
-                    if n_temp is not None:
-                        n = f"{n_temp.group(1)} {n_temp.group(5)}"
-                    else:
-                        raise ValueError("Person name could not be constructed.")
-                if n in PERSONS:
-                    voting_list.append(
-                        ingestion_models.Vote(
-                            person=PERSONS.get(n),
-                            decision=db_constants.VoteDecision.REJECT,
-                        )
-                    )
-                else:
-                    voting_list.append(
-                        ingestion_models.Vote(
-                            person = get_new_person(n), 
-                            decision=db_constants.VoteDecision.REJECT
-                        )
-                    )
-        if "ABSENT" in sub_content_role:
-            v_absent = driver.find_element(
-                By.XPATH,
-                '//*[@id="ContentPlaceHolder1_divHistory"]/div/table/tbody/tr['
-                + str(i + 1)
-                + "]/td/table/tbody/tr["
-                + str(j)
-                + "]/td[2]",
-            ).text
-            Absent_list = v_absent.split(", ")
-            for p in Absent_list:
-                if "President" in p:
-                    n = p.split("President ")[1]
-                else:
-                    n_temp = re.match(
-                        r"([a-zA-Z]+)((\ {0,1}[a-zA-Z]+\.{0,1}\ )|(\ ))([a-zA-Z]+)", p
-                    )
-                    if n_temp is not None:
-                        n = f"{n_temp.group(1)} {n_temp.group(5)}"
-                    else:
-                        raise ValueError("Person name could not be constructed.")
-                if n in PERSONS:
-                    voting_list.append(
-                        ingestion_models.Vote(
-                            person=PERSONS.get(n),
-                            decision=db_constants.VoteDecision.ABSENT_NON_VOTING,
-                        )
-                    )
-                else:
-                    voting_list.append(
-                        ingestion_models.Vote(
-                            person = get_new_person(n),
-                            decision=db_constants.VoteDecision.ABSENT_NON_VOTING,
-                        )
-                    )
-        if "AWAY" in sub_content_role:
-            v_away = driver.find_element(
-                By.XPATH,
-                '//*[@id="ContentPlaceHolder1_divHistory"]/div/table/tbody/tr['
-                + str(i + 1)
-                + "]/td/table/tbody/tr["
-                + str(j)
-                + "]/td[2]",
-            ).text
-            Away_list = v_away.split(", ")
-            for p in Away_list:
-                if "President" in p:
-                    n = p.split("President ")[1]
-                else:
-                    n_temp = re.match(
-                        r"([a-zA-Z]+)((\ {0,1}[a-zA-Z]+\.{0,1}\ )|(\ ))([a-zA-Z]+)", p
-                    )
-                    if n_temp is not None:
-                        n = f"{n_temp.group(1)} {n_temp.group(5)}"
-                    else:
-                        raise ValueError("Person name could not be constructed.")
-                if n in PERSONS:
-                    voting_list.append(
-                        ingestion_models.Vote(
-                            person=PERSONS.get(n),
-                            decision=db_constants.VoteDecision.ABSENT_NON_VOTING,
-                        )
-                    )
-                else:
-                    voting_list.append(
-                        ingestion_models.Vote(
-                            person = get_new_person(n),
-                            decision=db_constants.VoteDecision.ABSENT_NON_VOTING,
-                        )
-                    )
+            vote_decision = db_constants.VoteDecision.REJECT
+            assign_constant(driver, i, j, vote_decision, voting_list)
+        if "ABSENT" in sub_content_role or "AWAY" in sub_content_role or "EXCUSED" in sub_content_role:
+            vote_decision = db_constants.VoteDecision.ABSENT_NON_VOTING
+            assign_constant(driver, i, j, vote_decision, voting_list)
         if "ABSTAIN" in sub_content_role:
-            v_abstain = driver.find_element(
-                By.XPATH,
-                '//*[@id="ContentPlaceHolder1_divHistory"]/div/table/tbody/tr['
-                + str(i + 1)
-                + "]/td/table/tbody/tr["
-                + str(j)
-                + "]/td[2]",
-            ).text
-            Abstain_list = v_abstain.split(", ")
-            for p in Abstain_list:
-                if "President" in p:
-                    n = p.split("President ")[1]
-                else:
-                    n_temp = re.match(
-                        r"([a-zA-Z]+)((\ {0,1}[a-zA-Z]+\.{0,1}\ )|(\ ))([a-zA-Z]+)", p
-                    )
-                    if n_temp is not None:
-                        n = f"{n_temp.group(1)} {n_temp.group(5)}"
-                    else:
-                        raise ValueError("Person name could not be constructed.")
-                if n in PERSONS:
-                    voting_list.append(
-                        ingestion_models.Vote(
-                            person=PERSONS.get(n),
-                            decision=db_constants.VoteDecision.ABSTAIN_NON_VOTING,
-                        )
-                    )
-                else:
-                    voting_list.append(
-                        ingestion_models.Vote(
-                            person = get_new_person(n),
-                            decision=db_constants.VoteDecision.ABSTAIN_NON_VOTING,
-                        )
-                    )
-        if "EXCUSED" in sub_content_role:
-            v_excused = driver.find_element(
-                By.XPATH,
-                '//*[@id="ContentPlaceHolder1_divHistory"]/div/table/tbody/tr['
-                + str(i + 1)
-                + "]/td/table/tbody/tr["
-                + str(j)
-                + "]/td[2]",
-            ).text
-            Excused_list = v_excused.split(", ")
-            for p in Excused_list:
-                if "President" in p:
-                    n = p.split("President ")[1]
-                else:
-                    n_temp = re.match(
-                        r"([a-zA-Z]+)((\ {0,1}[a-zA-Z]+\.{0,1}\ )|(\ ))([a-zA-Z]+)", p
-                    )
-                    if n_temp is not None:
-                        n = f"{n_temp.group(1)} {n_temp.group(5)}"
-                    else:
-                        raise ValueError("Person name could not be constructed.")
-                if n in PERSONS:
-                    voting_list.append(
-                        ingestion_models.Vote(
-                            person=PERSONS.get(n),
-                            decision=db_constants.VoteDecision.ABSENT_NON_VOTING,
-                        )
-                    )
-                else:
-                    voting_list.append(
-                        ingestion_models.Vote(
-                            person = get_new_person(n),
-                            decision=db_constants.VoteDecision.ABSENT_NON_VOTING,
-                        )
-                    )
+            vote_decision = db_constants.VoteDecision.ABSTAIN_NON_VOTING
+            assign_constant(driver, i, j, vote_decision, voting_list)           
     return voting_list
 
 
@@ -541,7 +378,13 @@ def parse_single_matter(
             s_word = driver.find_element(
                 By.ID, "ContentPlaceHolder1_lblMeetingDate"
             ).text
-            if parse(s_word) == parse(date[:-6]):  # match the current meeting date
+            s_word_formated = datetime.strptime(
+            s_word, "%m/%d/%Y %I:%M %p"
+            )
+            date_formated = datetime.strptime(
+            date[:-6], "%b %d, %Y %I:%M %p"
+            )
+            if s_word_formated == date_formated:  # match the current meeting date
                 sub_sections, decision = get_matter_decision(
                     driver, i
                 )  # get the decision of the matter
@@ -833,3 +676,9 @@ def get_events(from_dt: datetime, to_dt: datetime) -> list:
 # # events = get_events(datetime.fromisoformat('2022-04-18'), datetime.fromisoformat('2022-04-26'))
 # with open("april-18th-auto", "w") as open_f:
 #     open_f.write(event.to_json(indent=4))
+
+
+# to do:
+# fix parse 
+# put the redundance into the function 
+# try to fix the Optional
