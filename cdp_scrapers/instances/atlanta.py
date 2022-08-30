@@ -2,6 +2,7 @@ from typing import Dict, Optional, Tuple
 import selenium
 import re
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
@@ -11,8 +12,9 @@ from cdp_backend.pipeline import ingestion_models
 from cdp_backend.database import constants as db_constants
 from datetime import datetime
 import logging
-
 log = logging.getLogger(__name__)
+chrome_options = Options()
+chrome_options.add_argument("--headless")
 
 # global variables
 MINUTE_INDEX = []
@@ -46,7 +48,7 @@ def get_single_person(
     if "President" in seat_role:
         member_role = "President"
         member_seat_name = "President"
-    elif "Post" in seat_role:  # need post number?
+    elif "Post" in seat_role: 
         name_list = seat_role.split(" ")
         member_seat_name = "Post " + name_list[1]
     else:
@@ -98,13 +100,13 @@ def get_person() -> dict:
         value: person's ingestion model
     """
     log.info("start get all the person ingestion model")
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+    driver = webdriver.Chrome(options=chrome_options, service=Service(ChromeDriverManager().install()))
     driver.get("https://citycouncil.atlantaga.gov/council-members")
     members = driver.find_elements(By.XPATH, '//*[@id="leftNav_2_0_12"]/ul/li')
     person_dict = {}
     for member in members:
         link = member.find_element(By.TAG_NAME, "a").get_attribute("href")
-        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+        driver = webdriver.Chrome(options=chrome_options, service=Service(ChromeDriverManager().install()))
         driver.get(link)
         member_name = driver.find_element(By.CLASS_NAME, "titlewidget-title").text
         if "President" in member_name:
@@ -469,7 +471,7 @@ def parse_event(url: str) -> ingestion_models.EventIngestionModel:
         the ingestion model for the meeting
     """
     log.info("start get ingestion model for a event")
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+    driver = webdriver.Chrome(options=chrome_options, service=Service(ChromeDriverManager().install()))
     driver.get(url)
 
     WebDriverWait(driver, 10).until(
@@ -699,7 +701,7 @@ def get_events(from_dt: datetime, to_dt: datetime) -> list:
     MINUTE_INDEX = [chr(i) for i in range(ord("A"), ord("Z") + 1)]
     global PERSONS
     PERSONS = get_person()
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+    driver = webdriver.Chrome(options=chrome_options, service=Service(ChromeDriverManager().install()))
     web_url = "https://atlantacityga.iqm2.com/Citizens/Calendar.aspx?Frame=Yes"
     driver.get(web_url)
     if from_dt.year != datetime.today().year:
