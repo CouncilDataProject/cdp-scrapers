@@ -28,10 +28,10 @@ def get_single_person(
 
     Parameter:
     ----------------
-    driver: 
-        webdriver calling the people's dictionary page 
-    member_name: 
-        person's name 
+    driver:
+        webdriver calling the people's dictionary page
+    member_name:
+        person's name
 
     Returns:
     --------------
@@ -89,7 +89,7 @@ def get_single_person(
 
 def get_person() -> dict:
     """
-    Put the informtion get by get_single_person() to dictionary 
+    Put the informtion get by get_single_person() to dictionary
 
     Returns:
     --------------
@@ -126,17 +126,17 @@ def get_person() -> dict:
 
 def get_new_person(name: str) -> ingestion_models.Person:
     """
-    Creates the person ingestion model for the people that are not recored 
+    Creates the person ingestion model for the people that are not recored
 
     Parameter:
     ----------------
     name:str
-        the name of the person 
+        the name of the person
 
     Returns:
     --------------
     ingestion model
-        the person ingestion model for the newly appeared person 
+        the person ingestion model for the newly appeared person
     """
     log.info("start get inactive person ingestion model")
     return ingestion_models.Person(name=name, is_active=False)
@@ -144,17 +144,17 @@ def get_new_person(name: str) -> ingestion_models.Person:
 
 def convert_status_constant(decision: str) -> str:
     """
-    Converts the matter result status to the exsiting constants 
+    Converts the matter result status to the exsiting constants
 
     Parameter:
     ----------------
-    decision: str 
+    decision: str
         decision of the matter
 
     Returns:
     --------------
     db_constants
-        result status constants 
+        result status constants
     """
     log.info("start convert result status for vote ingestion model")
     d_constant = decision
@@ -177,12 +177,12 @@ def assign_constant(
     driver: ChromeDriverManager, i: int, j: int, vote_decision: str, voting_list: list
 ):
     """
-    Assign constants and add Vote to the ingestion models based on the vote decision 
+    Assign constants and add Vote to the ingestion models based on the vote decision
 
     Parameter:
     ----------------
     driver:webdriver
-        webdriver of the matter page 
+        webdriver of the matter page
     i: int
         tr[i] is the matter we are looking at
     j: int
@@ -190,7 +190,7 @@ def assign_constant(
     vote_decision: str
         the vote decision constant of the vote decision
     voting_list: list
-        the list that contains vote ingestion models 
+        the list that contains vote ingestion models
     """
     log.info("start get vote ingestion model for one type of decision")
     v_res = driver.find_element(
@@ -218,7 +218,10 @@ def assign_constant(
         if n in PERSONS:
             person = PERSONS[n]
         voting_list.append(
-            ingestion_models.Vote(person=person, decision=vote_decision,)
+            ingestion_models.Vote(
+                person=person,
+                decision=vote_decision,
+            )
         )
     return voting_list
 
@@ -227,13 +230,13 @@ def get_voting_result(
     driver: ChromeDriverManager, sub_sections_len: int, i: int
 ) -> list:
     """
-    Scrapes and converts the voting decisions to the exsiting constants 
+    Scrapes and converts the voting decisions to the exsiting constants
 
     Parameter:
     ----------------
     driver:webdriver
-        webdriver of the matter page 
-    sub_sections_len: int 
+        webdriver of the matter page
+    sub_sections_len: int
         the row number in the block under the matter for the current date
     i: int
         tr[i] is the matter we are looking at
@@ -281,13 +284,13 @@ def get_matter_status(driver: ChromeDriverManager, i: int) -> Tuple[list, str]:
     Parameter:
     ----------------
     driver:webdriver
-        webdriver of the matter page 
+        webdriver of the matter page
     i: int
         tracker used to loop the rows in the matter page
 
     Returns:
     --------------
-    sub_sections: element 
+    sub_sections: element
         the block under the matter for the current date
     decision_constant: element
         the matter decision constant
@@ -319,7 +322,7 @@ def parse_single_matter(
     Parameter:
     ----------------
     driver:webdriver
-        webdriver of the matter page 
+        webdriver of the matter page
     matter:element
         the matter we are looking at
 
@@ -342,7 +345,10 @@ def parse_single_matter(
     # get to the specific page for each matter
     s_matter = WebDriverWait(driver, 10).until(
         EC.presence_of_all_elements_located(
-            (By.XPATH, '//*[@id="ContentPlaceHolder1_divHistory"]/div/table/tbody/tr',)
+            (
+                By.XPATH,
+                '//*[@id="ContentPlaceHolder1_divHistory"]/div/table/tbody/tr',
+            )
         )
     )
     sponsor_raw = driver.find_element(
@@ -492,29 +498,24 @@ def parse_event(url: str) -> ingestion_models.EventIngestionModel:
     ):
         try:
             if (
-                (
-                    len(
-                        driver.find_elements(
-                            By.XPATH,
-                            '//*[@id="MeetingDetail"]/tbody/tr['
-                            + str(i)
-                            + "]/td[1]/strong",
-                        )
+                len(
+                    driver.find_elements(
+                        By.XPATH,
+                        '//*[@id="MeetingDetail"]/tbody/tr['
+                        + str(i)
+                        + "]/td[1]/strong",
                     )
                 )
-                != 0
-                and (
-                    len(
-                        driver.find_element(
-                            By.XPATH,
-                            '//*[@id="MeetingDetail"]/tbody/tr['
-                            + str(i)
-                            + "]/td[1]/strong",
-                        ).text
-                    )
+            ) != 0 and (
+                len(
+                    driver.find_element(
+                        By.XPATH,
+                        '//*[@id="MeetingDetail"]/tbody/tr['
+                        + str(i)
+                        + "]/td[1]/strong",
+                    ).text
                 )
-                != 0
-            ):
+            ) != 0:
                 if (
                     driver.find_element(
                         By.XPATH,
@@ -612,7 +613,7 @@ def get_year(driver: ChromeDriverManager, url: str, from_dt: datetime) -> str:
 
     Parameter:
     ----------------
-    driver:webdriver 
+    driver:webdriver
         empty webdriver
     url:str
         the url of the calender page
@@ -620,7 +621,7 @@ def get_year(driver: ChromeDriverManager, url: str, from_dt: datetime) -> str:
     Returns:
     --------------
     link:str
-        the link to the calender of the year that we are looking for 
+        the link to the calender of the year that we are looking for
     """
     log.info("start get the current year's calender page")
     driver.get(url)
@@ -640,14 +641,14 @@ def get_date(
 
     Parameter:
     ----------------
-    driver:webdriver 
+    driver:webdriver
         empty webdriver
     url:str
         the url of the calender page
     from_dt:
-        the begin date 
+        the begin date
     to_date:
-        the end date 
+        the end date
 
     Returns:
     --------------
@@ -679,14 +680,14 @@ def get_date(
 def get_events(from_dt: datetime, to_dt: datetime) -> list:
     """
     gets the right calender link
-    feed it to the function that get a list of ingestion models 
+    feed it to the function that get a list of ingestion models
 
     Parameter:
     ----------------
     from_dt:
-        the begin date 
+        the begin date
     to_date:
-        the end date 
+        the end date
 
     Returns:
     --------------
