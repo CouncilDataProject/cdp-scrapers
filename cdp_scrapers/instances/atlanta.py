@@ -44,17 +44,17 @@ def get_single_person(
     log.info("start get active person ingestion model")
     seat_role = driver.find_element(By.CLASS_NAME, "titlewidget-subtitle").text
     member_role = "Member"
-    member_seat_name = "District"
-    member_seat_area = "Citywide"
+    member_seat_area = None
+    member_seat_name = "President"
     if "President" in seat_role:
         member_role = "President"
-        member_seat_name = "President"
+        member_seat_area = "Citywide"
     elif "Post" in seat_role:
         name_list = seat_role.split(" ")
         member_seat_name = "Post " + name_list[1]
+        member_seat_area = "Citywide"
     else:
-        area_list = seat_role.split(" ")
-        member_seat_area = area_list[1]
+        member_seat_name = seat_role
     member_pic = driver.find_element(
         By.CSS_SELECTOR, ".image_widget img"
     ).get_attribute("src")
@@ -181,7 +181,12 @@ def convert_status_constant(decision: str) -> str:
 
 
 def assign_constant(
-    driver: ChromeDriverManager, i: int, j: int, vote_decision: str, voting_list: list
+    driver: ChromeDriverManager,
+    i: int,
+    j: int,
+    vote_decision: str,
+    voting_list: list,
+    body_name: str,
 ):
     """
     Assign constants and add Vote to the ingestion models based on the vote decision
@@ -198,6 +203,8 @@ def assign_constant(
         the vote decision constant of the vote decision
     voting_list: list
         the list that contains vote ingestion models
+    body_name: str
+        the body name of the current meeting
     """
     log.info("start get vote ingestion model for one type of decision")
     v_res = driver.find_element(
@@ -224,6 +231,16 @@ def assign_constant(
         person = get_new_person(n)
         if n in PERSONS:
             person = PERSONS[n]
+            if person.seat is not None:
+                if person.seat.roles is not None:
+                    person.seat.roles[0].body = ingestion_models.Body(
+                        body_name, is_active=True
+                    )
+                    if (
+                        body_name == "City Council"
+                        and person.seat.roles[0].title == "Member"
+                    ):
+                        person.seat.roles[0].title = "Councilmember"
         voting_list.append(
             ingestion_models.Vote(
                 person=person,
@@ -234,7 +251,7 @@ def assign_constant(
 
 
 def get_voting_result(
-    driver: ChromeDriverManager, sub_sections_len: int, i: int
+    driver: ChromeDriverManager, sub_sections_len: int, i: int, body_name: str
 ) -> list:
     """
     Scrapes and converts the voting decisions to the exsiting constants
@@ -247,6 +264,8 @@ def get_voting_result(
         the row number in the block under the matter for the current date
     i: int
         tr[i] is the matter we are looking at
+    body_name: str
+        the body name of the current meeting
 
     Returns:
     --------------
@@ -267,20 +286,20 @@ def get_voting_result(
         sub_content_role = sub_content.find_element(By.CLASS_NAME, "Role").text
         if "AYES" in sub_content_role:
             vote_decision = db_constants.VoteDecision.APPROVE
-            assign_constant(driver, i, j, vote_decision, voting_list)
+            assign_constant(driver, i, j, vote_decision, voting_list, body_name)
         if "NAYS" in sub_content_role:
             vote_decision = db_constants.VoteDecision.REJECT
-            assign_constant(driver, i, j, vote_decision, voting_list)
+            assign_constant(driver, i, j, vote_decision, voting_list, body_name)
         if (
             "ABSENT" in sub_content_role
             or "AWAY" in sub_content_role
             or "EXCUSED" in sub_content_role
         ):
             vote_decision = db_constants.VoteDecision.ABSENT_NON_VOTING
-            assign_constant(driver, i, j, vote_decision, voting_list)
+            assign_constant(driver, i, j, vote_decision, voting_list, body_name)
         if "ABSTAIN" in sub_content_role:
             vote_decision = db_constants.VoteDecision.ABSTAIN_NON_VOTING
-            assign_constant(driver, i, j, vote_decision, voting_list)
+            assign_constant(driver, i, j, vote_decision, voting_list, body_name)
     return voting_list
 
 
@@ -321,7 +340,7 @@ def get_matter_status(driver: ChromeDriverManager, i: int) -> Tuple[list, str]:
 
 
 def parse_single_matter(
-    driver: ChromeDriverManager, test: str, item: str
+    driver: ChromeDriverManager, test: str, item: str, body_name: str
 ) -> ingestion_models.EventMinutesItem:
     """
     Get the minute items that contains a matter
@@ -332,6 +351,8 @@ def parse_single_matter(
         webdriver of the matter page
     matter:element
         the matter we are looking at
+    body_name: str
+        the body name of the current meeting
 
     Returns:
     --------------
@@ -434,10 +455,14 @@ def parse_single_matter(
                 else:
                     decision = db_constants.EventMinutesItemDecision.FAILED
                 if "[" in test:
-                    voting_list = get_voting_result(driver, len(sub_sections), i)
+                    voting_list = get_voting_result(
+                        driver, len(sub_sections), i, body_name
+                    )
         if len(sponsors) != 0:
             return ingestion_models.EventMinutesItem(
-                minutes_item=ingestion_models.MinutesItem(matter_name),
+                minutes_item=ingestion_models.MinutesItem(
+                    name=matter_name.title(), description=matter_title
+                ),
                 matter=ingestion_models.Matter(
                     matter_name,
                     matter_type=matter_type,
@@ -449,7 +474,9 @@ def parse_single_matter(
                 votes=voting_list,
             )
     return ingestion_models.EventMinutesItem(
-        minutes_item=ingestion_models.MinutesItem(matter_name),
+        minutes_item=ingestion_models.MinutesItem(
+            name=matter_name.title(), description=matter_title
+        ),
         matter=ingestion_models.Matter(
             matter_name,
             matter_type=matter_type,
@@ -490,6 +517,8 @@ def parse_event(url: str) -> ingestion_models.EventIngestionModel:
     body_name = driver.find_element(
         By.ID, "ContentPlaceHolder1_lblMeetingGroup"
     ).text  # body name
+    if body_name == "Atlanta City Council":
+        body_name = "City Council"
     video_link = driver.find_element(By.ID, "MediaPlayer1_html5_api").get_attribute(
         "src"
     )  # video link (mp4)
@@ -549,7 +578,9 @@ def parse_event(url: str) -> ingestion_models.EventIngestionModel:
                             '//*[@id="MeetingDetail"]/tbody/tr[' + str(i) + "]/td[2]",
                         ).text
                         minute_model = ingestion_models.EventMinutesItem(
-                            minutes_item=ingestion_models.MinutesItem(minute_title)
+                            minutes_item=ingestion_models.MinutesItem(
+                                minute_title.title()
+                            )
                         )
                         event_minutes_items.append(minute_model)
             elif (
@@ -566,7 +597,7 @@ def parse_event(url: str) -> ingestion_models.EventIngestionModel:
                 test = matter.find_element(By.CLASS_NAME, "ItemVoteResult").text
                 item = matter.find_element(By.CLASS_NAME, "AgendaOutlineLink").text
                 if len(item) != 0:
-                    matter_model = parse_single_matter(driver, test, item)
+                    matter_model = parse_single_matter(driver, test, item, body_name)
                     event_minutes_items.append(matter_model)
             elif (
                 len(
@@ -582,7 +613,7 @@ def parse_event(url: str) -> ingestion_models.EventIngestionModel:
                 test = matter.find_element(By.CLASS_NAME, "ItemVoteResult").text
                 item = matter.find_element(By.CLASS_NAME, "AgendaOutlineLink").text
                 if len(item) != 0:
-                    matter_model = parse_single_matter(driver, test, item)
+                    matter_model = parse_single_matter(driver, test, item, body_name)
                     event_minutes_items.append(matter_model)
             i += 1
         except (
