@@ -343,7 +343,11 @@ def get_matter_status(driver: ChromeDriverManager, i: int) -> Tuple[list, str]:
 
 
 def parse_single_matter(
-    driver: ChromeDriverManager, test: str, item: str, body_name: str
+    driver: ChromeDriverManager,
+    test: str,
+    item: str,
+    body_name: str,
+    s_word_formated: datetime,
 ) -> ingestion_models.EventMinutesItem:
     """
     Get the minute items that contains a matter
@@ -356,6 +360,8 @@ def parse_single_matter(
         the matter we are looking at
     body_name: str
         the body name of the current meeting
+    s_word_formated: datetime
+        the date of the current meeting
 
     Returns:
     --------------
@@ -445,10 +451,6 @@ def parse_single_matter(
                 + "]",
             )
             date = header.find_element(By.CLASS_NAME, "Date").text
-            s_word = driver.find_element(
-                By.ID, "ContentPlaceHolder1_lblMeetingDate"
-            ).text
-            s_word_formated = datetime.strptime(s_word, "%m/%d/%Y %I:%M %p")
             date_formated = datetime.strptime(date[:-6], "%b %d, %Y %I:%M %p")
             if s_word_formated == date_formated:  # match the current meeting date
                 sub_sections, status = get_matter_status(
@@ -526,6 +528,8 @@ def parse_event(url: str) -> ingestion_models.EventIngestionModel:
     ).text  # body name
     if body_name == "Atlanta City Council":
         body_name = "City Council"
+    s_word = driver.find_element(By.ID, "ContentPlaceHolder1_lblMeetingDate").text
+    s_word_formated = datetime.strptime(s_word, "%m/%d/%Y %I:%M %p")
     video_link = driver.find_element(By.ID, "MediaPlayer1_html5_api").get_attribute(
         "src"
     )  # video link (mp4)
@@ -604,7 +608,9 @@ def parse_event(url: str) -> ingestion_models.EventIngestionModel:
                 test = matter.find_element(By.CLASS_NAME, "ItemVoteResult").text
                 item = matter.find_element(By.CLASS_NAME, "AgendaOutlineLink").text
                 if len(item) != 0:
-                    matter_model = parse_single_matter(driver, test, item, body_name)
+                    matter_model = parse_single_matter(
+                        driver, test, item, body_name, s_word_formated
+                    )
                     event_minutes_items.append(matter_model)
             elif (
                 len(
@@ -620,7 +626,9 @@ def parse_event(url: str) -> ingestion_models.EventIngestionModel:
                 test = matter.find_element(By.CLASS_NAME, "ItemVoteResult").text
                 item = matter.find_element(By.CLASS_NAME, "AgendaOutlineLink").text
                 if len(item) != 0:
-                    matter_model = parse_single_matter(driver, test, item, body_name)
+                    matter_model = parse_single_matter(
+                        driver, test, item, body_name, s_word_formated
+                    )
                     event_minutes_items.append(matter_model)
             i += 1
         except (
@@ -645,7 +653,7 @@ def parse_event(url: str) -> ingestion_models.EventIngestionModel:
             ingestion_models.Session(
                 video_uri=video_link,
                 session_index=0,
-                session_datetime=datetime.utcnow(),
+                session_datetime=s_word_formated,
             )
         ],
         event_minutes_items=event_minutes_items,
