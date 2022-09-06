@@ -43,11 +43,11 @@ def get_single_person(
     """
     log.info("start get active person ingestion model")
     seat_role = driver.find_element(By.CLASS_NAME, "titlewidget-subtitle").text
-    member_role = "Member"
+    member_role = db_constants.RoleTitle.MEMBER
     member_seat_area = None
-    member_seat_name = "President"
+    member_seat_name = db_constants.RoleTitle.COUNCILPRESIDENT
     if "President" in seat_role:
-        member_role = "President"
+        member_role = db_constants.RoleTitle.COUNCILPRESIDENT
         member_seat_area = "Citywide"
     elif "Post" in seat_role:
         name_list = seat_role.split(" ")
@@ -236,11 +236,14 @@ def assign_constant(
                     person.seat.roles[0].body = ingestion_models.Body(
                         body_name, is_active=True
                     )
-                    if (
-                        body_name == "City Council"
-                        and person.seat.roles[0].title == "Member"
-                    ):
-                        person.seat.roles[0].title = "Councilmember"
+                    if body_name == "City Council":
+                        if (
+                            person.seat.roles[0].title
+                            != db_constants.RoleTitle.COUNCILPRESIDENT
+                        ):
+                            person.seat.roles[
+                                0
+                            ].title = db_constants.RoleTitle.COUNCILMEMBER
         voting_list.append(
             ingestion_models.Vote(
                 person=person,
@@ -365,9 +368,13 @@ def parse_single_matter(
     matter_title = item[
         12:
     ]  # the paragraph the describes the matter eg. "A COMMUNICATION FROM ..."
-    matter_type = " ".join(
-        re.split("BY |FROM", matter_title)[0].split(" ")[1:-1]
-    )  # the type of the matter eg. "COMMUNICATION", "SUBSTITUTE ORDINANCE"
+    matter_type = (
+        " "  # the type of the matter eg. "COMMUNICATION", "SUBSTITUTE ORDINANCE"
+    )
+    matter_type_temp = re.split(" BY| FROM", matter_title)[0]
+    matter_type_list = re.split("A |AN ", matter_type_temp)
+    if len(matter_type_list) > 1:
+        matter_type = matter_type_list[1]
     link = driver.find_element("link text", item)
     link.click()
     # get to the specific page for each matter
