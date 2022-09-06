@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Tuple
+from typing import Optional, Tuple
 import selenium
 import re
 from selenium import webdriver
@@ -16,10 +16,6 @@ import logging
 log = logging.getLogger(__name__)
 chrome_options = Options()
 chrome_options.add_argument("--headless")
-
-# global variables
-MINUTE_INDEX = []
-PERSONS: Dict[str, ingestion_models.Person] = {}
 
 
 def get_single_person(
@@ -187,6 +183,7 @@ def assign_constant(
     vote_decision: str,
     voting_list: list,
     body_name: str,
+    PERSONS: dict,
 ):
     """
     Assign constants and add Vote to the ingestion models based on the vote decision
@@ -205,6 +202,8 @@ def assign_constant(
         the list that contains vote ingestion models
     body_name: str
         the body name of the current meeting
+    PERSONS: dict
+        Dict[str, ingestion_models.Person]
     """
     log.info("start get vote ingestion model for one type of decision")
     v_res = driver.find_element(
@@ -254,7 +253,11 @@ def assign_constant(
 
 
 def get_voting_result(
-    driver: ChromeDriverManager, sub_sections_len: int, i: int, body_name: str
+    driver: ChromeDriverManager,
+    sub_sections_len: int,
+    i: int,
+    body_name: str,
+    PERSONS: dict,
 ) -> list:
     """
     Scrapes and converts the voting decisions to the exsiting constants
@@ -269,6 +272,8 @@ def get_voting_result(
         tr[i] is the matter we are looking at
     body_name: str
         the body name of the current meeting
+    PERSONS: dict
+        Dict[str, ingestion_models.Person]
 
     Returns:
     --------------
@@ -289,20 +294,28 @@ def get_voting_result(
         sub_content_role = sub_content.find_element(By.CLASS_NAME, "Role").text
         if "AYES" in sub_content_role:
             vote_decision = db_constants.VoteDecision.APPROVE
-            assign_constant(driver, i, j, vote_decision, voting_list, body_name)
+            assign_constant(
+                driver, i, j, vote_decision, voting_list, body_name, PERSONS
+            )
         if "NAYS" in sub_content_role:
             vote_decision = db_constants.VoteDecision.REJECT
-            assign_constant(driver, i, j, vote_decision, voting_list, body_name)
+            assign_constant(
+                driver, i, j, vote_decision, voting_list, body_name, PERSONS
+            )
         if (
             "ABSENT" in sub_content_role
             or "AWAY" in sub_content_role
             or "EXCUSED" in sub_content_role
         ):
             vote_decision = db_constants.VoteDecision.ABSENT_NON_VOTING
-            assign_constant(driver, i, j, vote_decision, voting_list, body_name)
+            assign_constant(
+                driver, i, j, vote_decision, voting_list, body_name, PERSONS
+            )
         if "ABSTAIN" in sub_content_role:
             vote_decision = db_constants.VoteDecision.ABSTAIN_NON_VOTING
-            assign_constant(driver, i, j, vote_decision, voting_list, body_name)
+            assign_constant(
+                driver, i, j, vote_decision, voting_list, body_name, PERSONS
+            )
     return voting_list
 
 
@@ -348,6 +361,7 @@ def parse_single_matter(
     item: str,
     body_name: str,
     s_word_formated: datetime,
+    PERSONS: dict,
 ) -> ingestion_models.EventMinutesItem:
     """
     Get the minute items that contains a matter
@@ -362,6 +376,8 @@ def parse_single_matter(
         the body name of the current meeting
     s_word_formated: datetime
         the date of the current meeting
+    PERSONS: dict
+        Dict[str, ingestion_models.Person]
 
     Returns:
     --------------
@@ -465,7 +481,7 @@ def parse_single_matter(
                     decision = db_constants.EventMinutesItemDecision.FAILED
                 if "[" in test:
                     voting_list = get_voting_result(
-                        driver, len(sub_sections), i, body_name
+                        driver, len(sub_sections), i, body_name, PERSONS
                     )
         if len(sponsors) != 0:
             return ingestion_models.EventMinutesItem(
@@ -512,6 +528,10 @@ def parse_event(url: str) -> ingestion_models.EventIngestionModel:
         the ingestion model for the meeting
     """
     log.info("start get ingestion model for a event")
+
+    MINUTE_INDEX = [chr(i) for i in range(ord("A"), ord("Z") + 1)]
+    PERSONS = get_person()
+
     driver = webdriver.Chrome(
         options=chrome_options, service=Service(ChromeDriverManager().install())
     )
@@ -609,7 +629,7 @@ def parse_event(url: str) -> ingestion_models.EventIngestionModel:
                 item = matter.find_element(By.CLASS_NAME, "AgendaOutlineLink").text
                 if len(item) != 0:
                     matter_model = parse_single_matter(
-                        driver, test, item, body_name, s_word_formated
+                        driver, test, item, body_name, s_word_formated, PERSONS
                     )
                     event_minutes_items.append(matter_model)
             elif (
@@ -627,7 +647,7 @@ def parse_event(url: str) -> ingestion_models.EventIngestionModel:
                 item = matter.find_element(By.CLASS_NAME, "AgendaOutlineLink").text
                 if len(item) != 0:
                     matter_model = parse_single_matter(
-                        driver, test, item, body_name, s_word_formated
+                        driver, test, item, body_name, s_word_formated, PERSONS
                     )
                     event_minutes_items.append(matter_model)
             i += 1
@@ -750,10 +770,6 @@ def get_events(from_dt: datetime, to_dt: datetime) -> list:
         all the ingestion models for the selected date range
     """
     log.info("start a date range and run all the functions")
-    global MINUTE_INDEX
-    MINUTE_INDEX = [chr(i) for i in range(ord("A"), ord("Z") + 1)]
-    global PERSONS
-    PERSONS = get_person()
     driver = webdriver.Chrome(
         options=chrome_options, service=Service(ChromeDriverManager().install())
     )
