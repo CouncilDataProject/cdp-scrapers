@@ -82,7 +82,7 @@ def get_single_person(driver: "WebDriver", member_name: str) -> ingestion_models
     )
 
 
-def get_person(driver: "WebDriver") -> dict:
+def get_person() -> dict:
     """
     Put the informtion get by get_single_person() to dictionary
 
@@ -92,7 +92,18 @@ def get_person(driver: "WebDriver") -> dict:
         key: person's name
         value: person's ingestion model
     """
+    from selenium import webdriver
     from selenium.webdriver.common.by import By
+    from selenium.webdriver.chrome.options import Options
+    from selenium.webdriver.chrome.service import Service
+    from webdriver_manager.chrome import ChromeDriverManager
+
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+
+    driver = webdriver.Chrome(
+        options=chrome_options, service=Service(ChromeDriverManager().install())
+    )
 
     log.info("start get all the person ingestion model")
     driver.get("https://citycouncil.atlantaga.gov/council-members")
@@ -100,6 +111,9 @@ def get_person(driver: "WebDriver") -> dict:
     person_dict = {}
     for member in members:
         link = member.find_element(By.TAG_NAME, "a").get_attribute("href")
+        driver = webdriver.Chrome(
+            options=chrome_options, service=Service(ChromeDriverManager().install())
+        )
         driver.get(link)
         member_name = driver.find_element(By.CLASS_NAME, "titlewidget-title").text
         if "President" in member_name:
@@ -113,7 +127,9 @@ def get_person(driver: "WebDriver") -> dict:
             else:
                 raise ValueError("Person name could not be constructed.")
         member_model = get_single_person(driver, member_name)
+        driver.quit()
         person_dict[member_name] = member_model
+    driver.quit()
     return person_dict
 
 
@@ -520,7 +536,6 @@ def parse_single_matter(
 
 def parse_event(
     url: str,
-    driver: "WebDriver",
 ) -> ingestion_models.EventIngestionModel:
     """
     Scrapes all the information for a meeting
@@ -540,10 +555,22 @@ def parse_event(
     from selenium.webdriver.support.ui import WebDriverWait
     from selenium.webdriver.support import expected_conditions as EC
 
+    from selenium import webdriver
+    from selenium.webdriver.chrome.options import Options
+    from selenium.webdriver.chrome.service import Service
+    from webdriver_manager.chrome import ChromeDriverManager
+
     log.info("start get ingestion model for a event")
 
     MINUTE_INDEX = [chr(i) for i in range(ord("A"), ord("Z") + 1)]
-    PERSONS = get_person(driver)
+    PERSONS = get_person()
+
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+
+    driver = webdriver.Chrome(
+        options=chrome_options, service=Service(ChromeDriverManager().install())
+    )
 
     driver.get(url)
 
@@ -767,10 +794,11 @@ def get_date(
                 By.CSS_SELECTOR, ".WithoutSeparator a"
             ).get_attribute("onclick")
             link = "https://atlantacityga.iqm2.com" + link_temp[23:-3]
-            event = parse_event(link, driver)
+            event = parse_event(link)
             events.append(event)
         else:
             continue
+    driver.quit()
     return events
 
 
@@ -809,5 +837,4 @@ def get_events(from_dt: datetime, to_dt: datetime) -> list:
     if from_dt.year != datetime.today().year:
         web_url = get_year(driver, web_url, from_dt)
     events = get_date(driver, web_url, from_dt, to_dt)
-    driver.quit()
     return events
