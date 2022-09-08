@@ -1,0 +1,1033 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>cdp_scrapers.instances.atlanta &mdash; cdp-scrapers 0.4.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> cdp-scrapers
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.4.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#stable-release">Stable release</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#from-sources">From sources</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finding_legistar_id.html">Searching for your Municipality's Legistar ID</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../legistar_scraper.html">LegistarScraper</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../legistar_scraper.html#filtering">Filtering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../legistar_scraper.html#legistar-to-cdp-ingestionmodel">Legistar to CDP <code class="docutils literal notranslate"><span class="pre">IngestionModel</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../legistar_scraper.html#instance-specific-scraping">Instance-Specific Scraping</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../legistar_scraper.html#scraping-for-session-video-uri">Scraping for <code class="docutils literal notranslate"><span class="pre">Session.video_uri</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../legistar_scraper.html#information-from-other-sources">Information From Other Sources</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../legistar_scraper.html#other-notes">Other Notes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Package Modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../cdp_scrapers.html">cdp_scrapers package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../cdp_scrapers.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../cdp_scrapers.instances.html">cdp_scrapers.instances package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../cdp_scrapers.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../cdp_scrapers.html#module-cdp_scrapers.legistar_content_parsers">cdp_scrapers.legistar_content_parsers module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../cdp_scrapers.html#module-cdp_scrapers.legistar_utils">cdp_scrapers.legistar_utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../cdp_scrapers.html#module-cdp_scrapers.scraper_utils">cdp_scrapers.scraper_utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../cdp_scrapers.html#module-cdp_scrapers.types">cdp_scrapers.types module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../cdp_scrapers.html#module-cdp_scrapers">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../contributing.html#get-started">Get Started!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../contributing.html#deploying">Deploying</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Core Components:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cdp_scrapers.instances.empty.get_events.html">cdp_scrapers.instances.empty.get_events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cdp_scrapers.legistar_utils.LegistarScraper.html">cdp_scrapers.legistar_utils.LegistarScraper</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">cdp-scrapers</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../cdp_scrapers.html">cdp_scrapers</a> &raquo;</li>
+        
+      <li>cdp_scrapers.instances.atlanta</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for cdp_scrapers.instances.atlanta</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span> <span class="nn">selenium</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">selenium</span> <span class="kn">import</span> <span class="n">webdriver</span>
+<span class="kn">from</span> <span class="nn">selenium.webdriver.chrome.options</span> <span class="kn">import</span> <span class="n">Options</span>
+<span class="kn">from</span> <span class="nn">selenium.webdriver.common.by</span> <span class="kn">import</span> <span class="n">By</span>
+<span class="kn">from</span> <span class="nn">selenium.webdriver.chrome.service</span> <span class="kn">import</span> <span class="n">Service</span>
+<span class="kn">from</span> <span class="nn">selenium.webdriver.support.ui</span> <span class="kn">import</span> <span class="n">WebDriverWait</span>
+<span class="kn">from</span> <span class="nn">selenium.webdriver.support</span> <span class="kn">import</span> <span class="n">expected_conditions</span> <span class="k">as</span> <span class="n">EC</span>
+<span class="kn">from</span> <span class="nn">webdriver_manager.chrome</span> <span class="kn">import</span> <span class="n">ChromeDriverManager</span>
+<span class="kn">from</span> <span class="nn">cdp_backend.pipeline</span> <span class="kn">import</span> <span class="n">ingestion_models</span>
+<span class="kn">from</span> <span class="nn">cdp_backend.database</span> <span class="kn">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">db_constants</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">chrome_options</span> <span class="o">=</span> <span class="n">Options</span><span class="p">()</span>
+<span class="n">chrome_options</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--headless&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="get_single_person"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.get_single_person">[docs]</a><span class="k">def</span> <span class="nf">get_single_person</span><span class="p">(</span>
+    <span class="n">driver</span><span class="p">:</span> <span class="n">ChromeDriverManager</span><span class="p">,</span> <span class="n">member_name</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ingestion_models</span><span class="o">.</span><span class="n">Person</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get all the information fot one person</span>
+<span class="sd">    Includes: role, seat, picture, phone, email</span>
+
+<span class="sd">    Parameter:</span>
+<span class="sd">    ----------------</span>
+<span class="sd">    driver:</span>
+<span class="sd">        webdriver calling the people&#39;s dictionary page</span>
+<span class="sd">    member_name:</span>
+<span class="sd">        person&#39;s name</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------------</span>
+<span class="sd">    ingestion_models</span>
+<span class="sd">        the ingestion model for the person&#39;s part</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;start get active person ingestion model&quot;</span><span class="p">)</span>
+    <span class="n">seat_role</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CLASS_NAME</span><span class="p">,</span> <span class="s2">&quot;titlewidget-subtitle&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+    <span class="n">member_role</span> <span class="o">=</span> <span class="n">db_constants</span><span class="o">.</span><span class="n">RoleTitle</span><span class="o">.</span><span class="n">MEMBER</span>
+    <span class="n">member_seat_area</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">member_seat_name</span> <span class="o">=</span> <span class="n">db_constants</span><span class="o">.</span><span class="n">RoleTitle</span><span class="o">.</span><span class="n">COUNCILPRESIDENT</span>
+    <span class="k">if</span> <span class="s2">&quot;President&quot;</span> <span class="ow">in</span> <span class="n">seat_role</span><span class="p">:</span>
+        <span class="n">member_role</span> <span class="o">=</span> <span class="n">db_constants</span><span class="o">.</span><span class="n">RoleTitle</span><span class="o">.</span><span class="n">COUNCILPRESIDENT</span>
+        <span class="n">member_seat_area</span> <span class="o">=</span> <span class="s2">&quot;Citywide&quot;</span>
+    <span class="k">elif</span> <span class="s2">&quot;Post&quot;</span> <span class="ow">in</span> <span class="n">seat_role</span><span class="p">:</span>
+        <span class="n">name_list</span> <span class="o">=</span> <span class="n">seat_role</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+        <span class="n">member_seat_name</span> <span class="o">=</span> <span class="s2">&quot;Post &quot;</span> <span class="o">+</span> <span class="n">name_list</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">member_seat_area</span> <span class="o">=</span> <span class="s2">&quot;Citywide&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">member_seat_name</span> <span class="o">=</span> <span class="n">seat_role</span>
+    <span class="n">member_pic</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span>
+        <span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="s2">&quot;.image_widget img&quot;</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">get_attribute</span><span class="p">(</span><span class="s2">&quot;src&quot;</span><span class="p">)</span>
+    <span class="n">temp_email</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span> <span class="s2">&quot;// a[contains(text(),&#39;Click Here&#39;)]&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">get_attribute</span><span class="p">(</span><span class="s2">&quot;href&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">member_email</span> <span class="o">=</span> <span class="n">temp_email</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">member_details</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span>
+            <span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span> <span class="s2">&quot;//*[contains(@id, &#39;widget_340_&#39;)]&quot;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">text</span>
+    <span class="k">except</span> <span class="p">(</span><span class="n">selenium</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">NoSuchElementException</span><span class="p">):</span>
+        <span class="n">member_details</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span>
+            <span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span> <span class="s2">&quot;//*[contains(@id, &#39;widget_437_&#39;)]&quot;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">text</span>
+    <span class="n">detail_str</span> <span class="o">=</span> <span class="n">member_details</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">phone_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">detail_str</span> <span class="k">if</span> <span class="s2">&quot;P&quot;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">]</span>
+    <span class="n">member_phone</span> <span class="o">=</span> <span class="n">phone_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;: &quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">ingestion_models</span><span class="o">.</span><span class="n">Person</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">member_name</span><span class="p">,</span>
+        <span class="n">is_active</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">email</span><span class="o">=</span><span class="n">member_email</span><span class="p">,</span>
+        <span class="n">phone</span><span class="o">=</span><span class="n">member_phone</span><span class="p">,</span>
+        <span class="n">picture_uri</span><span class="o">=</span><span class="n">member_pic</span><span class="p">,</span>
+        <span class="n">seat</span><span class="o">=</span><span class="n">ingestion_models</span><span class="o">.</span><span class="n">Seat</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">member_seat_name</span><span class="p">,</span>
+            <span class="n">electoral_area</span><span class="o">=</span><span class="n">member_seat_area</span><span class="p">,</span>
+            <span class="n">roles</span><span class="o">=</span><span class="p">[</span><span class="n">ingestion_models</span><span class="o">.</span><span class="n">Role</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">member_role</span><span class="p">)],</span>
+        <span class="p">),</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_person"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.get_person">[docs]</a><span class="k">def</span> <span class="nf">get_person</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Put the informtion get by get_single_person() to dictionary</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------------</span>
+<span class="sd">    dictionary</span>
+<span class="sd">        key: person&#39;s name</span>
+<span class="sd">        value: person&#39;s ingestion model</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;start get all the person ingestion model&quot;</span><span class="p">)</span>
+    <span class="n">driver</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Chrome</span><span class="p">(</span>
+        <span class="n">options</span><span class="o">=</span><span class="n">chrome_options</span><span class="p">,</span> <span class="n">service</span><span class="o">=</span><span class="n">Service</span><span class="p">(</span><span class="n">ChromeDriverManager</span><span class="p">()</span><span class="o">.</span><span class="n">install</span><span class="p">())</span>
+    <span class="p">)</span>
+    <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://citycouncil.atlantaga.gov/council-members&quot;</span><span class="p">)</span>
+    <span class="n">members</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_elements</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span> <span class="s1">&#39;//*[@id=&quot;leftNav_2_0_12&quot;]/ul/li&#39;</span><span class="p">)</span>
+    <span class="n">person_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="n">members</span><span class="p">:</span>
+        <span class="n">link</span> <span class="o">=</span> <span class="n">member</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">TAG_NAME</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get_attribute</span><span class="p">(</span><span class="s2">&quot;href&quot;</span><span class="p">)</span>
+        <span class="n">driver</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Chrome</span><span class="p">(</span>
+            <span class="n">options</span><span class="o">=</span><span class="n">chrome_options</span><span class="p">,</span> <span class="n">service</span><span class="o">=</span><span class="n">Service</span><span class="p">(</span><span class="n">ChromeDriverManager</span><span class="p">()</span><span class="o">.</span><span class="n">install</span><span class="p">())</span>
+        <span class="p">)</span>
+        <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">link</span><span class="p">)</span>
+        <span class="n">member_name</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CLASS_NAME</span><span class="p">,</span> <span class="s2">&quot;titlewidget-title&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+        <span class="k">if</span> <span class="s2">&quot;President&quot;</span> <span class="ow">in</span> <span class="n">member_name</span><span class="p">:</span>
+            <span class="n">member_name</span> <span class="o">=</span> <span class="n">member_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;President &quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">current_name</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span>
+                <span class="sa">r</span><span class="s2">&quot;([a-zA-Z]+)((\ {0,1}[a-zA-Z]+\.{0,1}\ )|(\ ))([a-zA-Z]+)&quot;</span><span class="p">,</span> <span class="n">member_name</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">current_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">member_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_name</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">current_name</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Person name could not be constructed.&quot;</span><span class="p">)</span>
+        <span class="n">member_model</span> <span class="o">=</span> <span class="n">get_single_person</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">member_name</span><span class="p">)</span>
+        <span class="n">driver</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
+        <span class="n">person_dict</span><span class="p">[</span><span class="n">member_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">member_model</span>
+    <span class="n">driver</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">person_dict</span></div>
+
+
+<div class="viewcode-block" id="get_new_person"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.get_new_person">[docs]</a><span class="k">def</span> <span class="nf">get_new_person</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ingestion_models</span><span class="o">.</span><span class="n">Person</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates the person ingestion model for the people that are not recored</span>
+
+<span class="sd">    Parameter:</span>
+<span class="sd">    ----------------</span>
+<span class="sd">    name:str</span>
+<span class="sd">        the name of the person</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------------</span>
+<span class="sd">    ingestion model</span>
+<span class="sd">        the person ingestion model for the newly appeared person</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;start get inactive person ingestion model&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ingestion_models</span><span class="o">.</span><span class="n">Person</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">is_active</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="convert_status_constant"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.convert_status_constant">[docs]</a><span class="k">def</span> <span class="nf">convert_status_constant</span><span class="p">(</span><span class="n">decision</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts the matter result status to the exsiting constants</span>
+
+<span class="sd">    Parameter:</span>
+<span class="sd">    ----------------</span>
+<span class="sd">    decision: str</span>
+<span class="sd">        decision of the matter</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------------</span>
+<span class="sd">    db_constants</span>
+<span class="sd">        result status constants</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;start convert result status for vote ingestion model&quot;</span><span class="p">)</span>
+    <span class="n">d_constant</span> <span class="o">=</span> <span class="n">decision</span>
+    <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;FAVORABLE&quot;</span> <span class="ow">in</span> <span class="n">decision</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s2">&quot;ADOPTED&quot;</span> <span class="ow">in</span> <span class="n">decision</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s2">&quot;ACCEPTED&quot;</span> <span class="ow">in</span> <span class="n">decision</span><span class="p">):</span>
+        <span class="n">d_constant</span> <span class="o">=</span> <span class="n">db_constants</span><span class="o">.</span><span class="n">MatterStatusDecision</span><span class="o">.</span><span class="n">ADOPTED</span>
+    <span class="k">elif</span> <span class="p">(</span>
+        <span class="p">(</span><span class="s2">&quot;REFERRED&quot;</span> <span class="ow">in</span> <span class="n">decision</span><span class="p">)</span>
+        <span class="ow">or</span> <span class="p">(</span><span class="s2">&quot;RETURNED&quot;</span> <span class="ow">in</span> <span class="n">decision</span><span class="p">)</span>
+        <span class="ow">or</span> <span class="p">(</span><span class="s2">&quot;FILED&quot;</span> <span class="ow">in</span> <span class="n">decision</span><span class="p">)</span>
+        <span class="ow">or</span> <span class="p">(</span><span class="s2">&quot;Refer&quot;</span><span class="p">)</span>
+        <span class="ow">or</span> <span class="p">(</span><span class="s2">&quot;/&quot;</span> <span class="ow">in</span> <span class="n">decision</span><span class="p">)</span>
+    <span class="p">):</span>
+        <span class="n">d_constant</span> <span class="o">=</span> <span class="n">db_constants</span><span class="o">.</span><span class="n">MatterStatusDecision</span><span class="o">.</span><span class="n">IN_PROGRESS</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;New Type&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">d_constant</span></div>
+
+
+<div class="viewcode-block" id="assign_constant"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.assign_constant">[docs]</a><span class="k">def</span> <span class="nf">assign_constant</span><span class="p">(</span>
+    <span class="n">driver</span><span class="p">:</span> <span class="n">ChromeDriverManager</span><span class="p">,</span>
+    <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">j</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">vote_decision</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">voting_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+    <span class="n">body_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">PERSONS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Assign constants and add Vote to the ingestion models based on the vote decision</span>
+
+<span class="sd">    Parameter:</span>
+<span class="sd">    ----------------</span>
+<span class="sd">    driver:webdriver</span>
+<span class="sd">        webdriver of the matter page</span>
+<span class="sd">    i: int</span>
+<span class="sd">        tr[i] is the matter we are looking at</span>
+<span class="sd">    j: int</span>
+<span class="sd">        the row number of the information in a matter that we are looking at</span>
+<span class="sd">    vote_decision: str</span>
+<span class="sd">        the vote decision constant of the vote decision</span>
+<span class="sd">    voting_list: list</span>
+<span class="sd">        the list that contains vote ingestion models</span>
+<span class="sd">    body_name: str</span>
+<span class="sd">        the body name of the current meeting</span>
+<span class="sd">    PERSONS: dict</span>
+<span class="sd">        Dict[str, ingestion_models.Person]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;start get vote ingestion model for one type of decision&quot;</span><span class="p">)</span>
+    <span class="n">v_res</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span>
+        <span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span>
+        <span class="s1">&#39;//*[@id=&quot;ContentPlaceHolder1_divHistory&quot;]/div/table/tbody/tr[&#39;</span>
+        <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="o">+</span> <span class="s2">&quot;]/td/table/tbody/tr[&quot;</span>
+        <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+        <span class="o">+</span> <span class="s2">&quot;]/td[2]&quot;</span><span class="p">,</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">text</span>
+    <span class="n">res_list</span> <span class="o">=</span> <span class="n">v_res</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="p">)</span>
+    <span class="n">n</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">res_list</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;President&quot;</span> <span class="ow">in</span> <span class="n">p</span><span class="p">:</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;President &quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">n_temp</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span>
+                <span class="sa">r</span><span class="s2">&quot;([a-zA-Z]+)((\ {0,1}[a-zA-Z]+\.{0,1}\ )|(\ ))([a-zA-Z]+)&quot;</span><span class="p">,</span> <span class="n">p</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">n_temp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">n</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n_temp</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">n_temp</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Person name could not be constructed.&quot;</span><span class="p">)</span>
+        <span class="n">person</span> <span class="o">=</span> <span class="n">get_new_person</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">PERSONS</span><span class="p">:</span>
+            <span class="n">person</span> <span class="o">=</span> <span class="n">PERSONS</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">person</span><span class="o">.</span><span class="n">seat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">person</span><span class="o">.</span><span class="n">seat</span><span class="o">.</span><span class="n">roles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">person</span><span class="o">.</span><span class="n">seat</span><span class="o">.</span><span class="n">roles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="n">ingestion_models</span><span class="o">.</span><span class="n">Body</span><span class="p">(</span>
+                        <span class="n">body_name</span><span class="p">,</span> <span class="n">is_active</span><span class="o">=</span><span class="kc">True</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">body_name</span> <span class="o">==</span> <span class="s2">&quot;City Council&quot;</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="p">(</span>
+                            <span class="n">person</span><span class="o">.</span><span class="n">seat</span><span class="o">.</span><span class="n">roles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">title</span>
+                            <span class="o">!=</span> <span class="n">db_constants</span><span class="o">.</span><span class="n">RoleTitle</span><span class="o">.</span><span class="n">COUNCILPRESIDENT</span>
+                        <span class="p">):</span>
+                            <span class="n">person</span><span class="o">.</span><span class="n">seat</span><span class="o">.</span><span class="n">roles</span><span class="p">[</span>
+                                <span class="mi">0</span>
+                            <span class="p">]</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">db_constants</span><span class="o">.</span><span class="n">RoleTitle</span><span class="o">.</span><span class="n">COUNCILMEMBER</span>
+        <span class="n">voting_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">ingestion_models</span><span class="o">.</span><span class="n">Vote</span><span class="p">(</span>
+                <span class="n">person</span><span class="o">=</span><span class="n">person</span><span class="p">,</span>
+                <span class="n">decision</span><span class="o">=</span><span class="n">vote_decision</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">voting_list</span></div>
+
+
+<div class="viewcode-block" id="get_voting_result"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.get_voting_result">[docs]</a><span class="k">def</span> <span class="nf">get_voting_result</span><span class="p">(</span>
+    <span class="n">driver</span><span class="p">:</span> <span class="n">ChromeDriverManager</span><span class="p">,</span>
+    <span class="n">sub_sections_len</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">body_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">PERSONS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Scrapes and converts the voting decisions to the exsiting constants</span>
+
+<span class="sd">    Parameter:</span>
+<span class="sd">    ----------------</span>
+<span class="sd">    driver:webdriver</span>
+<span class="sd">        webdriver of the matter page</span>
+<span class="sd">    sub_sections_len: int</span>
+<span class="sd">        the row number in the block under the matter for the current date</span>
+<span class="sd">    i: int</span>
+<span class="sd">        tr[i] is the matter we are looking at</span>
+<span class="sd">    body_name: str</span>
+<span class="sd">        the body name of the current meeting</span>
+<span class="sd">    PERSONS: dict</span>
+<span class="sd">        Dict[str, ingestion_models.Person]</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------------</span>
+<span class="sd">    list</span>
+<span class="sd">        contains the Vote ingestion model for each person</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;start get the vote ingestion model for a matter&quot;</span><span class="p">)</span>
+    <span class="n">voting_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ingestion_models</span><span class="o">.</span><span class="n">Vote</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">sub_sections_len</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">sub_content</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span>
+            <span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span>
+            <span class="s1">&#39;//*[@id=&quot;ContentPlaceHolder1_divHistory&quot;]/div/table/tbody/tr[&#39;</span>
+            <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s2">&quot;]/td/table/tbody/tr[&quot;</span>
+            <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s2">&quot;]&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">sub_content_role</span> <span class="o">=</span> <span class="n">sub_content</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CLASS_NAME</span><span class="p">,</span> <span class="s2">&quot;Role&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+        <span class="k">if</span> <span class="s2">&quot;AYES&quot;</span> <span class="ow">in</span> <span class="n">sub_content_role</span><span class="p">:</span>
+            <span class="n">vote_decision</span> <span class="o">=</span> <span class="n">db_constants</span><span class="o">.</span><span class="n">VoteDecision</span><span class="o">.</span><span class="n">APPROVE</span>
+            <span class="n">assign_constant</span><span class="p">(</span>
+                <span class="n">driver</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">vote_decision</span><span class="p">,</span> <span class="n">voting_list</span><span class="p">,</span> <span class="n">body_name</span><span class="p">,</span> <span class="n">PERSONS</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;NAYS&quot;</span> <span class="ow">in</span> <span class="n">sub_content_role</span><span class="p">:</span>
+            <span class="n">vote_decision</span> <span class="o">=</span> <span class="n">db_constants</span><span class="o">.</span><span class="n">VoteDecision</span><span class="o">.</span><span class="n">REJECT</span>
+            <span class="n">assign_constant</span><span class="p">(</span>
+                <span class="n">driver</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">vote_decision</span><span class="p">,</span> <span class="n">voting_list</span><span class="p">,</span> <span class="n">body_name</span><span class="p">,</span> <span class="n">PERSONS</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="s2">&quot;ABSENT&quot;</span> <span class="ow">in</span> <span class="n">sub_content_role</span>
+            <span class="ow">or</span> <span class="s2">&quot;AWAY&quot;</span> <span class="ow">in</span> <span class="n">sub_content_role</span>
+            <span class="ow">or</span> <span class="s2">&quot;EXCUSED&quot;</span> <span class="ow">in</span> <span class="n">sub_content_role</span>
+        <span class="p">):</span>
+            <span class="n">vote_decision</span> <span class="o">=</span> <span class="n">db_constants</span><span class="o">.</span><span class="n">VoteDecision</span><span class="o">.</span><span class="n">ABSENT_NON_VOTING</span>
+            <span class="n">assign_constant</span><span class="p">(</span>
+                <span class="n">driver</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">vote_decision</span><span class="p">,</span> <span class="n">voting_list</span><span class="p">,</span> <span class="n">body_name</span><span class="p">,</span> <span class="n">PERSONS</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;ABSTAIN&quot;</span> <span class="ow">in</span> <span class="n">sub_content_role</span><span class="p">:</span>
+            <span class="n">vote_decision</span> <span class="o">=</span> <span class="n">db_constants</span><span class="o">.</span><span class="n">VoteDecision</span><span class="o">.</span><span class="n">ABSTAIN_NON_VOTING</span>
+            <span class="n">assign_constant</span><span class="p">(</span>
+                <span class="n">driver</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">vote_decision</span><span class="p">,</span> <span class="n">voting_list</span><span class="p">,</span> <span class="n">body_name</span><span class="p">,</span> <span class="n">PERSONS</span>
+            <span class="p">)</span>
+    <span class="k">return</span> <span class="n">voting_list</span></div>
+
+
+<div class="viewcode-block" id="get_matter_status"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.get_matter_status">[docs]</a><span class="k">def</span> <span class="nf">get_matter_status</span><span class="p">(</span><span class="n">driver</span><span class="p">:</span> <span class="n">ChromeDriverManager</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find the matter result status</span>
+
+<span class="sd">    Parameter:</span>
+<span class="sd">    ----------------</span>
+<span class="sd">    driver:webdriver</span>
+<span class="sd">        webdriver of the matter page</span>
+<span class="sd">    i: int</span>
+<span class="sd">        tracker used to loop the rows in the matter page</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------------</span>
+<span class="sd">    sub_sections: element</span>
+<span class="sd">        the block under the matter for the current date</span>
+<span class="sd">    decision_constant: element</span>
+<span class="sd">        the matter decision constant</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;start get reslut status for a matter&quot;</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span>
+        <span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span>
+        <span class="s1">&#39;//*[@id=&quot;ContentPlaceHolder1_divHistory&quot;]/div/table/tbody/tr[&#39;</span>
+        <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="o">+</span> <span class="s2">&quot;]/td/table&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">decision</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CLASS_NAME</span><span class="p">,</span> <span class="s2">&quot;Result&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+    <span class="n">sub_sections</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">find_elements</span><span class="p">(</span>
+        <span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span>
+        <span class="s1">&#39;//*[@id=&quot;ContentPlaceHolder1_divHistory&quot;]/div/table/tbody/tr[&#39;</span>
+        <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="o">+</span> <span class="s2">&quot;]/td/table/tbody/tr&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">status_constant</span> <span class="o">=</span> <span class="n">convert_status_constant</span><span class="p">(</span><span class="n">decision</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sub_sections</span><span class="p">,</span> <span class="n">status_constant</span></div>
+
+
+<div class="viewcode-block" id="parse_single_matter"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.parse_single_matter">[docs]</a><span class="k">def</span> <span class="nf">parse_single_matter</span><span class="p">(</span>
+    <span class="n">driver</span><span class="p">:</span> <span class="n">ChromeDriverManager</span><span class="p">,</span>
+    <span class="n">test</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">item</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">body_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">s_word_formated</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span>
+    <span class="n">PERSONS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ingestion_models</span><span class="o">.</span><span class="n">EventMinutesItem</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the minute items that contains a matter</span>
+
+<span class="sd">    Parameter:</span>
+<span class="sd">    ----------------</span>
+<span class="sd">    driver:webdriver</span>
+<span class="sd">        webdriver of the matter page</span>
+<span class="sd">    matter:element</span>
+<span class="sd">        the matter we are looking at</span>
+<span class="sd">    body_name: str</span>
+<span class="sd">        the body name of the current meeting</span>
+<span class="sd">    s_word_formated: datetime</span>
+<span class="sd">        the date of the current meeting</span>
+<span class="sd">    PERSONS: dict</span>
+<span class="sd">        Dict[str, ingestion_models.Person]</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------------</span>
+<span class="sd">    ingestion model</span>
+<span class="sd">        minutes ingestion model with the matters information</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;start get ingestion model for a matter&quot;</span><span class="p">)</span>
+    <span class="n">voting_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">matter_name</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">9</span><span class="p">]</span>  <span class="c1"># name of the matter eg. &quot;22-C-5024&quot;, &quot;22-R-3404&quot;</span>
+    <span class="n">matter_title</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span>
+        <span class="mi">12</span><span class="p">:</span>
+    <span class="p">]</span>  <span class="c1"># the paragraph the describes the matter eg. &quot;A COMMUNICATION FROM ...&quot;</span>
+    <span class="n">matter_type</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot; &quot;</span>  <span class="c1"># the type of the matter eg. &quot;COMMUNICATION&quot;, &quot;SUBSTITUTE ORDINANCE&quot;</span>
+    <span class="p">)</span>
+    <span class="n">matter_type_temp</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; BY| FROM&quot;</span><span class="p">,</span> <span class="n">matter_title</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">matter_type_list</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;A |AN &quot;</span><span class="p">,</span> <span class="n">matter_type_temp</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matter_type_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">matter_type</span> <span class="o">=</span> <span class="n">matter_type_list</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">link</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span><span class="s2">&quot;link text&quot;</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
+    <span class="n">link</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+    <span class="c1"># get to the specific page for each matter</span>
+    <span class="n">s_matter</span> <span class="o">=</span> <span class="n">WebDriverWait</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">until</span><span class="p">(</span>
+        <span class="n">EC</span><span class="o">.</span><span class="n">presence_of_all_elements_located</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span>
+                <span class="s1">&#39;//*[@id=&quot;ContentPlaceHolder1_divHistory&quot;]/div/table/tbody/tr&#39;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">sponsor_raw</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span>
+        <span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span> <span class="s1">&#39;//*[@id=&quot;tblLegiFileInfo&quot;]/tbody/tr[1]/td[2]&#39;</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">text</span>
+    <span class="n">sponsor_list</span> <span class="o">=</span> <span class="n">sponsor_raw</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="p">)</span>
+    <span class="n">sponsors</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">ingestion_models</span><span class="o">.</span><span class="n">Person</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">sponsors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sponsor_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;District&quot;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+                <span class="n">current_temp</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)[</span><span class="mi">2</span><span class="p">:]</span>
+                <span class="n">current_temp2</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_temp</span><span class="p">)</span>
+                <span class="n">current_name</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span>
+                    <span class="sa">r</span><span class="s2">&quot;([a-zA-Z]+)((\ {0,1}[a-zA-Z]+\.{0,1}\ )|(\ ))([a-zA-Z]+)&quot;</span><span class="p">,</span>
+                    <span class="n">current_temp2</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">current_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">current</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_name</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">current_name</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Person name could not be constructed.&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">current</span> <span class="ow">in</span> <span class="n">PERSONS</span><span class="p">:</span>
+                    <span class="n">sponsors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PERSONS</span><span class="p">[</span><span class="n">current</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">sponsors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">get_new_person</span><span class="p">(</span><span class="n">current</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="s2">&quot;Post&quot;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+                <span class="n">current_temp</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;Large &quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">current_name</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span>
+                    <span class="sa">r</span><span class="s2">&quot;([a-zA-Z]+)((\ {0,1}[a-zA-Z]+\.{0,1}\ )|(\ ))([a-zA-Z]+)&quot;</span><span class="p">,</span>
+                    <span class="n">current_temp</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">current_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">current</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_name</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">current_name</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Person name could not be constructed.&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">current</span> <span class="ow">in</span> <span class="n">PERSONS</span><span class="p">:</span>
+                    <span class="n">sponsors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PERSONS</span><span class="p">[</span><span class="n">current</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">sponsors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">get_new_person</span><span class="p">(</span><span class="n">current</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="s2">&quot;President&quot;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+                <span class="n">current_temp</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;President &quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">current_name</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span>
+                    <span class="sa">r</span><span class="s2">&quot;([a-zA-Z]+)((\ {0,1}[a-zA-Z]+\.{0,1}\ )|(\ ))([a-zA-Z]+)&quot;</span><span class="p">,</span>
+                    <span class="n">current_temp</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">current_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">current</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_name</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">current_name</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Person name could not be constructed.&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">current</span> <span class="ow">in</span> <span class="n">PERSONS</span><span class="p">:</span>
+                    <span class="n">sponsors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PERSONS</span><span class="p">[</span><span class="n">current</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">sponsors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">get_new_person</span><span class="p">(</span><span class="n">current</span><span class="p">))</span>
+        <span class="n">s_rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">s_matter</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">s_rows</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span>
+                <span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span>
+                <span class="s1">&#39;//*[@id=&quot;ContentPlaceHolder1_divHistory&quot;]/div/table/tbody/tr[&#39;</span>
+                <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                <span class="o">+</span> <span class="s2">&quot;]&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">date</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CLASS_NAME</span><span class="p">,</span> <span class="s2">&quot;Date&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+            <span class="n">date_formated</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date</span><span class="p">[:</span><span class="o">-</span><span class="mi">6</span><span class="p">],</span> <span class="s2">&quot;%b </span><span class="si">%d</span><span class="s2">, %Y %I:%M %p&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">s_word_formated</span> <span class="o">==</span> <span class="n">date_formated</span><span class="p">:</span>  <span class="c1"># match the current meeting date</span>
+                <span class="n">sub_sections</span><span class="p">,</span> <span class="n">status</span> <span class="o">=</span> <span class="n">get_matter_status</span><span class="p">(</span>
+                    <span class="n">driver</span><span class="p">,</span> <span class="n">i</span>
+                <span class="p">)</span>  <span class="c1"># get the decision and result_status of the matter</span>
+                <span class="k">if</span> <span class="n">status</span> <span class="ow">in</span> <span class="p">(</span>
+                    <span class="n">db_constants</span><span class="o">.</span><span class="n">MatterStatusDecision</span><span class="o">.</span><span class="n">IN_PROGRESS</span><span class="p">,</span>
+                    <span class="n">db_constants</span><span class="o">.</span><span class="n">MatterStatusDecision</span><span class="o">.</span><span class="n">ADOPTED</span><span class="p">,</span>
+                <span class="p">):</span>
+                    <span class="n">decision</span> <span class="o">=</span> <span class="n">db_constants</span><span class="o">.</span><span class="n">EventMinutesItemDecision</span><span class="o">.</span><span class="n">PASSED</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">decision</span> <span class="o">=</span> <span class="n">db_constants</span><span class="o">.</span><span class="n">EventMinutesItemDecision</span><span class="o">.</span><span class="n">FAILED</span>
+                <span class="k">if</span> <span class="s2">&quot;[&quot;</span> <span class="ow">in</span> <span class="n">test</span><span class="p">:</span>
+                    <span class="n">voting_list</span> <span class="o">=</span> <span class="n">get_voting_result</span><span class="p">(</span>
+                        <span class="n">driver</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sub_sections</span><span class="p">),</span> <span class="n">i</span><span class="p">,</span> <span class="n">body_name</span><span class="p">,</span> <span class="n">PERSONS</span>
+                    <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sponsors</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ingestion_models</span><span class="o">.</span><span class="n">EventMinutesItem</span><span class="p">(</span>
+                <span class="n">minutes_item</span><span class="o">=</span><span class="n">ingestion_models</span><span class="o">.</span><span class="n">MinutesItem</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">matter_name</span><span class="o">.</span><span class="n">title</span><span class="p">(),</span> <span class="n">description</span><span class="o">=</span><span class="n">matter_title</span>
+                <span class="p">),</span>
+                <span class="n">matter</span><span class="o">=</span><span class="n">ingestion_models</span><span class="o">.</span><span class="n">Matter</span><span class="p">(</span>
+                    <span class="n">matter_name</span><span class="p">,</span>
+                    <span class="n">matter_type</span><span class="o">=</span><span class="n">matter_type</span><span class="p">,</span>
+                    <span class="n">title</span><span class="o">=</span><span class="n">matter_title</span><span class="p">,</span>
+                    <span class="n">result_status</span><span class="o">=</span><span class="n">status</span><span class="p">,</span>
+                    <span class="n">sponsors</span><span class="o">=</span><span class="n">sponsors</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">decision</span><span class="o">=</span><span class="n">decision</span><span class="p">,</span>
+                <span class="n">votes</span><span class="o">=</span><span class="n">voting_list</span><span class="p">,</span>
+            <span class="p">)</span>
+    <span class="k">return</span> <span class="n">ingestion_models</span><span class="o">.</span><span class="n">EventMinutesItem</span><span class="p">(</span>
+        <span class="n">minutes_item</span><span class="o">=</span><span class="n">ingestion_models</span><span class="o">.</span><span class="n">MinutesItem</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">matter_name</span><span class="o">.</span><span class="n">title</span><span class="p">(),</span> <span class="n">description</span><span class="o">=</span><span class="n">matter_title</span>
+        <span class="p">),</span>
+        <span class="n">matter</span><span class="o">=</span><span class="n">ingestion_models</span><span class="o">.</span><span class="n">Matter</span><span class="p">(</span>
+            <span class="n">matter_name</span><span class="p">,</span>
+            <span class="n">matter_type</span><span class="o">=</span><span class="n">matter_type</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="n">matter_title</span><span class="p">,</span>
+            <span class="n">result_status</span><span class="o">=</span><span class="n">status</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">decision</span><span class="o">=</span><span class="n">decision</span><span class="p">,</span>
+        <span class="n">votes</span><span class="o">=</span><span class="n">voting_list</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="parse_event"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.parse_event">[docs]</a><span class="k">def</span> <span class="nf">parse_event</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ingestion_models</span><span class="o">.</span><span class="n">EventIngestionModel</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Scrapes all the information for a meeting</span>
+
+<span class="sd">    Parameter:</span>
+<span class="sd">    ----------------</span>
+<span class="sd">    url:str</span>
+<span class="sd">        the url of the meeting that we want to scrape</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------------</span>
+<span class="sd">    ingestion model</span>
+<span class="sd">        the ingestion model for the meeting</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;start get ingestion model for a event&quot;</span><span class="p">)</span>
+
+    <span class="n">MINUTE_INDEX</span> <span class="o">=</span> <span class="p">[</span><span class="nb">chr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">),</span> <span class="nb">ord</span><span class="p">(</span><span class="s2">&quot;Z&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+    <span class="n">PERSONS</span> <span class="o">=</span> <span class="n">get_person</span><span class="p">()</span>
+
+    <span class="n">driver</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Chrome</span><span class="p">(</span>
+        <span class="n">options</span><span class="o">=</span><span class="n">chrome_options</span><span class="p">,</span> <span class="n">service</span><span class="o">=</span><span class="n">Service</span><span class="p">(</span><span class="n">ChromeDriverManager</span><span class="p">()</span><span class="o">.</span><span class="n">install</span><span class="p">())</span>
+    <span class="p">)</span>
+    <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+    <span class="n">WebDriverWait</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">until</span><span class="p">(</span>
+        <span class="n">EC</span><span class="o">.</span><span class="n">presence_of_all_elements_located</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span> <span class="s1">&#39;//*[@id=&quot;MeetingDetail&quot;]/tbody/tr&#39;</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">body_name</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span>
+        <span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="s2">&quot;ContentPlaceHolder1_lblMeetingGroup&quot;</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">text</span>  <span class="c1"># body name</span>
+    <span class="k">if</span> <span class="n">body_name</span> <span class="o">==</span> <span class="s2">&quot;Atlanta City Council&quot;</span><span class="p">:</span>
+        <span class="n">body_name</span> <span class="o">=</span> <span class="s2">&quot;City Council&quot;</span>
+    <span class="n">s_word</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="s2">&quot;ContentPlaceHolder1_lblMeetingDate&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+    <span class="n">s_word_formated</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">s_word</span><span class="p">,</span> <span class="s2">&quot;%m/</span><span class="si">%d</span><span class="s2">/%Y %I:%M %p&quot;</span><span class="p">)</span>
+    <span class="n">video_link</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="s2">&quot;MediaPlayer1_html5_api&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get_attribute</span><span class="p">(</span>
+        <span class="s2">&quot;src&quot;</span>
+    <span class="p">)</span>  <span class="c1"># video link (mp4)</span>
+
+    <span class="n">event_minutes_items</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">while</span> <span class="p">(</span>
+        <span class="nb">len</span><span class="p">(</span>
+            <span class="n">driver</span><span class="o">.</span><span class="n">find_elements</span><span class="p">(</span>
+                <span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span> <span class="s1">&#39;//*[@id=&quot;MeetingDetail&quot;]/tbody/tr[&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;]&quot;</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="o">!=</span> <span class="mi">0</span>
+    <span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="nb">len</span><span class="p">(</span>
+                    <span class="n">driver</span><span class="o">.</span><span class="n">find_elements</span><span class="p">(</span>
+                        <span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span>
+                        <span class="s1">&#39;//*[@id=&quot;MeetingDetail&quot;]/tbody/tr[&#39;</span>
+                        <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                        <span class="o">+</span> <span class="s2">&quot;]/td[1]/strong&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="p">(</span>
+                <span class="nb">len</span><span class="p">(</span>
+                    <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span>
+                        <span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span>
+                        <span class="s1">&#39;//*[@id=&quot;MeetingDetail&quot;]/tbody/tr[&#39;</span>
+                        <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                        <span class="o">+</span> <span class="s2">&quot;]/td[1]/strong&quot;</span><span class="p">,</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">text</span>
+                <span class="p">)</span>
+            <span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span>
+                        <span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span>
+                        <span class="s1">&#39;//*[@id=&quot;MeetingDetail&quot;]/tbody/tr[&#39;</span>
+                        <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                        <span class="o">+</span> <span class="s2">&quot;]/td[1]/strong&quot;</span><span class="p">,</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">text</span>
+                <span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">MINUTE_INDEX</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="p">(</span>
+                        <span class="nb">len</span><span class="p">(</span>
+                            <span class="n">driver</span><span class="o">.</span><span class="n">find_elements</span><span class="p">(</span>
+                                <span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span>
+                                <span class="s1">&#39;//*[@id=&quot;MeetingDetail&quot;]/tbody/tr[&#39;</span>
+                                <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                                <span class="o">+</span> <span class="s2">&quot;]/td[3]/span&quot;</span><span class="p">,</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+                        <span class="o">==</span> <span class="mi">0</span>
+                    <span class="p">):</span>
+                        <span class="n">minute_title</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span>
+                            <span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span>
+                            <span class="s1">&#39;//*[@id=&quot;MeetingDetail&quot;]/tbody/tr[&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;]/td[2]&quot;</span><span class="p">,</span>
+                        <span class="p">)</span><span class="o">.</span><span class="n">text</span>
+                        <span class="n">minute_model</span> <span class="o">=</span> <span class="n">ingestion_models</span><span class="o">.</span><span class="n">EventMinutesItem</span><span class="p">(</span>
+                            <span class="n">minutes_item</span><span class="o">=</span><span class="n">ingestion_models</span><span class="o">.</span><span class="n">MinutesItem</span><span class="p">(</span>
+                                <span class="n">minute_title</span><span class="o">.</span><span class="n">title</span><span class="p">()</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+                        <span class="n">event_minutes_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">minute_model</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="p">(</span>
+                <span class="nb">len</span><span class="p">(</span>
+                    <span class="n">driver</span><span class="o">.</span><span class="n">find_elements</span><span class="p">(</span>
+                        <span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span>
+                        <span class="s1">&#39;//*[@id=&quot;MeetingDetail&quot;]/tbody/tr[&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;]/td[3]/span&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">matter</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span>
+                    <span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span> <span class="s1">&#39;//*[@id=&quot;MeetingDetail&quot;]/tbody/tr[&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;]/td[3]&quot;</span>
+                <span class="p">)</span>
+                <span class="n">test</span> <span class="o">=</span> <span class="n">matter</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CLASS_NAME</span><span class="p">,</span> <span class="s2">&quot;ItemVoteResult&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">matter</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CLASS_NAME</span><span class="p">,</span> <span class="s2">&quot;AgendaOutlineLink&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">matter_model</span> <span class="o">=</span> <span class="n">parse_single_matter</span><span class="p">(</span>
+                        <span class="n">driver</span><span class="p">,</span> <span class="n">test</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">body_name</span><span class="p">,</span> <span class="n">s_word_formated</span><span class="p">,</span> <span class="n">PERSONS</span>
+                    <span class="p">)</span>
+                    <span class="n">event_minutes_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">matter_model</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="p">(</span>
+                <span class="nb">len</span><span class="p">(</span>
+                    <span class="n">driver</span><span class="o">.</span><span class="n">find_elements</span><span class="p">(</span>
+                        <span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span>
+                        <span class="s1">&#39;//*[@id=&quot;MeetingDetail&quot;]/tbody/tr[&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;]/td[6]/span&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">matter</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span>
+                    <span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span> <span class="s1">&#39;//*[@id=&quot;MeetingDetail&quot;]/tbody/tr[&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;]/td[6]&quot;</span>
+                <span class="p">)</span>
+                <span class="n">test</span> <span class="o">=</span> <span class="n">matter</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CLASS_NAME</span><span class="p">,</span> <span class="s2">&quot;ItemVoteResult&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">matter</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CLASS_NAME</span><span class="p">,</span> <span class="s2">&quot;AgendaOutlineLink&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">matter_model</span> <span class="o">=</span> <span class="n">parse_single_matter</span><span class="p">(</span>
+                        <span class="n">driver</span><span class="p">,</span> <span class="n">test</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">body_name</span><span class="p">,</span> <span class="n">s_word_formated</span><span class="p">,</span> <span class="n">PERSONS</span>
+                    <span class="p">)</span>
+                    <span class="n">event_minutes_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">matter_model</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">except</span> <span class="p">(</span>
+            <span class="n">selenium</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">NoSuchElementException</span><span class="p">,</span>
+            <span class="n">selenium</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">TimeoutException</span><span class="p">,</span>
+        <span class="p">):</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">continue</span>
+
+    <span class="n">agenda_link</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span>
+        <span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="s2">&quot;ContentPlaceHolder1_hlPublicAgendaFile&quot;</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">get_attribute</span><span class="p">(</span><span class="s2">&quot;oldhref&quot;</span><span class="p">)</span>
+    <span class="n">minutes_link</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span>
+        <span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="s2">&quot;ContentPlaceHolder1_hlPublicMinutesFile&quot;</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">get_attribute</span><span class="p">(</span><span class="s2">&quot;oldhref&quot;</span><span class="p">)</span>
+
+    <span class="n">driver</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">ingestion_models</span><span class="o">.</span><span class="n">EventIngestionModel</span><span class="p">(</span>
+        <span class="n">body</span><span class="o">=</span><span class="n">ingestion_models</span><span class="o">.</span><span class="n">Body</span><span class="p">(</span><span class="n">body_name</span><span class="p">,</span> <span class="n">is_active</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <span class="n">sessions</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">ingestion_models</span><span class="o">.</span><span class="n">Session</span><span class="p">(</span>
+                <span class="n">video_uri</span><span class="o">=</span><span class="n">video_link</span><span class="p">,</span>
+                <span class="n">session_index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="n">session_datetime</span><span class="o">=</span><span class="n">s_word_formated</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">],</span>
+        <span class="n">event_minutes_items</span><span class="o">=</span><span class="n">event_minutes_items</span><span class="p">,</span>
+        <span class="n">agenda_uri</span><span class="o">=</span><span class="s2">&quot;https://atlantacityga.iqm2.com/Citizens/&quot;</span> <span class="o">+</span> <span class="n">agenda_link</span><span class="p">,</span>
+        <span class="n">minutes_uri</span><span class="o">=</span><span class="s2">&quot;https://atlantacityga.iqm2.com/Citizens/&quot;</span> <span class="o">+</span> <span class="n">minutes_link</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_year"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.get_year">[docs]</a><span class="k">def</span> <span class="nf">get_year</span><span class="p">(</span><span class="n">driver</span><span class="p">:</span> <span class="n">ChromeDriverManager</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">from_dt</span><span class="p">:</span> <span class="n">datetime</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Navigate to the year that we are looking for</span>
+
+<span class="sd">    Parameter:</span>
+<span class="sd">    ----------------</span>
+<span class="sd">    driver:webdriver</span>
+<span class="sd">        empty webdriver</span>
+<span class="sd">    url:str</span>
+<span class="sd">        the url of the calender page</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------------</span>
+<span class="sd">    link:str</span>
+<span class="sd">        the link to the calender of the year that we are looking for</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;start get the current year&#39;s calender page&quot;</span><span class="p">)</span>
+    <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">dates</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="s2">&quot;ContentPlaceHolder1_lblCalendarRange&quot;</span><span class="p">)</span>
+    <span class="n">link_temp</span> <span class="o">=</span> <span class="n">dates</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span>
+        <span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;//*[text()=&#39;&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">from_dt</span><span class="o">.</span><span class="n">year</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;&#39;]&quot;</span><span class="p">)</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">get_attribute</span><span class="p">(</span><span class="s2">&quot;href&quot;</span><span class="p">)</span>
+    <span class="n">link</span> <span class="o">=</span> <span class="s2">&quot;https://atlantacityga.iqm2.com&quot;</span> <span class="o">+</span> <span class="n">link_temp</span>
+    <span class="k">return</span> <span class="n">link</span></div>
+
+
+<div class="viewcode-block" id="get_date"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.get_date">[docs]</a><span class="k">def</span> <span class="nf">get_date</span><span class="p">(</span>
+    <span class="n">driver</span><span class="p">:</span> <span class="n">ChromeDriverManager</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">from_dt</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">to_dt</span><span class="p">:</span> <span class="n">datetime</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get a list of ingestion models for the meetings hold during the selected time range</span>
+
+<span class="sd">    Parameter:</span>
+<span class="sd">    ----------------</span>
+<span class="sd">    driver:webdriver</span>
+<span class="sd">        empty webdriver</span>
+<span class="sd">    url:str</span>
+<span class="sd">        the url of the calender page</span>
+<span class="sd">    from_dt:</span>
+<span class="sd">        the begin date</span>
+<span class="sd">    to_date:</span>
+<span class="sd">        the end date</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------------</span>
+<span class="sd">    list</span>
+<span class="sd">        all the ingestion models for the selected date range</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;start calling parse_event for a signle meeting&quot;</span><span class="p">)</span>
+    <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">dates</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_elements</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CLASS_NAME</span><span class="p">,</span> <span class="s2">&quot;RowTop&quot;</span><span class="p">)</span>
+    <span class="n">events</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">current_date</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">:</span>
+        <span class="n">current_meeting_date</span> <span class="o">=</span> <span class="n">current_date</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CLASS_NAME</span><span class="p">,</span> <span class="s2">&quot;RowLink&quot;</span><span class="p">)</span>
+        <span class="n">current_meeting_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span>
+            <span class="n">current_meeting_date</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="s2">&quot;%b </span><span class="si">%d</span><span class="s2">, %Y %I:%M %p&quot;</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">from_dt</span> <span class="o">&lt;=</span> <span class="n">current_meeting_time</span> <span class="o">&lt;=</span> <span class="n">to_dt</span><span class="p">:</span>
+            <span class="n">link_temp</span> <span class="o">=</span> <span class="n">current_date</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span>
+                <span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="s2">&quot;.WithoutSeparator a&quot;</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">get_attribute</span><span class="p">(</span><span class="s2">&quot;onclick&quot;</span><span class="p">)</span>
+            <span class="n">link</span> <span class="o">=</span> <span class="s2">&quot;https://atlantacityga.iqm2.com&quot;</span> <span class="o">+</span> <span class="n">link_temp</span><span class="p">[</span><span class="mi">23</span><span class="p">:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">event</span> <span class="o">=</span> <span class="n">parse_event</span><span class="p">(</span><span class="n">link</span><span class="p">)</span>
+            <span class="n">events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">continue</span>
+    <span class="n">driver</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">events</span></div>
+
+
+<div class="viewcode-block" id="get_events"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.get_events">[docs]</a><span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span><span class="n">from_dt</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">to_dt</span><span class="p">:</span> <span class="n">datetime</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    gets the right calender link</span>
+<span class="sd">    feed it to the function that get a list of ingestion models</span>
+
+<span class="sd">    Parameter:</span>
+<span class="sd">    ----------------</span>
+<span class="sd">    from_dt:</span>
+<span class="sd">        the begin date</span>
+<span class="sd">    to_date:</span>
+<span class="sd">        the end date</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------------</span>
+<span class="sd">    list</span>
+<span class="sd">        all the ingestion models for the selected date range</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;start a date range and run all the functions&quot;</span><span class="p">)</span>
+    <span class="n">driver</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Chrome</span><span class="p">(</span>
+        <span class="n">options</span><span class="o">=</span><span class="n">chrome_options</span><span class="p">,</span> <span class="n">service</span><span class="o">=</span><span class="n">Service</span><span class="p">(</span><span class="n">ChromeDriverManager</span><span class="p">()</span><span class="o">.</span><span class="n">install</span><span class="p">())</span>
+    <span class="p">)</span>
+    <span class="n">web_url</span> <span class="o">=</span> <span class="s2">&quot;https://atlantacityga.iqm2.com/Citizens/Calendar.aspx?Frame=Yes&quot;</span>
+    <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">web_url</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">from_dt</span><span class="o">.</span><span class="n">year</span> <span class="o">!=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">year</span><span class="p">:</span>
+        <span class="n">web_url</span> <span class="o">=</span> <span class="n">get_year</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">web_url</span><span class="p">,</span> <span class="n">from_dt</span><span class="p">)</span>
+    <span class="n">events</span> <span class="o">=</span> <span class="n">get_date</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">web_url</span><span class="p">,</span> <span class="n">from_dt</span><span class="p">,</span> <span class="n">to_dt</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">events</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Jackson Maxfield Brown.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

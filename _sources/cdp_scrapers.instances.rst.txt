@@ -4,6 +4,14 @@ cdp\_scrapers.instances package
 Submodules
 ----------
 
+cdp\_scrapers.instances.atlanta module
+--------------------------------------
+
+.. automodule:: cdp_scrapers.instances.atlanta
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 cdp\_scrapers.instances.empty module
 ------------------------------------
 
