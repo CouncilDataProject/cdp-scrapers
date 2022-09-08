@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>cdp_scrapers.instances.atlanta &mdash; cdp-scrapers 0.4.5 documentation</title>
+  <title>cdp_scrapers.instances.atlanta &mdash; cdp-scrapers 0.4.6 documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                0.4.5
+                0.4.6
               </div>
             
           
@@ -288,7 +288,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_person"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.get_person">[docs]</a><span class="k">def</span> <span class="nf">get_person</span><span class="p">(</span><span class="n">driver</span><span class="p">:</span> <span class="s2">&quot;WebDriver&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<div class="viewcode-block" id="get_person"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.get_person">[docs]</a><span class="k">def</span> <span class="nf">get_person</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Put the informtion get by get_single_person() to dictionary</span>
 
@@ -298,7 +298,18 @@
 <span class="sd">        key: person&#39;s name</span>
 <span class="sd">        value: person&#39;s ingestion model</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">selenium</span> <span class="kn">import</span> <span class="n">webdriver</span>
     <span class="kn">from</span> <span class="nn">selenium.webdriver.common.by</span> <span class="kn">import</span> <span class="n">By</span>
+    <span class="kn">from</span> <span class="nn">selenium.webdriver.chrome.options</span> <span class="kn">import</span> <span class="n">Options</span>
+    <span class="kn">from</span> <span class="nn">selenium.webdriver.chrome.service</span> <span class="kn">import</span> <span class="n">Service</span>
+    <span class="kn">from</span> <span class="nn">webdriver_manager.chrome</span> <span class="kn">import</span> <span class="n">ChromeDriverManager</span>
+
+    <span class="n">chrome_options</span> <span class="o">=</span> <span class="n">Options</span><span class="p">()</span>
+    <span class="n">chrome_options</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--headless&quot;</span><span class="p">)</span>
+
+    <span class="n">driver</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Chrome</span><span class="p">(</span>
+        <span class="n">options</span><span class="o">=</span><span class="n">chrome_options</span><span class="p">,</span> <span class="n">service</span><span class="o">=</span><span class="n">Service</span><span class="p">(</span><span class="n">ChromeDriverManager</span><span class="p">()</span><span class="o">.</span><span class="n">install</span><span class="p">())</span>
+    <span class="p">)</span>
 
     <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;start get all the person ingestion model&quot;</span><span class="p">)</span>
     <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://citycouncil.atlantaga.gov/council-members&quot;</span><span class="p">)</span>
@@ -306,6 +317,9 @@
     <span class="n">person_dict</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="n">members</span><span class="p">:</span>
         <span class="n">link</span> <span class="o">=</span> <span class="n">member</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">TAG_NAME</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get_attribute</span><span class="p">(</span><span class="s2">&quot;href&quot;</span><span class="p">)</span>
+        <span class="n">driver</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Chrome</span><span class="p">(</span>
+            <span class="n">options</span><span class="o">=</span><span class="n">chrome_options</span><span class="p">,</span> <span class="n">service</span><span class="o">=</span><span class="n">Service</span><span class="p">(</span><span class="n">ChromeDriverManager</span><span class="p">()</span><span class="o">.</span><span class="n">install</span><span class="p">())</span>
+        <span class="p">)</span>
         <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">link</span><span class="p">)</span>
         <span class="n">member_name</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CLASS_NAME</span><span class="p">,</span> <span class="s2">&quot;titlewidget-title&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
         <span class="k">if</span> <span class="s2">&quot;President&quot;</span> <span class="ow">in</span> <span class="n">member_name</span><span class="p">:</span>
@@ -319,7 +333,9 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Person name could not be constructed.&quot;</span><span class="p">)</span>
         <span class="n">member_model</span> <span class="o">=</span> <span class="n">get_single_person</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">member_name</span><span class="p">)</span>
+        <span class="n">driver</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
         <span class="n">person_dict</span><span class="p">[</span><span class="n">member_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">member_model</span>
+    <span class="n">driver</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">person_dict</span></div>
 
 
@@ -726,7 +742,6 @@
 
 <div class="viewcode-block" id="parse_event"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.parse_event">[docs]</a><span class="k">def</span> <span class="nf">parse_event</span><span class="p">(</span>
     <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">driver</span><span class="p">:</span> <span class="s2">&quot;WebDriver&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ingestion_models</span><span class="o">.</span><span class="n">EventIngestionModel</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Scrapes all the information for a meeting</span>
@@ -746,10 +761,22 @@
     <span class="kn">from</span> <span class="nn">selenium.webdriver.support.ui</span> <span class="kn">import</span> <span class="n">WebDriverWait</span>
     <span class="kn">from</span> <span class="nn">selenium.webdriver.support</span> <span class="kn">import</span> <span class="n">expected_conditions</span> <span class="k">as</span> <span class="n">EC</span>
 
+    <span class="kn">from</span> <span class="nn">selenium</span> <span class="kn">import</span> <span class="n">webdriver</span>
+    <span class="kn">from</span> <span class="nn">selenium.webdriver.chrome.options</span> <span class="kn">import</span> <span class="n">Options</span>
+    <span class="kn">from</span> <span class="nn">selenium.webdriver.chrome.service</span> <span class="kn">import</span> <span class="n">Service</span>
+    <span class="kn">from</span> <span class="nn">webdriver_manager.chrome</span> <span class="kn">import</span> <span class="n">ChromeDriverManager</span>
+
     <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;start get ingestion model for a event&quot;</span><span class="p">)</span>
 
     <span class="n">MINUTE_INDEX</span> <span class="o">=</span> <span class="p">[</span><span class="nb">chr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">),</span> <span class="nb">ord</span><span class="p">(</span><span class="s2">&quot;Z&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
-    <span class="n">PERSONS</span> <span class="o">=</span> <span class="n">get_person</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+    <span class="n">PERSONS</span> <span class="o">=</span> <span class="n">get_person</span><span class="p">()</span>
+
+    <span class="n">chrome_options</span> <span class="o">=</span> <span class="n">Options</span><span class="p">()</span>
+    <span class="n">chrome_options</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--headless&quot;</span><span class="p">)</span>
+
+    <span class="n">driver</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Chrome</span><span class="p">(</span>
+        <span class="n">options</span><span class="o">=</span><span class="n">chrome_options</span><span class="p">,</span> <span class="n">service</span><span class="o">=</span><span class="n">Service</span><span class="p">(</span><span class="n">ChromeDriverManager</span><span class="p">()</span><span class="o">.</span><span class="n">install</span><span class="p">())</span>
+    <span class="p">)</span>
 
     <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
 
@@ -973,10 +1000,11 @@
                 <span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="s2">&quot;.WithoutSeparator a&quot;</span>
             <span class="p">)</span><span class="o">.</span><span class="n">get_attribute</span><span class="p">(</span><span class="s2">&quot;onclick&quot;</span><span class="p">)</span>
             <span class="n">link</span> <span class="o">=</span> <span class="s2">&quot;https://atlantacityga.iqm2.com&quot;</span> <span class="o">+</span> <span class="n">link_temp</span><span class="p">[</span><span class="mi">23</span><span class="p">:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
-            <span class="n">event</span> <span class="o">=</span> <span class="n">parse_event</span><span class="p">(</span><span class="n">link</span><span class="p">,</span> <span class="n">driver</span><span class="p">)</span>
+            <span class="n">event</span> <span class="o">=</span> <span class="n">parse_event</span><span class="p">(</span><span class="n">link</span><span class="p">)</span>
             <span class="n">events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">continue</span>
+    <span class="n">driver</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">events</span></div>
 
 
@@ -1015,7 +1043,6 @@
     <span class="k">if</span> <span class="n">from_dt</span><span class="o">.</span><span class="n">year</span> <span class="o">!=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">year</span><span class="p">:</span>
         <span class="n">web_url</span> <span class="o">=</span> <span class="n">get_year</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">web_url</span><span class="p">,</span> <span class="n">from_dt</span><span class="p">)</span>
     <span class="n">events</span> <span class="o">=</span> <span class="n">get_date</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">web_url</span><span class="p">,</span> <span class="n">from_dt</span><span class="p">,</span> <span class="n">to_dt</span><span class="p">)</span>
-    <span class="n">driver</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">events</span></div>
 </pre></div>
 
