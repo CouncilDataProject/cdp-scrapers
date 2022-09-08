@@ -413,6 +413,9 @@ def parse_single_matter(
     ).text
     sponsor_list = sponsor_raw.split(", ")
     sponsors: Optional[list[ingestion_models.Person]] = []
+    status = None
+    decision = None
+
     if sponsors is not None:
         for s in sponsor_list:
             if "District" in s:
@@ -483,6 +486,7 @@ def parse_single_matter(
                     voting_list = get_voting_result(
                         driver, len(sub_sections), i, body_name, PERSONS
                     )
+
         if len(sponsors) != 0:
             return ingestion_models.EventMinutesItem(
                 minutes_item=ingestion_models.MinutesItem(
@@ -498,6 +502,7 @@ def parse_single_matter(
                 decision=decision,
                 votes=voting_list,
             )
+
     return ingestion_models.EventMinutesItem(
         minutes_item=ingestion_models.MinutesItem(
             name=matter_name.title(), description=matter_title
