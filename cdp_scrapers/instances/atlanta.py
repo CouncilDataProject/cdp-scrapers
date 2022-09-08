@@ -1,25 +1,24 @@
-from typing import Optional, Tuple
-import selenium
+from typing import Optional, Tuple, TYPE_CHECKING
+
 import re
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
+
 from cdp_backend.pipeline import ingestion_models
 from cdp_backend.database import constants as db_constants
 from datetime import datetime
 import logging
 
+if TYPE_CHECKING:
+    import selenium
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.support.ui import WebDriverWait
+    from selenium.webdriver.support import expected_conditions as EC
+    from webdriver_manager.chrome import ChromeDriverManager
+
 log = logging.getLogger(__name__)
-chrome_options = Options()
-chrome_options.add_argument("--headless")
 
 
 def get_single_person(
-    driver: ChromeDriverManager, member_name: str
+    driver: "ChromeDriverManager", member_name: str
 ) -> ingestion_models.Person:
     """
     Get all the information fot one person
@@ -86,7 +85,7 @@ def get_single_person(
     )
 
 
-def get_person() -> dict:
+def get_person(driver: "ChromeDriverManager") -> dict:
     """
     Put the informtion get by get_single_person() to dictionary
 
@@ -97,17 +96,11 @@ def get_person() -> dict:
         value: person's ingestion model
     """
     log.info("start get all the person ingestion model")
-    driver = webdriver.Chrome(
-        options=chrome_options, service=Service(ChromeDriverManager().install())
-    )
     driver.get("https://citycouncil.atlantaga.gov/council-members")
     members = driver.find_elements(By.XPATH, '//*[@id="leftNav_2_0_12"]/ul/li')
     person_dict = {}
     for member in members:
         link = member.find_element(By.TAG_NAME, "a").get_attribute("href")
-        driver = webdriver.Chrome(
-            options=chrome_options, service=Service(ChromeDriverManager().install())
-        )
         driver.get(link)
         member_name = driver.find_element(By.CLASS_NAME, "titlewidget-title").text
         if "President" in member_name:
@@ -121,9 +114,7 @@ def get_person() -> dict:
             else:
                 raise ValueError("Person name could not be constructed.")
         member_model = get_single_person(driver, member_name)
-        driver.quit()
         person_dict[member_name] = member_model
-    driver.quit()
     return person_dict
 
 
@@ -177,7 +168,7 @@ def convert_status_constant(decision: str) -> str:
 
 
 def assign_constant(
-    driver: ChromeDriverManager,
+    driver: "ChromeDriverManager",
     i: int,
     j: int,
     vote_decision: str,
@@ -253,7 +244,7 @@ def assign_constant(
 
 
 def get_voting_result(
-    driver: ChromeDriverManager,
+    driver: "ChromeDriverManager",
     sub_sections_len: int,
     i: int,
     body_name: str,
@@ -319,7 +310,7 @@ def get_voting_result(
     return voting_list
 
 
-def get_matter_status(driver: ChromeDriverManager, i: int) -> Tuple[list, str]:
+def get_matter_status(driver: "ChromeDriverManager", i: int) -> Tuple[list, str]:
     """
     Find the matter result status
 
@@ -356,7 +347,7 @@ def get_matter_status(driver: ChromeDriverManager, i: int) -> Tuple[list, str]:
 
 
 def parse_single_matter(
-    driver: ChromeDriverManager,
+    driver: "ChromeDriverManager",
     test: str,
     item: str,
     body_name: str,
@@ -518,7 +509,10 @@ def parse_single_matter(
     )
 
 
-def parse_event(url: str) -> ingestion_models.EventIngestionModel:
+def parse_event(
+    url: str,
+    driver: "ChromeDriverManager",
+) -> ingestion_models.EventIngestionModel:
     """
     Scrapes all the information for a meeting
 
@@ -535,11 +529,8 @@ def parse_event(url: str) -> ingestion_models.EventIngestionModel:
     log.info("start get ingestion model for a event")
 
     MINUTE_INDEX = [chr(i) for i in range(ord("A"), ord("Z") + 1)]
-    PERSONS = get_person()
+    PERSONS = get_person(driver)
 
-    driver = webdriver.Chrome(
-        options=chrome_options, service=Service(ChromeDriverManager().install())
-    )
     driver.get(url)
 
     WebDriverWait(driver, 10).until(
@@ -663,14 +654,20 @@ def parse_event(url: str) -> ingestion_models.EventIngestionModel:
             i += 1
             continue
 
-    agenda_link = driver.find_element(
-        By.ID, "ContentPlaceHolder1_hlPublicAgendaFile"
-    ).get_attribute("oldhref")
-    minutes_link = driver.find_element(
-        By.ID, "ContentPlaceHolder1_hlPublicMinutesFile"
-    ).get_attribute("oldhref")
-
-    driver.quit()
+    try:
+        agenda_link = driver.find_element(
+            By.ID, "ContentPlaceHolder1_hlPublicAgendaFile"
+        ).get_attribute("oldhref")
+        agenda_uri = "https://atlantacityga.iqm2.com/Citizens/" + agenda_link
+    except selenium.common.exceptions.NoSuchElementException:
+        agenda_uri = None
+    try:
+        minutes_link = driver.find_element(
+            By.ID, "ContentPlaceHolder1_hlPublicMinutesFile"
+        ).get_attribute("oldhref")
+        minutes_uri = "https://atlantacityga.iqm2.com/Citizens/" + minutes_link
+    except selenium.common.exceptions.NoSuchElementException:
+        minutes_uri = None
 
     return ingestion_models.EventIngestionModel(
         body=ingestion_models.Body(body_name, is_active=True),
@@ -682,12 +679,12 @@ def parse_event(url: str) -> ingestion_models.EventIngestionModel:
             )
         ],
         event_minutes_items=event_minutes_items,
-        agenda_uri="https://atlantacityga.iqm2.com/Citizens/" + agenda_link,
-        minutes_uri="https://atlantacityga.iqm2.com/Citizens/" + minutes_link,
+        agenda_uri=agenda_uri,
+        minutes_uri=minutes_uri,
     )
 
 
-def get_year(driver: ChromeDriverManager, url: str, from_dt: datetime) -> str:
+def get_year(driver: "ChromeDriverManager", url: str, from_dt: datetime) -> str:
     """
     Navigate to the year that we are looking for
 
@@ -714,7 +711,10 @@ def get_year(driver: ChromeDriverManager, url: str, from_dt: datetime) -> str:
 
 
 def get_date(
-    driver: ChromeDriverManager, url: str, from_dt: datetime, to_dt: datetime
+    driver: "ChromeDriverManager",
+    url: str,
+    from_dt: datetime,
+    to_dt: datetime,
 ) -> list:
     """
     Get a list of ingestion models for the meetings hold during the selected time range
@@ -749,11 +749,10 @@ def get_date(
                 By.CSS_SELECTOR, ".WithoutSeparator a"
             ).get_attribute("onclick")
             link = "https://atlantacityga.iqm2.com" + link_temp[23:-3]
-            event = parse_event(link)
+            event = parse_event(link, driver)
             events.append(event)
         else:
             continue
-    driver.quit()
     return events
 
 
@@ -774,13 +773,27 @@ def get_events(from_dt: datetime, to_dt: datetime) -> list:
     list
         all the ingestion models for the selected date range
     """
+    import selenium  # noqa F401
+    from selenium import webdriver
+    from selenium.webdriver.chrome.options import Options
+    from selenium.webdriver.common.by import By  # noqa F401
+    from selenium.webdriver.chrome.service import Service
+    from selenium.webdriver.support.ui import WebDriverWait  # noqa F401
+    from selenium.webdriver.support import expected_conditions as EC  # noqa F401
+    from webdriver_manager.chrome import ChromeDriverManager
+
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+
     log.info("start a date range and run all the functions")
     driver = webdriver.Chrome(
         options=chrome_options, service=Service(ChromeDriverManager().install())
     )
+
     web_url = "https://atlantacityga.iqm2.com/Citizens/Calendar.aspx?Frame=Yes"
     driver.get(web_url)
     if from_dt.year != datetime.today().year:
         web_url = get_year(driver, web_url, from_dt)
     events = get_date(driver, web_url, from_dt, to_dt)
+    driver.quit()
     return events
