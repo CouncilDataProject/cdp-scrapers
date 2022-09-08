@@ -8,18 +8,12 @@ from datetime import datetime
 import logging
 
 if TYPE_CHECKING:
-    import selenium
-    from selenium.webdriver.common.by import By
-    from selenium.webdriver.support.ui import WebDriverWait
-    from selenium.webdriver.support import expected_conditions as EC
-    from webdriver_manager.chrome import ChromeDriverManager
+    from selenium.webdriver.chrome.webdriver import WebDriver
 
 log = logging.getLogger(__name__)
 
 
-def get_single_person(
-    driver: "ChromeDriverManager", member_name: str
-) -> ingestion_models.Person:
+def get_single_person(driver: "WebDriver", member_name: str) -> ingestion_models.Person:
     """
     Get all the information fot one person
     Includes: role, seat, picture, phone, email
@@ -36,6 +30,9 @@ def get_single_person(
     ingestion_models
         the ingestion model for the person's part
     """
+    import selenium
+    from selenium.webdriver.common.by import By
+
     log.info("start get active person ingestion model")
     seat_role = driver.find_element(By.CLASS_NAME, "titlewidget-subtitle").text
     member_role = db_constants.RoleTitle.MEMBER
@@ -85,7 +82,7 @@ def get_single_person(
     )
 
 
-def get_person(driver: "ChromeDriverManager") -> dict:
+def get_person(driver: "WebDriver") -> dict:
     """
     Put the informtion get by get_single_person() to dictionary
 
@@ -95,6 +92,8 @@ def get_person(driver: "ChromeDriverManager") -> dict:
         key: person's name
         value: person's ingestion model
     """
+    from selenium.webdriver.common.by import By
+
     log.info("start get all the person ingestion model")
     driver.get("https://citycouncil.atlantaga.gov/council-members")
     members = driver.find_elements(By.XPATH, '//*[@id="leftNav_2_0_12"]/ul/li')
@@ -168,7 +167,7 @@ def convert_status_constant(decision: str) -> str:
 
 
 def assign_constant(
-    driver: "ChromeDriverManager",
+    driver: "WebDriver",
     i: int,
     j: int,
     vote_decision: str,
@@ -196,6 +195,8 @@ def assign_constant(
     PERSONS: dict
         Dict[str, ingestion_models.Person]
     """
+    from selenium.webdriver.common.by import By
+
     log.info("start get vote ingestion model for one type of decision")
     v_res = driver.find_element(
         By.XPATH,
@@ -244,7 +245,7 @@ def assign_constant(
 
 
 def get_voting_result(
-    driver: "ChromeDriverManager",
+    driver: "WebDriver",
     sub_sections_len: int,
     i: int,
     body_name: str,
@@ -271,6 +272,8 @@ def get_voting_result(
     list
         contains the Vote ingestion model for each person
     """
+    from selenium.webdriver.common.by import By
+
     log.info("start get the vote ingestion model for a matter")
     voting_list: list[ingestion_models.Vote] = []
     for j in range(1, sub_sections_len + 1):
@@ -310,7 +313,7 @@ def get_voting_result(
     return voting_list
 
 
-def get_matter_status(driver: "ChromeDriverManager", i: int) -> Tuple[list, str]:
+def get_matter_status(driver: "WebDriver", i: int) -> Tuple[list, str]:
     """
     Find the matter result status
 
@@ -328,6 +331,8 @@ def get_matter_status(driver: "ChromeDriverManager", i: int) -> Tuple[list, str]
     decision_constant: element
         the matter decision constant
     """
+    from selenium.webdriver.common.by import By
+
     log.info("start get reslut status for a matter")
     result = driver.find_element(
         By.XPATH,
@@ -347,7 +352,7 @@ def get_matter_status(driver: "ChromeDriverManager", i: int) -> Tuple[list, str]
 
 
 def parse_single_matter(
-    driver: "ChromeDriverManager",
+    driver: "WebDriver",
     test: str,
     item: str,
     body_name: str,
@@ -375,6 +380,10 @@ def parse_single_matter(
     ingestion model
         minutes ingestion model with the matters information
     """
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.support.ui import WebDriverWait
+    from selenium.webdriver.support import expected_conditions as EC
+
     log.info("start get ingestion model for a matter")
     voting_list = []
     matter_name = item[0:9]  # name of the matter eg. "22-C-5024", "22-R-3404"
@@ -425,10 +434,10 @@ def parse_single_matter(
                 else:
                     sponsors.append(get_new_person(current))
             elif "Post" in s:
-                current_temp = s.split("Large ")[1]
+                current_temp3 = s.split("Large ")[1]
                 current_name = re.match(
                     r"([a-zA-Z]+)((\ {0,1}[a-zA-Z]+\.{0,1}\ )|(\ ))([a-zA-Z]+)",
-                    current_temp,
+                    current_temp3,
                 )
                 if current_name is not None:
                     current = f"{current_name.group(1)} {current_name.group(5)}"
@@ -439,10 +448,10 @@ def parse_single_matter(
                 else:
                     sponsors.append(get_new_person(current))
             elif "President" in s:
-                current_temp = s.split("President ")[1]
+                current_temp4 = s.split("President ")[1]
                 current_name = re.match(
                     r"([a-zA-Z]+)((\ {0,1}[a-zA-Z]+\.{0,1}\ )|(\ ))([a-zA-Z]+)",
-                    current_temp,
+                    current_temp4,
                 )
                 if current_name is not None:
                     current = f"{current_name.group(1)} {current_name.group(5)}"
@@ -511,7 +520,7 @@ def parse_single_matter(
 
 def parse_event(
     url: str,
-    driver: "ChromeDriverManager",
+    driver: "WebDriver",
 ) -> ingestion_models.EventIngestionModel:
     """
     Scrapes all the information for a meeting
@@ -526,6 +535,11 @@ def parse_event(
     ingestion model
         the ingestion model for the meeting
     """
+    import selenium
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.support.ui import WebDriverWait
+    from selenium.webdriver.support import expected_conditions as EC
+
     log.info("start get ingestion model for a event")
 
     MINUTE_INDEX = [chr(i) for i in range(ord("A"), ord("Z") + 1)]
@@ -684,7 +698,7 @@ def parse_event(
     )
 
 
-def get_year(driver: "ChromeDriverManager", url: str, from_dt: datetime) -> str:
+def get_year(driver: "WebDriver", url: str, from_dt: datetime) -> str:
     """
     Navigate to the year that we are looking for
 
@@ -700,6 +714,8 @@ def get_year(driver: "ChromeDriverManager", url: str, from_dt: datetime) -> str:
     link:str
         the link to the calender of the year that we are looking for
     """
+    from selenium.webdriver.common.by import By
+
     log.info("start get the current year's calender page")
     driver.get(url)
     dates = driver.find_element(By.ID, "ContentPlaceHolder1_lblCalendarRange")
@@ -711,7 +727,7 @@ def get_year(driver: "ChromeDriverManager", url: str, from_dt: datetime) -> str:
 
 
 def get_date(
-    driver: "ChromeDriverManager",
+    driver: "WebDriver",
     url: str,
     from_dt: datetime,
     to_dt: datetime,
@@ -735,6 +751,8 @@ def get_date(
     list
         all the ingestion models for the selected date range
     """
+    from selenium.webdriver.common.by import By
+
     log.info("start calling parse_event for a signle meeting")
     driver.get(url)
     dates = driver.find_elements(By.CLASS_NAME, "RowTop")
@@ -773,13 +791,9 @@ def get_events(from_dt: datetime, to_dt: datetime) -> list:
     list
         all the ingestion models for the selected date range
     """
-    import selenium  # noqa F401
     from selenium import webdriver
     from selenium.webdriver.chrome.options import Options
-    from selenium.webdriver.common.by import By  # noqa F401
     from selenium.webdriver.chrome.service import Service
-    from selenium.webdriver.support.ui import WebDriverWait  # noqa F401
-    from selenium.webdriver.support import expected_conditions as EC  # noqa F401
     from webdriver_manager.chrome import ChromeDriverManager
 
     chrome_options = Options()
