@@ -7,8 +7,14 @@ from setuptools import find_packages, setup
 
 with open("README.md") as readme_file:
     readme = readme_file.read()
+    
+atlanta_reqs = [
+    "selenium~=4.3",
+    "webdriver-manager~=3.8",
+]
 
 test_requirements = [
+    *atlanta_reqs,
     "black>=19.10b0",
     "flake8>=3.8.3",
     "flake8-debugger>=3.2.1",
