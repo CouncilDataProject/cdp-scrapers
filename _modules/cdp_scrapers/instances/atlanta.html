@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>cdp_scrapers.instances.atlanta &mdash; cdp-scrapers 0.4.4 documentation</title>
+  <title>cdp_scrapers.instances.atlanta &mdash; cdp-scrapers 0.4.5 documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                0.4.4
+                0.4.5
               </div>
             
           
@@ -214,18 +214,12 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">selenium</span>
-    <span class="kn">from</span> <span class="nn">selenium.webdriver.common.by</span> <span class="kn">import</span> <span class="n">By</span>
-    <span class="kn">from</span> <span class="nn">selenium.webdriver.support.ui</span> <span class="kn">import</span> <span class="n">WebDriverWait</span>
-    <span class="kn">from</span> <span class="nn">selenium.webdriver.support</span> <span class="kn">import</span> <span class="n">expected_conditions</span> <span class="k">as</span> <span class="n">EC</span>
-    <span class="kn">from</span> <span class="nn">webdriver_manager.chrome</span> <span class="kn">import</span> <span class="n">ChromeDriverManager</span>
+    <span class="kn">from</span> <span class="nn">selenium.webdriver.chrome.webdriver</span> <span class="kn">import</span> <span class="n">WebDriver</span>
 
 <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="get_single_person"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.get_single_person">[docs]</a><span class="k">def</span> <span class="nf">get_single_person</span><span class="p">(</span>
-    <span class="n">driver</span><span class="p">:</span> <span class="s2">&quot;ChromeDriverManager&quot;</span><span class="p">,</span> <span class="n">member_name</span><span class="p">:</span> <span class="nb">str</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ingestion_models</span><span class="o">.</span><span class="n">Person</span><span class="p">:</span>
+<div class="viewcode-block" id="get_single_person"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.get_single_person">[docs]</a><span class="k">def</span> <span class="nf">get_single_person</span><span class="p">(</span><span class="n">driver</span><span class="p">:</span> <span class="s2">&quot;WebDriver&quot;</span><span class="p">,</span> <span class="n">member_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ingestion_models</span><span class="o">.</span><span class="n">Person</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get all the information fot one person</span>
 <span class="sd">    Includes: role, seat, picture, phone, email</span>
@@ -242,6 +236,9 @@
 <span class="sd">    ingestion_models</span>
 <span class="sd">        the ingestion model for the person&#39;s part</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">selenium</span>
+    <span class="kn">from</span> <span class="nn">selenium.webdriver.common.by</span> <span class="kn">import</span> <span class="n">By</span>
+
     <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;start get active person ingestion model&quot;</span><span class="p">)</span>
     <span class="n">seat_role</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CLASS_NAME</span><span class="p">,</span> <span class="s2">&quot;titlewidget-subtitle&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
     <span class="n">member_role</span> <span class="o">=</span> <span class="n">db_constants</span><span class="o">.</span><span class="n">RoleTitle</span><span class="o">.</span><span class="n">MEMBER</span>
@@ -291,7 +288,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_person"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.get_person">[docs]</a><span class="k">def</span> <span class="nf">get_person</span><span class="p">(</span><span class="n">driver</span><span class="p">:</span> <span class="s2">&quot;ChromeDriverManager&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<div class="viewcode-block" id="get_person"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.get_person">[docs]</a><span class="k">def</span> <span class="nf">get_person</span><span class="p">(</span><span class="n">driver</span><span class="p">:</span> <span class="s2">&quot;WebDriver&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Put the informtion get by get_single_person() to dictionary</span>
 
@@ -301,6 +298,8 @@
 <span class="sd">        key: person&#39;s name</span>
 <span class="sd">        value: person&#39;s ingestion model</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">selenium.webdriver.common.by</span> <span class="kn">import</span> <span class="n">By</span>
+
     <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;start get all the person ingestion model&quot;</span><span class="p">)</span>
     <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://citycouncil.atlantaga.gov/council-members&quot;</span><span class="p">)</span>
     <span class="n">members</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_elements</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span> <span class="s1">&#39;//*[@id=&quot;leftNav_2_0_12&quot;]/ul/li&#39;</span><span class="p">)</span>
@@ -374,7 +373,7 @@
 
 
 <div class="viewcode-block" id="assign_constant"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.assign_constant">[docs]</a><span class="k">def</span> <span class="nf">assign_constant</span><span class="p">(</span>
-    <span class="n">driver</span><span class="p">:</span> <span class="s2">&quot;ChromeDriverManager&quot;</span><span class="p">,</span>
+    <span class="n">driver</span><span class="p">:</span> <span class="s2">&quot;WebDriver&quot;</span><span class="p">,</span>
     <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">j</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">vote_decision</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -402,6 +401,8 @@
 <span class="sd">    PERSONS: dict</span>
 <span class="sd">        Dict[str, ingestion_models.Person]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">selenium.webdriver.common.by</span> <span class="kn">import</span> <span class="n">By</span>
+
     <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;start get vote ingestion model for one type of decision&quot;</span><span class="p">)</span>
     <span class="n">v_res</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span>
         <span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span>
@@ -450,7 +451,7 @@
 
 
 <div class="viewcode-block" id="get_voting_result"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.get_voting_result">[docs]</a><span class="k">def</span> <span class="nf">get_voting_result</span><span class="p">(</span>
-    <span class="n">driver</span><span class="p">:</span> <span class="s2">&quot;ChromeDriverManager&quot;</span><span class="p">,</span>
+    <span class="n">driver</span><span class="p">:</span> <span class="s2">&quot;WebDriver&quot;</span><span class="p">,</span>
     <span class="n">sub_sections_len</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">body_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -477,6 +478,8 @@
 <span class="sd">    list</span>
 <span class="sd">        contains the Vote ingestion model for each person</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">selenium.webdriver.common.by</span> <span class="kn">import</span> <span class="n">By</span>
+
     <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;start get the vote ingestion model for a matter&quot;</span><span class="p">)</span>
     <span class="n">voting_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ingestion_models</span><span class="o">.</span><span class="n">Vote</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">sub_sections_len</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
@@ -516,7 +519,7 @@
     <span class="k">return</span> <span class="n">voting_list</span></div>
 
 
-<div class="viewcode-block" id="get_matter_status"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.get_matter_status">[docs]</a><span class="k">def</span> <span class="nf">get_matter_status</span><span class="p">(</span><span class="n">driver</span><span class="p">:</span> <span class="s2">&quot;ChromeDriverManager&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="get_matter_status"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.get_matter_status">[docs]</a><span class="k">def</span> <span class="nf">get_matter_status</span><span class="p">(</span><span class="n">driver</span><span class="p">:</span> <span class="s2">&quot;WebDriver&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Find the matter result status</span>
 
@@ -534,6 +537,8 @@
 <span class="sd">    decision_constant: element</span>
 <span class="sd">        the matter decision constant</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">selenium.webdriver.common.by</span> <span class="kn">import</span> <span class="n">By</span>
+
     <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;start get reslut status for a matter&quot;</span><span class="p">)</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span>
         <span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span>
@@ -553,7 +558,7 @@
 
 
 <div class="viewcode-block" id="parse_single_matter"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.parse_single_matter">[docs]</a><span class="k">def</span> <span class="nf">parse_single_matter</span><span class="p">(</span>
-    <span class="n">driver</span><span class="p">:</span> <span class="s2">&quot;ChromeDriverManager&quot;</span><span class="p">,</span>
+    <span class="n">driver</span><span class="p">:</span> <span class="s2">&quot;WebDriver&quot;</span><span class="p">,</span>
     <span class="n">test</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">item</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">body_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -581,6 +586,10 @@
 <span class="sd">    ingestion model</span>
 <span class="sd">        minutes ingestion model with the matters information</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">selenium.webdriver.common.by</span> <span class="kn">import</span> <span class="n">By</span>
+    <span class="kn">from</span> <span class="nn">selenium.webdriver.support.ui</span> <span class="kn">import</span> <span class="n">WebDriverWait</span>
+    <span class="kn">from</span> <span class="nn">selenium.webdriver.support</span> <span class="kn">import</span> <span class="n">expected_conditions</span> <span class="k">as</span> <span class="n">EC</span>
+
     <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;start get ingestion model for a matter&quot;</span><span class="p">)</span>
     <span class="n">voting_list</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">matter_name</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">9</span><span class="p">]</span>  <span class="c1"># name of the matter eg. &quot;22-C-5024&quot;, &quot;22-R-3404&quot;</span>
@@ -631,10 +640,10 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">sponsors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">get_new_person</span><span class="p">(</span><span class="n">current</span><span class="p">))</span>
             <span class="k">elif</span> <span class="s2">&quot;Post&quot;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
-                <span class="n">current_temp</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;Large &quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">current_temp3</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;Large &quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
                 <span class="n">current_name</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span>
                     <span class="sa">r</span><span class="s2">&quot;([a-zA-Z]+)((\ {0,1}[a-zA-Z]+\.{0,1}\ )|(\ ))([a-zA-Z]+)&quot;</span><span class="p">,</span>
-                    <span class="n">current_temp</span><span class="p">,</span>
+                    <span class="n">current_temp3</span><span class="p">,</span>
                 <span class="p">)</span>
                 <span class="k">if</span> <span class="n">current_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">current</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_name</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">current_name</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -645,10 +654,10 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">sponsors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">get_new_person</span><span class="p">(</span><span class="n">current</span><span class="p">))</span>
             <span class="k">elif</span> <span class="s2">&quot;President&quot;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
-                <span class="n">current_temp</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;President &quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">current_temp4</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;President &quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
                 <span class="n">current_name</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span>
                     <span class="sa">r</span><span class="s2">&quot;([a-zA-Z]+)((\ {0,1}[a-zA-Z]+\.{0,1}\ )|(\ ))([a-zA-Z]+)&quot;</span><span class="p">,</span>
-                    <span class="n">current_temp</span><span class="p">,</span>
+                    <span class="n">current_temp4</span><span class="p">,</span>
                 <span class="p">)</span>
                 <span class="k">if</span> <span class="n">current_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">current</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_name</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">current_name</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -717,7 +726,7 @@
 
 <div class="viewcode-block" id="parse_event"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.parse_event">[docs]</a><span class="k">def</span> <span class="nf">parse_event</span><span class="p">(</span>
     <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">driver</span><span class="p">:</span> <span class="s2">&quot;ChromeDriverManager&quot;</span><span class="p">,</span>
+    <span class="n">driver</span><span class="p">:</span> <span class="s2">&quot;WebDriver&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ingestion_models</span><span class="o">.</span><span class="n">EventIngestionModel</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Scrapes all the information for a meeting</span>
@@ -732,6 +741,11 @@
 <span class="sd">    ingestion model</span>
 <span class="sd">        the ingestion model for the meeting</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">selenium</span>
+    <span class="kn">from</span> <span class="nn">selenium.webdriver.common.by</span> <span class="kn">import</span> <span class="n">By</span>
+    <span class="kn">from</span> <span class="nn">selenium.webdriver.support.ui</span> <span class="kn">import</span> <span class="n">WebDriverWait</span>
+    <span class="kn">from</span> <span class="nn">selenium.webdriver.support</span> <span class="kn">import</span> <span class="n">expected_conditions</span> <span class="k">as</span> <span class="n">EC</span>
+
     <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;start get ingestion model for a event&quot;</span><span class="p">)</span>
 
     <span class="n">MINUTE_INDEX</span> <span class="o">=</span> <span class="p">[</span><span class="nb">chr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">),</span> <span class="nb">ord</span><span class="p">(</span><span class="s2">&quot;Z&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
@@ -890,7 +904,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_year"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.get_year">[docs]</a><span class="k">def</span> <span class="nf">get_year</span><span class="p">(</span><span class="n">driver</span><span class="p">:</span> <span class="s2">&quot;ChromeDriverManager&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">from_dt</span><span class="p">:</span> <span class="n">datetime</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<div class="viewcode-block" id="get_year"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.get_year">[docs]</a><span class="k">def</span> <span class="nf">get_year</span><span class="p">(</span><span class="n">driver</span><span class="p">:</span> <span class="s2">&quot;WebDriver&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">from_dt</span><span class="p">:</span> <span class="n">datetime</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Navigate to the year that we are looking for</span>
 
@@ -906,6 +920,8 @@
 <span class="sd">    link:str</span>
 <span class="sd">        the link to the calender of the year that we are looking for</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">selenium.webdriver.common.by</span> <span class="kn">import</span> <span class="n">By</span>
+
     <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;start get the current year&#39;s calender page&quot;</span><span class="p">)</span>
     <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
     <span class="n">dates</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="s2">&quot;ContentPlaceHolder1_lblCalendarRange&quot;</span><span class="p">)</span>
@@ -917,7 +933,7 @@
 
 
 <div class="viewcode-block" id="get_date"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.get_date">[docs]</a><span class="k">def</span> <span class="nf">get_date</span><span class="p">(</span>
-    <span class="n">driver</span><span class="p">:</span> <span class="s2">&quot;ChromeDriverManager&quot;</span><span class="p">,</span>
+    <span class="n">driver</span><span class="p">:</span> <span class="s2">&quot;WebDriver&quot;</span><span class="p">,</span>
     <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">from_dt</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span>
     <span class="n">to_dt</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span>
@@ -941,6 +957,8 @@
 <span class="sd">    list</span>
 <span class="sd">        all the ingestion models for the selected date range</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">selenium.webdriver.common.by</span> <span class="kn">import</span> <span class="n">By</span>
+
     <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;start calling parse_event for a signle meeting&quot;</span><span class="p">)</span>
     <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
     <span class="n">dates</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_elements</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CLASS_NAME</span><span class="p">,</span> <span class="s2">&quot;RowTop&quot;</span><span class="p">)</span>
@@ -979,13 +997,9 @@
 <span class="sd">    list</span>
 <span class="sd">        all the ingestion models for the selected date range</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">selenium</span>  <span class="c1"># noqa F401</span>
     <span class="kn">from</span> <span class="nn">selenium</span> <span class="kn">import</span> <span class="n">webdriver</span>
     <span class="kn">from</span> <span class="nn">selenium.webdriver.chrome.options</span> <span class="kn">import</span> <span class="n">Options</span>
-    <span class="kn">from</span> <span class="nn">selenium.webdriver.common.by</span> <span class="kn">import</span> <span class="n">By</span>  <span class="c1"># noqa F401</span>
     <span class="kn">from</span> <span class="nn">selenium.webdriver.chrome.service</span> <span class="kn">import</span> <span class="n">Service</span>
-    <span class="kn">from</span> <span class="nn">selenium.webdriver.support.ui</span> <span class="kn">import</span> <span class="n">WebDriverWait</span>  <span class="c1"># noqa F401</span>
-    <span class="kn">from</span> <span class="nn">selenium.webdriver.support</span> <span class="kn">import</span> <span class="n">expected_conditions</span> <span class="k">as</span> <span class="n">EC</span>  <span class="c1"># noqa F401</span>
     <span class="kn">from</span> <span class="nn">webdriver_manager.chrome</span> <span class="kn">import</span> <span class="n">ChromeDriverManager</span>
 
     <span class="n">chrome_options</span> <span class="o">=</span> <span class="n">Options</span><span class="p">()</span>
