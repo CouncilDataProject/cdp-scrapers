@@ -46,6 +46,7 @@ requirements = [
 ]
 
 extra_requirements = {
+    "atlanta": atlanta_reqs,
     "test": test_requirements,
     "dev": dev_requirements,
     "all": [
@@ -55,8 +56,8 @@ extra_requirements = {
 }
 
 setup(
-    author="Jackson Maxfield Brown, Sung Cho",
-    author_email="jmaxfieldbrown@gmail.com",
+    author="Eva Maxfield Brown, Sung Cho",
+    author_email="evamaxfieldbrown@gmail.com",
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
