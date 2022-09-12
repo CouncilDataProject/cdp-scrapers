@@ -56,7 +56,7 @@ extra_requirements = {
 }
 
 setup(
-    author="Eva Maxfield Brown, Sung Cho",
+    author="Eva Maxfield Brown, Sung Cho, Shak Ragoler",
     author_email="evamaxfieldbrown@gmail.com",
     classifiers=[
         "Development Status :: 4 - Beta",
