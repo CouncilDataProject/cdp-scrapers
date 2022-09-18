@@ -43,6 +43,7 @@ requirements = [
     "pytz~=2021.1",
     "requests~=2.25",
     "clean-text~=0.6.0",
+    "civic-scraper~=0.2.5",
 ]
 
 extra_requirements = {
