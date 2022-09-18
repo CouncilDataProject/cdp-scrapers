@@ -1,7 +1,10 @@
+import abc
+from copy import deepcopy
 import enum
 from datetime import datetime
+from itertools import groupby
 from logging import getLogger
-from typing import Dict, Optional
+from typing import Dict, Iterable, List, Optional, Tuple
 
 from cdp_backend.pipeline.ingestion_models import (
     EventIngestionModel,
@@ -9,6 +12,7 @@ from cdp_backend.pipeline.ingestion_models import (
     Session,
 )
 from civic_scraper.base.asset import Asset
+from civic_scraper.runner import Runner
 
 ###############################################################################
 
@@ -17,6 +21,7 @@ log = getLogger(__name__)
 ###############################################################################
 
 DATE_FORMAT = "%Y-%m-%d"
+IngestionType = abc.ABCMeta
 
 
 class AssetType(enum.IntFlag):
@@ -125,6 +130,12 @@ class CivicIngestionModel:
         """
         return self.asset.asset_type == asset_type.name
 
+    def is_ingestion(self, ingestion_type: IngestionType) -> bool:
+        return (
+            CivicIngestionModel.type_map.get(self.asset.asset_type, None)
+            is ingestion_type
+        )
+
     def get_asset_uri(self, asset_type: AssetType) -> Optional[str]:
         """
         Get url of given type from ingested asset.
@@ -141,6 +152,25 @@ class CivicIngestionModel:
         """
         return self.asset.url if self.is_asset(asset_type) else None
 
+    def ingest(self, **kwargs) -> Optional[IngestionModel]:
+        """
+        Call the constructor for the matching IngestionModel.
+
+        Parameters
+        ----------
+        kwargs: Any
+            The keyword arguments passed to IngestionModel.__init__()
+
+        Returns
+        -------
+        Optional[IngestionModel]
+            Instance of the IngestionModel that matches the Asset.
+        """
+        try:
+            return CivicIngestionModel.type_map[self.asset.asset_type](**kwargs)
+        except (KeyError, TypeError):
+            return None
+
     def get_event(self) -> Optional[EventIngestionModel]:
         """
         civic_scraper Asset to EventIngestionModel
@@ -150,16 +180,13 @@ class CivicIngestionModel:
         Optional[EventIngestionModel]
             The asset converted to EventIngestionModel; None if asset type mismatch
         """
-        try:
-            return CivicIngestionModel.type_map[self.asset.asset_type](
-                body=self.asset.committee_name,
-                sessions=None,
-                agenda_uri=self.get_asset_uri(AssetType.agenda),
-                minutes_uri=self.get_asset_uri(AssetType.minutes),
-            )
-        except (KeyError, TypeError):
-            # type_map[asset_type] != EventIngestionModel
-            return None
+        return self.ingest(
+            body=self.asset.committee_name,
+            sessions=None,
+            agenda_uri=self.get_asset_uri(AssetType.agenda),
+            minutes_uri=self.get_asset_uri(AssetType.minutes),
+            external_source_id=self.asset.meeting_id,
+        )
 
     def get_session(self) -> Optional[Session]:
         """
@@ -170,32 +197,62 @@ class CivicIngestionModel:
         Optional[Session]
             The asset converted to Session; None if asset type mismatch
         """
-        try:
-            return CivicIngestionModel.type_map[self.asset.asset_type](
-                session_datetime=asset_datetime(self.asset),
-                session_index=0,
-                video_uri=self.get_asset_uri(AssetType.video),
-                caption_uri=self.get_asset_uri(AssetType.captions),
-            )
-        except (KeyError, TypeError):
-            return None
+        return self.ingest(
+            session_datetime=asset_datetime(self.asset),
+            session_index=0,
+            video_uri=self.get_asset_uri(AssetType.video),
+            caption_uri=self.get_asset_uri(AssetType.captions),
+            external_source_id=self.asset.meeting_id,
+        )
 
-    def get_ingested(self) -> IngestionModel:
-        """
-        civic_scraper Asset to IngestionModel
 
-        Returns
-        -------
-        Optional[IngestionModel]
-            The asset converted to some IngestionSession.
-            None if no conversion exists for this asset type.
-        """
-        for ingestion in [
-            self.get_event,
-            self.get_session,
-        ]:
-            ingested = ingestion()
-            if ingested is not None:
-                return ingested
+def merge_ingestion(old: IngestionModel, new: IngestionModel) -> IngestionModel:
+    kwargs = {
+        k: deepcopy(getattr(new, k) if v is None else v)
+        for k, v in old.__dict__.items()
+    }
+    return old.__class__(**kwargs)
 
-        return None
+
+def merge_session(session: Session, ingestion: CivicIngestionModel) -> Session:
+    if not ingestion.is_ingestion(Session):
+        return session
+    return merge_ingestion(session, ingestion.get_session())
+
+
+def merge_event(
+    event: EventIngestionModel, ingestion: CivicIngestionModel
+) -> EventIngestionModel:
+    if not ingestion.is_ingestion(EventIngestionModel):
+        return event
+    return merge_ingestion(event, ingestion.get_event())
+
+
+def merge_assets(assets: Iterable[Asset]) -> Tuple[EventIngestionModel, Session]:
+    event = EventIngestionModel(body=None, sessions=None)
+    session = Session(session_datetime=None, video_uri=None, session_index=None)
+    for asset in assets:
+        ingestion = CivicIngestionModel(asset)
+        event = merge_event(event, ingestion)
+        session = merge_session(session, ingestion)
+
+    return event, session
+
+
+def get_events(site_url: str, begin: datetime, end: datetime):
+    assets = Runner().scrape(start_date=begin, end_date=end, site_urls=[site_url])
+    events: List[EventIngestionModel] = list()
+
+    for meeting_id, meeting_assets in groupby(assets, key=lambda a: a.meeting_id):
+        event, session = merge_assets(meeting_assets)
+
+        if session.video_uri is None:
+            continue
+
+        event.sessions = [session]
+        if event.body is None:
+            continue
+
+        events.append(event)
+
+    return events
