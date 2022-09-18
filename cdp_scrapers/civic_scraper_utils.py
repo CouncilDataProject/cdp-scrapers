@@ -1,10 +1,9 @@
 import abc
-from copy import deepcopy
 import enum
+from copy import deepcopy
 from datetime import datetime
-from itertools import groupby
 from logging import getLogger
-from typing import Dict, Iterable, List, Optional, Tuple
+from typing import Dict, Iterable, Optional
 
 from cdp_backend.pipeline.ingestion_models import (
     EventIngestionModel,
@@ -12,7 +11,6 @@ from cdp_backend.pipeline.ingestion_models import (
     Session,
 )
 from civic_scraper.base.asset import Asset
-from civic_scraper.runner import Runner
 
 ###############################################################################
 
@@ -206,15 +204,61 @@ class CivicIngestionModel:
         )
 
 
-def merge_ingestion(old: IngestionModel, new: IngestionModel) -> IngestionModel:
-    kwargs = {
-        k: deepcopy(getattr(new, k) if v is None else v)
-        for k, v in old.__dict__.items()
-    }
-    return old.__class__(**kwargs)
+def merge_ingestion(
+    left_ingestion: IngestionModel, right_ingestion: IngestionModel
+) -> IngestionModel:
+    """
+    Return a merged instance of the given ingestion models.
+
+    Parameters
+    ----------
+    left_ingestion: IngestionModel
+        Ingestion model to merge
+    right_ingestion: IngestionModel
+        Ingestion model to merge
+
+    Returns
+    -------
+    IngestionModel
+        Input ingestion models merged.
+
+    Raises
+    ------
+    ValueError
+        When both ingestion models have different values for the same attribute.
+    """
+    kwargs = dict()
+    for key, left_attr in left_ingestion.__dict__.items():
+        right_attr = getattr(right_ingestion, key)
+        if left_attr is not None and right_attr is not None and left_attr != right_attr:
+            raise ValueError(
+                f"Cannot resolve conflict for {key}: {left_attr} and {right_attr}"
+            )
+        kwargs.update({key: deepcopy(left_attr or right_attr)})
+
+    return left_ingestion.__class__(**kwargs)
 
 
 def merge_session(session: Session, ingestion: CivicIngestionModel) -> Session:
+    """
+    Return input session merged with information from the ingested asset.
+
+    Parameters
+    ----------
+    session: Session
+        Merge target session
+    ingestion: CivicIngestionModel
+        Ingested civic_scraper Asset
+
+    Returns
+    -------
+    Session
+        Input session and asset merged.
+
+    Notes
+    -----
+    ingestion is ignored if asset_type is not for Session.
+    """
     if not ingestion.is_ingestion(Session):
         return session
     return merge_ingestion(session, ingestion.get_session())
@@ -223,36 +267,73 @@ def merge_session(session: Session, ingestion: CivicIngestionModel) -> Session:
 def merge_event(
     event: EventIngestionModel, ingestion: CivicIngestionModel
 ) -> EventIngestionModel:
+    """
+    Return input event merged with information from the ingested asset.
+
+    Parameters
+    ----------
+    session: EventIngestionModel
+        Merge target event
+    ingestion: CivicIngestionModel
+        Ingested civic_scraper Asset
+
+    Returns
+    -------
+    EventIngestionModel
+        Input event and asset merged.
+
+    Notes
+    -----
+    ingestion is ignored if asset_type is not for EventIngestionModel.
+    """
     if not ingestion.is_ingestion(EventIngestionModel):
         return event
     return merge_ingestion(event, ingestion.get_event())
 
 
-def merge_assets(assets: Iterable[Asset]) -> Tuple[EventIngestionModel, Session]:
+def merge_assets(assets: Iterable[Asset]) -> Optional[EventIngestionModel]:
+    """
+    Create an event from civic_scraper assets.
+
+    Parameters
+    ----------
+    assets: Iterable[Asset]
+        AssetCollection from civic_scraper.
+
+    Returns
+    -------
+    Optional[EventIngestionModel]
+        Event created from input assets.
+
+    Raises
+    -----
+    ValueError
+        If input AssetCollection contains assets for different meetings.
+    """
     event = EventIngestionModel(body=None, sessions=None)
     session = Session(session_datetime=None, video_uri=None, session_index=None)
-    for asset in assets:
-        ingestion = CivicIngestionModel(asset)
+
+    meeting_id: str = None
+    for ingestion in map(CivicIngestionModel, assets):
         event = merge_event(event, ingestion)
         session = merge_session(session, ingestion)
 
-    return event, session
+        if meeting_id is None:
+            meeting_id = ingestion.asset.meeting_id
+        elif (
+            ingestion.asset.meeting_id is not None
+            and ingestion.asset.meeting_id != meeting_id
+        ):
+            raise ValueError(
+                f"Mixed meetings: {meeting_id} and {ingestion.asset.meeting_id}"
+            )
 
+    if session.video_uri is None:
+        return None
 
-def get_events(site_url: str, begin: datetime, end: datetime):
-    assets = Runner().scrape(start_date=begin, end_date=end, site_urls=[site_url])
-    events: List[EventIngestionModel] = list()
+    event.sessions = [session]
 
-    for meeting_id, meeting_assets in groupby(assets, key=lambda a: a.meeting_id):
-        event, session = merge_assets(meeting_assets)
+    if event.body is None:
+        return None
 
-        if session.video_uri is None:
-            continue
-
-        event.sessions = [session]
-        if event.body is None:
-            continue
-
-        events.append(event)
-
-    return events
+    return event

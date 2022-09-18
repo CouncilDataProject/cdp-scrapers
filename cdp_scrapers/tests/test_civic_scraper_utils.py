@@ -1,11 +1,6 @@
-from datetime import datetime, time
-
 import pytest
-from cdp_backend.pipeline.ingestion_models import (
-    EventIngestionModel,
-    Session,
-)
-from civic_scraper.base.asset import Asset
+from cdp_backend.pipeline.ingestion_models import EventIngestionModel, Session
+from civic_scraper.base.asset import Asset, AssetCollection
 
 from cdp_scrapers.civic_scraper_utils import (
     AssetType,
@@ -13,9 +8,11 @@ from cdp_scrapers.civic_scraper_utils import (
     IngestionType,
     asset_datetime,
     civic_strftime,
+    merge_assets,
     merge_event,
     merge_session,
 )
+from datetime import datetime, time
 
 assets = [
     (
@@ -181,3 +178,52 @@ def test_merge_event(
     event: EventIngestionModel, asset: Asset, merged: EventIngestionModel
 ):
     assert merge_event(event, CivicIngestionModel(asset)) == merged
+
+
+@pytest.mark.parametrize(
+    "assets, event",
+    [
+        (
+            [Asset(url=None)],
+            None,
+        ),
+        (
+            [
+                Asset(
+                    url="agenda_url",
+                    asset_type="agenda",
+                    meeting_date=datetime(2022, 1, 9, 1, 2, 3),
+                    meeting_id="meeting 1",
+                ),
+                Asset(
+                    url="minutes_url",
+                    committee_name="committee",
+                    asset_type="minutes",
+                    meeting_id="meeting 1",
+                ),
+                Asset(
+                    url="video_url",
+                    asset_type="video",
+                    meeting_date=datetime(2022, 1, 9, 1, 2, 3),
+                    meeting_id="meeting 1",
+                ),
+            ],
+            EventIngestionModel(
+                body="committee",
+                sessions=[
+                    Session(
+                        session_datetime=datetime(2022, 1, 9, 1, 2, 3),
+                        video_uri="video_url",
+                        external_source_id="meeting 1",
+                        session_index=0,
+                    )
+                ],
+                agenda_uri="agenda_url",
+                minutes_uri="minutes_url",
+                external_source_id="meeting 1",
+            ),
+        ),
+    ],
+)
+def test_merge_assets(assets: AssetCollection, event: EventIngestionModel):
+    assert merge_assets(assets) == event
