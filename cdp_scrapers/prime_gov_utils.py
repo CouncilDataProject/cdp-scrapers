@@ -1,10 +1,11 @@
 from datetime import date, datetime
 from logging import getLogger
+from optparse import Option
 from typing import Any, Dict, Iterable, Optional, Set
 from cdp_backend.pipeline.ingestion_models import Session, EventIngestionModel, Body
 from civic_scraper.base.asset import Asset
 from civic_scraper.platforms.primegov.site import PrimeGovSite
-from .scraper_utils import IngestionModelScraper, str_simplified
+from .scraper_utils import IngestionModelScraper, reduced_list, str_simplified
 
 
 ###############################################################################
@@ -16,11 +17,12 @@ log = getLogger(__name__)
 SITE_URL = "https://{client}.primegov.com/"
 API_URL = "{base_url}/api/meeting/search?from={start_date}&to={end_date}"
 
-VIDEO_URL = "videoUrl"
 MEETING_DATETIME = "dateTime"
 MEETING_DATE = "date"
 MEETING_TIME = "time"
+MEETING_ID = "id"
 BODY_NAME = "title"
+VIDEO_URL = "videoUrl"
 
 DATE_FORMAT = "%m/%d/%Y"
 TIME_FORMAT = "%I:%M %p"
@@ -78,4 +80,13 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
     def get_body(self, meeting: Meeting) -> Optional[Body]:
         return self.get_none_if_empty(
             Body(name=str_simplified(meeting[BODY_NAME]))
+        )
+
+    def get_event(self, meeting: Meeting) -> Optional[EventIngestionModel]:
+        return self.get_none_if_empty(
+            EventIngestionModel(
+                body=self.get_body(meeting),
+                sessions=reduced_list([self.get_session(meeting)]),
+                external_source_id=str_simplified(str(meeting[MEETING_ID])),
+            )
         )

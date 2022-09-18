@@ -33,3 +33,8 @@ def test_get_session(scraper: PrimeGovScraper, meetings: List[Meeting]):
 def test_get_body(scraper: PrimeGovScraper, meetings: List[Meeting]):
     bodies = reduced_list(map(scraper.get_body, meetings))
     assert len(bodies) == len(meetings)
+
+@pytest.mark.parametrize("scraper, meetings", [(d[DataItem.Scraper], d[DataItem.Meetings]) for d in test_data])
+def test_get_event(scraper: PrimeGovScraper, meetings: List[Meeting]):
+    events = reduced_list(map(scraper.get_event, meetings))
+    assert len(events) == len(meetings)
