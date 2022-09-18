@@ -4,7 +4,13 @@ from typing import List
 
 import pytest
 
-from cdp_scrapers.prime_gov_utils import Meeting, PrimeGovScraper
+from cdp_scrapers.prime_gov_utils import (
+    MEETING_DATETIME,
+    Meeting,
+    PrimeGovScraper,
+    primegov_strftime,
+    primegov_strptime,
+)
 from cdp_scrapers.scraper_utils import reduced_list
 
 
@@ -42,6 +48,35 @@ test_data = list(
         test_data,
     )
 )
+
+
+@pytest.mark.parametrize(
+    "meeting, date_time",
+    [
+        (
+            {"dateTime": "2022-09-06T10:00:00", "date": "", "time": ""},
+            datetime(2022, 9, 6, 10),
+        ),
+        (
+            {"dateTime": "", "date": "09/06/2022", "time": "10:00 AM"},
+            datetime(2022, 9, 6, 10),
+        ),
+        ({"dateTime": "2022-09-06", "date": "", "time": ""}, datetime(2022, 9, 6)),
+        ({"dateTime": "", "date": "09/06/2022", "time": ""}, datetime(2022, 9, 6)),
+    ],
+)
+def test_strptime(meeting: Meeting, date_time: datetime):
+    assert primegov_strptime(meeting) == date_time
+
+
+@pytest.mark.parametrize(
+    "date_time",
+    [
+        (datetime(2022, 9, 1, 10)),
+    ],
+)
+def test_strftime(date_time: datetime):
+    assert date_time.strftime("%m/%d/%Y") == primegov_strftime(date_time)
 
 
 @pytest.mark.parametrize(

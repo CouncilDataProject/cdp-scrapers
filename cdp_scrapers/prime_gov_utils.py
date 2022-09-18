@@ -72,7 +72,13 @@ def primegov_strptime(meeting: Meeting) -> Optional[datetime]:
                 f"{DATE_FORMAT} {TIME_FORMAT}",
             )
         except ValueError:
-            pass
+            try:
+                return datetime.strptime(
+                    meeting[MEETING_DATE],
+                    DATE_FORMAT,
+                )
+            except ValueError:
+                pass
 
     log.debug(
         f"Error parsing '{meeting[MEETING_DATETIME]}', "
