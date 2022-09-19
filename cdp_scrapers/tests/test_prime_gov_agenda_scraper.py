@@ -17,14 +17,10 @@ name_texts = [
     ],
 ]
 names = [
-    [
-        "NITHYA RAMAN", "BOB BLUMENFIELD", "CURREN D. PRICE, JR."
-    ],
+    ["NITHYA RAMAN", "BOB BLUMENFIELD", "CURREN D. PRICE, JR."],
 ]
 role_titles = [
-    [
-        RoleTitle.CHAIR, RoleTitle.COUNCILMEMBER, RoleTitle.COUNCILMEMBER
-    ],
+    [RoleTitle.CHAIR, RoleTitle.COUNCILMEMBER, RoleTitle.COUNCILMEMBER],
 ]
 
 
@@ -32,8 +28,17 @@ role_titles = [
 def test_get_member_names(scraper: PrimeGovAgendaScraper, name_texts: List[str]):
     assert scraper.get_member_names() == name_texts
 
-@pytest.mark.parametrize("scraper, name_texts, names, role_titles", zip(scrapers, name_texts, names, role_titles))
-def test_pop_role_title(scraper: PrimeGovAgendaScraper, name_texts: List[str], names: List[str], role_titles: List[str]):
+
+@pytest.mark.parametrize(
+    "scraper, name_texts, names, role_titles",
+    zip(scrapers, name_texts, names, role_titles),
+)
+def test_pop_role_title(
+    scraper: PrimeGovAgendaScraper,
+    name_texts: List[str],
+    names: List[str],
+    role_titles: List[str],
+):
     for name_text, expected_name, expected_title in zip(name_texts, names, role_titles):
         name, title = scraper.pop_role_title(name_text)
         assert name == expected_name

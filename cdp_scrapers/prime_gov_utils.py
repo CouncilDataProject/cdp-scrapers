@@ -138,33 +138,39 @@ class PrimeGovAgendaScraper:
 
         return self.agenda_soup.find(_is_members_table)
 
-    def get_member_names(self) -> List[str]:
+    def get_member_names(self) -> List[PersonName]:
         table = self._get_members_table()
         if not table:
             return list()
 
-        def _get_name(row: Tag) -> str:
+        def _get_name(row: Tag) -> PersonName:
             return row.find_all("td")[-1].string
 
         return reduced_list(map(_get_name, table.find_all("tr")), collapse=False)
 
-    def pop_role_title(self, name_text: str) -> Tuple[str, RoleTitle]:
-        def _pop_lead_title() -> Tuple[str, RoleTitle]:
+    def pop_role_title(self, name_text: PersonName) -> Tuple[PersonName, RoleTitle]:
+        def _pop_lead_title() -> Tuple[PersonName, RoleTitle]:
             for match, std_title in map(
-                lambda title: (re.search(f"^\\s*{title[0]}", name_text, re.I), title[1]),
-                self.role_replacements.items()
+                lambda title: (
+                    re.search(f"^\\s*{title[0]}", name_text, re.I),
+                    title[1],
+                ),
+                self.role_replacements.items(),
             ):
                 if match is not None:
-                    return name_text[match.end():], std_title
+                    return name_text[match.end() :], std_title
             return name_text, None
 
-        def _pop_trail_title() -> Tuple[str, Optional[RoleTitle]]:
+        def _pop_trail_title() -> Tuple[PersonName, Optional[RoleTitle]]:
             for match, std_title in map(
-                lambda title: (re.search(f",\\s*{title[0]}\\s*$", name_text, re.I), title[1]),
-                self.role_replacements.items()
+                lambda title: (
+                    re.search(f",\\s*{title[0]}\\s*$", name_text, re.I),
+                    title[1],
+                ),
+                self.role_replacements.items(),
             ):
                 if match is not None:
-                    return name_text[:match.start()], std_title
+                    return name_text[: match.start()], std_title
             return name_text, None
 
         name_text, lead_title = _pop_lead_title()
