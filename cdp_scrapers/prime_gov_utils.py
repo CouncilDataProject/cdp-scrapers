@@ -1,10 +1,17 @@
+import re
 import requests
 from bs4 import BeautifulSoup, Tag
 from datetime import datetime
 from logging import getLogger
-from typing import Any, Dict, Iterable, List, Optional, Set
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
-from cdp_backend.pipeline.ingestion_models import Body, EventIngestionModel, Session, Person
+from cdp_backend.database.constants import RoleTitle
+from cdp_backend.pipeline.ingestion_models import (
+    Body,
+    EventIngestionModel,
+    Session,
+    Person,
+)
 from civic_scraper.platforms.primegov.site import PrimeGovSite
 
 from .scraper_utils import IngestionModelScraper, reduced_list, str_simplified
@@ -29,6 +36,7 @@ DATE_FORMAT = "%m/%d/%Y"
 TIME_FORMAT = "%I:%M %p"
 
 Meeting = Dict[str, Any]
+PersonName = str
 
 
 def primegov_strftime(dt: datetime) -> str:
@@ -94,22 +102,39 @@ def primegov_strptime(meeting: Meeting) -> Optional[datetime]:
 class PrimeGovAgendaScraper:
     MEMBERS_TBL_KEYWORD = "MEMBERS:"
 
-    def __init__(self, agenda_url: str):
+    def __init__(
+        self, agenda_url: str, role_replacements: Optional[Dict[str, RoleTitle]] = None
+    ):
         self.agenda_url = str_simplified(agenda_url)
+        self.role_replacements = role_replacements or {
+            "CHAIR": RoleTitle.CHAIR,
+            "COUNCILMEMBER": RoleTitle.COUNCILMEMBER,
+        }
         self.agenda_soup: Optional[BeautifulSoup] = None
 
         resp = requests.get(self.agenda_url)
         if resp.status_code == 200:
-            self.agenda_soup = BeautifulSoup(requests.get(self.agenda_url).text, "html.parser")
+            self.agenda_soup = BeautifulSoup(
+                requests.get(self.agenda_url).text, "html.parser"
+            )
         elif any(self.agenda_url):
-            log.warning(f"{self.agenda_url} -> {resp.status_code} {resp.reason} {resp.text}")
+            log.warning(
+                f"{self.agenda_url} -> {resp.status_code} {resp.reason} {resp.text}"
+            )
 
     def _get_members_table(self) -> Optional[Tag]:
         def _contains_members_row(tag: Tag) -> bool:
-            return tag.find("span", string=PrimeGovAgendaScraper.MEMBERS_TBL_KEYWORD) is not None
+            return (
+                tag.find("span", string=PrimeGovAgendaScraper.MEMBERS_TBL_KEYWORD)
+                is not None
+            )
 
         def _is_members_table(table: Tag) -> bool:
-            return table.name == "table" and _contains_members_row(table) and len(table.find_all("tr")) >= 2
+            return (
+                table.name == "table"
+                and _contains_members_row(table)
+                and len(table.find_all("tr")) >= 2
+            )
 
         return self.agenda_soup.find(_is_members_table)
 
@@ -122,6 +147,32 @@ class PrimeGovAgendaScraper:
             return row.find_all("td")[-1].string
 
         return reduced_list(map(_get_name, table.find_all("tr")), collapse=False)
+
+    def pop_role_title(self, name_text: str) -> Tuple[str, RoleTitle]:
+        def _pop_lead_title() -> Tuple[str, RoleTitle]:
+            for match, std_title in map(
+                lambda title: (re.search(f"^\\s*{title[0]}", name_text, re.I), title[1]),
+                self.role_replacements.items()
+            ):
+                if match is not None:
+                    return name_text[match.end():], std_title
+            return name_text, None
+
+        def _pop_trail_title() -> Tuple[str, Optional[RoleTitle]]:
+            for match, std_title in map(
+                lambda title: (re.search(f",\\s*{title[0]}\\s*$", name_text, re.I), title[1]),
+                self.role_replacements.items()
+            ):
+                if match is not None:
+                    return name_text[:match.start()], std_title
+            return name_text, None
+
+        name_text, lead_title = _pop_lead_title()
+        name_text, trail_title = _pop_trail_title()
+        title = trail_title or lead_title
+        title = title or RoleTitle.MEMBER
+
+        return str_simplified(name_text), title
 
 
 class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
