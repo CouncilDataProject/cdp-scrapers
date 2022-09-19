@@ -14,6 +14,7 @@ log = getLogger(__name__)
 ###############################################################################
 
 SITE_URL = "https://{client}.primegov.com/"
+API_URL = "{base_url}/api/meeting/search?from={begin}&to={end}"
 
 MEETING_DATETIME = "dateTime"
 MEETING_DATE = "date"
@@ -222,8 +223,11 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
         get_events()
         """
         resp = self.session.get(
-            f"{self.base_url}/api/meeting/search?"
-            f"from={primegov_strftime(begin)}&to={primegov_strftime(end)}"
+            API_URL.format(
+                base_url=self.base_url,
+                begin=primegov_strftime(begin),
+                end=primegov_strftime(end),
+            )
         )
         return filter(lambda m: any(m[VIDEO_URL]), resp.json())
 

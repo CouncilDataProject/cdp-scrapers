@@ -5,7 +5,6 @@ from typing import List
 import pytest
 
 from cdp_scrapers.prime_gov_utils import (
-    MEETING_DATETIME,
     Meeting,
     PrimeGovScraper,
     primegov_strftime,
@@ -15,9 +14,7 @@ from cdp_scrapers.scraper_utils import reduced_list
 
 
 class DataItem(enum.IntEnum):
-    ClientId = 0
-    TimeZone = enum.auto()
-    Begin = enum.auto()
+    Begin = 0
     End = enum.auto()
     Scraper = enum.auto()
     NumMeetings = enum.auto()
@@ -26,8 +23,6 @@ class DataItem(enum.IntEnum):
 
 test_data = [
     (
-        "lacity",
-        "America/Los_Angeles",
         datetime(2022, 9, 1),
         datetime(2022, 9, 1),
         PrimeGovScraper(client_id="lacity", timezone="America/Los_Angeles"),
