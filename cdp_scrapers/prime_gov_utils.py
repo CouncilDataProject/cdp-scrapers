@@ -1,18 +1,12 @@
-from bdb import set_trace
 import re
-import requests
-from bs4 import BeautifulSoup, Tag
 from datetime import datetime
 from logging import getLogger
 from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
+import requests
+from bs4 import BeautifulSoup, Tag
 from cdp_backend.database.constants import RoleTitle
-from cdp_backend.pipeline.ingestion_models import (
-    Body,
-    EventIngestionModel,
-    Session,
-    Person,
-)
+from cdp_backend.pipeline.ingestion_models import Body, EventIngestionModel, Session
 from civic_scraper.platforms.primegov.site import PrimeGovSite
 
 from .scraper_utils import IngestionModelScraper, reduced_list, str_simplified
@@ -40,6 +34,7 @@ MEMBERS_TBL_KEYWORD = "MEMBERS:"
 
 Meeting = Dict[str, Any]
 PersonName = str
+Agenda = BeautifulSoup
 
 
 def primegov_strftime(dt: datetime) -> str:
@@ -102,47 +97,108 @@ def primegov_strptime(meeting: Meeting) -> Optional[datetime]:
     return None
 
 
-def load_agenda(url: str) -> Optional[BeautifulSoup]:
+def load_agenda(url: str) -> Optional[Agenda]:
+    """
+    Load the agenda web page.
+
+    Parameters
+    ----------
+    url: str
+        Agenda web page URL
+
+    Returns
+    -------
+    Optional[Agenda]
+        Agenda web page loaded into BeautifulSoup
+    """
     resp = requests.get(str_simplified(url))
     if resp.status_code == 200:
         return BeautifulSoup(resp.text, "html.parser")
 
-    log.warning(
-        f"{url} responed {resp.status_code} {resp.reason} {resp.text}"
-    )
+    log.warning(f"{url} responed {resp.status_code} {resp.reason} {resp.text}")
     return None
 
 
-def get_members_table(agenda: BeautifulSoup) -> Optional[Tag]:
+def get_members_table(agenda: Agenda) -> Optional[Tag]:
+    """
+    Get the <table> on the agenda web page that contains councilmember names.
+
+    Parameters
+    ----------
+    agenda: Agenda
+        Agenda web page loaded into BeautifulSoup
+
+    Returns
+    -------
+    Optional[Tag]
+        <table> for councilmember names
+    """
+
     def _contains_members_row(tag: Tag) -> bool:
-        return (
-            tag.find("span", string="MEMBERS:")
-            is not None
-        )
+        return tag.find("span", string=MEMBERS_TBL_KEYWORD) is not None
 
     def _is_members_table(table: Tag) -> bool:
         return (
             table.name == "table"
             and _contains_members_row(table)
-            and len(table.find_all("tr")) >= 2
+            and any(table.find_all("tr"))
         )
 
     return agenda.find(_is_members_table)
 
 
-def get_member_names(agenda: BeautifulSoup) -> List[PersonName]:
+def get_member_names(agenda: Agenda) -> List[PersonName]:
+    """
+    Get names of councilmembers listed on the agenda.
+
+    Parameters
+    ----------
+    agenda: Agenda
+        Agenda web page loaded into BeautifulSoup
+
+    Returns
+    -------
+    List[PersonName]
+        Names of councilmembers on the agenda.
+    """
     table = get_members_table(agenda)
     if not table:
         return list()
 
     def _get_name(row: Tag) -> PersonName:
+        # Last column in the members table has the name
         return row.find_all("td")[-1].string
 
     return reduced_list(map(_get_name, table.find_all("tr")), collapse=False)
 
 
-def split_name_role(name_text: PersonName, role_map: Dict[str, RoleTitle]) -> Tuple[PersonName, RoleTitle]:
-    def _pop_lead_title() -> Tuple[PersonName, RoleTitle]:
+def split_name_role(
+    name_text: PersonName, role_map: Dict[str, RoleTitle]
+) -> Tuple[PersonName, RoleTitle]:
+    """
+    Split councilmember name text blob into name and role title.
+
+    Parameters
+    ----------
+    name_text: PersonName
+        Name as listed on agenda web page
+    role_map: Dict[str, RoleTitle]
+        Map titles on agenda to CDP std role titles
+
+    Returns
+    -------
+    PersonName, RoleTitle
+        The person's name and std role title
+
+    See Also
+    --------
+    cdp_backend.database.constants.RoleTitle
+    """
+
+    def _pop_lead_title() -> Tuple[PersonName, Optional[RoleTitle]]:
+        """
+        Pop any role title in the beginning of name blob
+        """
         for match, std_title in map(
             lambda title: (
                 re.search(f"^\\s*{title[0]}", name_text, re.I),
@@ -151,10 +207,14 @@ def split_name_role(name_text: PersonName, role_map: Dict[str, RoleTitle]) -> Tu
             role_map.items(),
         ):
             if match is not None:
+                # Remove title from name blob
                 return name_text[match.end() :], std_title
         return name_text, None
 
     def _pop_trail_title() -> Tuple[PersonName, Optional[RoleTitle]]:
+        """
+        Pop any role title at the end of name blob
+        """
         for match, std_title in map(
             lambda title: (
                 re.search(f",\\s*{title[0]}\\s*$", name_text, re.I),
@@ -163,11 +223,14 @@ def split_name_role(name_text: PersonName, role_map: Dict[str, RoleTitle]) -> Tu
             role_map.items(),
         ):
             if match is not None:
+                # Remove title from name blob
                 return name_text[: match.start()], std_title
         return name_text, None
 
     name_text, lead_title = _pop_lead_title()
     name_text, trail_title = _pop_trail_title()
+    # trailing title is more "important"; they are titles like chair.
+    # leading title is usually councilmember.
     title = trail_title or lead_title
     title = title or RoleTitle.MEMBER
 

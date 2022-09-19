@@ -1,8 +1,16 @@
 from typing import Dict, List
+
 import pytest
-from bs4 import BeautifulSoup
 from cdp_backend.database.constants import RoleTitle
-from cdp_scrapers.prime_gov_utils import PersonName, get_member_names, get_members_table, load_agenda, split_name_role
+
+from cdp_scrapers.prime_gov_utils import (
+    Agenda,
+    PersonName,
+    get_member_names,
+    get_members_table,
+    load_agenda,
+    split_name_role,
+)
 
 urls = [
     (
@@ -38,15 +46,25 @@ def test_load_agenda(url: str):
 
 
 @pytest.mark.parametrize("agenda", agendas)
-def test_get_members_table(agenda: BeautifulSoup):
+def test_get_members_table(agenda: Agenda):
     assert get_members_table(agenda) is not None
 
 
 @pytest.mark.parametrize("agenda, _name_texts", zip(agendas, name_texts))
-def test_get_member_names(agenda: BeautifulSoup, _name_texts: List[PersonName]):
+def test_get_member_names(agenda: Agenda, _name_texts: List[PersonName]):
     assert get_member_names(agenda) == _name_texts
 
 
-@pytest.mark.parametrize("_name_texts, _names, titles, role_map", zip(name_texts, names, role_titles, role_maps))
-def test_split_name_title(_name_texts: List[PersonName], _names: List[PersonName], titles: List[RoleTitle], role_map: Dict[str, RoleTitle]):
-    assert list(map(lambda n: split_name_role(n, role_map), _name_texts)) == list(zip(_names, titles))
+@pytest.mark.parametrize(
+    "_name_texts, _names, titles, role_map",
+    zip(name_texts, names, role_titles, role_maps),
+)
+def test_split_name_title(
+    _name_texts: List[PersonName],
+    _names: List[PersonName],
+    titles: List[RoleTitle],
+    role_map: Dict[str, RoleTitle],
+):
+    assert list(map(lambda n: split_name_role(n, role_map), _name_texts)) == list(
+        zip(_names, titles)
+    )
