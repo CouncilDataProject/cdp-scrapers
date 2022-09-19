@@ -1,8 +1,10 @@
+import requests
+from bs4 import BeautifulSoup, Tag
 from datetime import datetime
 from logging import getLogger
 from typing import Any, Dict, Iterable, List, Optional, Set
 
-from cdp_backend.pipeline.ingestion_models import Body, EventIngestionModel, Session
+from cdp_backend.pipeline.ingestion_models import Body, EventIngestionModel, Session, Person
 from civic_scraper.platforms.primegov.site import PrimeGovSite
 
 from .scraper_utils import IngestionModelScraper, reduced_list, str_simplified
@@ -87,6 +89,39 @@ def primegov_strptime(meeting: Meeting) -> Optional[datetime]:
         f"'{meeting[MEETING_TIME]}'"
     )
     return None
+
+
+class PrimeGovAgendaScraper:
+    MEMBERS_TBL_KEYWORD = "MEMBERS:"
+
+    def __init__(self, agenda_url: str):
+        self.agenda_url = str_simplified(agenda_url)
+        self.agenda_soup: Optional[BeautifulSoup] = None
+
+        resp = requests.get(self.agenda_url)
+        if resp.status_code == 200:
+            self.agenda_soup = BeautifulSoup(requests.get(self.agenda_url).text, "html.parser")
+        elif any(self.agenda_url):
+            log.warning(f"{self.agenda_url} -> {resp.status_code} {resp.reason} {resp.text}")
+
+    def _get_members_table(self) -> Optional[Tag]:
+        def _contains_members_row(tag: Tag) -> bool:
+            return tag.find("span", text=PrimeGovAgendaScraper.MEMBERS_TBL_KEYWORD) is not None
+
+        def _is_members_table(table: Tag) -> bool:
+            return table.name == "table" and _contains_members_row(table) and len(table.find_all("tr")) >= 2
+
+        return self.agenda_soup.find(_is_members_table)
+
+    def get_member_names(self) -> List[str]:
+        table = self._get_members_table()
+        if not table:
+            return list()
+
+        def _get_name(row: Tag) -> str:
+            return row.find_all("td")[-1].string
+
+        return reduced_list(map(_get_name, table.find_all("tr")[1:]), collapse=False)
 
 
 class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
