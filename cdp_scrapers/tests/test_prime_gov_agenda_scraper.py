@@ -1,14 +1,16 @@
-from typing import List
+from typing import Dict, List
 import pytest
+from bs4 import BeautifulSoup
 from cdp_backend.database.constants import RoleTitle
-from cdp_scrapers.prime_gov_utils import PrimeGovAgendaScraper
+from cdp_scrapers.prime_gov_utils import PersonName, get_member_names, get_members_table, load_agenda, split_name_role
 
-scrapers = [
-    PrimeGovAgendaScraper(
+urls = [
+    (
         "https://lacity.primegov.com/Portal/MeetingPreview"
         "?compiledMeetingDocumentFileId=40742"
     ),
 ]
+agendas = list(map(load_agenda, urls))
 name_texts = [
     [
         "COUNCILMEMBER NITHYA RAMAN, CHAIR",
@@ -22,24 +24,29 @@ names = [
 role_titles = [
     [RoleTitle.CHAIR, RoleTitle.COUNCILMEMBER, RoleTitle.COUNCILMEMBER],
 ]
+role_maps = [
+    {
+        "CHAIR": RoleTitle.CHAIR,
+        "COUNCILMEMBER": RoleTitle.COUNCILMEMBER,
+    },
+]
 
 
-@pytest.mark.parametrize("scraper, name_texts", zip(scrapers, name_texts))
-def test_get_member_names(scraper: PrimeGovAgendaScraper, name_texts: List[str]):
-    assert scraper.get_member_names() == name_texts
+@pytest.mark.parametrize("url", urls)
+def test_load_agenda(url: str):
+    assert load_agenda(url) is not None
 
 
-@pytest.mark.parametrize(
-    "scraper, name_texts, names, role_titles",
-    zip(scrapers, name_texts, names, role_titles),
-)
-def test_pop_role_title(
-    scraper: PrimeGovAgendaScraper,
-    name_texts: List[str],
-    names: List[str],
-    role_titles: List[str],
-):
-    for name_text, expected_name, expected_title in zip(name_texts, names, role_titles):
-        name, title = scraper.pop_role_title(name_text)
-        assert name == expected_name
-        assert title == expected_title
+@pytest.mark.parametrize("agenda", agendas)
+def test_get_members_table(agenda: BeautifulSoup):
+    assert get_members_table(agenda) is not None
+
+
+@pytest.mark.parametrize("agenda, _name_texts", zip(agendas, name_texts))
+def test_get_member_names(agenda: BeautifulSoup, _name_texts: List[PersonName]):
+    assert get_member_names(agenda) == _name_texts
+
+
+@pytest.mark.parametrize("_name_texts, _names, titles, role_map", zip(name_texts, names, role_titles, role_maps))
+def test_split_name_title(_name_texts: List[PersonName], _names: List[PersonName], titles: List[RoleTitle], role_map: Dict[str, RoleTitle]):
+    assert list(map(lambda n: split_name_role(n, role_map), _name_texts)) == list(zip(_names, titles))

@@ -1,3 +1,4 @@
+from bdb import set_trace
 import re
 import requests
 from bs4 import BeautifulSoup, Tag
@@ -34,6 +35,8 @@ VIDEO_URL = "videoUrl"
 
 DATE_FORMAT = "%m/%d/%Y"
 TIME_FORMAT = "%I:%M %p"
+
+MEMBERS_TBL_KEYWORD = "MEMBERS:"
 
 Meeting = Dict[str, Any]
 PersonName = str
@@ -99,86 +102,76 @@ def primegov_strptime(meeting: Meeting) -> Optional[datetime]:
     return None
 
 
-class PrimeGovAgendaScraper:
-    MEMBERS_TBL_KEYWORD = "MEMBERS:"
+def load_agenda(url: str) -> Optional[BeautifulSoup]:
+    resp = requests.get(str_simplified(url))
+    if resp.status_code == 200:
+        return BeautifulSoup(resp.text, "html.parser")
 
-    def __init__(
-        self, agenda_url: str, role_replacements: Optional[Dict[str, RoleTitle]] = None
-    ):
-        self.agenda_url = str_simplified(agenda_url)
-        self.role_replacements = role_replacements or {
-            "CHAIR": RoleTitle.CHAIR,
-            "COUNCILMEMBER": RoleTitle.COUNCILMEMBER,
-        }
-        self.agenda_soup: Optional[BeautifulSoup] = None
+    log.warning(
+        f"{url} responed {resp.status_code} {resp.reason} {resp.text}"
+    )
+    return None
 
-        resp = requests.get(self.agenda_url)
-        if resp.status_code == 200:
-            self.agenda_soup = BeautifulSoup(
-                requests.get(self.agenda_url).text, "html.parser"
-            )
-        elif any(self.agenda_url):
-            log.warning(
-                f"{self.agenda_url} -> {resp.status_code} {resp.reason} {resp.text}"
-            )
 
-    def _get_members_table(self) -> Optional[Tag]:
-        def _contains_members_row(tag: Tag) -> bool:
-            return (
-                tag.find("span", string=PrimeGovAgendaScraper.MEMBERS_TBL_KEYWORD)
-                is not None
-            )
+def get_members_table(agenda: BeautifulSoup) -> Optional[Tag]:
+    def _contains_members_row(tag: Tag) -> bool:
+        return (
+            tag.find("span", string="MEMBERS:")
+            is not None
+        )
 
-        def _is_members_table(table: Tag) -> bool:
-            return (
-                table.name == "table"
-                and _contains_members_row(table)
-                and len(table.find_all("tr")) >= 2
-            )
+    def _is_members_table(table: Tag) -> bool:
+        return (
+            table.name == "table"
+            and _contains_members_row(table)
+            and len(table.find_all("tr")) >= 2
+        )
 
-        return self.agenda_soup.find(_is_members_table)
+    return agenda.find(_is_members_table)
 
-    def get_member_names(self) -> List[PersonName]:
-        table = self._get_members_table()
-        if not table:
-            return list()
 
-        def _get_name(row: Tag) -> PersonName:
-            return row.find_all("td")[-1].string
+def get_member_names(agenda: BeautifulSoup) -> List[PersonName]:
+    table = get_members_table(agenda)
+    if not table:
+        return list()
 
-        return reduced_list(map(_get_name, table.find_all("tr")), collapse=False)
+    def _get_name(row: Tag) -> PersonName:
+        return row.find_all("td")[-1].string
 
-    def pop_role_title(self, name_text: PersonName) -> Tuple[PersonName, RoleTitle]:
-        def _pop_lead_title() -> Tuple[PersonName, RoleTitle]:
-            for match, std_title in map(
-                lambda title: (
-                    re.search(f"^\\s*{title[0]}", name_text, re.I),
-                    title[1],
-                ),
-                self.role_replacements.items(),
-            ):
-                if match is not None:
-                    return name_text[match.end() :], std_title
-            return name_text, None
+    return reduced_list(map(_get_name, table.find_all("tr")), collapse=False)
 
-        def _pop_trail_title() -> Tuple[PersonName, Optional[RoleTitle]]:
-            for match, std_title in map(
-                lambda title: (
-                    re.search(f",\\s*{title[0]}\\s*$", name_text, re.I),
-                    title[1],
-                ),
-                self.role_replacements.items(),
-            ):
-                if match is not None:
-                    return name_text[: match.start()], std_title
-            return name_text, None
 
-        name_text, lead_title = _pop_lead_title()
-        name_text, trail_title = _pop_trail_title()
-        title = trail_title or lead_title
-        title = title or RoleTitle.MEMBER
+def split_name_role(name_text: PersonName, role_map: Dict[str, RoleTitle]) -> Tuple[PersonName, RoleTitle]:
+    def _pop_lead_title() -> Tuple[PersonName, RoleTitle]:
+        for match, std_title in map(
+            lambda title: (
+                re.search(f"^\\s*{title[0]}", name_text, re.I),
+                title[1],
+            ),
+            role_map.items(),
+        ):
+            if match is not None:
+                return name_text[match.end() :], std_title
+        return name_text, None
 
-        return str_simplified(name_text), title
+    def _pop_trail_title() -> Tuple[PersonName, Optional[RoleTitle]]:
+        for match, std_title in map(
+            lambda title: (
+                re.search(f",\\s*{title[0]}\\s*$", name_text, re.I),
+                title[1],
+            ),
+            role_map.items(),
+        ):
+            if match is not None:
+                return name_text[: match.start()], std_title
+        return name_text, None
+
+    name_text, lead_title = _pop_lead_title()
+    name_text, trail_title = _pop_trail_title()
+    title = trail_title or lead_title
+    title = title or RoleTitle.MEMBER
+
+    return str_simplified(name_text), title
 
 
 class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
