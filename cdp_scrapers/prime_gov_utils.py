@@ -106,7 +106,7 @@ class PrimeGovAgendaScraper:
 
     def _get_members_table(self) -> Optional[Tag]:
         def _contains_members_row(tag: Tag) -> bool:
-            return tag.find("span", text=PrimeGovAgendaScraper.MEMBERS_TBL_KEYWORD) is not None
+            return tag.find("span", string=PrimeGovAgendaScraper.MEMBERS_TBL_KEYWORD) is not None
 
         def _is_members_table(table: Tag) -> bool:
             return table.name == "table" and _contains_members_row(table) and len(table.find_all("tr")) >= 2
@@ -121,7 +121,7 @@ class PrimeGovAgendaScraper:
         def _get_name(row: Tag) -> str:
             return row.find_all("td")[-1].string
 
-        return reduced_list(map(_get_name, table.find_all("tr")[1:]), collapse=False)
+        return reduced_list(map(_get_name, table.find_all("tr")), collapse=False)
 
 
 class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
