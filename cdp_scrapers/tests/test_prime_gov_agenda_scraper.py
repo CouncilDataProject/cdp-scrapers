@@ -5,7 +5,6 @@ from cdp_backend.database.constants import RoleTitle
 
 from cdp_scrapers.prime_gov_utils import (
     Agenda,
-    PersonName,
     default_role_map,
     get_member_names,
     get_members_table,
@@ -51,7 +50,7 @@ def test_get_members_table(agenda: Agenda):
 
 
 @pytest.mark.parametrize("agenda, _name_texts", zip(agendas, name_texts))
-def test_get_member_names(agenda: Agenda, _name_texts: List[PersonName]):
+def test_get_member_names(agenda: Agenda, _name_texts: List[str]):
     assert get_member_names(agenda) == _name_texts
 
 
@@ -60,8 +59,8 @@ def test_get_member_names(agenda: Agenda, _name_texts: List[PersonName]):
     zip(name_texts, names, role_titles, role_maps),
 )
 def test_split_name_title(
-    _name_texts: List[PersonName],
-    _names: List[PersonName],
+    _name_texts: List[str],
+    _names: List[str],
     titles: List[RoleTitle],
     role_map: Dict[str, RoleTitle],
 ):

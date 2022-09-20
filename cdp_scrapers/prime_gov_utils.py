@@ -38,7 +38,6 @@ TIME_FORMAT = "%I:%M %p"
 MEMBERS_TBL_KEYWORD = "MEMBERS:"
 
 Meeting = Dict[str, Any]
-PersonName = str
 Agenda = BeautifulSoup
 
 default_role_map: Dict[str, RoleTitle] = {
@@ -157,7 +156,7 @@ def get_members_table(agenda: Agenda) -> Optional[Tag]:
     return agenda.find(_is_members_table)
 
 
-def get_member_names(agenda: Agenda) -> List[PersonName]:
+def get_member_names(agenda: Agenda) -> List[str]:
     """
     Get names of councilmembers listed on the agenda.
 
@@ -168,14 +167,14 @@ def get_member_names(agenda: Agenda) -> List[PersonName]:
 
     Returns
     -------
-    List[PersonName]
+    List[str]
         Names of councilmembers on the agenda.
     """
     table = get_members_table(agenda)
     if not table:
         return list()
 
-    def _get_name(row: Tag) -> PersonName:
+    def _get_name(row: Tag) -> str:
         # Last column in the members table has the name
         return row.find_all("td")[-1].string
 
@@ -183,21 +182,21 @@ def get_member_names(agenda: Agenda) -> List[PersonName]:
 
 
 def split_name_role(
-    name_text: PersonName, role_map: Dict[str, RoleTitle]
-) -> Tuple[PersonName, RoleTitle]:
+    name_text: str, role_map: Dict[str, RoleTitle]
+) -> Tuple[str, RoleTitle]:
     """
     Split councilmember name text blob into name and role title.
 
     Parameters
     ----------
-    name_text: PersonName
+    name_text: str
         Name as listed on agenda web page
     role_map: Dict[str, RoleTitle]
         Map titles on agenda to CDP std role titles
 
     Returns
     -------
-    PersonName, RoleTitle
+    str, RoleTitle
         The person's name and std role title
 
     See Also
@@ -205,7 +204,7 @@ def split_name_role(
     cdp_backend.database.constants.RoleTitle
     """
 
-    def _pop_lead_title() -> Tuple[PersonName, Optional[RoleTitle]]:
+    def _pop_lead_title() -> Tuple[str, Optional[RoleTitle]]:
         """
         Pop any role title in the beginning of name blob
         """
@@ -221,7 +220,7 @@ def split_name_role(
                 return name_text[match.end() :], std_title
         return name_text, None
 
-    def _pop_trail_title() -> Tuple[PersonName, Optional[RoleTitle]]:
+    def _pop_trail_title() -> Tuple[str, Optional[RoleTitle]]:
         """
         Pop any role title at the end of name blob
         """
@@ -336,14 +335,14 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
         """
         return self.get_none_if_empty(Body(name=str_simplified(meeting[BODY_NAME])))
 
-    def get_person(self, name_text: PersonName) -> Optional[Person]:
+    def get_person(self, name_text: str) -> Optional[Person]:
         """
         Convert a councilmember name text blob from an agenda page
         to a Person instance
 
         Parameters
         ----------
-        name_text: PersonName
+        name_text: str
             Name as listed on agenda web page
 
         Returns
