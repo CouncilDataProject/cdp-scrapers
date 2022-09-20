@@ -247,6 +247,12 @@ def split_name_role(
     return str_simplified(name_text), title
 
 
+def get_minutes_tables(agenda: Agenda) -> List[Tag]:
+    def _is_minutes_item(tag):
+        return tag.name == "table" and tag.find_parent("div", class_="agenda-item") is not None
+    return agenda.find_all(_is_minutes_item)
+
+
 class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
     """
     Adapter for civic_scraper PrimeGovSite in cdp-scrapers
@@ -331,6 +337,28 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
         return self.get_none_if_empty(Body(name=str_simplified(meeting[BODY_NAME])))
 
     def get_person(self, name_text: PersonName) -> Optional[Person]:
+        """
+        Convert a councilmember name text blob from an agenda page
+        to a Person instance
+
+        Parameters
+        ----------
+        name_text: PersonName
+            Name as listed on agenda web page
+
+        Returns
+        -------
+        Optional[Person]
+            Person from given name text blob
+
+        Notes
+        -----
+        For now role title in the text blob is ignored.
+
+        See Also
+        --------
+        split_name_role()
+        """
         name, _ = split_name_role(name_text, self.role_map)
         return self.get_none_if_empty(self.resolve_person_alias(Person(name=name)))
 
@@ -423,6 +451,5 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
         --------
         get_meetings()
         """
-        return reduced_list(
-            map(self.get_event, self.get_meetings(begin, end)), collapse=False
-        )
+        meetings = self.get_meetings(begin, end)
+        return reduced_list(map(self.get_event, meetings), collapse=False)

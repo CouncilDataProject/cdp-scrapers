@@ -11,6 +11,7 @@ from cdp_scrapers.prime_gov_utils import (
     get_members_table,
     load_agenda,
     split_name_role,
+    get_minutes_tables,
 )
 
 urls = [
@@ -36,6 +37,7 @@ role_titles = [
 role_maps = [
     default_role_map,
 ]
+minutes_counts = [8]
 
 
 @pytest.mark.parametrize("url", urls)
@@ -66,3 +68,14 @@ def test_split_name_title(
     assert list(map(lambda n: split_name_role(n, role_map), _name_texts)) == list(
         zip(_names, titles)
     )
+
+
+@pytest.mark.parametrize(
+    "agenda, num_minutes",
+    zip(agendas, minutes_counts),
+)
+def test_get_minutes_tables(
+    agenda: Agenda,
+    num_minutes: int,
+):
+    assert len(get_minutes_tables(agenda)) == num_minutes
