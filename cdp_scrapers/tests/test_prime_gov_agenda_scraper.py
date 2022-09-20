@@ -42,7 +42,11 @@ minutes_counts = [8]
 first_minutes_items = [
     MinutesItemInfo(
         name="22-0600-S29",
-        desc="Information Technology Agency (ITA) report, in response to a 2022-23 Budget Recommendation, relative to the status on the implementation of permanent Wi-Fi hotspots.",
+        desc=(
+            "Information Technology Agency (ITA) report, "
+            "in response to a 2022-23 Budget Recommendation, "
+            "relative to the status on the implementation of permanent Wi-Fi hotspots."
+        ),
     ),
 ]
 

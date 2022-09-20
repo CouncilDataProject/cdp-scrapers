@@ -1,4 +1,3 @@
-import enum
 from datetime import datetime
 from typing import List
 
@@ -14,36 +13,13 @@ from cdp_scrapers.prime_gov_utils import (
 from cdp_scrapers.scraper_utils import reduced_list
 
 
-class DataItem(enum.IntEnum):
-    Begin = 0
-    End = enum.auto()
-    Scraper = enum.auto()
-    NumMeetings = enum.auto()
-    Meetings = enum.auto()
-
-
-test_data = [
-    (
-        datetime(2022, 9, 1),
-        datetime(2022, 9, 1),
-        PrimeGovScraper(client_id="lacity", timezone="America/Los_Angeles"),
-        2,
-    ),
+begin_dates = [datetime(2022, 9, 1)]
+end_dates = [datetime(2022, 9, 1)]
+scrapers = [PrimeGovScraper(client_id="lacity", timezone="America/Los_Angeles")]
+all_meetings = [
+    list(s.get_meetings(begin_dates[i], end_dates[i])) for i, s in enumerate(scrapers)
 ]
-# append scraped meetings to each test input data set
-test_data = list(
-    map(
-        lambda d: (
-            *d,
-            list(
-                d[DataItem.Scraper].get_meetings(
-                    begin=d[DataItem.Begin], end=d[DataItem.End]
-                )
-            ),
-        ),
-        test_data,
-    )
-)
+meeting_counts = [2]
 
 
 @pytest.mark.parametrize(
@@ -77,7 +53,7 @@ def test_strftime(date_time: datetime):
 
 @pytest.mark.parametrize(
     "num_meetings, meetings",
-    [(d[DataItem.NumMeetings], d[DataItem.Meetings]) for d in test_data],
+    zip(meeting_counts, all_meetings),
 )
 def test_get_meetings(num_meetings: int, meetings: List[Meeting]):
     assert len(meetings) == num_meetings
@@ -85,7 +61,7 @@ def test_get_meetings(num_meetings: int, meetings: List[Meeting]):
 
 @pytest.mark.parametrize(
     "scraper, meetings",
-    [(d[DataItem.Scraper], d[DataItem.Meetings]) for d in test_data],
+    zip(scrapers, all_meetings),
 )
 def test_get_session(scraper: PrimeGovScraper, meetings: List[Meeting]):
     sessions = reduced_list(map(scraper.get_session, meetings))
@@ -94,7 +70,7 @@ def test_get_session(scraper: PrimeGovScraper, meetings: List[Meeting]):
 
 @pytest.mark.parametrize(
     "scraper, meetings",
-    [(d[DataItem.Scraper], d[DataItem.Meetings]) for d in test_data],
+    zip(scrapers, all_meetings),
 )
 def test_get_body(scraper: PrimeGovScraper, meetings: List[Meeting]):
     bodies = reduced_list(map(scraper.get_body, meetings))
@@ -103,7 +79,7 @@ def test_get_body(scraper: PrimeGovScraper, meetings: List[Meeting]):
 
 @pytest.mark.parametrize(
     "scraper, meetings",
-    [(d[DataItem.Scraper], d[DataItem.Meetings]) for d in test_data],
+    zip(scrapers, all_meetings),
 )
 def test_get_event(scraper: PrimeGovScraper, meetings: List[Meeting]):
     events = reduced_list(map(scraper.get_event, meetings))
@@ -112,15 +88,7 @@ def test_get_event(scraper: PrimeGovScraper, meetings: List[Meeting]):
 
 @pytest.mark.parametrize(
     "scraper, begin, end, num_meetings",
-    [
-        (
-            d[DataItem.Scraper],
-            d[DataItem.Begin],
-            d[DataItem.End],
-            d[DataItem.NumMeetings],
-        )
-        for d in test_data
-    ],
+    zip(scrapers, begin_dates, end_dates, meeting_counts),
 )
 def test_get_events(
     scraper: PrimeGovScraper, begin: datetime, end: datetime, num_meetings: int
@@ -138,4 +106,4 @@ def test_get_events(
     ],
 )
 def test_get_person(name_text: str, person: Person):
-    assert test_data[0][DataItem.Scraper].get_person(name_text) == person
+    assert scrapers[0].get_person(name_text) == person
