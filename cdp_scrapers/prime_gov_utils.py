@@ -246,10 +246,9 @@ def split_name_role(
     return str_simplified(name_text), title
 
 
-def get_minutes_tables(agenda: Agenda) -> List[Tag]:
-    def _is_minutes_item(tag):
-        return tag.name == "table" and tag.find_parent("div", class_="agenda-item") is not None
-    return agenda.find_all(_is_minutes_item)
+def get_minutes_tables(agenda: Agenda) -> Iterable[Tag]:
+    divs = agenda.find_all("div", class_="agenda-item")
+    return map(lambda d: d.find("table"), divs)
 
 
 class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):

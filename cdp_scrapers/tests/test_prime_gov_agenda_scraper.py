@@ -16,7 +16,7 @@ from cdp_scrapers.prime_gov_utils import (
 urls = [
     (
         "https://lacity.primegov.com/Portal/MeetingPreview"
-        "?compiledMeetingDocumentFileId=40742"
+        "?compiledMeetingDocumentFileId=41088"
     ),
 ]
 agendas = list(map(load_agenda, urls))
@@ -77,4 +77,4 @@ def test_get_minutes_tables(
     agenda: Agenda,
     num_minutes: int,
 ):
-    assert len(get_minutes_tables(agenda)) == num_minutes
+    assert len(list(get_minutes_tables(agenda))) == num_minutes
