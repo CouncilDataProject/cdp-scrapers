@@ -9,6 +9,7 @@ from cdp_backend.database.constants import RoleTitle
 from cdp_backend.pipeline.ingestion_models import (
     Body,
     EventIngestionModel,
+    MinutesItem,
     Person,
     Session,
 )
@@ -252,11 +253,41 @@ def split_name_role(
 
 
 def get_minutes_tables(agenda: Agenda) -> Iterator[Tag]:
+    """
+    Return iterator over tables for minutes items.
+
+    Parameters
+    ----------
+    agenda: Agenda
+        Agenda web page loaded into BeautifulSoup
+
+    Returns
+    -------
+    Iterator[Tag]
+        List of <table> for minutes items
+    """
     divs = agenda.find_all("div", class_="agenda-item")
     return map(lambda d: d.find("table"), divs)
 
 
 def get_minutes_item(minutes_table: Tag) -> MinutesItemInfo:
+    """
+    Extract minutes item name and description.
+
+    Parameters
+    ----------
+    minutes_table: Tag
+        <table> for a minutes item on agenda web page
+
+    Returns
+    -------
+    MinutesItemInfo
+        Minutes item name and description
+
+    See Also
+    --------
+    get_minutes_tables()
+    """
     rows = minutes_table.find_all("tr")
 
     try:
@@ -379,6 +410,29 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
         """
         name, _ = split_name_role(name_text, self.role_map)
         return self.get_none_if_empty(self.resolve_person_alias(Person(name=name)))
+
+    def get_minutes_item(self, minutes_table: Tag) -> Optional[MinutesItem]:
+        """
+        Extract a minutes item from a <table> on agenda web page
+
+        Parameters
+        ----------
+        minutes_table: Tag
+            <table> tag on agenda web page for a minutes item.
+
+        Returns
+        -------
+        Optional[MinutesItem]
+            MinutesItem from given <table>
+
+        See Also
+        --------
+        get_minutes_item()
+        """
+        minutes_info = get_minutes_item(minutes_table)
+        return self.get_none_if_empty(
+            MinutesItem(name=minutes_info.name, description=minutes_info.desc)
+        )
 
     def get_event(self, meeting: Meeting) -> Optional[EventIngestionModel]:
         """
