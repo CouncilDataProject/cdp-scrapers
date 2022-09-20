@@ -1,7 +1,7 @@
 import re
 from datetime import datetime
 from logging import getLogger
-from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
+from typing import Any, Dict, Iterator, List, NamedTuple, Optional, Set, Tuple
 
 import requests
 from bs4 import BeautifulSoup, Tag
@@ -44,6 +44,11 @@ default_role_map: Dict[str, RoleTitle] = {
     "CHAIR": RoleTitle.CHAIR,
     "COUNCILMEMBER": RoleTitle.COUNCILMEMBER,
 }
+
+
+class MinutesItemInfo(NamedTuple):
+    name: str
+    desc: str
 
 
 def primegov_strftime(dt: datetime) -> str:
@@ -246,9 +251,24 @@ def split_name_role(
     return str_simplified(name_text), title
 
 
-def get_minutes_tables(agenda: Agenda) -> Iterable[Tag]:
+def get_minutes_tables(agenda: Agenda) -> Iterator[Tag]:
     divs = agenda.find_all("div", class_="agenda-item")
     return map(lambda d: d.find("table"), divs)
+
+
+def get_minutes_item(minutes_table: Tag) -> MinutesItemInfo:
+    rows = minutes_table.find_all("tr")
+
+    try:
+        name = rows[0].find("td").string
+        desc = rows[1].find("div").string
+    except (IndexError, AttributeError):
+        # rows is empty; find*() returned None
+        raise ValueError(
+            f"Minutes item <table> is no longer recognized: {minutes_table}"
+        )
+
+    return MinutesItemInfo(str_simplified(name), str_simplified(desc))
 
 
 class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
@@ -391,7 +411,7 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
         self,
         begin: datetime,
         end: datetime,
-    ) -> Iterable[Meeting]:
+    ) -> Iterator[Meeting]:
         """
         Query meetings from primegov api endpoint
 
@@ -404,7 +424,7 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
 
         Returns
         -------
-        Optional[Iterable[Meeting]]
+        Optional[Iterator[Meeting]]
             Iterator over list of meeting JSON
 
         Notes

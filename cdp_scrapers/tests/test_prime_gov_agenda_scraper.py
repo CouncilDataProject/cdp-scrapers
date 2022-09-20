@@ -8,9 +8,11 @@ from cdp_scrapers.prime_gov_utils import (
     default_role_map,
     get_member_names,
     get_members_table,
+    get_minutes_item,
     load_agenda,
     split_name_role,
     get_minutes_tables,
+    MinutesItemInfo,
 )
 
 urls = [
@@ -37,6 +39,12 @@ role_maps = [
     default_role_map,
 ]
 minutes_counts = [8]
+first_minutes_items = [
+    MinutesItemInfo(
+        name="22-0600-S29",
+        desc="Information Technology Agency (ITA) report, in response to a 2022-23 Budget Recommendation, relative to the status on the implementation of permanent Wi-Fi hotspots.",
+    ),
+]
 
 
 @pytest.mark.parametrize("url", urls)
@@ -78,3 +86,14 @@ def test_get_minutes_tables(
     num_minutes: int,
 ):
     assert len(list(get_minutes_tables(agenda))) == num_minutes
+
+
+@pytest.mark.parametrize(
+    "agenda, minutes_item",
+    zip(agendas, first_minutes_items),
+)
+def test_get_minutes_item(
+    agenda: Agenda,
+    minutes_item: MinutesItemInfo,
+):
+    assert get_minutes_item(next(get_minutes_tables(agenda))) == minutes_item
