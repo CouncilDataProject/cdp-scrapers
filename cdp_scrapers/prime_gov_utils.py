@@ -6,7 +6,12 @@ from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 import requests
 from bs4 import BeautifulSoup, Tag
 from cdp_backend.database.constants import RoleTitle
-from cdp_backend.pipeline.ingestion_models import Body, EventIngestionModel, Session
+from cdp_backend.pipeline.ingestion_models import (
+    Body,
+    EventIngestionModel,
+    Person,
+    Session,
+)
 from civic_scraper.platforms.primegov.site import PrimeGovSite
 
 from .scraper_utils import IngestionModelScraper, reduced_list, str_simplified
@@ -35,6 +40,11 @@ MEMBERS_TBL_KEYWORD = "MEMBERS:"
 Meeting = Dict[str, Any]
 PersonName = str
 Agenda = BeautifulSoup
+
+default_role_map: Dict[str, RoleTitle] = {
+    "CHAIR": RoleTitle.CHAIR,
+    "COUNCILMEMBER": RoleTitle.COUNCILMEMBER,
+}
 
 
 def primegov_strftime(dt: datetime) -> str:
@@ -252,6 +262,7 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
         client_id: str,
         timezone: str,
         person_aliases: Optional[Dict[str, Set[str]]] = None,
+        role_map: Dict[str, RoleTitle] = None,
     ):
         """
         Parameters
@@ -263,11 +274,16 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
         person_aliases: Optional[Dict[str, Set[str]]] = None
             Dictionary used to catch name aliases
             and resolve improperly different Persons to the one correct Person.
+        role_map: Dict[str, RoleTitle] = None
+            Dictionary used to replace role titles with CDP standard role titles.
+            The keys should be titles you want to replace and the values should be a
+            CDP standard role.
         """
         PrimeGovSite.__init__(self, SITE_URL.format(client=client_id))
         IngestionModelScraper.__init__(
             self, timezone=timezone, person_aliases=person_aliases
         )
+        self.role_map = role_map or default_role_map
 
         log.debug(
             f"Created PrimeGovScraper "
@@ -313,6 +329,10 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
             Body extracted from the meeting
         """
         return self.get_none_if_empty(Body(name=str_simplified(meeting[BODY_NAME])))
+
+    def get_person(self, name_text: PersonName) -> Optional[Person]:
+        name, _ = split_name_role(name_text, self.role_map)
+        return self.get_none_if_empty(self.resolve_person_alias(Person(name=name)))
 
     def get_event(self, meeting: Meeting) -> Optional[EventIngestionModel]:
         """

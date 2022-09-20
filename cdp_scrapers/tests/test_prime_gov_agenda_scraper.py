@@ -6,6 +6,7 @@ from cdp_backend.database.constants import RoleTitle
 from cdp_scrapers.prime_gov_utils import (
     Agenda,
     PersonName,
+    default_role_map,
     get_member_names,
     get_members_table,
     load_agenda,
@@ -33,10 +34,7 @@ role_titles = [
     [RoleTitle.CHAIR, RoleTitle.COUNCILMEMBER, RoleTitle.COUNCILMEMBER],
 ]
 role_maps = [
-    {
-        "CHAIR": RoleTitle.CHAIR,
-        "COUNCILMEMBER": RoleTitle.COUNCILMEMBER,
-    },
+    default_role_map,
 ]
 
 

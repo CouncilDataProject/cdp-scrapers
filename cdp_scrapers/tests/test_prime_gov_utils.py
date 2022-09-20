@@ -4,8 +4,10 @@ from typing import List
 
 import pytest
 
+from cdp_backend.pipeline.ingestion_models import Person
 from cdp_scrapers.prime_gov_utils import (
     Meeting,
+    PersonName,
     PrimeGovScraper,
     primegov_strftime,
     primegov_strptime,
@@ -126,3 +128,15 @@ def test_get_events(
 ):
     events = scraper.get_events(begin, end)
     assert len(events) == num_meetings
+
+
+@pytest.mark.parametrize(
+    "name_text, person",
+    [
+        ("COUNCILMEMBER NITHYA RAMAN, CHAIR", Person(name="NITHYA RAMAN")),
+        ("COUNCILMEMBER BOB BLUMENFIELD", Person(name="BOB BLUMENFIELD")),
+        ("COUNCILMEMBER CURREN D. PRICE, JR.", Person(name="CURREN D. PRICE, JR.")),
+    ],
+)
+def test_get_person(name_text: PersonName, person: Person):
+    assert test_data[0][DataItem.Scraper].get_person(name_text) == person
