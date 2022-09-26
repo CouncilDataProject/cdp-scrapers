@@ -28,6 +28,14 @@ cdp\_scrapers.legistar\_utils module
    :undoc-members:
    :show-inheritance:
 
+cdp\_scrapers.prime\_gov\_utils module
+--------------------------------------
+
+.. automodule:: cdp_scrapers.prime_gov_utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 cdp\_scrapers.scraper\_utils module
 -----------------------------------
 

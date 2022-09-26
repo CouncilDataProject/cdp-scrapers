@@ -37,6 +37,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -121,10 +122,40 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-cdp_scrapers.legistar_content_parsers">cdp_scrapers.legistar_content_parsers module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-cdp_scrapers.legistar_utils">cdp_scrapers.legistar_utils module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-cdp_scrapers.scraper_utils">cdp_scrapers.scraper_utils module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-cdp_scrapers.types">cdp_scrapers.types module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-cdp_scrapers">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cdp_scrapers.legistar_utils">cdp_scrapers.legistar_utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#cdp_scrapers.legistar_utils.ContentUriScrapeResult"><code class="docutils literal notranslate"><span class="pre">ContentUriScrapeResult</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cdp_scrapers.legistar_utils.LegistarScraper"><code class="docutils literal notranslate"><span class="pre">LegistarScraper</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cdp_scrapers.legistar_utils.get_legistar_body"><code class="docutils literal notranslate"><span class="pre">get_legistar_body()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cdp_scrapers.legistar_utils.get_legistar_content_uris"><code class="docutils literal notranslate"><span class="pre">get_legistar_content_uris()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cdp_scrapers.legistar_utils.get_legistar_events_for_timespan"><code class="docutils literal notranslate"><span class="pre">get_legistar_events_for_timespan()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cdp_scrapers.legistar_utils.get_legistar_person"><code class="docutils literal notranslate"><span class="pre">get_legistar_person()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cdp_scrapers.prime_gov_utils">cdp_scrapers.prime_gov_utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#cdp_scrapers.prime_gov_utils.PrimeGovScraper"><code class="docutils literal notranslate"><span class="pre">PrimeGovScraper</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cdp_scrapers.prime_gov_utils.primegov_strftime"><code class="docutils literal notranslate"><span class="pre">primegov_strftime()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cdp_scrapers.prime_gov_utils.primegov_strptime"><code class="docutils literal notranslate"><span class="pre">primegov_strptime()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cdp_scrapers.scraper_utils">cdp_scrapers.scraper_utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#cdp_scrapers.scraper_utils.IngestionModelScraper"><code class="docutils literal notranslate"><span class="pre">IngestionModelScraper</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cdp_scrapers.scraper_utils.parse_static_file"><code class="docutils literal notranslate"><span class="pre">parse_static_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cdp_scrapers.scraper_utils.parse_static_person"><code class="docutils literal notranslate"><span class="pre">parse_static_person()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cdp_scrapers.scraper_utils.reduced_list"><code class="docutils literal notranslate"><span class="pre">reduced_list()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cdp_scrapers.scraper_utils.sanitize_roles"><code class="docutils literal notranslate"><span class="pre">sanitize_roles()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cdp_scrapers.scraper_utils.str_simplified"><code class="docutils literal notranslate"><span class="pre">str_simplified()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cdp_scrapers.types">cdp_scrapers.types module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#cdp_scrapers.types.ContentURIs"><code class="docutils literal notranslate"><span class="pre">ContentURIs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cdp_scrapers.types.LegistarContentParser"><code class="docutils literal notranslate"><span class="pre">LegistarContentParser</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cdp_scrapers.types.ScraperStaticData"><code class="docutils literal notranslate"><span class="pre">ScraperStaticData</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-contents">Module contents</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#cdp_scrapers.get_module_version"><code class="docutils literal notranslate"><span class="pre">get_module_version()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -137,8 +168,17 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Core Components:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="cdp_scrapers.instances.empty.get_events.html">cdp_scrapers.instances.empty.get_events</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cdp_scrapers.legistar_utils.LegistarScraper.html">cdp_scrapers.legistar_utils.LegistarScraper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cdp_scrapers.instances.empty.get_events.html">cdp_scrapers.instances.empty.get_events</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cdp_scrapers.instances.empty.get_events.html#cdp_scrapers.instances.empty.get_events"><code class="docutils literal notranslate"><span class="pre">get_events()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cdp_scrapers.legistar_utils.LegistarScraper.html">cdp_scrapers.legistar_utils.LegistarScraper</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cdp_scrapers.legistar_utils.LegistarScraper.html#cdp_scrapers.legistar_utils.LegistarScraper"><code class="docutils literal notranslate"><span class="pre">LegistarScraper</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.legistar_utils.LegistarScraper.html#cdp_scrapers.legistar_utils.LegistarScraper.__init__"><code class="docutils literal notranslate"><span class="pre">LegistarScraper.__init__()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
             
@@ -225,12 +265,82 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="cdp_scrapers.instances.html">cdp_scrapers.instances package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="cdp_scrapers.instances.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cdp_scrapers.instances.html#module-cdp_scrapers.instances.atlanta">cdp_scrapers.instances.atlanta module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cdp_scrapers.instances.html#module-cdp_scrapers.instances.empty">cdp_scrapers.instances.empty module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cdp_scrapers.instances.html#module-cdp_scrapers.instances.kingcounty">cdp_scrapers.instances.kingcounty module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cdp_scrapers.instances.html#module-cdp_scrapers.instances.portland">cdp_scrapers.instances.portland module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cdp_scrapers.instances.html#module-cdp_scrapers.instances.seattle">cdp_scrapers.instances.seattle module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cdp_scrapers.instances.html#module-cdp_scrapers.instances">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cdp_scrapers.instances.html#module-cdp_scrapers.instances.atlanta">cdp_scrapers.instances.atlanta module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.assign_constant"><code class="docutils literal notranslate"><span class="pre">assign_constant()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.convert_status_constant"><code class="docutils literal notranslate"><span class="pre">convert_status_constant()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.get_date"><code class="docutils literal notranslate"><span class="pre">get_date()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.get_events"><code class="docutils literal notranslate"><span class="pre">get_events()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.get_matter_status"><code class="docutils literal notranslate"><span class="pre">get_matter_status()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.get_new_person"><code class="docutils literal notranslate"><span class="pre">get_new_person()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.get_person"><code class="docutils literal notranslate"><span class="pre">get_person()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.get_single_person"><code class="docutils literal notranslate"><span class="pre">get_single_person()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.get_voting_result"><code class="docutils literal notranslate"><span class="pre">get_voting_result()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.get_year"><code class="docutils literal notranslate"><span class="pre">get_year()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.parse_event"><code class="docutils literal notranslate"><span class="pre">parse_event()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.atlanta.parse_single_matter"><code class="docutils literal notranslate"><span class="pre">parse_single_matter()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cdp_scrapers.instances.html#module-cdp_scrapers.instances.empty">cdp_scrapers.instances.empty module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.empty.get_events"><code class="docutils literal notranslate"><span class="pre">get_events()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cdp_scrapers.instances.html#module-cdp_scrapers.instances.kingcounty">cdp_scrapers.instances.kingcounty module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.kingcounty.KingCountyScraper"><code class="docutils literal notranslate"><span class="pre">KingCountyScraper</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.kingcounty.KingCountyScraper.PYTHON_MUNICIPALITY_SLUG"><code class="docutils literal notranslate"><span class="pre">KingCountyScraper.PYTHON_MUNICIPALITY_SLUG</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.kingcounty.KingCountyScraper.dump_static_info"><code class="docutils literal notranslate"><span class="pre">KingCountyScraper.dump_static_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.kingcounty.KingCountyScraper.get_static_person_info"><code class="docutils literal notranslate"><span class="pre">KingCountyScraper.get_static_person_info()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cdp_scrapers.instances.html#module-cdp_scrapers.instances.portland">cdp_scrapers.instances.portland module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper"><code class="docutils literal notranslate"><span class="pre">PortlandScraper</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_agenda_uri"><code class="docutils literal notranslate"><span class="pre">PortlandScraper.get_agenda_uri()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_doc_number"><code class="docutils literal notranslate"><span class="pre">PortlandScraper.get_doc_number()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_event"><code class="docutils literal notranslate"><span class="pre">PortlandScraper.get_event()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_event_minutes"><code class="docutils literal notranslate"><span class="pre">PortlandScraper.get_event_minutes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_events"><code class="docutils literal notranslate"><span class="pre">PortlandScraper.get_events()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_matter"><code class="docutils literal notranslate"><span class="pre">PortlandScraper.get_matter()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_person"><code class="docutils literal notranslate"><span class="pre">PortlandScraper.get_person()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_section_top_number"><code class="docutils literal notranslate"><span class="pre">PortlandScraper.get_section_top_number()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_sessions"><code class="docutils literal notranslate"><span class="pre">PortlandScraper.get_sessions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_supporting_files"><code class="docutils literal notranslate"><span class="pre">PortlandScraper.get_supporting_files()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_votes"><code class="docutils literal notranslate"><span class="pre">PortlandScraper.get_votes()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.portland.WebPageSoup"><code class="docutils literal notranslate"><span class="pre">WebPageSoup</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.portland.WebPageSoup.soup"><code class="docutils literal notranslate"><span class="pre">WebPageSoup.soup</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.portland.WebPageSoup.status"><code class="docutils literal notranslate"><span class="pre">WebPageSoup.status</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.portland.disposition_to_minute_decision"><code class="docutils literal notranslate"><span class="pre">disposition_to_minute_decision()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.portland.get_disposition"><code class="docutils literal notranslate"><span class="pre">get_disposition()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.portland.get_portland_events"><code class="docutils literal notranslate"><span class="pre">get_portland_events()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.portland.load_web_page"><code class="docutils literal notranslate"><span class="pre">load_web_page()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.portland.make_efile_url"><code class="docutils literal notranslate"><span class="pre">make_efile_url()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.portland.separate_name_from_title"><code class="docutils literal notranslate"><span class="pre">separate_name_from_title()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cdp_scrapers.instances.html#module-cdp_scrapers.instances.seattle">cdp_scrapers.instances.seattle module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.SeattleScraper"><code class="docutils literal notranslate"><span class="pre">SeattleScraper</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.SeattleScraper.PYTHON_MUNICIPALITY_SLUG"><code class="docutils literal notranslate"><span class="pre">SeattleScraper.PYTHON_MUNICIPALITY_SLUG</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.SeattleScraper.dump_static_info"><code class="docutils literal notranslate"><span class="pre">SeattleScraper.dump_static_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.SeattleScraper.get_content_uris"><code class="docutils literal notranslate"><span class="pre">SeattleScraper.get_content_uris()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.SeattleScraper.get_person_picture_url"><code class="docutils literal notranslate"><span class="pre">SeattleScraper.get_person_picture_url()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.SeattleScraper.get_static_person_info"><code class="docutils literal notranslate"><span class="pre">SeattleScraper.get_static_person_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.SeattleScraper.get_video_page_urls"><code class="docutils literal notranslate"><span class="pre">SeattleScraper.get_video_page_urls()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.SeattleScraper.parse_content_uris"><code class="docutils literal notranslate"><span class="pre">SeattleScraper.parse_content_uris()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.SeattleScraper.roman_to_int"><code class="docutils literal notranslate"><span class="pre">SeattleScraper.roman_to_int()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cdp_scrapers.instances.html#module-contents">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.get_king_county_events"><code class="docutils literal notranslate"><span class="pre">get_king_county_events()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.get_seattle_events"><code class="docutils literal notranslate"><span class="pre">get_seattle_events()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.scraper_get_events"><code class="docutils literal notranslate"><span class="pre">scraper_get_events()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -940,6 +1050,176 @@ and requests person information for any vote.</p>
 </dd></dl>
 
 </section>
+<section id="module-cdp_scrapers.prime_gov_utils">
+<span id="cdp-scrapers-prime-gov-utils-module"></span><h2>cdp_scrapers.prime_gov_utils module<a class="headerlink" href="#module-cdp_scrapers.prime_gov_utils" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="cdp_scrapers.prime_gov_utils.PrimeGovScraper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cdp_scrapers.prime_gov_utils.</span></span><span class="sig-name descname"><span class="pre">PrimeGovScraper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timezone</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">person_aliases</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cdp_scrapers/prime_gov_utils.html#PrimeGovScraper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.prime_gov_utils.PrimeGovScraper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PrimeGovSite</span></code>, <a class="reference internal" href="#cdp_scrapers.scraper_utils.IngestionModelScraper" title="cdp_scrapers.scraper_utils.IngestionModelScraper"><code class="xref py py-class docutils literal notranslate"><span class="pre">IngestionModelScraper</span></code></a></p>
+<p>Adapter for civic_scraper PrimeGovSite in cdp-scrapers</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">civic_scraper.platforms.primegov.site.PrimeGoveSite</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">cdp_screapers.scraper_utils.IngestionModelScraper</span></code></p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>client_id</strong> (<em>str</em>) – primegov api instance id, e.g. lacity for Los Angeles, CA</p></li>
+<li><p><strong>timezone</strong> (<em>str</em>) – Local time zone</p></li>
+<li><p><strong>person_aliases</strong> (<em>Optional[Dict[str, Set[str]]] = None</em>) – Dictionary used to catch name aliases
+and resolve improperly different Persons to the one correct Person.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_body">
+<span class="sig-name descname"><span class="pre">get_body</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">meeting</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Body</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/prime_gov_utils.html#PrimeGovScraper.get_body"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_body" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract a Body from a primegov meeting dictionary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>meeting</strong> (<em>Meeting</em>) – Target meeting</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Body extracted from the meeting</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Optional[Body]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_event">
+<span class="sig-name descname"><span class="pre">get_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">meeting</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">EventIngestionModel</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/prime_gov_utils.html#PrimeGovScraper.get_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract a EventIngestionModel from a primegov meeting dictionary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>meeting</strong> (<em>Meeting</em>) – Target meeting</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>EventIngestionModel extracted from the meeting</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Optional[EventIngestionModel]</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_body" title="cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_body"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_body</span></code></a>, <a class="reference internal" href="#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_session" title="cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_session"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_session</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_events">
+<span class="sig-name descname"><span class="pre">get_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">begin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">EventIngestionModel</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/prime_gov_utils.html#PrimeGovScraper.get_events"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_events" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return list of ingested events for the given time period.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>begin</strong> (<em>Optional[datetime]</em>) – The timespan beginning datetime to query for events after.
+Default is 2 days from UTC now</p></li>
+<li><p><strong>end</strong> (<em>Optional[datetime]</em>) – The timespan end datetime to query for events before.
+Default is UTC now</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>events</strong> – One instance of EventIngestionModel per primegov api meeting</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[EventIngestionModel]</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_meetings" title="cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_meetings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_meetings</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_meetings">
+<span class="sig-name descname"><span class="pre">get_meetings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">begin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/prime_gov_utils.html#PrimeGovScraper.get_meetings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_meetings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Query meetings from primegov api endpoint</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>begin</strong> (<em>datetime</em>) – The timespan beginning datetime to query for events after.</p></li>
+<li><p><strong>end</strong> (<em>datetime</em>) – The timespan end datetime to query for events before.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Iterator over list of meeting JSON</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Optional[Iterable[Meeting]]</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Because of CDP’s preference for videos,
+meetings without video URL are filtered out.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_events" title="cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_events"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_events</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_session">
+<span class="sig-name descname"><span class="pre">get_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">meeting</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Session</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/prime_gov_utils.html#PrimeGovScraper.get_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_session" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract a Session from a primegov meeting dictionary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>meeting</strong> (<em>Meeting</em>) – Target meeting</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Session extracted from the meeting</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Optional[Session]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cdp_scrapers.prime_gov_utils.primegov_strftime">
+<span class="sig-prename descclassname"><span class="pre">cdp_scrapers.prime_gov_utils.</span></span><span class="sig-name descname"><span class="pre">primegov_strftime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/prime_gov_utils.html#primegov_strftime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.prime_gov_utils.primegov_strftime" title="Permalink to this definition">¶</a></dt>
+<dd><p>strftime() in format expected for search by primegov api</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dt</strong> (<em>datetime</em>) – datetime to convert</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Input datetime in string</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">civic_scraper.platforms.primegov.site.PrimeGovSite.scrape</span></code></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cdp_scrapers.prime_gov_utils.primegov_strptime">
+<span class="sig-prename descclassname"><span class="pre">cdp_scrapers.prime_gov_utils.</span></span><span class="sig-name descname"><span class="pre">primegov_strptime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">meeting</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/prime_gov_utils.html#primegov_strptime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.prime_gov_utils.primegov_strptime" title="Permalink to this definition">¶</a></dt>
+<dd><p>strptime() on meeting_date_time using expected format commonly used in primegov api</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>meeting</strong> (<em>Meeting</em>) – Target meeting</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Meeting’s date and time</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Optional[datetime]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 <section id="module-cdp_scrapers.scraper_utils">
 <span id="cdp-scrapers-scraper-utils-module"></span><h2>cdp_scrapers.scraper_utils module<a class="headerlink" href="#module-cdp_scrapers.scraper_utils" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
@@ -1235,10 +1515,10 @@ from a Legistar/Granicus-hosted video web page</p>
 </dd></dl>
 
 </section>
-<section id="module-cdp_scrapers">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-cdp_scrapers" title="Permalink to this heading">¶</a></h2>
+<section id="module-contents">
+<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">¶</a></h2>
 <p>Top-level package for cdp-scrapers.</p>
-<dl class="py function">
+<span class="target" id="module-cdp_scrapers"></span><dl class="py function">
 <dt class="sig sig-object py" id="cdp_scrapers.get_module_version">
 <span class="sig-prename descclassname"><span class="pre">cdp_scrapers.</span></span><span class="sig-name descname"><span class="pre">get_module_version</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cdp_scrapers.html#get_module_version"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.get_module_version" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>

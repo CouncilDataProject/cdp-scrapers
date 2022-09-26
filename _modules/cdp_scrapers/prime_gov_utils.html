@@ -1,0 +1,542 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>cdp_scrapers.prime_gov_utils &mdash; cdp-scrapers 0.4.7 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> cdp-scrapers
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.4.7
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#stable-release">Stable release</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#from-sources">From sources</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../finding_legistar_id.html">Searching for your Municipality's Legistar ID</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../legistar_scraper.html">LegistarScraper</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../legistar_scraper.html#filtering">Filtering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../legistar_scraper.html#legistar-to-cdp-ingestionmodel">Legistar to CDP <code class="docutils literal notranslate"><span class="pre">IngestionModel</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../legistar_scraper.html#instance-specific-scraping">Instance-Specific Scraping</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../legistar_scraper.html#scraping-for-session-video-uri">Scraping for <code class="docutils literal notranslate"><span class="pre">Session.video_uri</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../legistar_scraper.html#information-from-other-sources">Information From Other Sources</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../legistar_scraper.html#other-notes">Other Notes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Package Modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../cdp_scrapers.html">cdp_scrapers package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../cdp_scrapers.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.instances.html">cdp_scrapers.instances package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../cdp_scrapers.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../cdp_scrapers.html#module-cdp_scrapers.legistar_content_parsers">cdp_scrapers.legistar_content_parsers module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../cdp_scrapers.html#module-cdp_scrapers.legistar_utils">cdp_scrapers.legistar_utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.ContentUriScrapeResult"><code class="docutils literal notranslate"><span class="pre">ContentUriScrapeResult</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper"><code class="docutils literal notranslate"><span class="pre">LegistarScraper</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.get_legistar_body"><code class="docutils literal notranslate"><span class="pre">get_legistar_body()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.get_legistar_content_uris"><code class="docutils literal notranslate"><span class="pre">get_legistar_content_uris()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.get_legistar_events_for_timespan"><code class="docutils literal notranslate"><span class="pre">get_legistar_events_for_timespan()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.get_legistar_person"><code class="docutils literal notranslate"><span class="pre">get_legistar_person()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../cdp_scrapers.html#module-cdp_scrapers.prime_gov_utils">cdp_scrapers.prime_gov_utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper"><code class="docutils literal notranslate"><span class="pre">PrimeGovScraper</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.primegov_strftime"><code class="docutils literal notranslate"><span class="pre">primegov_strftime()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.primegov_strptime"><code class="docutils literal notranslate"><span class="pre">primegov_strptime()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../cdp_scrapers.html#module-cdp_scrapers.scraper_utils">cdp_scrapers.scraper_utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.scraper_utils.IngestionModelScraper"><code class="docutils literal notranslate"><span class="pre">IngestionModelScraper</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.scraper_utils.parse_static_file"><code class="docutils literal notranslate"><span class="pre">parse_static_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.scraper_utils.parse_static_person"><code class="docutils literal notranslate"><span class="pre">parse_static_person()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.scraper_utils.reduced_list"><code class="docutils literal notranslate"><span class="pre">reduced_list()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.scraper_utils.sanitize_roles"><code class="docutils literal notranslate"><span class="pre">sanitize_roles()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.scraper_utils.str_simplified"><code class="docutils literal notranslate"><span class="pre">str_simplified()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../cdp_scrapers.html#module-cdp_scrapers.types">cdp_scrapers.types module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.types.ContentURIs"><code class="docutils literal notranslate"><span class="pre">ContentURIs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.types.LegistarContentParser"><code class="docutils literal notranslate"><span class="pre">LegistarContentParser</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.types.ScraperStaticData"><code class="docutils literal notranslate"><span class="pre">ScraperStaticData</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../cdp_scrapers.html#module-contents">Module contents</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.get_module_version"><code class="docutils literal notranslate"><span class="pre">get_module_version()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#get-started">Get Started!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#deploying">Deploying</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Core Components:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cdp_scrapers.instances.empty.get_events.html">cdp_scrapers.instances.empty.get_events</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../cdp_scrapers.instances.empty.get_events.html#cdp_scrapers.instances.empty.get_events"><code class="docutils literal notranslate"><span class="pre">get_events()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../cdp_scrapers.legistar_utils.LegistarScraper.html">cdp_scrapers.legistar_utils.LegistarScraper</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../cdp_scrapers.legistar_utils.LegistarScraper.html#cdp_scrapers.legistar_utils.LegistarScraper"><code class="docutils literal notranslate"><span class="pre">LegistarScraper</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../cdp_scrapers.legistar_utils.LegistarScraper.html#cdp_scrapers.legistar_utils.LegistarScraper.__init__"><code class="docutils literal notranslate"><span class="pre">LegistarScraper.__init__()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">cdp-scrapers</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../cdp_scrapers.html">cdp_scrapers</a> &raquo;</li>
+        
+      <li>cdp_scrapers.prime_gov_utils</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for cdp_scrapers.prime_gov_utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span>
+
+<span class="kn">from</span> <span class="nn">cdp_backend.pipeline.ingestion_models</span> <span class="kn">import</span> <span class="n">Body</span><span class="p">,</span> <span class="n">EventIngestionModel</span><span class="p">,</span> <span class="n">Session</span>
+<span class="kn">from</span> <span class="nn">civic_scraper.platforms.primegov.site</span> <span class="kn">import</span> <span class="n">PrimeGovSite</span>
+
+<span class="kn">from</span> <span class="nn">.scraper_utils</span> <span class="kn">import</span> <span class="n">IngestionModelScraper</span><span class="p">,</span> <span class="n">reduced_list</span><span class="p">,</span> <span class="n">str_simplified</span>
+
+<span class="c1">###############################################################################</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="c1">###############################################################################</span>
+
+<span class="n">SITE_URL</span> <span class="o">=</span> <span class="s2">&quot;https://</span><span class="si">{client}</span><span class="s2">.primegov.com/&quot;</span>
+
+<span class="n">MEETING_DATETIME</span> <span class="o">=</span> <span class="s2">&quot;dateTime&quot;</span>
+<span class="n">MEETING_DATE</span> <span class="o">=</span> <span class="s2">&quot;date&quot;</span>
+<span class="n">MEETING_TIME</span> <span class="o">=</span> <span class="s2">&quot;time&quot;</span>
+<span class="n">MEETING_ID</span> <span class="o">=</span> <span class="s2">&quot;id&quot;</span>
+<span class="n">BODY_NAME</span> <span class="o">=</span> <span class="s2">&quot;title&quot;</span>
+<span class="n">VIDEO_URL</span> <span class="o">=</span> <span class="s2">&quot;videoUrl&quot;</span>
+
+<span class="n">DATE_FORMAT</span> <span class="o">=</span> <span class="s2">&quot;%m/</span><span class="si">%d</span><span class="s2">/%Y&quot;</span>
+<span class="n">TIME_FORMAT</span> <span class="o">=</span> <span class="s2">&quot;%I:%M %p&quot;</span>
+
+<span class="n">Meeting</span> <span class="o">=</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="primegov_strftime"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.primegov_strftime">[docs]</a><span class="k">def</span> <span class="nf">primegov_strftime</span><span class="p">(</span><span class="n">dt</span><span class="p">:</span> <span class="n">datetime</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    strftime() in format expected for search by primegov api</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dt: datetime</span>
+<span class="sd">        datetime to convert</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        Input datetime in string</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    civic_scraper.platforms.primegov.site.PrimeGovSite.scrape()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">DATE_FORMAT</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="primegov_strptime"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.primegov_strptime">[docs]</a><span class="k">def</span> <span class="nf">primegov_strptime</span><span class="p">(</span><span class="n">meeting</span><span class="p">:</span> <span class="n">Meeting</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    strptime() on meeting_date_time using expected format commonly used in primegov api</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    meeting: Meeting</span>
+<span class="sd">        Target meeting</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Optional[datetime]</span>
+<span class="sd">        Meeting&#39;s date and time</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">meeting</span><span class="p">[</span><span class="n">MEETING_DATETIME</span><span class="p">])</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">meeting</span><span class="p">[</span><span class="n">MEETING_DATE</span><span class="p">]</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">meeting</span><span class="p">[</span><span class="n">MEETING_TIME</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DATE_FORMAT</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">TIME_FORMAT</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Error parsing &#39;</span><span class="si">{</span><span class="n">meeting</span><span class="p">[</span><span class="n">MEETING_DATETIME</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">meeting</span><span class="p">[</span><span class="n">MEETING_DATE</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">meeting</span><span class="p">[</span><span class="n">MEETING_TIME</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="PrimeGovScraper"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper">[docs]</a><span class="k">class</span> <span class="nc">PrimeGovScraper</span><span class="p">(</span><span class="n">PrimeGovSite</span><span class="p">,</span> <span class="n">IngestionModelScraper</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adapter for civic_scraper PrimeGovSite in cdp-scrapers</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    civic_scraper.platforms.primegov.site.PrimeGoveSite</span>
+<span class="sd">    cdp_screapers.scraper_utils.IngestionModelScraper</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">client_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">timezone</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">person_aliases</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        client_id: str</span>
+<span class="sd">            primegov api instance id, e.g. lacity for Los Angeles, CA</span>
+<span class="sd">        timezone: str</span>
+<span class="sd">            Local time zone</span>
+<span class="sd">        person_aliases: Optional[Dict[str, Set[str]]] = None</span>
+<span class="sd">            Dictionary used to catch name aliases</span>
+<span class="sd">            and resolve improperly different Persons to the one correct Person.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">PrimeGovSite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">SITE_URL</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client_id</span><span class="p">))</span>
+        <span class="n">IngestionModelScraper</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">timezone</span><span class="o">=</span><span class="n">timezone</span><span class="p">,</span> <span class="n">person_aliases</span><span class="o">=</span><span class="n">person_aliases</span>
+        <span class="p">)</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Created PrimeGovScraper &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;for primegov_instance: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">primegov_instance</span><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;in timezone: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">timezone</span><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;at url: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="PrimeGovScraper.get_session"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_session">[docs]</a>    <span class="k">def</span> <span class="nf">get_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meeting</span><span class="p">:</span> <span class="n">Meeting</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Session</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract a Session from a primegov meeting dictionary</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        meeting: Meeting</span>
+<span class="sd">            Target meeting</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Optional[Session]</span>
+<span class="sd">            Session extracted from the meeting</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>
+            <span class="n">Session</span><span class="p">(</span>
+                <span class="n">session_datetime</span><span class="o">=</span><span class="n">primegov_strptime</span><span class="p">(</span><span class="n">meeting</span><span class="p">),</span>
+                <span class="n">video_uri</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">meeting</span><span class="p">[</span><span class="n">VIDEO_URL</span><span class="p">]),</span>
+                <span class="n">session_index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="PrimeGovScraper.get_body"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_body">[docs]</a>    <span class="k">def</span> <span class="nf">get_body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meeting</span><span class="p">:</span> <span class="n">Meeting</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Body</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract a Body from a primegov meeting dictionary</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        meeting: Meeting</span>
+<span class="sd">            Target meeting</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Optional[Body]</span>
+<span class="sd">            Body extracted from the meeting</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span><span class="n">Body</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">meeting</span><span class="p">[</span><span class="n">BODY_NAME</span><span class="p">])))</span></div>
+
+<div class="viewcode-block" id="PrimeGovScraper.get_event"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_event">[docs]</a>    <span class="k">def</span> <span class="nf">get_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meeting</span><span class="p">:</span> <span class="n">Meeting</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract a EventIngestionModel from a primegov meeting dictionary</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        meeting: Meeting</span>
+<span class="sd">            Target meeting</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Optional[EventIngestionModel]</span>
+<span class="sd">            EventIngestionModel extracted from the meeting</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        get_body()</span>
+<span class="sd">        get_session()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>
+            <span class="n">EventIngestionModel</span><span class="p">(</span>
+                <span class="n">body</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_body</span><span class="p">(</span><span class="n">meeting</span><span class="p">),</span>
+                <span class="n">sessions</span><span class="o">=</span><span class="n">reduced_list</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">get_session</span><span class="p">(</span><span class="n">meeting</span><span class="p">)]),</span>
+                <span class="n">external_source_id</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">meeting</span><span class="p">[</span><span class="n">MEETING_ID</span><span class="p">])),</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="PrimeGovScraper.get_meetings"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_meetings">[docs]</a>    <span class="k">def</span> <span class="nf">get_meetings</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">begin</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span>
+        <span class="n">end</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Meeting</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Query meetings from primegov api endpoint</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        begin: datetime</span>
+<span class="sd">            The timespan beginning datetime to query for events after.</span>
+<span class="sd">        end: datetime</span>
+<span class="sd">            The timespan end datetime to query for events before.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Optional[Iterable[Meeting]]</span>
+<span class="sd">            Iterator over list of meeting JSON</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Because of CDP&#39;s preference for videos,</span>
+<span class="sd">        meetings without video URL are filtered out.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        get_events()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">resp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/api/meeting/search?&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;from=</span><span class="si">{</span><span class="n">primegov_strftime</span><span class="p">(</span><span class="n">begin</span><span class="p">)</span><span class="si">}</span><span class="s2">&amp;to=</span><span class="si">{</span><span class="n">primegov_strftime</span><span class="p">(</span><span class="n">end</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">m</span><span class="p">:</span> <span class="nb">any</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="n">VIDEO_URL</span><span class="p">]),</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="PrimeGovScraper.get_events"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_events">[docs]</a>    <span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">begin</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return list of ingested events for the given time period.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        begin: Optional[datetime]</span>
+<span class="sd">            The timespan beginning datetime to query for events after.</span>
+<span class="sd">            Default is 2 days from UTC now</span>
+<span class="sd">        end: Optional[datetime]</span>
+<span class="sd">            The timespan end datetime to query for events before.</span>
+<span class="sd">            Default is UTC now</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        events: List[EventIngestionModel]</span>
+<span class="sd">            One instance of EventIngestionModel per primegov api meeting</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        get_meetings()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">reduced_list</span><span class="p">(</span>
+            <span class="nb">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_meetings</span><span class="p">(</span><span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">)),</span> <span class="n">collapse</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Eva Maxfield Brown.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
