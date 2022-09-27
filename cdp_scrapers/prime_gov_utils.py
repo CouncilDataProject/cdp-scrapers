@@ -37,11 +37,6 @@ Meeting = Dict[str, Any]
 Agenda = BeautifulSoup
 
 
-class MinutesItemInfo(NamedTuple):
-    name: str
-    desc: str
-
-
 def primegov_strftime(dt: datetime) -> str:
     """
     strftime() in format expected for search by primegov api
@@ -143,7 +138,7 @@ def get_minutes_tables(agenda: Agenda) -> Iterator[Tag]:
     return map(lambda d: d.find("table"), divs)
 
 
-def get_minutes_item(minutes_table: Tag) -> MinutesItemInfo:
+def get_minutes_item(minutes_table: Tag) -> MinutesItem:
     """
     Extract minutes item name and description.
 
@@ -178,7 +173,7 @@ def get_minutes_item(minutes_table: Tag) -> MinutesItemInfo:
             f"Minutes item <table> is no longer recognized: {minutes_table}"
         )
 
-    return MinutesItemInfo(str_simplified(name), str_simplified(desc))
+    return MinutesItem(name=str_simplified(name), description=str_simplified(desc))
 
 
 class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
@@ -276,10 +271,7 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
         --------
         get_minutes_item()
         """
-        minutes_info = get_minutes_item(minutes_table)
-        return self.get_none_if_empty(
-            MinutesItem(name=minutes_info.name, description=minutes_info.desc)
-        )
+        return self.get_none_if_empty(get_minutes_item(minutes_table))
 
     def get_event(self, meeting: Meeting) -> Optional[EventIngestionModel]:
         """
