@@ -1,16 +1,13 @@
-import re
 from datetime import datetime
 from logging import getLogger
-from typing import Any, Dict, Iterator, List, NamedTuple, Optional, Set, Tuple
+from typing import Any, Dict, Iterator, List, NamedTuple, Optional, Set
 
 import requests
 from bs4 import BeautifulSoup, Tag
-from cdp_backend.database.constants import RoleTitle
 from cdp_backend.pipeline.ingestion_models import (
     Body,
     EventIngestionModel,
     MinutesItem,
-    Person,
     Session,
 )
 from civic_scraper.platforms.primegov.site import PrimeGovSite
@@ -36,15 +33,8 @@ VIDEO_URL = "videoUrl"
 DATE_FORMAT = "%m/%d/%Y"
 TIME_FORMAT = "%I:%M %p"
 
-MEMBERS_TBL_KEYWORD = "MEMBERS:"
-
 Meeting = Dict[str, Any]
 Agenda = BeautifulSoup
-
-default_role_map: Dict[str, RoleTitle] = {
-    "CHAIR": RoleTitle.CHAIR,
-    "COUNCILMEMBER": RoleTitle.COUNCILMEMBER,
-}
 
 
 class MinutesItemInfo(NamedTuple):
@@ -134,124 +124,6 @@ def load_agenda(url: str) -> Optional[Agenda]:
     return None
 
 
-def get_members_table(agenda: Agenda) -> Optional[Tag]:
-    """
-    Get the <table> on the agenda web page that contains councilmember names.
-
-    Parameters
-    ----------
-    agenda: Agenda
-        Agenda web page loaded into BeautifulSoup
-
-    Returns
-    -------
-    Optional[Tag]
-        <table> for councilmember names
-    """
-
-    def _contains_members_row(tag: Tag) -> bool:
-        return tag.find("span", string=MEMBERS_TBL_KEYWORD) is not None
-
-    def _is_members_table(table: Tag) -> bool:
-        return (
-            table.name == "table"
-            and _contains_members_row(table)
-            and any(table.find_all("tr"))
-        )
-
-    return agenda.find(_is_members_table)
-
-
-def get_member_names(agenda: Agenda) -> List[str]:
-    """
-    Get names of councilmembers listed on the agenda.
-
-    Parameters
-    ----------
-    agenda: Agenda
-        Agenda web page loaded into BeautifulSoup
-
-    Returns
-    -------
-    List[str]
-        Names of councilmembers on the agenda.
-    """
-    table = get_members_table(agenda)
-    if not table:
-        return list()
-
-    def _get_name(row: Tag) -> str:
-        # Last column in the members table has the name
-        return row.find_all("td")[-1].string
-
-    return reduced_list(map(_get_name, table.find_all("tr")), collapse=False)
-
-
-def split_name_role(
-    name_text: str, role_map: Dict[str, RoleTitle]
-) -> Tuple[str, RoleTitle]:
-    """
-    Split councilmember name text blob into name and role title.
-
-    Parameters
-    ----------
-    name_text: str
-        Name as listed on agenda web page
-    role_map: Dict[str, RoleTitle]
-        Map titles on agenda to CDP std role titles
-
-    Returns
-    -------
-    str, RoleTitle
-        The person's name and std role title
-
-    See Also
-    --------
-    cdp_backend.database.constants.RoleTitle
-    """
-
-    def _pop_lead_title() -> Tuple[str, Optional[RoleTitle]]:
-        """
-        Pop any role title in the beginning of name blob
-        """
-        for match, std_title in map(
-            lambda title: (
-                re.search(f"^\\s*{title[0]}", name_text, re.I),
-                title[1],
-            ),
-            role_map.items(),
-        ):
-            if match is not None:
-                # Remove title from name blob
-                return name_text[match.end() :], std_title
-        return name_text, None
-
-    def _pop_trail_title() -> Tuple[str, Optional[RoleTitle]]:
-        """
-        Pop any role title at the end of name blob
-        """
-        for match, std_title in map(
-            lambda title: (
-                re.search(f",\\s*{title[0]}\\s*$", name_text, re.I),
-                title[1],
-            ),
-            role_map.items(),
-        ):
-            if match is not None:
-                # Remove title from name blob
-                return name_text[: match.start()], std_title
-        return name_text, None
-
-    name_text, lead_title = _pop_lead_title()
-    name_text, trail_title = _pop_trail_title()
-    # trailing title is more "important"; they are titles like chair.
-    # leading title is usually councilmember.
-    title = trail_title or lead_title
-    title = title or RoleTitle.MEMBER
-
-    return str_simplified(name_text), title
-
-
 def get_minutes_tables(agenda: Agenda) -> Iterator[Tag]:
     """
     Return iterator over tables for minutes items.
@@ -266,6 +138,7 @@ def get_minutes_tables(agenda: Agenda) -> Iterator[Tag]:
     Iterator[Tag]
         List of <table> for minutes items
     """
+    # look for <div> with certain class then get the <table> inside the <div>
     divs = agenda.find_all("div", class_="agenda-item")
     return map(lambda d: d.find("table"), divs)
 
@@ -291,6 +164,7 @@ def get_minutes_item(minutes_table: Tag) -> MinutesItemInfo:
     rows = minutes_table.find_all("tr")
 
     try:
+        # minutes item name in the first row, description in the second row
         name = rows[0].find("td").string
         desc = rows[1].find("div").string
     except (IndexError, AttributeError):
@@ -317,7 +191,6 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
         client_id: str,
         timezone: str,
         person_aliases: Optional[Dict[str, Set[str]]] = None,
-        role_map: Dict[str, RoleTitle] = None,
     ):
         """
         Parameters
@@ -329,16 +202,11 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
         person_aliases: Optional[Dict[str, Set[str]]] = None
             Dictionary used to catch name aliases
             and resolve improperly different Persons to the one correct Person.
-        role_map: Dict[str, RoleTitle] = None
-            Dictionary used to replace role titles with CDP standard role titles.
-            The keys should be titles you want to replace and the values should be a
-            CDP standard role.
         """
         PrimeGovSite.__init__(self, SITE_URL.format(client=client_id))
         IngestionModelScraper.__init__(
             self, timezone=timezone, person_aliases=person_aliases
         )
-        self.role_map = role_map or default_role_map
 
         log.debug(
             f"Created PrimeGovScraper "
@@ -384,32 +252,6 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
             Body extracted from the meeting
         """
         return self.get_none_if_empty(Body(name=str_simplified(meeting[BODY_NAME])))
-
-    def get_person(self, name_text: str) -> Optional[Person]:
-        """
-        Convert a councilmember name text blob from an agenda page
-        to a Person instance
-
-        Parameters
-        ----------
-        name_text: str
-            Name as listed on agenda web page
-
-        Returns
-        -------
-        Optional[Person]
-            Person from given name text blob
-
-        Notes
-        -----
-        For now role title in the text blob is ignored.
-
-        See Also
-        --------
-        split_name_role()
-        """
-        name, _ = split_name_role(name_text, self.role_map)
-        return self.get_none_if_empty(self.resolve_person_alias(Person(name=name)))
 
     def get_minutes_item(self, minutes_table: Tag) -> Optional[MinutesItem]:
         """

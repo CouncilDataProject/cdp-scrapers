@@ -3,7 +3,6 @@ from typing import List
 
 import pytest
 
-from cdp_backend.pipeline.ingestion_models import Person
 from cdp_scrapers.prime_gov_utils import (
     Meeting,
     PrimeGovScraper,
@@ -95,15 +94,3 @@ def test_get_events(
 ):
     events = scraper.get_events(begin, end)
     assert len(events) == num_meetings
-
-
-@pytest.mark.parametrize(
-    "name_text, person",
-    [
-        ("COUNCILMEMBER NITHYA RAMAN, CHAIR", Person(name="NITHYA RAMAN")),
-        ("COUNCILMEMBER BOB BLUMENFIELD", Person(name="BOB BLUMENFIELD")),
-        ("COUNCILMEMBER CURREN D. PRICE, JR.", Person(name="CURREN D. PRICE, JR.")),
-    ],
-)
-def test_get_person(name_text: str, person: Person):
-    assert scrapers[0].get_person(name_text) == person
