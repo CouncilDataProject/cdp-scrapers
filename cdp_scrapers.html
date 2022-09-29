@@ -132,7 +132,11 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-cdp_scrapers.prime_gov_utils">cdp_scrapers.prime_gov_utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#cdp_scrapers.prime_gov_utils.MinutesItemInfo"><code class="docutils literal notranslate"><span class="pre">MinutesItemInfo</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cdp_scrapers.prime_gov_utils.PrimeGovScraper"><code class="docutils literal notranslate"><span class="pre">PrimeGovScraper</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cdp_scrapers.prime_gov_utils.get_minutes_item"><code class="docutils literal notranslate"><span class="pre">get_minutes_item()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cdp_scrapers.prime_gov_utils.get_minutes_tables"><code class="docutils literal notranslate"><span class="pre">get_minutes_tables()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cdp_scrapers.prime_gov_utils.load_agenda"><code class="docutils literal notranslate"><span class="pre">load_agenda()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cdp_scrapers.prime_gov_utils.primegov_strftime"><code class="docutils literal notranslate"><span class="pre">primegov_strftime()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cdp_scrapers.prime_gov_utils.primegov_strptime"><code class="docutils literal notranslate"><span class="pre">primegov_strptime()</span></code></a></li>
 </ul>
@@ -152,7 +156,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#cdp_scrapers.types.ScraperStaticData"><code class="docutils literal notranslate"><span class="pre">ScraperStaticData</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#module-contents">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-cdp_scrapers">Module contents</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#cdp_scrapers.get_module_version"><code class="docutils literal notranslate"><span class="pre">get_module_version()</span></code></a></li>
 </ul>
 </li>
@@ -335,7 +339,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="cdp_scrapers.instances.html#module-contents">Module contents</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cdp_scrapers.instances.html#module-cdp_scrapers.instances">Module contents</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.get_king_county_events"><code class="docutils literal notranslate"><span class="pre">get_king_county_events()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.get_seattle_events"><code class="docutils literal notranslate"><span class="pre">get_seattle_events()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.instances.html#cdp_scrapers.instances.scraper_get_events"><code class="docutils literal notranslate"><span class="pre">scraper_get_events()</span></code></a></li>
@@ -1053,6 +1057,25 @@ and requests person information for any vote.</p>
 <section id="module-cdp_scrapers.prime_gov_utils">
 <span id="cdp-scrapers-prime-gov-utils-module"></span><h2>cdp_scrapers.prime_gov_utils module<a class="headerlink" href="#module-cdp_scrapers.prime_gov_utils" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
+<dt class="sig sig-object py" id="cdp_scrapers.prime_gov_utils.MinutesItemInfo">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cdp_scrapers.prime_gov_utils.</span></span><span class="sig-name descname"><span class="pre">MinutesItemInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cdp_scrapers/prime_gov_utils.html#MinutesItemInfo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.prime_gov_utils.MinutesItemInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">NamedTuple</span></code></p>
+<p>Create new instance of MinutesItemInfo(name, desc)</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cdp_scrapers.prime_gov_utils.MinutesItemInfo.desc">
+<span class="sig-name descname"><span class="pre">desc</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cdp_scrapers.prime_gov_utils.MinutesItemInfo.desc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cdp_scrapers.prime_gov_utils.MinutesItemInfo.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cdp_scrapers.prime_gov_utils.MinutesItemInfo.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="cdp_scrapers.prime_gov_utils.PrimeGovScraper">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cdp_scrapers.prime_gov_utils.</span></span><span class="sig-name descname"><span class="pre">PrimeGovScraper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timezone</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">person_aliases</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cdp_scrapers/prime_gov_utils.html#PrimeGovScraper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.prime_gov_utils.PrimeGovScraper" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PrimeGovSite</span></code>, <a class="reference internal" href="#cdp_scrapers.scraper_utils.IngestionModelScraper" title="cdp_scrapers.scraper_utils.IngestionModelScraper"><code class="xref py py-class docutils literal notranslate"><span class="pre">IngestionModelScraper</span></code></a></p>
@@ -1137,7 +1160,7 @@ Default is UTC now</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_meetings">
-<span class="sig-name descname"><span class="pre">get_meetings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">begin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/prime_gov_utils.html#PrimeGovScraper.get_meetings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_meetings" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_meetings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">begin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/prime_gov_utils.html#PrimeGovScraper.get_meetings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_meetings" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query meetings from primegov api endpoint</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1150,7 +1173,7 @@ Default is UTC now</p></li>
 <dd class="field-even"><p>Iterator over list of meeting JSON</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Optional[Iterable[Meeting]]</p>
+<dd class="field-odd"><p>Optional[Iterator[Meeting]]</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -1159,6 +1182,27 @@ meetings without video URL are filtered out.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_events" title="cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_events"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_events</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_minutes_item">
+<span class="sig-name descname"><span class="pre">get_minutes_item</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">minutes_table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tag</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">MinutesItem</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/prime_gov_utils.html#PrimeGovScraper.get_minutes_item"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_minutes_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract a minutes item from a &lt;table&gt; on agenda web page</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>minutes_table</strong> (<em>Tag</em>) – &lt;table&gt; tag on agenda web page for a minutes item.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>MinutesItem from given &lt;table&gt;</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Optional[MinutesItem]</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#cdp_scrapers.prime_gov_utils.get_minutes_item" title="cdp_scrapers.prime_gov_utils.get_minutes_item"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_minutes_item</span></code></a></p>
 </div>
 </dd></dl>
 
@@ -1179,6 +1223,64 @@ meetings without video URL are filtered out.</p>
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cdp_scrapers.prime_gov_utils.get_minutes_item">
+<span class="sig-prename descclassname"><span class="pre">cdp_scrapers.prime_gov_utils.</span></span><span class="sig-name descname"><span class="pre">get_minutes_item</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">minutes_table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tag</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#cdp_scrapers.prime_gov_utils.MinutesItemInfo" title="cdp_scrapers.prime_gov_utils.MinutesItemInfo"><span class="pre">MinutesItemInfo</span></a></span></span><a class="reference internal" href="_modules/cdp_scrapers/prime_gov_utils.html#get_minutes_item"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.prime_gov_utils.get_minutes_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract minutes item name and description.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>minutes_table</strong> (<em>Tag</em>) – &lt;table&gt; for a minutes item on agenda web page</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Minutes item name and description</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#cdp_scrapers.prime_gov_utils.MinutesItemInfo" title="cdp_scrapers.prime_gov_utils.MinutesItemInfo">MinutesItemInfo</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the &lt;table&gt; HTML structure is not as expected</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#cdp_scrapers.prime_gov_utils.get_minutes_tables" title="cdp_scrapers.prime_gov_utils.get_minutes_tables"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_minutes_tables</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cdp_scrapers.prime_gov_utils.get_minutes_tables">
+<span class="sig-prename descclassname"><span class="pre">cdp_scrapers.prime_gov_utils.</span></span><span class="sig-name descname"><span class="pre">get_minutes_tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">agenda</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BeautifulSoup</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><span class="pre">Tag</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/prime_gov_utils.html#get_minutes_tables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.prime_gov_utils.get_minutes_tables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return iterator over tables for minutes items.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>agenda</strong> (<em>Agenda</em>) – Agenda web page loaded into BeautifulSoup</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of &lt;table&gt; for minutes items</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Iterator[Tag]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cdp_scrapers.prime_gov_utils.load_agenda">
+<span class="sig-prename descclassname"><span class="pre">cdp_scrapers.prime_gov_utils.</span></span><span class="sig-name descname"><span class="pre">load_agenda</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">BeautifulSoup</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/prime_gov_utils.html#load_agenda"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.prime_gov_utils.load_agenda" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the agenda web page.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>url</strong> (<em>str</em>) – Agenda web page URL</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Agenda web page loaded into BeautifulSoup</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Optional[Agenda]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -1515,10 +1617,10 @@ from a Legistar/Granicus-hosted video web page</p>
 </dd></dl>
 
 </section>
-<section id="module-contents">
-<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">¶</a></h2>
+<section id="module-cdp_scrapers">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-cdp_scrapers" title="Permalink to this heading">¶</a></h2>
 <p>Top-level package for cdp-scrapers.</p>
-<span class="target" id="module-cdp_scrapers"></span><dl class="py function">
+<dl class="py function">
 <dt class="sig sig-object py" id="cdp_scrapers.get_module_version">
 <span class="sig-prename descclassname"><span class="pre">cdp_scrapers.</span></span><span class="sig-name descname"><span class="pre">get_module_version</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cdp_scrapers.html#get_module_version"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.get_module_version" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
