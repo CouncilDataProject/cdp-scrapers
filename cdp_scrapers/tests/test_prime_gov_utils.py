@@ -1,52 +1,58 @@
-import enum
 from datetime import datetime
 from typing import List
 
 import pytest
 
-from cdp_scrapers.prime_gov_utils import Meeting, PrimeGovScraper
+from cdp_scrapers.prime_gov_utils import (
+    Meeting,
+    PrimeGovScraper,
+    primegov_strftime,
+    primegov_strptime,
+)
 from cdp_scrapers.scraper_utils import reduced_list
 
 
-class DataItem(enum.IntEnum):
-    ClientId = 0
-    TimeZone = enum.auto()
-    Begin = enum.auto()
-    End = enum.auto()
-    Scraper = enum.auto()
-    NumMeetings = enum.auto()
-    Meetings = enum.auto()
-
-
-test_data = [
-    (
-        "lacity",
-        "America/Los_Angeles",
-        datetime(2022, 9, 1),
-        datetime(2022, 9, 1),
-        PrimeGovScraper(client_id="lacity", timezone="America/Los_Angeles"),
-        2,
-    ),
+begin_dates = [datetime(2022, 9, 1)]
+end_dates = [datetime(2022, 9, 1)]
+scrapers = [PrimeGovScraper(client_id="lacity", timezone="America/Los_Angeles")]
+all_meetings = [
+    list(s.get_meetings(begin_dates[i], end_dates[i])) for i, s in enumerate(scrapers)
 ]
-# append scraped meetings to each test input data set
-test_data = list(
-    map(
-        lambda d: (
-            *d,
-            list(
-                d[DataItem.Scraper].get_meetings(
-                    begin=d[DataItem.Begin], end=d[DataItem.End]
-                )
-            ),
+meeting_counts = [2]
+
+
+@pytest.mark.parametrize(
+    "meeting, date_time",
+    [
+        (
+            {"dateTime": "2022-09-06T10:00:00", "date": "", "time": ""},
+            datetime(2022, 9, 6, 10),
         ),
-        test_data,
-    )
+        (
+            {"dateTime": "", "date": "09/06/2022", "time": "10:00 AM"},
+            datetime(2022, 9, 6, 10),
+        ),
+        ({"dateTime": "2022-09-06", "date": "", "time": ""}, datetime(2022, 9, 6)),
+        ({"dateTime": "", "date": "09/06/2022", "time": ""}, datetime(2022, 9, 6)),
+    ],
 )
+def test_strptime(meeting: Meeting, date_time: datetime):
+    assert primegov_strptime(meeting) == date_time
+
+
+@pytest.mark.parametrize(
+    "date_time",
+    [
+        (datetime(2022, 9, 1, 10)),
+    ],
+)
+def test_strftime(date_time: datetime):
+    assert date_time.strftime("%m/%d/%Y") == primegov_strftime(date_time)
 
 
 @pytest.mark.parametrize(
     "num_meetings, meetings",
-    [(d[DataItem.NumMeetings], d[DataItem.Meetings]) for d in test_data],
+    zip(meeting_counts, all_meetings),
 )
 def test_get_meetings(num_meetings: int, meetings: List[Meeting]):
     assert len(meetings) == num_meetings
@@ -54,7 +60,7 @@ def test_get_meetings(num_meetings: int, meetings: List[Meeting]):
 
 @pytest.mark.parametrize(
     "scraper, meetings",
-    [(d[DataItem.Scraper], d[DataItem.Meetings]) for d in test_data],
+    zip(scrapers, all_meetings),
 )
 def test_get_session(scraper: PrimeGovScraper, meetings: List[Meeting]):
     sessions = reduced_list(map(scraper.get_session, meetings))
@@ -63,7 +69,7 @@ def test_get_session(scraper: PrimeGovScraper, meetings: List[Meeting]):
 
 @pytest.mark.parametrize(
     "scraper, meetings",
-    [(d[DataItem.Scraper], d[DataItem.Meetings]) for d in test_data],
+    zip(scrapers, all_meetings),
 )
 def test_get_body(scraper: PrimeGovScraper, meetings: List[Meeting]):
     bodies = reduced_list(map(scraper.get_body, meetings))
@@ -72,7 +78,7 @@ def test_get_body(scraper: PrimeGovScraper, meetings: List[Meeting]):
 
 @pytest.mark.parametrize(
     "scraper, meetings",
-    [(d[DataItem.Scraper], d[DataItem.Meetings]) for d in test_data],
+    zip(scrapers, all_meetings),
 )
 def test_get_event(scraper: PrimeGovScraper, meetings: List[Meeting]):
     events = reduced_list(map(scraper.get_event, meetings))
@@ -81,15 +87,7 @@ def test_get_event(scraper: PrimeGovScraper, meetings: List[Meeting]):
 
 @pytest.mark.parametrize(
     "scraper, begin, end, num_meetings",
-    [
-        (
-            d[DataItem.Scraper],
-            d[DataItem.Begin],
-            d[DataItem.End],
-            d[DataItem.NumMeetings],
-        )
-        for d in test_data
-    ],
+    zip(scrapers, begin_dates, end_dates, meeting_counts),
 )
 def test_get_events(
     scraper: PrimeGovScraper, begin: datetime, end: datetime, num_meetings: int

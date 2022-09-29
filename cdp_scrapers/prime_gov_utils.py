@@ -1,8 +1,15 @@
 from datetime import datetime
 from logging import getLogger
-from typing import Any, Dict, Iterable, List, Optional, Set
+from typing import Any, Dict, Iterator, List, NamedTuple, Optional, Set
 
-from cdp_backend.pipeline.ingestion_models import Body, EventIngestionModel, Session
+import requests
+from bs4 import BeautifulSoup, Tag
+from cdp_backend.pipeline.ingestion_models import (
+    Body,
+    EventIngestionModel,
+    MinutesItem,
+    Session,
+)
 from civic_scraper.platforms.primegov.site import PrimeGovSite
 
 from .scraper_utils import IngestionModelScraper, reduced_list, str_simplified
@@ -14,6 +21,7 @@ log = getLogger(__name__)
 ###############################################################################
 
 SITE_URL = "https://{client}.primegov.com/"
+API_URL = "{base_url}/api/meeting/search?from={begin}&to={end}"
 
 MEETING_DATETIME = "dateTime"
 MEETING_DATE = "date"
@@ -26,6 +34,12 @@ DATE_FORMAT = "%m/%d/%Y"
 TIME_FORMAT = "%I:%M %p"
 
 Meeting = Dict[str, Any]
+Agenda = BeautifulSoup
+
+
+class MinutesItemInfo(NamedTuple):
+    name: str
+    desc: str
 
 
 def primegov_strftime(dt: datetime) -> str:
@@ -72,7 +86,13 @@ def primegov_strptime(meeting: Meeting) -> Optional[datetime]:
                 f"{DATE_FORMAT} {TIME_FORMAT}",
             )
         except ValueError:
-            pass
+            try:
+                return datetime.strptime(
+                    meeting[MEETING_DATE],
+                    DATE_FORMAT,
+                )
+            except ValueError:
+                pass
 
     log.debug(
         f"Error parsing '{meeting[MEETING_DATETIME]}', "
@@ -80,6 +100,85 @@ def primegov_strptime(meeting: Meeting) -> Optional[datetime]:
         f"'{meeting[MEETING_TIME]}'"
     )
     return None
+
+
+def load_agenda(url: str) -> Optional[Agenda]:
+    """
+    Load the agenda web page.
+
+    Parameters
+    ----------
+    url: str
+        Agenda web page URL
+
+    Returns
+    -------
+    Optional[Agenda]
+        Agenda web page loaded into BeautifulSoup
+    """
+    resp = requests.get(str_simplified(url))
+    if resp.status_code == 200:
+        return BeautifulSoup(resp.text, "html.parser")
+
+    log.warning(f"{url} responded {resp.status_code} {resp.reason} {resp.text}")
+    return None
+
+
+def get_minutes_tables(agenda: Agenda) -> Iterator[Tag]:
+    """
+    Return iterator over tables for minutes items.
+
+    Parameters
+    ----------
+    agenda: Agenda
+        Agenda web page loaded into BeautifulSoup
+
+    Returns
+    -------
+    Iterator[Tag]
+        List of <table> for minutes items
+    """
+    # look for <div> with certain class then get the <table> inside the <div>
+    divs = agenda.find_all("div", class_="agenda-item")
+    return map(lambda d: d.find("table"), divs)
+
+
+def get_minutes_item(minutes_table: Tag) -> MinutesItemInfo:
+    """
+    Extract minutes item name and description.
+
+    Parameters
+    ----------
+    minutes_table: Tag
+        <table> for a minutes item on agenda web page
+
+    Returns
+    -------
+    MinutesItemInfo
+        Minutes item name and description
+
+    Raises
+    ------
+    ValueError
+        If the <table> HTML structure is not as expected
+
+    See Also
+    --------
+    get_minutes_tables()
+    """
+    rows = minutes_table.find_all("tr")
+
+    try:
+        # minutes item name in the first row, description in the second row
+        name = rows[0].find("td").string
+        desc = rows[1].find("div").string
+    except (IndexError, AttributeError):
+        # rows is empty; find*() returned None
+        raise ValueError(
+            f"Minutes item <table> is no longer recognized: {minutes_table}"
+        )
+
+    return MinutesItemInfo(str_simplified(name), str_simplified(desc))
 
 
 class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
@@ -159,6 +258,29 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
         """
         return self.get_none_if_empty(Body(name=str_simplified(meeting[BODY_NAME])))
 
+    def get_minutes_item(self, minutes_table: Tag) -> Optional[MinutesItem]:
+        """
+        Extract a minutes item from a <table> on agenda web page
+
+        Parameters
+        ----------
+        minutes_table: Tag
+            <table> tag on agenda web page for a minutes item.
+
+        Returns
+        -------
+        Optional[MinutesItem]
+            MinutesItem from given <table>
+
+        See Also
+        --------
+        get_minutes_item()
+        """
+        minutes_info = get_minutes_item(minutes_table)
+        return self.get_none_if_empty(
+            MinutesItem(name=minutes_info.name, description=minutes_info.desc)
+        )
+
     def get_event(self, meeting: Meeting) -> Optional[EventIngestionModel]:
         """
         Extract a EventIngestionModel from a primegov meeting dictionary
@@ -190,7 +312,7 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
         self,
         begin: datetime,
         end: datetime,
-    ) -> Iterable[Meeting]:
+    ) -> Iterator[Meeting]:
         """
         Query meetings from primegov api endpoint
 
@@ -203,7 +325,7 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
 
         Returns
         -------
-        Optional[Iterable[Meeting]]
+        Optional[Iterator[Meeting]]
             Iterator over list of meeting JSON
 
         Notes
@@ -216,8 +338,11 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
         get_events()
         """
         resp = self.session.get(
-            f"{self.base_url}/api/meeting/search?"
-            f"from={primegov_strftime(begin)}&to={primegov_strftime(end)}"
+            API_URL.format(
+                base_url=self.base_url,
+                begin=primegov_strftime(begin),
+                end=primegov_strftime(end),
+            )
         )
         return filter(lambda m: any(m[VIDEO_URL]), resp.json())
 
@@ -245,6 +370,5 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
         --------
         get_meetings()
         """
-        return reduced_list(
-            map(self.get_event, self.get_meetings(begin, end)), collapse=False
-        )
+        meetings = self.get_meetings(begin, end)
+        return reduced_list(map(self.get_event, meetings), collapse=False)
