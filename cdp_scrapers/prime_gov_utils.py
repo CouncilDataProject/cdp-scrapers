@@ -120,7 +120,7 @@ def load_agenda(url: str) -> Optional[Agenda]:
     if resp.status_code == 200:
         return BeautifulSoup(resp.text, "html.parser")
 
-    log.warning(f"{url} responed {resp.status_code} {resp.reason} {resp.text}")
+    log.warning(f"{url} responded {resp.status_code} {resp.reason} {resp.text}")
     return None
 
 
@@ -156,6 +156,11 @@ def get_minutes_item(minutes_table: Tag) -> MinutesItemInfo:
     -------
     MinutesItemInfo
         Minutes item name and description
+
+    Raises
+    ------
+    ValueError
+        If the <table> HTML structure is not as expected
 
     See Also
     --------
