@@ -1,6 +1,8 @@
 from datetime import datetime
 from logging import getLogger
-from typing import Any, Dict, Iterator, List, NamedTuple, Optional, Set
+from pathlib import Path
+import re
+from typing import Any, Dict, Iterator, List, Optional, Set
 
 import requests
 from bs4 import BeautifulSoup, Tag
@@ -9,6 +11,7 @@ from cdp_backend.pipeline.ingestion_models import (
     EventIngestionModel,
     MinutesItem,
     Session,
+    SupportingFile,
 )
 from civic_scraper.platforms.primegov.site import PrimeGovSite
 
@@ -149,7 +152,7 @@ def get_minutes_item(minutes_table: Tag) -> MinutesItem:
 
     Returns
     -------
-    MinutesItemInfo
+    MinutesItem
         Minutes item name and description
 
     Raises
@@ -174,6 +177,64 @@ def get_minutes_item(minutes_table: Tag) -> MinutesItem:
         )
 
     return MinutesItem(name=str_simplified(name), description=str_simplified(desc))
+
+
+def get_support_files(minutes_table: Tag) -> Iterator[SupportingFile]:
+    """
+    Extract the minutes item's support file URLs
+
+    Parameters
+    ----------
+    minutes_table: Tag
+        <table> for a minutes item on agenda web page
+
+    Returns
+    -------
+    Iterator[SupportingFile]
+        List of support file information for the input minutes item
+
+    Raises
+    ------
+    ValueError
+        If the <table> HTML structure is not as expected
+
+    See Also
+    --------
+    get_minutes_tables()
+    """
+
+    def extract_file(file_div: Tag) -> SupportingFile:
+        try:
+            # the second <a> tag in each file <div> has the file url.
+            url_tag = file_div.find_all("a")[1]
+        except IndexError:
+            # if here, we found <div> with correct class
+            # so if we didn't find expected <a>, probably means HTML changed
+            raise ValueError(f"Support file <div> is no longer recognized: {file_div}")
+
+        # they sometimes include file suffix in the document title
+        # e.g. Budget Recommendation dated 5-18-22.pdf
+        name = re.sub(r"\.\S{2,4}\s*$", "", url_tag.text)
+
+        url: str = url_tag["href"]
+        # don't need all the query after the file suffix
+        # e.g. ...pdf?name=...
+        url = url[: url.find("?")]
+
+        # use as id if file name is just a number
+        id = Path(url).stem
+        if re.match(r"\d+", id) is None:
+            id = None
+
+        return SupportingFile(
+            external_source_id=id, name=str_simplified(name), uri=str_simplified(url)
+        )
+
+    # go up from the <table> for this minutes item
+    # then find the next <div> that contains the associated support files.
+    contents_div = minutes_table.parent.find_next_sibling("div", class_="item_contents")
+    file_divs = contents_div.find_all("div", class_="attachment-holder")
+    return map(extract_file, file_divs)
 
 
 class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
