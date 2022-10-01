@@ -118,8 +118,23 @@ def test_get_body(scraper: PrimeGovScraper, meetings: List[Meeting]):
     "scraper, minutes_tbls, minutes_item",
     zip(scrapers, minutes_tables, minutes_items),
 )
-def test_get_minutes_item(scraper: PrimeGovScraper, minutes_tbls: Iterator[Tag], minutes_item: MinutesItem):
+def test_get_minutes_item(
+    scraper: PrimeGovScraper, minutes_tbls: Iterator[Tag], minutes_item: MinutesItem
+):
     assert scraper.get_minutes_item(next(minutes_tbls)) == minutes_item
+
+
+@pytest.mark.parametrize(
+    "scraper, minutes_tbls, minutes_item, matter",
+    zip(scrapers, minutes_tables, minutes_items, matters),
+)
+def test_get_matter(
+    scraper: PrimeGovScraper,
+    minutes_tbls: Iterator[Tag],
+    minutes_item: MinutesItem,
+    matter: Matter,
+):
+    assert scraper.get_matter(next(minutes_tbls), minutes_item) == matter
 
 
 @pytest.mark.parametrize(
