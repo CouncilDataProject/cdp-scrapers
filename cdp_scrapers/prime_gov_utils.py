@@ -6,6 +6,7 @@ from typing import Any, Dict, Iterator, List, Optional, Set, Tuple
 
 import requests
 from bs4 import BeautifulSoup, Tag
+from cdp_backend.database.constants import MatterStatusDecision
 from cdp_backend.pipeline.ingestion_models import (
     Body,
     EventIngestionModel,
@@ -277,8 +278,8 @@ def get_matter(
 
     Notes
     -----
-    result_status is not standarized. It is returned as-is.
-    Caller is expect to clean up the data as desired.
+    Only basic string clean-up is applied, e.g. simplify whitespace.
+    Caller is expect to clean up the data as appropriate.
 
     See Also
     --------
@@ -373,6 +374,11 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
         self,
         client_id: str,
         timezone: str,
+        matter_adopted_pattern: str = (
+            r"approved|confirmed|passed|adopted|consent|(?:voted.*com+it+ee)"
+        ),
+        matter_in_progress_pattern: str = r"heard|read|filed|held|(?:in.*com+it+ee)",
+        matter_rejected_pattern: str = r"rejected|dropped",
         person_aliases: Optional[Dict[str, Set[str]]] = None,
     ):
         """
@@ -382,6 +388,15 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
             primegov api instance id, e.g. lacity for Los Angeles, CA
         timezone: str
             Local time zone
+        matter_adopted_pattern: str
+            Regex pattern used to convert matter was adopted to CDP constant value.
+            Default: "approved|confirmed|passed|adopted"
+        matter_in_progess_pattern: str
+            Regex pattern used to convert matter is in-progress to CDP constant value.
+            Default: "heard|ready|filed|held|(?:in\\s*committee)"
+        matter_rejected_pattern: str
+            Regex pattern used to convert matter was rejected to CDP constant value.
+            Default: "rejected|dropped"
         person_aliases: Optional[Dict[str, Set[str]]] = None
             Dictionary used to catch name aliases
             and resolve improperly different Persons to the one correct Person.
@@ -389,6 +404,25 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
         PrimeGovSite.__init__(self, SITE_URL.format(client=client_id))
         IngestionModelScraper.__init__(
             self, timezone=timezone, person_aliases=person_aliases
+        )
+
+        self.matter_adopted_pattern = matter_adopted_pattern
+        self.matter_in_progress_pattern = matter_in_progress_pattern
+        self.matter_rejected_patten = matter_rejected_pattern
+        # {"pattern_for_adopted": ADOPTED, ...}
+        self.matter_status_pattern_map: Dict[str, MatterStatusDecision] = dict(
+            zip(
+                [
+                    self.matter_adopted_pattern,
+                    self.matter_in_progress_pattern,
+                    self.matter_status_pattern_map,
+                ],
+                [
+                    MatterStatusDecision.ADOPTED,
+                    MatterStatusDecision.IN_PROGRESS,
+                    MatterStatusDecision.REJECTED,
+                ],
+            )
         )
 
         log.debug(
@@ -455,6 +489,59 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
         get_minutes_item()
         """
         return self.get_none_if_empty(get_minutes_item(minutes_table))
+
+    def get_matter(
+        self, minutes_table: Tag, minutes_item: Optional[MinutesItem] = None
+    ) -> Optional[Matter]:
+        """
+        Extract matter info from a minutes item <table> on agenda web page
+
+        Parameters
+        ----------
+        minutes_table: Tag
+            <table> tag on agenda web page for a minutes item.
+        minutes_item: Optional[MinutesItem] = None
+            Associated minutes item that will be used to fill in some info.
+
+        Returns
+        -------
+        Matter
+            A Matter instance associated with a minutes item.
+
+        Notes
+        -----
+        self.matter_status_pattern_map is used to standardize result_status
+        to one of the CDP ingetion model constants.
+
+        See Also
+        --------
+        matter_status_pattern_map
+        get_matter()
+        """
+
+        def _standardize_type(matter: Matter) -> Matter:
+            if matter.matter_type is not None:
+                # First letter uppercased
+                matter.matter_type = re.sub(
+                    r"^\s*([a-z])", lambda m: m.group(1).upper(), matter.matter_type
+                )
+            return matter
+
+        def _standarize_status(matter: Matter) -> Matter:
+            for pattern, status in self.matter_status_pattern_map.items():
+                match = re.search(pattern, matter.result_status, re.I)
+                if match is not None:
+                    matter.result_status = status
+                    break
+            return matter
+
+        matter = get_matter(minutes_table, minutes_item)
+        if matter is None:
+            return None
+
+        matter = _standardize_type(matter)
+        matter = _standarize_status(matter)
+        return self.get_none_if_empty(matter)
 
     def get_event(self, meeting: Meeting) -> Optional[EventIngestionModel]:
         """
