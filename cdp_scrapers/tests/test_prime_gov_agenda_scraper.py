@@ -18,6 +18,7 @@ urls = [
 ]
 agendas = list(map(load_agenda, urls))
 minutes_counts = [8]
+support_file_counts = [4]
 first_minutes_items = [
     MinutesItem(
         name="22-0600-S29",
@@ -28,7 +29,6 @@ first_minutes_items = [
         ),
     ),
 ]
-support_file_counts = [4]
 matters = [
     Matter(
         name="Information Technology Agency report",
@@ -36,8 +36,7 @@ matters = [
         title=(
             "Information Technology Agency (ITA) report, "
             "in response to a 2022-23 Budget Recommendation, "
-            "relative to the status on the implementation "
-            "of permanent Wi-Fi hotspots."
+            "relative to the status on the implementation of permanent Wi-Fi hotspots."
         ),
         result_status="APPROVED",
         sponsors=None,

@@ -409,13 +409,14 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
         self.matter_adopted_pattern = matter_adopted_pattern
         self.matter_in_progress_pattern = matter_in_progress_pattern
         self.matter_rejected_patten = matter_rejected_pattern
+
         # {"pattern_for_adopted": ADOPTED, ...}
         self.matter_status_pattern_map: Dict[str, MatterStatusDecision] = dict(
             zip(
                 [
                     self.matter_adopted_pattern,
                     self.matter_in_progress_pattern,
-                    self.matter_status_pattern_map,
+                    self.matter_rejected_patten,
                 ],
                 [
                     MatterStatusDecision.ADOPTED,
