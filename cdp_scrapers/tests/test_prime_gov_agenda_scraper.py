@@ -1,8 +1,9 @@
 import pytest
 
-from cdp_backend.pipeline.ingestion_models import MinutesItem
+from cdp_backend.pipeline.ingestion_models import Matter, MinutesItem
 from cdp_scrapers.prime_gov_utils import (
     Agenda,
+    get_matter,
     get_minutes_item,
     get_support_files,
     load_agenda,
@@ -28,6 +29,21 @@ first_minutes_items = [
     ),
 ]
 support_file_counts = [4]
+matters = [
+    Matter(
+        name="Information Technology Agency report",
+        matter_type="report",
+        title=(
+            "Information Technology Agency (ITA) report, "
+            "in response to a 2022-23 Budget Recommendation, "
+            "relative to the status on the implementation "
+            "of permanent Wi-Fi hotspots."
+        ),
+        result_status="APPROVED",
+        sponsors=None,
+        external_source_id=None,
+    )
+]
 
 
 @pytest.mark.parametrize("url", urls)
@@ -63,3 +79,13 @@ def test_get_minutes_item(
 )
 def test_get_support_files(agenda: Agenda, num_files: int):
     assert len(list(get_support_files(next(get_minutes_tables(agenda))))) == num_files
+
+
+@pytest.mark.parametrize(
+    "agenda, matter",
+    zip(agendas, matters),
+)
+def test_get_matter(agenda: Agenda, matter: Matter):
+    minutes_table = next(get_minutes_tables(agenda))
+    minutes_item = get_minutes_item(minutes_table)
+    assert get_matter(minutes_table, minutes_item) == matter

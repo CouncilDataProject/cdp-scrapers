@@ -2,13 +2,14 @@ from datetime import datetime
 from logging import getLogger
 from pathlib import Path
 import re
-from typing import Any, Dict, Iterator, List, Optional, Set
+from typing import Any, Dict, Iterator, List, Optional, Set, Tuple
 
 import requests
 from bs4 import BeautifulSoup, Tag
 from cdp_backend.pipeline.ingestion_models import (
     Body,
     EventIngestionModel,
+    Matter,
     MinutesItem,
     Session,
     SupportingFile,
@@ -253,6 +254,109 @@ def get_support_files(minutes_table: Tag) -> Iterator[SupportingFile]:
     contents_div = get_support_files_div(minutes_table)
     file_divs = contents_div.find_all("div", class_="attachment-holder")
     return map(extract_file, file_divs)
+
+
+def get_matter(
+    minutes_table: Tag, minutes_item: Optional[MinutesItem] = None
+) -> Optional[Matter]:
+    """
+    Extract matter info from a minutes item <table>
+
+    Parameters
+    ----------
+    minutes_table: Tag
+        <table> for a minutes item on agenda web page
+    minutes_item: Optional[MinutesItem] = None
+        Associated minutes item that will be used to fill in some info.
+        e.g. matter title is taken from it if available.
+
+    Returns
+    -------
+    Matter
+        A Matter instance associated with a minutes item.
+
+    Notes
+    -----
+    result_status is not standarized. It is returned as-is.
+    Caller is expect to clean up the data as desired.
+
+    See Also
+    --------
+    get_minutes_tables()
+    """
+    # ex 1. APPROVED Information Technology Agency report dated July 26, 2022
+    #       - (3) Yes; (0) No
+    # ex 2. APPROVED Motion (Buscaino - Lee) - (3) Yes; (0) No
+
+    def _get_matter_text(minutes_table: Tag) -> Optional[str]:
+        """
+        Matter text blob from minutes item <table>
+        """
+        this_div = minutes_table.parent
+        matter_div = this_div.next_sibling
+        files_div = get_support_files_div(minutes_table)
+
+        # If there is a <div> between current <table>
+        # and the <div> with the support documents,
+        # that <div> will contain matter information
+        if matter_div == files_div:
+            return None
+        return str_simplified(matter_div.text)
+
+    def _extract_status(text: str) -> Tuple[str, Optional[str]]:
+        """
+        (matter text blob, result status)
+        """
+        uppercase_word = re.search(r"^\s*([A-Z]+)", text)
+        if uppercase_word is None:
+            return text, None
+
+        result_status = uppercase_word.group(1)
+        return str_simplified(text[uppercase_word.end() :]), str_simplified(
+            result_status
+        )
+
+    def _get_name(text: str) -> str:
+        """
+        Keep just the name in the matter text blob
+        """
+        name_end = text.rfind(" dated")
+        if name_end < 0:
+            name_end = text.rfind(" - (")
+
+        if name_end < 0:
+            return text
+        return str_simplified(text[:name_end])
+
+    def _get_type(matter_name: str) -> Optional[str]:
+        """
+        Last word seems to be appropriate to use as type
+        e.g. report, motion
+        """
+        type_end = matter_name.rfind("(")
+        if type_end < 0:
+            type_end = None
+
+        type_start = matter_name.rfind(" ", None, type_end)
+        if type_start < 0:
+            return None
+        return str_simplified(matter_name[type_start:type_end])
+
+    matter_text = _get_matter_text(minutes_table)
+    if matter_text is None:
+        return None
+
+    matter_text, result_status = _extract_status(matter_text)
+    matter_name = _get_name(matter_text)
+    matter_type = _get_type(matter_name)
+    matter_title = matter_text if minutes_item is None else minutes_item.description
+
+    return Matter(
+        matter_type=matter_type,
+        name=matter_name,
+        result_status=result_status,
+        title=matter_title,
+    )
 
 
 class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
