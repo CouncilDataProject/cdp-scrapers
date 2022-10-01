@@ -1,7 +1,7 @@
+import re
 from datetime import datetime
 from logging import getLogger
 from pathlib import Path
-import re
 from typing import Any, Dict, Iterator, List, Optional, Pattern, Set, Tuple
 
 import requests
