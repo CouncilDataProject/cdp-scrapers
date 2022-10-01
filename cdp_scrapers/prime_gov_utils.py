@@ -179,6 +179,25 @@ def get_minutes_item(minutes_table: Tag) -> MinutesItem:
     return MinutesItem(name=str_simplified(name), description=str_simplified(desc))
 
 
+def get_support_files_div(minutes_table: Tag) -> Tag:
+    """
+    Find the <div> containing a minutes item's support document URLs
+
+    Parameters
+    ----------
+    minutes_table: Tag
+        <table> for a minutes item on agenda web page
+
+    Returns
+    -------
+    Tag
+        <div> with support documents for the minutes item
+    """
+    # go up from the <table> for this minutes item
+    # then find the next <div> that contains the associated support files.
+    return minutes_table.parent.find_next_sibling("div", class_="item_contents")
+
+
 def get_support_files(minutes_table: Tag) -> Iterator[SupportingFile]:
     """
     Extract the minutes item's support file URLs
@@ -214,6 +233,7 @@ def get_support_files(minutes_table: Tag) -> Iterator[SupportingFile]:
 
         # they sometimes include file suffix in the document title
         # e.g. Budget Recommendation dated 5-18-22.pdf
+        # get rid of the suffix .pdf from the descriptive name for the file
         name = re.sub(r"\.\S{2,4}\s*$", "", url_tag.text)
 
         url: str = url_tag["href"]
@@ -230,9 +250,7 @@ def get_support_files(minutes_table: Tag) -> Iterator[SupportingFile]:
             external_source_id=id, name=str_simplified(name), uri=str_simplified(url)
         )
 
-    # go up from the <table> for this minutes item
-    # then find the next <div> that contains the associated support files.
-    contents_div = minutes_table.parent.find_next_sibling("div", class_="item_contents")
+    contents_div = get_support_files_div(minutes_table)
     file_divs = contents_div.find_all("div", class_="attachment-holder")
     return map(extract_file, file_divs)
 
