@@ -546,6 +546,26 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
         return self.get_none_if_empty(matter)
 
     def get_event_minutes_item(self, minutes_table: Tag) -> Optional[EventMinutesItem]:
+        """
+        Extract event minutes item info from a minutes item <table> on agenda web page
+
+        Parameters
+        ----------
+        minutes_table: Tag
+            <table> tag on agenda web page for a minutes item.
+
+        Returns
+        -------
+        EventMinutesItem
+            Container object with matter, minutes item
+
+        See Also
+        --------
+        get_matter()
+        get_minutes_item()
+        get_support_files()
+        """
+
         def _get_index(minutes_table: Tag) -> Optional[int]:
             # (number)
             index_pattern: Pattern = re.compile(r"\s*\(\s*(\d+)\s*\)\s*")
