@@ -1,11 +1,11 @@
 from datetime import datetime
-from typing import Iterator, List
+from typing import List
 
 import pytest
 
 from bs4 import Tag
 from cdp_backend.database.constants import MatterStatusDecision
-from cdp_backend.pipeline.ingestion_models import Matter, MinutesItem
+from cdp_backend.pipeline.ingestion_models import EventMinutesItem, Matter, MinutesItem
 from cdp_scrapers.prime_gov_utils import (
     Meeting,
     get_minutes_tables,
@@ -32,7 +32,7 @@ urls = [
     ),
 ]
 agendas = list(map(load_agenda, urls))
-minutes_tables = list(map(get_minutes_tables, agendas))
+minutes_tables = list(map(lambda agenda: list(get_minutes_tables(agenda)), agendas))
 minutes_items = [
     MinutesItem(
         name="22-0600-S29",
@@ -57,6 +57,11 @@ matters = [
         external_source_id=None,
     )
 ]
+event_minutes_items = [
+    # Will be filled in the respective test cases using input data defined above
+    EventMinutesItem(minutes_item=None, index=1),
+]
+support_file_counts = [4]
 
 
 @pytest.mark.parametrize(
@@ -119,9 +124,9 @@ def test_get_body(scraper: PrimeGovScraper, meetings: List[Meeting]):
     zip(scrapers, minutes_tables, minutes_items),
 )
 def test_get_minutes_item(
-    scraper: PrimeGovScraper, minutes_tbls: Iterator[Tag], minutes_item: MinutesItem
+    scraper: PrimeGovScraper, minutes_tbls: List[Tag], minutes_item: MinutesItem
 ):
-    assert scraper.get_minutes_item(next(minutes_tbls)) == minutes_item
+    assert scraper.get_minutes_item(minutes_tbls[0]) == minutes_item
 
 
 @pytest.mark.parametrize(
@@ -130,11 +135,40 @@ def test_get_minutes_item(
 )
 def test_get_matter(
     scraper: PrimeGovScraper,
-    minutes_tbls: Iterator[Tag],
+    minutes_tbls: List[Tag],
     minutes_item: MinutesItem,
     matter: Matter,
 ):
-    assert scraper.get_matter(next(minutes_tbls), minutes_item) == matter
+    assert scraper.get_matter(minutes_tbls[0], minutes_item) == matter
+
+
+@pytest.mark.parametrize(
+    "scraper, minutes_tbls, minutes_item, matter, num_support_files, expected_item",
+    zip(
+        scrapers,
+        minutes_tables,
+        minutes_items,
+        matters,
+        support_file_counts,
+        event_minutes_items,
+    ),
+)
+def test_get_event_minutes_item(
+    scraper: PrimeGovScraper,
+    minutes_tbls: List[Tag],
+    minutes_item: MinutesItem,
+    matter: Matter,
+    num_support_files: int,
+    expected_item: EventMinutesItem,
+):
+    expected_item.minutes_item = minutes_item
+    expected_item.matter = matter
+    event_minutes_item = scraper.get_event_minutes_item(minutes_tbls[0])
+
+    assert event_minutes_item.index == expected_item.index
+    assert event_minutes_item.matter == expected_item.matter
+    assert event_minutes_item.minutes_item == expected_item.minutes_item
+    assert len(event_minutes_item.supporting_files) == num_support_files
 
 
 @pytest.mark.parametrize(

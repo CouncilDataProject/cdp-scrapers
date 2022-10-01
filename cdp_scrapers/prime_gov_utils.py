@@ -2,7 +2,7 @@ from datetime import datetime
 from logging import getLogger
 from pathlib import Path
 import re
-from typing import Any, Dict, Iterator, List, Optional, Set, Tuple
+from typing import Any, Dict, Iterator, List, Optional, Pattern, Set, Tuple
 
 import requests
 from bs4 import BeautifulSoup, Tag
@@ -10,6 +10,7 @@ from cdp_backend.database.constants import MatterStatusDecision
 from cdp_backend.pipeline.ingestion_models import (
     Body,
     EventIngestionModel,
+    EventMinutesItem,
     Matter,
     MinutesItem,
     Session,
@@ -543,6 +544,33 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
         matter = _standardize_type(matter)
         matter = _standarize_status(matter)
         return self.get_none_if_empty(matter)
+
+    def get_event_minutes_item(self, minutes_table: Tag) -> Optional[EventMinutesItem]:
+        def _get_index(minutes_table: Tag) -> Optional[int]:
+            # (number)
+            index_pattern: Pattern = re.compile(r"\s*\(\s*(\d+)\s*\)\s*")
+            index_span = minutes_table.find_parent("table").find(
+                "span", string=index_pattern
+            )
+            if index_span is None:
+                return None
+
+            index = index_pattern.search(index_span.string).group(1)
+            return int(index)
+
+        index = _get_index(minutes_table)
+        minutes_item = self.get_minutes_item(minutes_table)
+        matter = self.get_matter(minutes_table, minutes_item)
+        support_files = get_support_files(minutes_table)
+        support_files = reduced_list(map(self.get_none_if_empty, support_files))
+
+        event_minutes_item = EventMinutesItem(
+            index=index,
+            matter=matter,
+            minutes_item=minutes_item,
+            supporting_files=support_files,
+        )
+        return self.get_none_if_empty(event_minutes_item)
 
     def get_event(self, meeting: Meeting) -> Optional[EventIngestionModel]:
         """
