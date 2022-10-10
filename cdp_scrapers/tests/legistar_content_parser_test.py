@@ -55,7 +55,7 @@ from cdp_scrapers.legistar_utils import parse_video_page_url
         (
             # parser3
             "http://elpasotexas.granicus.com/player/clip/224?view_id=1"
-                + "&redirect=true&h=0a4363d1c34a910f97dfc42636b53cf1",
+            + "&redirect=true&h=0a4363d1c34a910f97dfc42636b53cf1",
             "elpasotexas",
             "http://elpasotexas.granicus.com//videos/224/captions.vtt",
             "https://archive-stream.granicus.com/OnDemand/_definst_/mp4"
