@@ -395,6 +395,48 @@ class ContentUriScrapeResult(NamedTuple):
     uris: Optional[List[ContentURIs]] = None
 
 
+def parse_video_page_url(video_page_url: str, client: str):
+    """
+    Return URLs for videos and captions from a Legistar/Granicus-hosted video web page
+
+    Parameters
+    ----------
+    video_page_url: str
+        The URL for the page of the legistar video
+    client: str
+        Which legistar client to target. Ex: "seattle"
+
+    Returns
+    -------
+    ContentUriScrapeResult
+        uris: Optional[List[ContentURIs]]
+            URIs for video and optional caption
+    """
+    try:
+        with urlopen(video_page_url) as resp:
+            # now load the page to get the actual video url
+            soup = BeautifulSoup(resp.read(), "html.parser")
+
+            if client in video_page_parser:
+                # we already know which format parser to call
+                uris = video_page_parser[client](client, soup)
+            else:
+                for parser in all_parsers:
+                    uris = parser(client, soup)
+                    if uris is not None:
+                        # remember so we just call this from here on
+                        video_page_parser[client] = parser
+                        log.debug(f"{parser} for {client}")
+                        break
+                else:
+                    uris = None
+    except HTTPError as e:
+        log.debug(f"Error opening {video_page_url}:\n{str(e)}")
+        return (ContentUriScrapeResult.Status.ResourceAccessError, None)
+
+    return uris
+
+
 def get_legistar_content_uris(client: str, legistar_ev: Dict) -> ContentUriScrapeResult:
     """
     Return URLs for videos and captions from a Legistar/Granicus-hosted video web page
@@ -482,28 +524,7 @@ def get_legistar_content_uris(client: str, legistar_ev: Dict) -> ContentUriScrap
     video_page_url = f"https://{client}.legistar.com/{extract_url[start:end]}"
 
     log.debug(f"{legistar_ev[LEGISTAR_EV_SITE_URL]} -> {video_page_url}")
-
-    try:
-        with urlopen(video_page_url) as resp:
-            # now load the page to get the actual video url
-            soup = BeautifulSoup(resp.read(), "html.parser")
-
-            if client in video_page_parser:
-                # we alrady know which format parser to call
-                uris = video_page_parser[client](client, soup)
-            else:
-                for parser in all_parsers:
-                    uris = parser(client, soup)
-                    if uris is not None:
-                        # remember so we just call this from here on
-                        video_page_parser[client] = parser
-                        log.debug(f"{parser} for {client}")
-                        break
-                else:
-                    uris = None
-    except HTTPError as e:
-        log.debug(f"Error opening {video_page_url}:\n{str(e)}")
-        return (ContentUriScrapeResult.Status.ResourceAccessError, None)
+    uris = parse_video_page_url(video_page_url, client)
 
     if uris is None:
         raise NotImplementedError(
