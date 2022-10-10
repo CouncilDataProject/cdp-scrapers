@@ -14,32 +14,18 @@ from urllib.request import urlopen
 
 import requests
 from bs4 import BeautifulSoup
-from cdp_backend.database.constants import (
-    EventMinutesItemDecision,
-    MatterStatusDecision,
-    VoteDecision,
-)
-from cdp_backend.pipeline.ingestion_models import (
-    Body,
-    EventIngestionModel,
-    EventMinutesItem,
-    Matter,
-    MinutesItem,
-    Person,
-    Role,
-    Session,
-    SupportingFile,
-    Vote,
-)
+from cdp_backend.database.constants import (EventMinutesItemDecision,
+                                            MatterStatusDecision, VoteDecision)
+from cdp_backend.pipeline.ingestion_models import (Body, EventIngestionModel,
+                                                   EventMinutesItem, Matter,
+                                                   MinutesItem, Person, Role,
+                                                   Session, SupportingFile,
+                                                   Vote)
 
-from .scraper_utils import (
-    IngestionModelScraper,
-    reduced_list,
-    sanitize_roles,
-    str_simplified,
-)
-from .types import ContentURIs, LegistarContentParser, ScraperStaticData
 from .legistar_content_parsers import all_parsers
+from .scraper_utils import (IngestionModelScraper, reduced_list,
+                            sanitize_roles, str_simplified)
+from .types import ContentURIs, LegistarContentParser, ScraperStaticData
 
 ###############################################################################
 
