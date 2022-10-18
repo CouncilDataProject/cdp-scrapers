@@ -129,6 +129,7 @@
 <li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.get_legistar_content_uris"><code class="docutils literal notranslate"><span class="pre">get_legistar_content_uris()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.get_legistar_events_for_timespan"><code class="docutils literal notranslate"><span class="pre">get_legistar_events_for_timespan()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.get_legistar_person"><code class="docutils literal notranslate"><span class="pre">get_legistar_person()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.legistar_utils.parse_video_page_url"><code class="docutils literal notranslate"><span class="pre">parse_video_page_url()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.html#module-cdp_scrapers.prime_gov_utils">cdp_scrapers.prime_gov_utils module</a><ul>
@@ -274,6 +275,8 @@
 <dt class="sig sig-object py" id="cdp_scrapers.instances.atlanta.assign_constant">
 <span class="sig-prename descclassname"><span class="pre">cdp_scrapers.instances.atlanta.</span></span><span class="sig-name descname"><span class="pre">assign_constant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">driver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">WebDriver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_decision</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voting_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PERSONS</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cdp_scrapers/instances/atlanta.html#assign_constant"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.atlanta.assign_constant" title="Permalink to this definition">¶</a></dt>
 <dd><p>Assign constants and add Vote to the ingestion models based on the vote decision</p>
+<section id="parameter">
+<h3>Parameter:<a class="headerlink" href="#parameter" title="Permalink to this heading">¶</a></h3>
 <dl class="simple">
 <dt>driver:webdriver</dt><dd><p>webdriver of the matter page</p>
 </dd>
@@ -290,26 +293,35 @@
 <dt>PERSONS: dict</dt><dd><p>Dict[str, ingestion_models.Person]</p>
 </dd>
 </dl>
+</section>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cdp_scrapers.instances.atlanta.convert_status_constant">
 <span class="sig-prename descclassname"><span class="pre">cdp_scrapers.instances.atlanta.</span></span><span class="sig-name descname"><span class="pre">convert_status_constant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decision</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/atlanta.html#convert_status_constant"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.atlanta.convert_status_constant" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts the matter result status to the exsiting constants</p>
+<section id="id1">
+<h3>Parameter:<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
 <dl class="simple">
 <dt>decision: str</dt><dd><p>decision of the matter</p>
 </dd>
 </dl>
+</section>
+<section id="returns">
+<h3>Returns:<a class="headerlink" href="#returns" title="Permalink to this heading">¶</a></h3>
 <dl class="simple">
 <dt>db_constants</dt><dd><p>result status constants</p>
 </dd>
 </dl>
+</section>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cdp_scrapers.instances.atlanta.get_date">
 <span class="sig-prename descclassname"><span class="pre">cdp_scrapers.instances.atlanta.</span></span><span class="sig-name descname"><span class="pre">get_date</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">driver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">WebDriver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/atlanta.html#get_date"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.atlanta.get_date" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a list of ingestion models for the meetings hold during the selected time range</p>
+<section id="id2">
+<h3>Parameter:<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h3>
 <dl class="simple">
 <dt>driver:webdriver</dt><dd><p>empty webdriver</p>
 </dd>
@@ -320,10 +332,14 @@
 <dt>to_date:</dt><dd><p>the end date</p>
 </dd>
 </dl>
+</section>
+<section id="id3">
+<h3>Returns:<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h3>
 <dl class="simple">
 <dt>list</dt><dd><p>all the ingestion models for the selected date range</p>
 </dd>
 </dl>
+</section>
 </dd></dl>
 
 <dl class="py function">
@@ -331,59 +347,80 @@
 <span class="sig-prename descclassname"><span class="pre">cdp_scrapers.instances.atlanta.</span></span><span class="sig-name descname"><span class="pre">get_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">from_dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/atlanta.html#get_events"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.atlanta.get_events" title="Permalink to this definition">¶</a></dt>
 <dd><p>gets the right calender link
 feed it to the function that get a list of ingestion models</p>
+<section id="id4">
+<h3>Parameter:<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h3>
 <dl class="simple">
 <dt>from_dt:</dt><dd><p>the begin date</p>
 </dd>
 <dt>to_date:</dt><dd><p>the end date</p>
 </dd>
 </dl>
+</section>
+<section id="id5">
+<h3>Returns:<a class="headerlink" href="#id5" title="Permalink to this heading">¶</a></h3>
 <dl class="simple">
 <dt>list</dt><dd><p>all the ingestion models for the selected date range</p>
 </dd>
 </dl>
+</section>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cdp_scrapers.instances.atlanta.get_matter_status">
 <span class="sig-prename descclassname"><span class="pre">cdp_scrapers.instances.atlanta.</span></span><span class="sig-name descname"><span class="pre">get_matter_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">driver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">WebDriver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/atlanta.html#get_matter_status"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.atlanta.get_matter_status" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find the matter result status</p>
+<section id="id6">
+<h3>Parameter:<a class="headerlink" href="#id6" title="Permalink to this heading">¶</a></h3>
 <dl class="simple">
 <dt>driver:webdriver</dt><dd><p>webdriver of the matter page</p>
 </dd>
 <dt>i: int</dt><dd><p>tracker used to loop the rows in the matter page</p>
 </dd>
 </dl>
+</section>
+<section id="id7">
+<h3>Returns:<a class="headerlink" href="#id7" title="Permalink to this heading">¶</a></h3>
 <dl class="simple">
 <dt>sub_sections: element</dt><dd><p>the block under the matter for the current date</p>
 </dd>
 <dt>decision_constant: element</dt><dd><p>the matter decision constant</p>
 </dd>
 </dl>
+</section>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cdp_scrapers.instances.atlanta.get_new_person">
 <span class="sig-prename descclassname"><span class="pre">cdp_scrapers.instances.atlanta.</span></span><span class="sig-name descname"><span class="pre">get_new_person</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Person</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/atlanta.html#get_new_person"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.atlanta.get_new_person" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the person ingestion model for the people that are not recored</p>
+<section id="id8">
+<h3>Parameter:<a class="headerlink" href="#id8" title="Permalink to this heading">¶</a></h3>
 <dl class="simple">
 <dt>name:str</dt><dd><p>the name of the person</p>
 </dd>
 </dl>
+</section>
+<section id="id9">
+<h3>Returns:<a class="headerlink" href="#id9" title="Permalink to this heading">¶</a></h3>
 <dl class="simple">
 <dt>ingestion model</dt><dd><p>the person ingestion model for the newly appeared person</p>
 </dd>
 </dl>
+</section>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cdp_scrapers.instances.atlanta.get_person">
 <span class="sig-prename descclassname"><span class="pre">cdp_scrapers.instances.atlanta.</span></span><span class="sig-name descname"><span class="pre">get_person</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/atlanta.html#get_person"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.atlanta.get_person" title="Permalink to this definition">¶</a></dt>
 <dd><p>Put the informtion get by get_single_person() to dictionary</p>
+<section id="id10">
+<h3>Returns:<a class="headerlink" href="#id10" title="Permalink to this heading">¶</a></h3>
 <dl class="simple">
 <dt>dictionary</dt><dd><p>key: person’s name
 value: person’s ingestion model</p>
 </dd>
 </dl>
+</section>
 </dd></dl>
 
 <dl class="py function">
@@ -391,22 +428,30 @@ value: person’s ingestion model</p>
 <span class="sig-prename descclassname"><span class="pre">cdp_scrapers.instances.atlanta.</span></span><span class="sig-name descname"><span class="pre">get_single_person</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">driver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">WebDriver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">member_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Person</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/atlanta.html#get_single_person"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.atlanta.get_single_person" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get all the information fot one person
 Includes: role, seat, picture, phone, email</p>
+<section id="id11">
+<h3>Parameter:<a class="headerlink" href="#id11" title="Permalink to this heading">¶</a></h3>
 <dl class="simple">
 <dt>driver:</dt><dd><p>webdriver calling the people’s dictionary page</p>
 </dd>
 <dt>member_name:</dt><dd><p>person’s name</p>
 </dd>
 </dl>
+</section>
+<section id="id12">
+<h3>Returns:<a class="headerlink" href="#id12" title="Permalink to this heading">¶</a></h3>
 <dl class="simple">
 <dt>ingestion_models</dt><dd><p>the ingestion model for the person’s part</p>
 </dd>
 </dl>
+</section>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cdp_scrapers.instances.atlanta.get_voting_result">
 <span class="sig-prename descclassname"><span class="pre">cdp_scrapers.instances.atlanta.</span></span><span class="sig-name descname"><span class="pre">get_voting_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">driver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">WebDriver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sub_sections_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PERSONS</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/atlanta.html#get_voting_result"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.atlanta.get_voting_result" title="Permalink to this definition">¶</a></dt>
 <dd><p>Scrapes and converts the voting decisions to the exsiting constants</p>
+<section id="id13">
+<h3>Parameter:<a class="headerlink" href="#id13" title="Permalink to this heading">¶</a></h3>
 <dl class="simple">
 <dt>driver:webdriver</dt><dd><p>webdriver of the matter page</p>
 </dd>
@@ -419,46 +464,64 @@ Includes: role, seat, picture, phone, email</p>
 <dt>PERSONS: dict</dt><dd><p>Dict[str, ingestion_models.Person]</p>
 </dd>
 </dl>
+</section>
+<section id="id14">
+<h3>Returns:<a class="headerlink" href="#id14" title="Permalink to this heading">¶</a></h3>
 <dl class="simple">
 <dt>list</dt><dd><p>contains the Vote ingestion model for each person</p>
 </dd>
 </dl>
+</section>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cdp_scrapers.instances.atlanta.get_year">
 <span class="sig-prename descclassname"><span class="pre">cdp_scrapers.instances.atlanta.</span></span><span class="sig-name descname"><span class="pre">get_year</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">driver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">WebDriver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/atlanta.html#get_year"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.atlanta.get_year" title="Permalink to this definition">¶</a></dt>
 <dd><p>Navigate to the year that we are looking for</p>
+<section id="id15">
+<h3>Parameter:<a class="headerlink" href="#id15" title="Permalink to this heading">¶</a></h3>
 <dl class="simple">
 <dt>driver:webdriver</dt><dd><p>empty webdriver</p>
 </dd>
 <dt>url:str</dt><dd><p>the url of the calender page</p>
 </dd>
 </dl>
+</section>
+<section id="id16">
+<h3>Returns:<a class="headerlink" href="#id16" title="Permalink to this heading">¶</a></h3>
 <dl class="simple">
 <dt>link:str</dt><dd><p>the link to the calender of the year that we are looking for</p>
 </dd>
 </dl>
+</section>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cdp_scrapers.instances.atlanta.parse_event">
 <span class="sig-prename descclassname"><span class="pre">cdp_scrapers.instances.atlanta.</span></span><span class="sig-name descname"><span class="pre">parse_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">EventIngestionModel</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/atlanta.html#parse_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.atlanta.parse_event" title="Permalink to this definition">¶</a></dt>
 <dd><p>Scrapes all the information for a meeting</p>
+<section id="id17">
+<h3>Parameter:<a class="headerlink" href="#id17" title="Permalink to this heading">¶</a></h3>
 <dl class="simple">
 <dt>url:str</dt><dd><p>the url of the meeting that we want to scrape</p>
 </dd>
 </dl>
+</section>
+<section id="id18">
+<h3>Returns:<a class="headerlink" href="#id18" title="Permalink to this heading">¶</a></h3>
 <dl class="simple">
 <dt>ingestion model</dt><dd><p>the ingestion model for the meeting</p>
 </dd>
 </dl>
+</section>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cdp_scrapers.instances.atlanta.parse_single_matter">
 <span class="sig-prename descclassname"><span class="pre">cdp_scrapers.instances.atlanta.</span></span><span class="sig-name descname"><span class="pre">parse_single_matter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">driver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">WebDriver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s_word_formated</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PERSONS</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">EventMinutesItem</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/atlanta.html#parse_single_matter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.atlanta.parse_single_matter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the minute items that contains a matter</p>
+<section id="id19">
+<h3>Parameter:<a class="headerlink" href="#id19" title="Permalink to this heading">¶</a></h3>
 <dl class="simple">
 <dt>driver:webdriver</dt><dd><p>webdriver of the matter page</p>
 </dd>
@@ -471,10 +534,14 @@ Includes: role, seat, picture, phone, email</p>
 <dt>PERSONS: dict</dt><dd><p>Dict[str, ingestion_models.Person]</p>
 </dd>
 </dl>
+</section>
+<section id="id20">
+<h3>Returns:<a class="headerlink" href="#id20" title="Permalink to this heading">¶</a></h3>
 <dl class="simple">
 <dt>ingestion model</dt><dd><p>minutes ingestion model with the matters information</p>
 </dd>
 </dl>
+</section>
 </dd></dl>
 
 </section>

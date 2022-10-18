@@ -129,6 +129,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#cdp_scrapers.legistar_utils.get_legistar_content_uris"><code class="docutils literal notranslate"><span class="pre">get_legistar_content_uris()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cdp_scrapers.legistar_utils.get_legistar_events_for_timespan"><code class="docutils literal notranslate"><span class="pre">get_legistar_events_for_timespan()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cdp_scrapers.legistar_utils.get_legistar_person"><code class="docutils literal notranslate"><span class="pre">get_legistar_person()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cdp_scrapers.legistar_utils.parse_video_page_url"><code class="docutils literal notranslate"><span class="pre">parse_video_page_url()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-cdp_scrapers.prime_gov_utils">cdp_scrapers.prime_gov_utils module</a><ul>
@@ -1051,6 +1052,26 @@ and requests person information for any vote.</p>
 </dl>
 <p class="rubric">Notes</p>
 <p>known_legistar_persons cache is cleared for every LegistarScraper.get_events() call</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cdp_scrapers.legistar_utils.parse_video_page_url">
+<span class="sig-prename descclassname"><span class="pre">cdp_scrapers.legistar_utils.</span></span><span class="sig-name descname"><span class="pre">parse_video_page_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">video_page_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#cdp_scrapers.types.ContentURIs" title="cdp_scrapers.types.ContentURIs"><span class="pre">ContentURIs</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/legistar_utils.html#parse_video_page_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.legistar_utils.parse_video_page_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return URLs for videos and captions from a Legistar/Granicus-hosted video web page</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>video_page_url</strong> (<em>str</em>) – The URL for the page of the legistar video</p></li>
+<li><p><strong>client</strong> (<em>str</em>) – Which legistar client to target. Ex: “seattle”</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>uris</strong> – URIs for video and optional caption</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Optional[List[<a class="reference internal" href="#cdp_scrapers.types.ContentURIs" title="cdp_scrapers.types.ContentURIs">ContentURIs</a>]]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
