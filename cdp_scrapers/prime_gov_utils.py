@@ -567,7 +567,9 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
         """
 
         def _get_index(minutes_table: Tag) -> Optional[int]:
-            # (number)
+            # Parent <table> of this minutes item contains a <span> tag
+            # with this minutes item's 1-baesd number
+            # <span ...>(1)</span>
             index_pattern: Pattern = re.compile(r"\s*\(\s*(\d+)\s*\)\s*")
             index_span = minutes_table.find_parent("table").find(
                 "span", string=index_pattern
@@ -591,6 +593,85 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
             supporting_files=support_files,
         )
         return self.get_none_if_empty(event_minutes_item)
+
+    def get_event_minutes_items(
+        self, meeting: Meeting
+    ) -> Optional[List[EventMinutesItem]]:
+        """
+        First find a web page for the given meeting's agenda.
+        Then scrape minutes items.
+
+        Parameters
+        ----------
+        meeting: Meeting
+            Target meeting
+
+        Returns
+        -------
+        Optional[List[EventMinutesItem]]
+            Event minutes items scraped from the meeting agenda web page.
+
+        See Also
+        --------
+        get_event_minutes_item()
+        """
+
+        def _get_output_id(output_docs: List[Dict]) -> int:
+            """
+            Extract an agenda output document id
+            "compiledMeetingDocumentFiles": [{"id": 41005, ...}, ...]
+            """
+            WEB_PAGE_TYPE = 3
+            web_pages = list(
+                filter(lambda d: d["compileOutputType"] == WEB_PAGE_TYPE, output_docs)
+            )
+            # it appears that, when there are multiple, we want output type 3
+            if any(web_pages):
+                document = web_pages[0]
+            else:
+                document = output_docs[0]
+            return document["id"]
+
+        def _find_agenda_urls() -> Iterator[str]:
+            output_templates = meeting.get("templates", list())
+            # These 2 output file templates refer to potential agenda web pages
+            # meeting["templates"] = [
+            #     {"title": "Journal", ...},
+            #     {"title": "Agenda", "compileOutputType": 3, ...},
+            #     ...,
+            # ]
+            for journal in filter(
+                lambda t: t["title"].lower() == "journal", output_templates
+            ):
+                yield _get_output_id(journal["compiledMeetingDocumentFiles"])
+
+            for agenda in filter(
+                lambda t: t["title"].lower() == "agenda", output_templates
+            ):
+                yield _get_output_id(agenda["compiledMeetingDocumentFiles"])
+
+        def _get_agenda_and_minutes_tables() -> Tuple[
+            Optional[Agenda], Optional[List[Tag]]
+        ]:
+            """
+            Get agenda web page parsed into memory
+            along with html <table> tags describing the event minutes.
+            """
+            for url in _find_agenda_urls():
+                agenda = load_agenda(self._get_agenda_url(url))
+                if agenda is None:
+                    continue
+                minutes_tables = list(get_minutes_tables(agenda))
+                # A valid agenda web page should yield some html <table> tags
+                if any(minutes_tables):
+                    return agenda, minutes_tables
+            return None, None
+
+        agenda, minutes_tables = _get_agenda_and_minutes_tables()
+        if not agenda or not minutes_tables:
+            return None
+
+        return reduced_list(map(self.get_event_minutes_item, minutes_tables))
 
     def get_event(self, meeting: Meeting) -> Optional[EventIngestionModel]:
         """
@@ -616,6 +697,7 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
                 body=self.get_body(meeting),
                 sessions=reduced_list([self.get_session(meeting)]),
                 external_source_id=str_simplified(str(meeting[MEETING_ID])),
+                event_minutes_items=self.get_event_minutes_items(meeting),
             )
         )
 
