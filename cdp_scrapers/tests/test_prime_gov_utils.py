@@ -189,3 +189,16 @@ def test_get_events(
 ):
     events = scraper.get_events(begin, end)
     assert len(events) == num_meetings
+
+
+@pytest.mark.parametrize(
+    "scraper, meetings, num_event_minutes_items",
+    zip(scrapers, all_meetings, [[13, 8]]),
+)
+def test_get_event_minutes_items(
+    scraper: PrimeGovScraper,
+    meetings: List[Meeting],
+    num_event_minutes_items: List[int],
+):
+    for meeting, num_items in zip(meetings, num_event_minutes_items):
+        assert len(scraper.get_event_minutes_items(meeting)) == num_items
