@@ -130,10 +130,12 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../cdp_scrapers.html#module-cdp_scrapers.prime_gov_utils">cdp_scrapers.prime_gov_utils module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.MinutesItemInfo"><code class="docutils literal notranslate"><span class="pre">MinutesItemInfo</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper"><code class="docutils literal notranslate"><span class="pre">PrimeGovScraper</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_matter"><code class="docutils literal notranslate"><span class="pre">get_matter()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_minutes_item"><code class="docutils literal notranslate"><span class="pre">get_minutes_item()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_minutes_tables"><code class="docutils literal notranslate"><span class="pre">get_minutes_tables()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_support_files"><code class="docutils literal notranslate"><span class="pre">get_support_files()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_support_files_div"><code class="docutils literal notranslate"><span class="pre">get_support_files_div()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.load_agenda"><code class="docutils literal notranslate"><span class="pre">load_agenda()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.primegov_strftime"><code class="docutils literal notranslate"><span class="pre">primegov_strftime()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.primegov_strptime"><code class="docutils literal notranslate"><span class="pre">primegov_strptime()</span></code></a></li>
@@ -249,17 +251,26 @@
            <div itemprop="articleBody">
             
   <h1>Source code for cdp_scrapers.prime_gov_utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
 <span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Pattern</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">requests</span>
 <span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span><span class="p">,</span> <span class="n">Tag</span>
+<span class="kn">from</span> <span class="nn">cdp_backend.database.constants</span> <span class="kn">import</span> <span class="n">MatterStatusDecision</span>
 <span class="kn">from</span> <span class="nn">cdp_backend.pipeline.ingestion_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Body</span><span class="p">,</span>
     <span class="n">EventIngestionModel</span><span class="p">,</span>
+    <span class="n">EventMinutesItem</span><span class="p">,</span>
+    <span class="n">Matter</span><span class="p">,</span>
     <span class="n">MinutesItem</span><span class="p">,</span>
     <span class="n">Session</span><span class="p">,</span>
+    <span class="n">SupportingFile</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">civic_scraper.platforms.primegov.site</span> <span class="kn">import</span> <span class="n">PrimeGovSite</span>
 
@@ -286,11 +297,6 @@
 
 <span class="n">Meeting</span> <span class="o">=</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
 <span class="n">Agenda</span> <span class="o">=</span> <span class="n">BeautifulSoup</span>
-
-
-<div class="viewcode-block" id="MinutesItemInfo"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.MinutesItemInfo">[docs]</a><span class="k">class</span> <span class="nc">MinutesItemInfo</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
-    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">desc</span><span class="p">:</span> <span class="nb">str</span></div>
 
 
 <div class="viewcode-block" id="primegov_strftime"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.primegov_strftime">[docs]</a><span class="k">def</span> <span class="nf">primegov_strftime</span><span class="p">(</span><span class="n">dt</span><span class="p">:</span> <span class="n">datetime</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -394,7 +400,7 @@
     <span class="k">return</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">d</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;table&quot;</span><span class="p">),</span> <span class="n">divs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_minutes_item"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_minutes_item">[docs]</a><span class="k">def</span> <span class="nf">get_minutes_item</span><span class="p">(</span><span class="n">minutes_table</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MinutesItemInfo</span><span class="p">:</span>
+<div class="viewcode-block" id="get_minutes_item"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_minutes_item">[docs]</a><span class="k">def</span> <span class="nf">get_minutes_item</span><span class="p">(</span><span class="n">minutes_table</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MinutesItem</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract minutes item name and description.</span>
 
@@ -405,7 +411,7 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    MinutesItemInfo</span>
+<span class="sd">    MinutesItem</span>
 <span class="sd">        Minutes item name and description</span>
 
 <span class="sd">    Raises</span>
@@ -429,7 +435,186 @@
             <span class="sa">f</span><span class="s2">&quot;Minutes item &lt;table&gt; is no longer recognized: </span><span class="si">{</span><span class="n">minutes_table</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">MinutesItemInfo</span><span class="p">(</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">name</span><span class="p">),</span> <span class="n">str_simplified</span><span class="p">(</span><span class="n">desc</span><span class="p">))</span></div>
+    <span class="k">return</span> <span class="n">MinutesItem</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">name</span><span class="p">),</span> <span class="n">description</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">desc</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="get_support_files_div"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_support_files_div">[docs]</a><span class="k">def</span> <span class="nf">get_support_files_div</span><span class="p">(</span><span class="n">minutes_table</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tag</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find the &lt;div&gt; containing a minutes item&#39;s support document URLs</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    minutes_table: Tag</span>
+<span class="sd">        &lt;table&gt; for a minutes item on agenda web page</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Tag</span>
+<span class="sd">        &lt;div&gt; with support documents for the minutes item</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># go up from the &lt;table&gt; for this minutes item</span>
+    <span class="c1"># then find the next &lt;div&gt; that contains the associated support files.</span>
+    <span class="k">return</span> <span class="n">minutes_table</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">find_next_sibling</span><span class="p">(</span><span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;item_contents&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_support_files"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_support_files">[docs]</a><span class="k">def</span> <span class="nf">get_support_files</span><span class="p">(</span><span class="n">minutes_table</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">SupportingFile</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extract the minutes item&#39;s support file URLs</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    minutes_table: Tag</span>
+<span class="sd">        &lt;table&gt; for a minutes item on agenda web page</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Iterator[SupportingFile]</span>
+<span class="sd">        List of support file information for the input minutes item</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the &lt;table&gt; HTML structure is not as expected</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    get_minutes_tables()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">extract_file</span><span class="p">(</span><span class="n">file_div</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SupportingFile</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># the second &lt;a&gt; tag in each file &lt;div&gt; has the file url.</span>
+            <span class="n">url_tag</span> <span class="o">=</span> <span class="n">file_div</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="c1"># if here, we found &lt;div&gt; with correct class</span>
+            <span class="c1"># so if we didn&#39;t find expected &lt;a&gt;, probably means HTML changed</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Support file &lt;div&gt; is no longer recognized: </span><span class="si">{</span><span class="n">file_div</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># they sometimes include file suffix in the document title</span>
+        <span class="c1"># e.g. Budget Recommendation dated 5-18-22.pdf</span>
+        <span class="c1"># get rid of the suffix .pdf from the descriptive name for the file</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\.\S{2,4}\s*$&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">url_tag</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+
+        <span class="n">url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">url_tag</span><span class="p">[</span><span class="s2">&quot;href&quot;</span><span class="p">]</span>
+        <span class="c1"># don&#39;t need all the query after the file suffix</span>
+        <span class="c1"># e.g. ...pdf?name=...</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">url</span><span class="p">[:</span> <span class="n">url</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;?&quot;</span><span class="p">)]</span>
+
+        <span class="c1"># use as id if file name is just a number</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span>
+        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\d+&quot;</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="n">SupportingFile</span><span class="p">(</span>
+            <span class="n">external_source_id</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">name</span><span class="p">),</span> <span class="n">uri</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="n">contents_div</span> <span class="o">=</span> <span class="n">get_support_files_div</span><span class="p">(</span><span class="n">minutes_table</span><span class="p">)</span>
+    <span class="n">file_divs</span> <span class="o">=</span> <span class="n">contents_div</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;attachment-holder&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">map</span><span class="p">(</span><span class="n">extract_file</span><span class="p">,</span> <span class="n">file_divs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_matter"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_matter">[docs]</a><span class="k">def</span> <span class="nf">get_matter</span><span class="p">(</span>
+    <span class="n">minutes_table</span><span class="p">:</span> <span class="n">Tag</span><span class="p">,</span> <span class="n">minutes_item</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">MinutesItem</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Matter</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extract matter info from a minutes item &lt;table&gt;</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    minutes_table: Tag</span>
+<span class="sd">        &lt;table&gt; for a minutes item on agenda web page</span>
+<span class="sd">    minutes_item: Optional[MinutesItem] = None</span>
+<span class="sd">        Associated minutes item that will be used to fill in some info.</span>
+<span class="sd">        e.g. matter title is taken from it if available.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Matter</span>
+<span class="sd">        A Matter instance associated with a minutes item.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Only basic string clean-up is applied, e.g. simplify whitespace.</span>
+<span class="sd">    Caller is expect to clean up the data as appropriate.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    get_minutes_tables()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># ex 1. APPROVED Information Technology Agency report dated July 26, 2022</span>
+    <span class="c1">#       - (3) Yes; (0) No</span>
+    <span class="c1"># ex 2. APPROVED Motion (Buscaino - Lee) - (3) Yes; (0) No</span>
+
+    <span class="k">def</span> <span class="nf">_get_matter_text</span><span class="p">(</span><span class="n">minutes_table</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Matter text blob from minutes item &lt;table&gt;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">this_div</span> <span class="o">=</span> <span class="n">minutes_table</span><span class="o">.</span><span class="n">parent</span>
+        <span class="n">matter_div</span> <span class="o">=</span> <span class="n">this_div</span><span class="o">.</span><span class="n">next_sibling</span>
+        <span class="n">files_div</span> <span class="o">=</span> <span class="n">get_support_files_div</span><span class="p">(</span><span class="n">minutes_table</span><span class="p">)</span>
+
+        <span class="c1"># If there is a &lt;div&gt; between current &lt;table&gt;</span>
+        <span class="c1"># and the &lt;div&gt; with the support documents,</span>
+        <span class="c1"># that &lt;div&gt; will contain matter information</span>
+        <span class="k">if</span> <span class="n">matter_div</span> <span class="o">==</span> <span class="n">files_div</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">str_simplified</span><span class="p">(</span><span class="n">matter_div</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_extract_status</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        (matter text blob, result status)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">uppercase_word</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^\s*([A-Z]+)&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">uppercase_word</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">text</span><span class="p">,</span> <span class="kc">None</span>
+
+        <span class="n">result_status</span> <span class="o">=</span> <span class="n">uppercase_word</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">str_simplified</span><span class="p">(</span><span class="n">text</span><span class="p">[</span><span class="n">uppercase_word</span><span class="o">.</span><span class="n">end</span><span class="p">()</span> <span class="p">:]),</span> <span class="n">str_simplified</span><span class="p">(</span>
+            <span class="n">result_status</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_name</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Keep just the name in the matter text blob</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">name_end</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s2">&quot; dated&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">name_end</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">name_end</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s2">&quot; - (&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">name_end</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">text</span>
+        <span class="k">return</span> <span class="n">str_simplified</span><span class="p">(</span><span class="n">text</span><span class="p">[:</span><span class="n">name_end</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">_get_type</span><span class="p">(</span><span class="n">matter_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Last word seems to be appropriate to use as type</span>
+<span class="sd">        e.g. report, motion</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">type_end</span> <span class="o">=</span> <span class="n">matter_name</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s2">&quot;(&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">type_end</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">type_end</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">type_start</span> <span class="o">=</span> <span class="n">matter_name</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">type_end</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">type_start</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">str_simplified</span><span class="p">(</span><span class="n">matter_name</span><span class="p">[</span><span class="n">type_start</span><span class="p">:</span><span class="n">type_end</span><span class="p">])</span>
+
+    <span class="n">matter_text</span> <span class="o">=</span> <span class="n">_get_matter_text</span><span class="p">(</span><span class="n">minutes_table</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">matter_text</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="n">matter_text</span><span class="p">,</span> <span class="n">result_status</span> <span class="o">=</span> <span class="n">_extract_status</span><span class="p">(</span><span class="n">matter_text</span><span class="p">)</span>
+    <span class="n">matter_name</span> <span class="o">=</span> <span class="n">_get_name</span><span class="p">(</span><span class="n">matter_text</span><span class="p">)</span>
+    <span class="n">matter_type</span> <span class="o">=</span> <span class="n">_get_type</span><span class="p">(</span><span class="n">matter_name</span><span class="p">)</span>
+    <span class="n">matter_title</span> <span class="o">=</span> <span class="n">matter_text</span> <span class="k">if</span> <span class="n">minutes_item</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">minutes_item</span><span class="o">.</span><span class="n">description</span>
+
+    <span class="k">return</span> <span class="n">Matter</span><span class="p">(</span>
+        <span class="n">matter_type</span><span class="o">=</span><span class="n">matter_type</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">matter_name</span><span class="p">,</span>
+        <span class="n">result_status</span><span class="o">=</span><span class="n">result_status</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="n">matter_title</span><span class="p">,</span>
+    <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="PrimeGovScraper"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper">[docs]</a><span class="k">class</span> <span class="nc">PrimeGovScraper</span><span class="p">(</span><span class="n">PrimeGovSite</span><span class="p">,</span> <span class="n">IngestionModelScraper</span><span class="p">):</span>
@@ -446,6 +631,11 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">client_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">timezone</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">matter_adopted_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s2">&quot;approved|confirmed|passed|adopted|consent|(?:voted.*com+it+ee)&quot;</span>
+        <span class="p">),</span>
+        <span class="n">matter_in_progress_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;heard|read|filed|held|(?:in.*com+it+ee)&quot;</span><span class="p">,</span>
+        <span class="n">matter_rejected_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;rejected|dropped&quot;</span><span class="p">,</span>
         <span class="n">person_aliases</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -455,6 +645,15 @@
 <span class="sd">            primegov api instance id, e.g. lacity for Los Angeles, CA</span>
 <span class="sd">        timezone: str</span>
 <span class="sd">            Local time zone</span>
+<span class="sd">        matter_adopted_pattern: str</span>
+<span class="sd">            Regex pattern used to convert matter was adopted to CDP constant value.</span>
+<span class="sd">            Default: &quot;approved|confirmed|passed|adopted&quot;</span>
+<span class="sd">        matter_in_progess_pattern: str</span>
+<span class="sd">            Regex pattern used to convert matter is in-progress to CDP constant value.</span>
+<span class="sd">            Default: &quot;heard|ready|filed|held|(?:in\\s*committee)&quot;</span>
+<span class="sd">        matter_rejected_pattern: str</span>
+<span class="sd">            Regex pattern used to convert matter was rejected to CDP constant value.</span>
+<span class="sd">            Default: &quot;rejected|dropped&quot;</span>
 <span class="sd">        person_aliases: Optional[Dict[str, Set[str]]] = None</span>
 <span class="sd">            Dictionary used to catch name aliases</span>
 <span class="sd">            and resolve improperly different Persons to the one correct Person.</span>
@@ -462,6 +661,26 @@
         <span class="n">PrimeGovSite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">SITE_URL</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client_id</span><span class="p">))</span>
         <span class="n">IngestionModelScraper</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">timezone</span><span class="o">=</span><span class="n">timezone</span><span class="p">,</span> <span class="n">person_aliases</span><span class="o">=</span><span class="n">person_aliases</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">matter_adopted_pattern</span> <span class="o">=</span> <span class="n">matter_adopted_pattern</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matter_in_progress_pattern</span> <span class="o">=</span> <span class="n">matter_in_progress_pattern</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matter_rejected_patten</span> <span class="o">=</span> <span class="n">matter_rejected_pattern</span>
+
+        <span class="c1"># {&quot;pattern_for_adopted&quot;: ADOPTED, ...}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matter_status_pattern_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MatterStatusDecision</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="nb">zip</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">matter_adopted_pattern</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">matter_in_progress_pattern</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">matter_rejected_patten</span><span class="p">,</span>
+                <span class="p">],</span>
+                <span class="p">[</span>
+                    <span class="n">MatterStatusDecision</span><span class="o">.</span><span class="n">ADOPTED</span><span class="p">,</span>
+                    <span class="n">MatterStatusDecision</span><span class="o">.</span><span class="n">IN_PROGRESS</span><span class="p">,</span>
+                    <span class="n">MatterStatusDecision</span><span class="o">.</span><span class="n">REJECTED</span><span class="p">,</span>
+                <span class="p">],</span>
+            <span class="p">)</span>
         <span class="p">)</span>
 
         <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
@@ -527,10 +746,107 @@
 <span class="sd">        --------</span>
 <span class="sd">        get_minutes_item()</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">minutes_info</span> <span class="o">=</span> <span class="n">get_minutes_item</span><span class="p">(</span><span class="n">minutes_table</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>
-            <span class="n">MinutesItem</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">minutes_info</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">minutes_info</span><span class="o">.</span><span class="n">desc</span><span class="p">)</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span><span class="n">get_minutes_item</span><span class="p">(</span><span class="n">minutes_table</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="PrimeGovScraper.get_matter"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_matter">[docs]</a>    <span class="k">def</span> <span class="nf">get_matter</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">minutes_table</span><span class="p">:</span> <span class="n">Tag</span><span class="p">,</span> <span class="n">minutes_item</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">MinutesItem</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Matter</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract matter info from a minutes item &lt;table&gt; on agenda web page</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        minutes_table: Tag</span>
+<span class="sd">            &lt;table&gt; tag on agenda web page for a minutes item.</span>
+<span class="sd">        minutes_item: Optional[MinutesItem] = None</span>
+<span class="sd">            Associated minutes item that will be used to fill in some info.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Matter</span>
+<span class="sd">            A Matter instance associated with a minutes item.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        self.matter_status_pattern_map is used to standardize result_status</span>
+<span class="sd">        to one of the CDP ingetion model constants.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        matter_status_pattern_map</span>
+<span class="sd">        get_matter()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">_standardize_type</span><span class="p">(</span><span class="n">matter</span><span class="p">:</span> <span class="n">Matter</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Matter</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">matter</span><span class="o">.</span><span class="n">matter_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># First letter uppercased</span>
+                <span class="n">matter</span><span class="o">.</span><span class="n">matter_type</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+                    <span class="sa">r</span><span class="s2">&quot;^\s*([a-z])&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">m</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="n">matter</span><span class="o">.</span><span class="n">matter_type</span>
+                <span class="p">)</span>
+            <span class="k">return</span> <span class="n">matter</span>
+
+        <span class="k">def</span> <span class="nf">_standarize_status</span><span class="p">(</span><span class="n">matter</span><span class="p">:</span> <span class="n">Matter</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Matter</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">pattern</span><span class="p">,</span> <span class="n">status</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">matter_status_pattern_map</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">matter</span><span class="o">.</span><span class="n">result_status</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">matter</span><span class="o">.</span><span class="n">result_status</span> <span class="o">=</span> <span class="n">status</span>
+                    <span class="k">break</span>
+            <span class="k">return</span> <span class="n">matter</span>
+
+        <span class="n">matter</span> <span class="o">=</span> <span class="n">get_matter</span><span class="p">(</span><span class="n">minutes_table</span><span class="p">,</span> <span class="n">minutes_item</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">matter</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">matter</span> <span class="o">=</span> <span class="n">_standardize_type</span><span class="p">(</span><span class="n">matter</span><span class="p">)</span>
+        <span class="n">matter</span> <span class="o">=</span> <span class="n">_standarize_status</span><span class="p">(</span><span class="n">matter</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span><span class="n">matter</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PrimeGovScraper.get_event_minutes_item"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_event_minutes_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_event_minutes_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">minutes_table</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EventMinutesItem</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract event minutes item info from a minutes item &lt;table&gt; on agenda web page</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        minutes_table: Tag</span>
+<span class="sd">            &lt;table&gt; tag on agenda web page for a minutes item.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        EventMinutesItem</span>
+<span class="sd">            Container object with matter, minutes item</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        get_matter()</span>
+<span class="sd">        get_minutes_item()</span>
+<span class="sd">        get_support_files()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">_get_index</span><span class="p">(</span><span class="n">minutes_table</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+            <span class="c1"># (number)</span>
+            <span class="n">index_pattern</span><span class="p">:</span> <span class="n">Pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\s*\(\s*(\d+)\s*\)\s*&quot;</span><span class="p">)</span>
+            <span class="n">index_span</span> <span class="o">=</span> <span class="n">minutes_table</span><span class="o">.</span><span class="n">find_parent</span><span class="p">(</span><span class="s2">&quot;table&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">find</span><span class="p">(</span>
+                <span class="s2">&quot;span&quot;</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="n">index_pattern</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">index_span</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+            <span class="n">index</span> <span class="o">=</span> <span class="n">index_pattern</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">index_span</span><span class="o">.</span><span class="n">string</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+
+        <span class="n">index</span> <span class="o">=</span> <span class="n">_get_index</span><span class="p">(</span><span class="n">minutes_table</span><span class="p">)</span>
+        <span class="n">minutes_item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_minutes_item</span><span class="p">(</span><span class="n">minutes_table</span><span class="p">)</span>
+        <span class="n">matter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_matter</span><span class="p">(</span><span class="n">minutes_table</span><span class="p">,</span> <span class="n">minutes_item</span><span class="p">)</span>
+        <span class="n">support_files</span> <span class="o">=</span> <span class="n">get_support_files</span><span class="p">(</span><span class="n">minutes_table</span><span class="p">)</span>
+        <span class="n">support_files</span> <span class="o">=</span> <span class="n">reduced_list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">,</span> <span class="n">support_files</span><span class="p">))</span>
+
+        <span class="n">event_minutes_item</span> <span class="o">=</span> <span class="n">EventMinutesItem</span><span class="p">(</span>
+            <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
+            <span class="n">matter</span><span class="o">=</span><span class="n">matter</span><span class="p">,</span>
+            <span class="n">minutes_item</span><span class="o">=</span><span class="n">minutes_item</span><span class="p">,</span>
+            <span class="n">supporting_files</span><span class="o">=</span><span class="n">support_files</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span><span class="n">event_minutes_item</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PrimeGovScraper.get_event"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_event">[docs]</a>    <span class="k">def</span> <span class="nf">get_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meeting</span><span class="p">:</span> <span class="n">Meeting</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>

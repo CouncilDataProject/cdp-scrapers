@@ -130,10 +130,12 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="cdp_scrapers.html#module-cdp_scrapers.prime_gov_utils">cdp_scrapers.prime_gov_utils module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.prime_gov_utils.MinutesItemInfo"><code class="docutils literal notranslate"><span class="pre">MinutesItemInfo</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper"><code class="docutils literal notranslate"><span class="pre">PrimeGovScraper</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_matter"><code class="docutils literal notranslate"><span class="pre">get_matter()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_minutes_item"><code class="docutils literal notranslate"><span class="pre">get_minutes_item()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_minutes_tables"><code class="docutils literal notranslate"><span class="pre">get_minutes_tables()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_support_files"><code class="docutils literal notranslate"><span class="pre">get_support_files()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_support_files_div"><code class="docutils literal notranslate"><span class="pre">get_support_files_div()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.prime_gov_utils.load_agenda"><code class="docutils literal notranslate"><span class="pre">load_agenda()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.prime_gov_utils.primegov_strftime"><code class="docutils literal notranslate"><span class="pre">primegov_strftime()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.prime_gov_utils.primegov_strptime"><code class="docutils literal notranslate"><span class="pre">primegov_strptime()</span></code></a></li>
@@ -260,7 +262,6 @@
  | <a href="#K"><strong>K</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
- | <a href="#N"><strong>N</strong></a>
  | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
@@ -397,12 +398,10 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.date_and_time_to_datetime">date_and_time_to_datetime() (cdp_scrapers.legistar_utils.LegistarScraper static method)</a>
 </li>
-      <li><a href="cdp_scrapers.html#cdp_scrapers.prime_gov_utils.MinutesItemInfo.desc">desc (cdp_scrapers.prime_gov_utils.MinutesItemInfo attribute)</a>
+      <li><a href="cdp_scrapers.instances.html#cdp_scrapers.instances.portland.disposition_to_minute_decision">disposition_to_minute_decision() (in module cdp_scrapers.instances.portland)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="cdp_scrapers.instances.html#cdp_scrapers.instances.portland.disposition_to_minute_decision">disposition_to_minute_decision() (in module cdp_scrapers.instances.portland)</a>
-</li>
       <li><a href="cdp_scrapers.instances.html#cdp_scrapers.instances.kingcounty.KingCountyScraper.dump_static_info">dump_static_info() (cdp_scrapers.instances.kingcounty.KingCountyScraper static method)</a>
 
       <ul>
@@ -461,6 +460,8 @@
         <li><a href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_event_minutes">(cdp_scrapers.legistar_utils.LegistarScraper method)</a>
 </li>
       </ul></li>
+      <li><a href="cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_event_minutes_item">get_event_minutes_item() (cdp_scrapers.prime_gov_utils.PrimeGovScraper method)</a>
+</li>
       <li><a href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_event_supporting_files">get_event_supporting_files() (cdp_scrapers.legistar_utils.LegistarScraper method)</a>
 </li>
       <li><a href="cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_events">get_events() (cdp_scrapers.instances.portland.PortlandScraper method)</a>
@@ -490,6 +491,10 @@
       <ul>
         <li><a href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_matter">(cdp_scrapers.legistar_utils.LegistarScraper method)</a>
 </li>
+        <li><a href="cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_matter">(cdp_scrapers.prime_gov_utils.PrimeGovScraper method)</a>
+</li>
+        <li><a href="cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_matter">(in module cdp_scrapers.prime_gov_utils)</a>
+</li>
       </ul></li>
       <li><a href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_matter_status">get_matter_status() (cdp_scrapers.legistar_utils.LegistarScraper method)</a>
 
@@ -499,6 +504,8 @@
       </ul></li>
       <li><a href="cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_meetings">get_meetings() (cdp_scrapers.prime_gov_utils.PrimeGovScraper method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_minutes_item">get_minutes_item() (cdp_scrapers.legistar_utils.LegistarScraper method)</a>
 
       <ul>
@@ -507,8 +514,6 @@
         <li><a href="cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_minutes_item">(in module cdp_scrapers.prime_gov_utils)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_minutes_item_decision">get_minutes_item_decision() (cdp_scrapers.legistar_utils.LegistarScraper method)</a>
 </li>
       <li><a href="cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_minutes_tables">get_minutes_tables() (in module cdp_scrapers.prime_gov_utils)</a>
@@ -553,6 +558,10 @@
         <li><a href="cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.SeattleScraper.get_static_person_info">(cdp_scrapers.instances.seattle.SeattleScraper static method)</a>
 </li>
       </ul></li>
+      <li><a href="cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_support_files">get_support_files() (in module cdp_scrapers.prime_gov_utils)</a>
+</li>
+      <li><a href="cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_support_files_div">get_support_files_div() (in module cdp_scrapers.prime_gov_utils)</a>
+</li>
       <li><a href="cdp_scrapers.instances.html#cdp_scrapers.instances.portland.PortlandScraper.get_supporting_files">get_supporting_files() (cdp_scrapers.instances.portland.PortlandScraper method)</a>
 </li>
       <li><a href="cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.SeattleScraper.get_video_page_urls">get_video_page_urls() (cdp_scrapers.instances.seattle.SeattleScraper method)</a>
@@ -619,8 +628,6 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cdp_scrapers.instances.html#cdp_scrapers.instances.portland.make_efile_url">make_efile_url() (in module cdp_scrapers.instances.portland)</a>
 </li>
-      <li><a href="cdp_scrapers.html#cdp_scrapers.prime_gov_utils.MinutesItemInfo">MinutesItemInfo (class in cdp_scrapers.prime_gov_utils)</a>
-</li>
       <li>
     module
 
@@ -650,14 +657,6 @@
         <li><a href="cdp_scrapers.html#module-cdp_scrapers.types">cdp_scrapers.types</a>
 </li>
       </ul></li>
-  </ul></td>
-</tr></table>
-
-<h2 id="N">N</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="cdp_scrapers.html#cdp_scrapers.prime_gov_utils.MinutesItemInfo.name">name (cdp_scrapers.prime_gov_utils.MinutesItemInfo attribute)</a>
-</li>
   </ul></td>
 </tr></table>
 
