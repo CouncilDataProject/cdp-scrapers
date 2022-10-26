@@ -118,9 +118,14 @@ def _parse_format_3(client: str, soup: BeautifulSoup) -> Optional[List[ContentUR
     video_url = soup.find("video")
     if video_url is None:
         return None
+
+    video_uri = str_simplified(video_url.source['src'])
+    if not video_uri.startswith("http"):
+        video_uri = f"https:{video_uri}"
+
     return [
         ContentURIs(
-            video_uri=f"https:{str_simplified(video_url.source['src'])}",
+            video_uri=video_uri,
             caption_uri=(
                 (
                     f"http://{client}.granicus.com/"
