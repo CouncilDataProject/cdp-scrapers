@@ -12,7 +12,7 @@ from cdp_scrapers.legistar_utils import parse_video_page_url
             + "D64F10C7-C196-4013-ABF6-0DA49839DE59&Mode2=Video",
             "kingcounty",
             None,
-            "http://archive-media.granicus.com:443/OnDemand/king/king_80aac332-5f77"
+            "https://archive-video.granicus.com/king/king_80aac332-5f77"
             + "-43b4-9259-79d108cdbff1.mp4",
         ),
         (
@@ -21,7 +21,7 @@ from cdp_scrapers.legistar_utils import parse_video_page_url
             + "redirect=true&h=554d836741a2ef17c85f81f393fdd2a0",
             "milwaukee",
             None,
-            "https://archive-media2.granicus.com/OnDemand/milwaukee/"
+            "https://archive-video.granicus.com/milwaukee/"
             + "milwaukee_ab8846f8-7591-4c06-bffe-8f3953346af2.mp4",
         ),
         (
@@ -30,7 +30,7 @@ from cdp_scrapers.legistar_utils import parse_video_page_url
             + "redirect=true&h=061d42ee62c77b4008bd1841ecd023ad",
             "denver",
             None,
-            "http://archive-media.granicus.com:443/OnDemand/denver/"
+            "https://archive-video.granicus.com/denver/"
             + "denver_7f5b308a-1a82-48dc-8f1b-ce7767ee2e9b.mp4",
         ),
         (
@@ -39,8 +39,8 @@ from cdp_scrapers.legistar_utils import parse_video_page_url
             + "h=09f2d7e09d3f0ebcdb959f089e3f922a",
             "boston",
             "http://boston.granicus.com//videos/324/captions.vtt",
-            "https://archive-stream.granicus.com/OnDemand/_definst_/mp4:boston/"
-            + "boston_3260c449-dba9-4b54-8cdd-38bf31147d98.mp4/playlist.m3u8",
+            "https://archive-stream.granicus.com/OnDemand/_definst_/mp4:archive"
+            + "/boston/boston_3260c449-dba9-4b54-8cdd-38bf31147d98.mp4/playlist.m3u8",
         ),
         (
             # parser3
@@ -49,7 +49,7 @@ from cdp_scrapers.legistar_utils import parse_video_page_url
             "corpuschristi",
             "http://corpuschristi.granicus.com//videos/1694/captions.vtt",
             "https://archive-stream.granicus.com/OnDemand/_definst_/mp4:"
-            + "corpuschristi/corpuschristi_f91b021b-b5da-45bb-b5fc"
+            + "archive/corpuschristi/corpuschristi_f91b021b-b5da-45bb-b5fc"
             + "-ec7c7d8c2d32.mp4/playlist.m3u8",
         ),
         (
@@ -58,8 +58,8 @@ from cdp_scrapers.legistar_utils import parse_video_page_url
             + "&redirect=true&h=0a4363d1c34a910f97dfc42636b53cf1",
             "elpasotexas",
             "http://elpasotexas.granicus.com//videos/224/captions.vtt",
-            "https://archive-stream.granicus.com/OnDemand/_definst_/mp4"
-            + ":elpasotexas/elpasotexas_c654bf29-2d1b-4de3-826d-9c5746511f6a"
+            "https://archive-stream.granicus.com/OnDemand/_definst_/mp4:archive/"
+            + "elpasotexas/elpasotexas_c654bf29-2d1b-4de3-826d-9c5746511f6a"
             + ".mp4/playlist.m3u8",
         ),
         (
@@ -67,7 +67,7 @@ from cdp_scrapers.legistar_utils import parse_video_page_url
             "https://longbeach.granicus.com/MediaPlayer.php?view_id=84&clip_id=13404",
             "longbeach",
             None,
-            "http://archive-media.granicus.com:443/OnDemand/longbeach/"
+            "https://archive-video.granicus.com/longbeach/"
             + "longbeach_cf37b162-9817-428a-9fcd-b72daca8062a.mp4",
         ),
         (
@@ -75,7 +75,7 @@ from cdp_scrapers.legistar_utils import parse_video_page_url
             "https://richmondva.granicus.com/MediaPlayer.php?view_id=1&clip_id=3271",
             "richmondva",
             None,
-            "http://archive-media.granicus.com:443/OnDemand/richmondva/"
+            "https://archive-video.granicus.com/richmondva/"
             + "richmondva_870c84ae-9614-44a3-a65b-a3e79c56426d.mp4",
         ),
     ],
