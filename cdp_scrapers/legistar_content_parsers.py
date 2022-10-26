@@ -119,7 +119,7 @@ def _parse_format_3(client: str, soup: BeautifulSoup) -> Optional[List[ContentUR
     if video_url is None:
         return None
 
-    video_uri = str_simplified(video_url.source['src'])
+    video_uri = str_simplified(video_url.source["src"])
     if not video_uri.startswith("http"):
         video_uri = f"https:{video_uri}"
 
