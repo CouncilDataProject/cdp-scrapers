@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 from logging import getLogger
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional, Pattern, Set, Tuple
@@ -766,5 +766,10 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
         --------
         get_meetings()
         """
+        if begin is None:
+            begin = datetime.utcnow() - timedelta(days=2)
+        if end is None:
+            end = datetime.utcnow()
+
         meetings = self.get_meetings(begin, end)
         return reduced_list(map(self.get_event, meetings), collapse=False)

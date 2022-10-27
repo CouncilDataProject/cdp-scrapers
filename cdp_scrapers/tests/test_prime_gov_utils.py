@@ -15,6 +15,7 @@ from cdp_scrapers.prime_gov_utils import (
     primegov_strptime,
 )
 from cdp_scrapers.scraper_utils import reduced_list
+from cdp_scrapers.instances.lacity import get_lacity_events
 
 
 begin_dates = [datetime(2022, 9, 1)]
@@ -202,3 +203,14 @@ def test_get_event_minutes_items(
 ):
     for meeting, num_items in zip(meetings, num_event_minutes_items):
         assert len(scraper.get_event_minutes_items(meeting)) == num_items
+
+
+@pytest.mark.parametrize(
+    "begin, end, num_meetings",
+    zip(begin_dates, end_dates, meeting_counts),
+)
+def test_get_lacity_events(
+    begin: datetime, end: datetime, num_meetings: int
+):
+    events = get_lacity_events(begin, end)
+    assert len(events) == num_meetings
