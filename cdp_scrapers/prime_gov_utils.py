@@ -766,10 +766,10 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
         --------
         get_meetings()
         """
-        if begin is None:
-            begin = datetime.utcnow() - timedelta(days=2)
         if end is None:
             end = datetime.utcnow()
+        if begin is None:
+            begin = end - timedelta(days=2)
 
         meetings = self.get_meetings(begin, end)
         return reduced_list(map(self.get_event, meetings), collapse=False)
