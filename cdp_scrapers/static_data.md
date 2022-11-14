@@ -3,7 +3,7 @@
 Certain types of information may change much less frequently, relative to those that are specific to a given meeting.
 List of councilmembers and their biographical data are some examples.
 Let's call them "static data." Given this context,
-`scraper_utils.parse_static_file()` is an utility function that can be used
+`scraper_utils.parse_static_file()` and a static data file can be used
 
 1. As source of biographical (e.g. e-mail address) and professional (e.g. seats held) information for councilmembers.
 This may be useful in situations when scraping such information is not trivial.
@@ -99,8 +99,8 @@ A councilmember's [roles](https://councildataproject.org/cdp-backend/cdp_backend
 
 ### `persons`
 
-Councilmembers defined as [`ingestion_models.Person`](https://councildataproject.org/cdp-backend/cdp_backend.pipeline.html#cdp_backend.pipeline.ingestion_models.Person) in JSON.
-Provide information here to augment scraped data at run time.
+Provide information here to augment scraped data for [councilmembers](https://councildataproject.org/cdp-backend/cdp_backend.pipeline.html#cdp_backend.pipeline.ingestion_models.Person)
+at run time.
 
 For example, if the scraping yieled the following `Person` instance,
 
