@@ -255,7 +255,7 @@
 <span class="c1"># -*- coding: utf-8 -*-</span>
 
 <span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
 <span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Pattern</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span>
@@ -823,7 +823,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">def</span> <span class="nf">_get_index</span><span class="p">(</span><span class="n">minutes_table</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-            <span class="c1"># (number)</span>
+            <span class="c1"># Parent &lt;table&gt; of this minutes item contains a &lt;span&gt; tag</span>
+            <span class="c1"># with this minutes item&#39;s 1-baesd number</span>
+            <span class="c1"># &lt;span ...&gt;(1)&lt;/span&gt;</span>
             <span class="n">index_pattern</span><span class="p">:</span> <span class="n">Pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\s*\(\s*(\d+)\s*\)\s*&quot;</span><span class="p">)</span>
             <span class="n">index_span</span> <span class="o">=</span> <span class="n">minutes_table</span><span class="o">.</span><span class="n">find_parent</span><span class="p">(</span><span class="s2">&quot;table&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">find</span><span class="p">(</span>
                 <span class="s2">&quot;span&quot;</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="n">index_pattern</span>
@@ -847,6 +849,85 @@
             <span class="n">supporting_files</span><span class="o">=</span><span class="n">support_files</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span><span class="n">event_minutes_item</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PrimeGovScraper.get_event_minutes_items"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_event_minutes_items">[docs]</a>    <span class="k">def</span> <span class="nf">get_event_minutes_items</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">meeting</span><span class="p">:</span> <span class="n">Meeting</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">EventMinutesItem</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        First find a web page for the given meeting&#39;s agenda.</span>
+<span class="sd">        Then scrape minutes items.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        meeting: Meeting</span>
+<span class="sd">            Target meeting</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Optional[List[EventMinutesItem]]</span>
+<span class="sd">            Event minutes items scraped from the meeting agenda web page.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        get_event_minutes_item()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">_get_output_id</span><span class="p">(</span><span class="n">output_docs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Extract an agenda output document id</span>
+<span class="sd">            &quot;compiledMeetingDocumentFiles&quot;: [{&quot;id&quot;: 41005, ...}, ...]</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">WEB_PAGE_TYPE</span> <span class="o">=</span> <span class="mi">3</span>
+            <span class="n">web_pages</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;compileOutputType&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">WEB_PAGE_TYPE</span><span class="p">,</span> <span class="n">output_docs</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="c1"># it appears that, when there are multiple, we want output type 3</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">web_pages</span><span class="p">):</span>
+                <span class="n">document</span> <span class="o">=</span> <span class="n">web_pages</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">document</span> <span class="o">=</span> <span class="n">output_docs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">document</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+
+        <span class="k">def</span> <span class="nf">_find_agenda_urls</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+            <span class="n">output_templates</span> <span class="o">=</span> <span class="n">meeting</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;templates&quot;</span><span class="p">,</span> <span class="nb">list</span><span class="p">())</span>
+            <span class="c1"># These 2 output file templates refer to potential agenda web pages</span>
+            <span class="c1"># meeting[&quot;templates&quot;] = [</span>
+            <span class="c1">#     {&quot;title&quot;: &quot;Journal&quot;, ...},</span>
+            <span class="c1">#     {&quot;title&quot;: &quot;Agenda&quot;, &quot;compileOutputType&quot;: 3, ...},</span>
+            <span class="c1">#     ...,</span>
+            <span class="c1"># ]</span>
+            <span class="k">for</span> <span class="n">journal</span> <span class="ow">in</span> <span class="nb">filter</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">t</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;journal&quot;</span><span class="p">,</span> <span class="n">output_templates</span>
+            <span class="p">):</span>
+                <span class="k">yield</span> <span class="n">_get_output_id</span><span class="p">(</span><span class="n">journal</span><span class="p">[</span><span class="s2">&quot;compiledMeetingDocumentFiles&quot;</span><span class="p">])</span>
+
+            <span class="k">for</span> <span class="n">agenda</span> <span class="ow">in</span> <span class="nb">filter</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">t</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;agenda&quot;</span><span class="p">,</span> <span class="n">output_templates</span>
+            <span class="p">):</span>
+                <span class="k">yield</span> <span class="n">_get_output_id</span><span class="p">(</span><span class="n">agenda</span><span class="p">[</span><span class="s2">&quot;compiledMeetingDocumentFiles&quot;</span><span class="p">])</span>
+
+        <span class="k">def</span> <span class="nf">_get_agenda_and_minutes_tables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
+            <span class="n">Optional</span><span class="p">[</span><span class="n">Agenda</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tag</span><span class="p">]]</span>
+        <span class="p">]:</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Get agenda web page parsed into memory</span>
+<span class="sd">            along with html &lt;table&gt; tags describing the event minutes.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">_find_agenda_urls</span><span class="p">():</span>
+                <span class="n">agenda</span> <span class="o">=</span> <span class="n">load_agenda</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_agenda_url</span><span class="p">(</span><span class="n">url</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">agenda</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">minutes_tables</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">get_minutes_tables</span><span class="p">(</span><span class="n">agenda</span><span class="p">))</span>
+                <span class="c1"># A valid agenda web page should yield some html &lt;table&gt; tags</span>
+                <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">minutes_tables</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="n">agenda</span><span class="p">,</span> <span class="n">minutes_tables</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+        <span class="n">agenda</span><span class="p">,</span> <span class="n">minutes_tables</span> <span class="o">=</span> <span class="n">_get_agenda_and_minutes_tables</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">agenda</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">minutes_tables</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="n">reduced_list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event_minutes_item</span><span class="p">,</span> <span class="n">minutes_tables</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="PrimeGovScraper.get_event"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_event">[docs]</a>    <span class="k">def</span> <span class="nf">get_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meeting</span><span class="p">:</span> <span class="n">Meeting</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -872,6 +953,7 @@
                 <span class="n">body</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_body</span><span class="p">(</span><span class="n">meeting</span><span class="p">),</span>
                 <span class="n">sessions</span><span class="o">=</span><span class="n">reduced_list</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">get_session</span><span class="p">(</span><span class="n">meeting</span><span class="p">)]),</span>
                 <span class="n">external_source_id</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">meeting</span><span class="p">[</span><span class="n">MEETING_ID</span><span class="p">])),</span>
+                <span class="n">event_minutes_items</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event_minutes_items</span><span class="p">(</span><span class="n">meeting</span><span class="p">),</span>
             <span class="p">)</span>
         <span class="p">)</span></div>
 
@@ -937,6 +1019,11 @@
 <span class="sd">        --------</span>
 <span class="sd">        get_meetings()</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">end</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">begin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">begin</span> <span class="o">=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
         <span class="n">meetings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_meetings</span><span class="p">(</span><span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">reduced_list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event</span><span class="p">,</span> <span class="n">meetings</span><span class="p">),</span> <span class="n">collapse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div></div>
 </pre></div>

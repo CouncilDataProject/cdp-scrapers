@@ -28,6 +28,14 @@ cdp\_scrapers.instances.kingcounty module
    :undoc-members:
    :show-inheritance:
 
+cdp\_scrapers.instances.lacity module
+-------------------------------------
+
+.. automodule:: cdp_scrapers.instances.lacity
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 cdp\_scrapers.instances.portland module
 ---------------------------------------
 

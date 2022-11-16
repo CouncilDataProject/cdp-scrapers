@@ -619,6 +619,50 @@ that contains list of current council members name, position, contact info</p>
 </dd></dl>
 
 </section>
+<section id="module-cdp_scrapers.instances.lacity">
+<span id="cdp-scrapers-instances-lacity-module"></span><h2>cdp_scrapers.instances.lacity module<a class="headerlink" href="#module-cdp_scrapers.instances.lacity" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="cdp_scrapers.instances.lacity.LosAngelesScraper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cdp_scrapers.instances.lacity.</span></span><span class="sig-name descname"><span class="pre">LosAngelesScraper</span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/lacity.html#LosAngelesScraper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.lacity.LosAngelesScraper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper" title="cdp_scrapers.prime_gov_utils.PrimeGovScraper"><code class="xref py py-class docutils literal notranslate"><span class="pre">PrimeGovScraper</span></code></a></p>
+<p>LA, CA specific implementation of PrimeGovScraper.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cdp_scrapers.instances.lacity.LosAngelesScraper.PYTHON_MUNICIPALITY_SLUG">
+<span class="sig-name descname"><span class="pre">PYTHON_MUNICIPALITY_SLUG</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'lacity'</span></em><a class="headerlink" href="#cdp_scrapers.instances.lacity.LosAngelesScraper.PYTHON_MUNICIPALITY_SLUG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cdp_scrapers.instances.lacity.get_lacity_events">
+<span class="sig-prename descclassname"><span class="pre">cdp_scrapers.instances.lacity.</span></span><span class="sig-name descname"><span class="pre">get_lacity_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">from_dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">EventIngestionModel</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cdp_scrapers/instances/lacity.html#get_lacity_events"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.instances.lacity.get_lacity_events" title="Permalink to this definition">¶</a></dt>
+<dd><p>Public API for use in instances.__init__ so that this func can be attached
+as an attribute to cdp_scrapers.instances module.
+Thus the outside world like cdp-backend can get at this by asking for
+“get_lacity_events”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>from_dt</strong> (<em>datetime, optional</em>) – The timespan beginning datetime to query for events after.
+Default is 2 days from UTC now</p></li>
+<li><p><strong>to_dt</strong> (<em>datetime, optional</em>) – The timespan end datetime to query for events before.
+Default is UTC now</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>events</strong></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[EventIngestionModel]</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdp_scrapers.instances.__init__.py</span></code></p>
+</div>
+</dd></dl>
+
+</section>
 <section id="module-cdp_scrapers.instances.portland">
 <span id="cdp-scrapers-instances-portland-module"></span><h2>cdp_scrapers.instances.portland module<a class="headerlink" href="#module-cdp_scrapers.instances.portland" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
