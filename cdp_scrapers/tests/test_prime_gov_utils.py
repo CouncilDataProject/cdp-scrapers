@@ -15,6 +15,7 @@ from cdp_scrapers.prime_gov_utils import (
     primegov_strptime,
 )
 from cdp_scrapers.scraper_utils import reduced_list
+from cdp_scrapers.instances.lacity import get_lacity_events
 
 
 begin_dates = [datetime(2022, 9, 1)]
@@ -24,6 +25,7 @@ all_meetings = [
     list(s.get_meetings(begin_dates[i], end_dates[i])) for i, s in enumerate(scrapers)
 ]
 meeting_counts = [2]
+event_minutes_item_counts = [[13, 8]]
 
 urls = [
     (
@@ -189,3 +191,33 @@ def test_get_events(
 ):
     events = scraper.get_events(begin, end)
     assert len(events) == num_meetings
+
+
+@pytest.mark.parametrize(
+    "scraper, meetings, num_event_minutes_items",
+    zip(scrapers, all_meetings, event_minutes_item_counts),
+)
+def test_get_event_minutes_items(
+    scraper: PrimeGovScraper,
+    meetings: List[Meeting],
+    num_event_minutes_items: List[int],
+):
+    for meeting, num_items in zip(meetings, num_event_minutes_items):
+        assert len(scraper.get_event_minutes_items(meeting)) == num_items
+
+
+@pytest.mark.parametrize(
+    "begin, end, num_meetings, num_event_minutes_items",
+    zip(begin_dates, end_dates, meeting_counts, event_minutes_item_counts),
+)
+def test_get_lacity_events(
+    begin: datetime,
+    end: datetime,
+    num_meetings: int,
+    num_event_minutes_items: List[int],
+):
+    events = get_lacity_events(begin, end)
+    assert len(events) == num_meetings
+
+    for event, num_items in zip(events, num_event_minutes_items):
+        assert len(event.event_minutes_items) == num_items
