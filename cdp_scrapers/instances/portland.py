@@ -26,9 +26,9 @@ from cdp_backend.pipeline.ingestion_models import (
 
 from ..scraper_utils import (
     IngestionModelScraper,
+    parse_static_file,
     reduced_list,
     str_simplified,
-    parse_static_file,
 )
 
 ###############################################################################

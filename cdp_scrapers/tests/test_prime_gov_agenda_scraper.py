@@ -1,13 +1,13 @@
 import pytest
-
 from cdp_backend.pipeline.ingestion_models import Matter, MinutesItem
+
 from cdp_scrapers.prime_gov_utils import (
     Agenda,
     get_matter,
     get_minutes_item,
+    get_minutes_tables,
     get_support_files,
     load_agenda,
-    get_minutes_tables,
 )
 
 urls = [

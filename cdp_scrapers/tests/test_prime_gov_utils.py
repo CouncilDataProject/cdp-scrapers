@@ -2,21 +2,20 @@ from datetime import datetime
 from typing import List
 
 import pytest
-
 from bs4 import Tag
 from cdp_backend.database.constants import MatterStatusDecision
 from cdp_backend.pipeline.ingestion_models import EventMinutesItem, Matter, MinutesItem
+
+from cdp_scrapers.instances.lacity import get_lacity_events
 from cdp_scrapers.prime_gov_utils import (
     Meeting,
+    PrimeGovScraper,
     get_minutes_tables,
     load_agenda,
-    PrimeGovScraper,
     primegov_strftime,
     primegov_strptime,
 )
 from cdp_scrapers.scraper_utils import reduced_list
-from cdp_scrapers.instances.lacity import get_lacity_events
-
 
 begin_dates = [datetime(2022, 9, 1)]
 end_dates = [datetime(2022, 9, 1)]

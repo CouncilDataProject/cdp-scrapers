@@ -1,11 +1,10 @@
-from typing import Optional, Tuple, TYPE_CHECKING
-
-import re
-
-from cdp_backend.pipeline import ingestion_models
-from cdp_backend.database import constants as db_constants
-from datetime import datetime
 import logging
+import re
+from datetime import datetime
+from typing import TYPE_CHECKING, Optional, Tuple
+
+from cdp_backend.database import constants as db_constants
+from cdp_backend.pipeline import ingestion_models
 
 if TYPE_CHECKING:
     from selenium.webdriver.chrome.webdriver import WebDriver
@@ -60,7 +59,7 @@ def get_single_person(driver: "WebDriver", member_name: str) -> ingestion_models
         member_details = driver.find_element(
             By.XPATH, "//*[contains(@id, 'widget_340_')]"
         ).text
-    except (selenium.common.exceptions.NoSuchElementException):
+    except selenium.common.exceptions.NoSuchElementException:
         member_details = driver.find_element(
             By.XPATH, "//*[contains(@id, 'widget_437_')]"
         ).text
@@ -93,9 +92,9 @@ def get_person() -> dict:
         value: person's ingestion model
     """
     from selenium import webdriver
-    from selenium.webdriver.common.by import By
     from selenium.webdriver.chrome.options import Options
     from selenium.webdriver.chrome.service import Service
+    from selenium.webdriver.common.by import By
     from webdriver_manager.chrome import ChromeDriverManager
 
     chrome_options = Options()
@@ -397,8 +396,8 @@ def parse_single_matter(
         minutes ingestion model with the matters information
     """
     from selenium.webdriver.common.by import By
-    from selenium.webdriver.support.ui import WebDriverWait
     from selenium.webdriver.support import expected_conditions as EC
+    from selenium.webdriver.support.ui import WebDriverWait
 
     log.info("start get ingestion model for a matter")
     voting_list = []
@@ -551,13 +550,12 @@ def parse_event(
         the ingestion model for the meeting
     """
     import selenium
-    from selenium.webdriver.common.by import By
-    from selenium.webdriver.support.ui import WebDriverWait
-    from selenium.webdriver.support import expected_conditions as EC
-
     from selenium import webdriver
     from selenium.webdriver.chrome.options import Options
     from selenium.webdriver.chrome.service import Service
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.support import expected_conditions as EC
+    from selenium.webdriver.support.ui import WebDriverWait
     from webdriver_manager.chrome import ChromeDriverManager
 
     log.info("start get ingestion model for a event")

@@ -2,12 +2,9 @@
 # -*- coding: utf-8 -*-
 
 from typing import Callable, Dict, List, NamedTuple, Optional
+
 from bs4 import BeautifulSoup
-from cdp_backend.pipeline.ingestion_models import (
-    Body,
-    Person,
-    Seat,
-)
+from cdp_backend.pipeline.ingestion_models import Body, Person, Seat
 
 ###############################################################################
 
