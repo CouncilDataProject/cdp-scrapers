@@ -1,539 +1,291 @@
 from bs4 import BeautifulSoup, Tag, NavigableString
 import requests
 from cdp_backend.pipeline import ingestion_models
-from datetime import datetime, timedelta
-from typing import List, Union
-import bs4
+from cdp_backend.pipeline.ingestion_models import (
+    Body,
+    EventIngestionModel,
+    EventMinutesItem,
+    Matter,
+    MinutesItem,
+    Person,
+    Session,
+    SupportingFile,
+    Vote,
+)
+
+
+from datetime import datetime
+from typing import List, Union, Optional, Any
 import logging
+
+from cdp_scrapers.scraper_utils import IngestionModelScraper
 
 log = logging.getLogger(__name__)
 
-# Houston has no person info currently
-# but these functions are ready whenever we do have person data
 
-# from typing import Tuple, Optional
+class HoustonScraper(IngestionModelScraper):
+    def __init__(self):
+        super().__init__(timezone="America/Chicago")
 
-# def get_role(name: str) -> Tuple[List[str], bool]:
-#     """
-#     Get the role name for one person
-#     title: eg.PUBLIC SAFETY & HOMELAND SECURITY (PSHS)
-#     role_name: chair, vice chair, member, etc
+    def remove_extra_type(self, element: Union[Tag, NavigableString, None]) -> Tag:
+        """
+        Remove types that are not useful
 
-#     Parameters:
-#     ----------------
-#     name: str
-#         The name of one person who participates in voting
+        Parameter:
+        ----------------
+        event: Union[Tag, NavigableString, None]
+            All elements in the page that we want to scrape
 
-#     Returns:
-#     ----------------
-#     (str, boolean)
-#         str: role name
-#         boolean: whether the person is in the current council
-#     """
-#     name = name.split(" ")[-1].strip()
-#     role_url = "http://www.houstontx.gov/council/committees/"
-#     role_page = BeautifulSoup(requests.get(role_url).content, "html.parser")
-#     roles = ["City Council: Member"]
-#     status = False
-#     role_list = role_page.find("div", class_="8u 12u(mobile)")
-#     role_titles = role_list.find_all("p")
-#     for role_title in role_titles:
-#         titles = role_title.find_all("strong")
-#         for title in titles:
-#             if title is not None and title.text != "":
-#                 role_members = title.find_next("ul").find_all("li")
-#                 for role_member in role_members:
-#                     if "Agenda" not in role_member.text:
-#                         role_and_member = role_member.text.split(":")
-#                         role_name = role_and_member[0].strip()
-#                         if len(role_and_member) > 2:
-#                             member_names = role_and_member[2].split(",")
-#                         else:
-#                             member_names = role_and_member[1].split(",")
-#                         for member_name in member_names:
-#                             if name in member_name.strip():
-#                                 roles.append(title.text + ": " + role_name)
-#                                 status = True
+        Returns:
+        ----------------
+        Tag
+            Same elements as received, assuming the elements are not null
+        """
+        if isinstance(element, NavigableString) or element is None:
+            raise ValueError(f"Wrong Type {type(element)}")
+        return element
 
-#     return (roles, status)
+    def get_body_name(self, event: Union[Tag, NavigableString, None]) -> str:
+        """
+        Get the body name for an event
 
+        Parameter:
+        ----------------
+        event: Union[Tag, NavigableString, None]
+            All elements in the page that we want to scrape
 
-# def get_seat(name: str, event: Tag) -> str:
-#     """
-#     Get the seat for one person
-#     Not calling this currently as there's no voting info
-
-#     Parameters:
-#     ----------------
-#     name: str
-#         The name of the person who votes
-#     event: Tag
-#         All elements in the page that we want to scrape
-
-#     Returns:
-#     ----------------
-#     str:
-#         The seat information for one person
-#     """
-#     peopleTable = event.find_all("table")[1].find_all("table")[1].table.table
-#     membersTable = peopleTable.find_all("tr")[1]
-#     districtTable = membersTable.find("table").find("tr").find_all("td")
-#     seat = ""
-#     # left and right district
-#     for td in districtTable:
-#         text = td.find("span").find_all("br")
-#         for br in text:
-#             content = br.previousSibling
-#             if type(content) is bs4.element.NavigableString:
-#                 if content.text.strip() == name:
-#                     seat = content.nextSibling.nextSibling.strip()
-#     # lower district
-#     underDistrict = membersTable.find("p").find("span").find("br")
-#     underDName = underDistrict.previousSibling
-#     if underDName.text.strip() == name:
-#         seat = underDName.nextSibling.nextSibling.strip()
-#     # left and right position
-#     positionTable = membersTable.find_all("table")[1].find("tr").find_all("td")
-#     for td in positionTable:
-#         textP = td.find("span").find_all("br")
-#         for br in textP:
-#             contentP = br.previousSibling
-#             if type(contentP) is bs4.element.NavigableString:
-#                 if contentP.text.strip() == name:
-#                     seat = contentP.nextSibling.nextSibling.strip()
-#     # lower position
-#     underPosition = membersTable.find_all("span")[-1].find("br")
-#     underPName = underPosition.previousSibling
-#     if underPName.text.strip() == name:
-#         seat = underPName.nextSibling.nextSibling.strip()
-#     return seat
-
-
-# def get_person(name: str, event: Tag) -> ingestion_models.Person:
-#     """
-#     Get the seat and role for one person
-
-#     Parameters:
-#     -----------------
-#     name:str
-#         The name of one person
-
-#     Returns:
-#     -----------------
-#     ingestion_models.Person:
-#         Seat and role information for one person
-#     """
-#     return ingestion_models.Person(
-#         name=name,
-#         is_active=get_role(name)[1],
-#         seat=ingestion_models.Seat(
-#             name = get_seat(name, event),
-#             roles = ingestion_models.Role(title=get_role(name)[0])
-#         ),
-#     )
-
-
-# missing: get_votes()
-
-
-def remove_extra_type(element: Union[Tag, NavigableString, None]) -> Tag:
-    if isinstance(element, NavigableString) or element is None:
-        raise ValueError(f"Wrong Type {type(element)}")
-    return element
-
-
-def get_body_name(event: Union[Tag, NavigableString, None]) -> str:
-    """
-    Get the body name for an event
-
-    Parameter:
-    ----------------
-    event: Union[Tag, NavigableString, None]
-        All elements in the page that we want to scrape
-
-    Returns:
-    ----------------
-    str
-        The body name
-    """
-    log.info("start get body name")
-    event = remove_extra_type(event)
-    bodyTable = event.find_all("table")[1].find("table")
-    if "CITY COUNCIL" in bodyTable.text:
-        return "City Council"
-    else:
-        return bodyTable.find_all("span")[3].text.title()
-
-
-def get_matter_name(link: str) -> str:
-    """
-    Get the matter numbers for one matter
-
-    Parameters:
-    ---------------
-    link:str
-        The link to each matter item
-
-    Returns:
-    ---------------
-    str:
-        The matter numbers for one matter
-    """
-    matter_page = requests.get(link)
-    matter = BeautifulSoup(matter_page.content, "html.parser").body
-    matter = remove_extra_type(matter)
-    matter_table = remove_extra_type(matter.find("table"))
-    matter_table1 = remove_extra_type(matter_table.find("table"))
-    matter_table2 = remove_extra_type(matter_table1.find("table"))
-    matter_td = remove_extra_type(matter_table2.find_all("td")[1])
-    matter_div = remove_extra_type(matter_td.find("div"))
-    matter_div1 = remove_extra_type(matter_div.find("div"))
-    matter_br = remove_extra_type(matter_div1.find("br"))
-    matter_name = matter_br.previousSibling
-    name_return = ""
-    if type(matter_name) is bs4.element.NavigableString:
-        name_return = matter_name
-    return name_return
-
-
-def get_matter_title(link: str) -> str:
-    """
-    Get title for one matter, which is the summary for one matter
-
-    Parameters:
-    --------------
-    link:str
-        The link to each matter item
-
-    Returns:
-    --------------
-    str: Title for one matter, which is the summary for one matter
-    """
-    matter_page = requests.get(link)
-    matter = BeautifulSoup(matter_page.content, "html.parser").body
-    matter = remove_extra_type(matter)
-    matter_title = (
-        remove_extra_type(matter.find("table"))
-        .find_all("table")[2]
-        .text.replace("Summary:", "")
-        .strip()
-    )
-    return matter_title
-
-
-def get_event_Minutes_Item(
-    event: Union[Tag, NavigableString, None],
-) -> List[ingestion_models.EventMinutesItem]:
-    """
-    Loop through the whole agenda and get both the minutes item and matter.
-
-    The first block of code:
-    * get minutes item on the first day of the meeting
-    The second block of code:
-    * get minutes item before the matter items in the second day of meeting.
-    The third block of code:
-    * get all matter items
-    The fourth block of code:
-    * get minutes items after the matter items
-
-    Parameter:
-    --------------
-    event: Union[Tag, NavigableString, None]
-        The web page of agenda that we are parsing
-
-    Returns:
-    --------------
-    list[ingestion_models.EventMinutesItem]
-        A list of EventMinutesItem
-    """
-    log.info("start get items")
-    event_minutes_items = []
-    # get minutes on the first day
-    firstday_minutes = remove_extra_type(event).find_all(
-        "td", id="column1", class_="style1"
-    )
-    for firstday_minute in firstday_minutes:
-        event_minutes_items.append(
-            ingestion_models.EventMinutesItem(
-                minutes_item=ingestion_models.MinutesItem(firstday_minute.text.strip())
-            )
-        )
-
-    # get minutes before matter
-    all_tables = remove_extra_type(event).find_all("table")[1].find_all("table")
-    for all_table in all_tables:
-        if (
-            "DESCRIPTIONS OR CAPTIONS OF AGENDA ITEMS WILL BE READ BY THE"
-            in all_table.text
-        ):
-            all_prematter_tables = all_table.find_all_next("table")
-            for all_prematter_table in all_prematter_tables:
-                if "CONSENT AGENDA NUMBERS" in all_prematter_table.text:
-                    break
-                else:
-                    minutes_names = all_prematter_table.find_all("td", id="column2")
-                    for minutes_name in minutes_names:
-                        if (
-                            minutes_name is not None
-                            and minutes_name.text != ""
-                            and "." not in minutes_name.text
-                        ):
-                            event_minutes_items.append(
-                                ingestion_models.EventMinutesItem(
-                                    minutes_item=ingestion_models.MinutesItem(
-                                        minutes_name.text.strip()
-                                    )
-                                )
-                            )
-
-    # get matter
-    allTable = remove_extra_type(event).find_all("table")[1].find_all("table")
-    for table in allTable:
-        for td in table.find_all("td", id="column2"):
-            if "CONSENT AGENDA NUMBERS" in td.text:
-                all_Link = table.find_all_next("table")
-                for table_link in all_Link:
-                    if table_link.text == "END OF CONSENT AGENDA":
-                        break
-                    else:
-                        all_links = table_link.find_all("a", href=True)
-                        for links in all_links:  # links: one matter
-                            if links is not None and links.text != "VIDEO":
-                                link = (
-                                    "https://houston.novusagenda.com/agendapublic//"
-                                    + links["href"]
-                                )
-                                if "**PULLED" not in get_matter_title(link):
-                                    matter_types = links.find_all_previous(
-                                        "td", id="column2", class_="style1"
-                                    )
-                                    one_matter_type = ""
-                                    for matter_type in matter_types:
-                                        if "-" in matter_type.text:
-                                            one_matter_type = matter_type.text.split(
-                                                "-"
-                                            )[0].strip()
-                                            break
-                                    event_minutes_items.append(
-                                        ingestion_models.EventMinutesItem(
-                                            minutes_item=ingestion_models.MinutesItem(
-                                                get_matter_name(link)
-                                            ),
-                                            matter=ingestion_models.Matter(
-                                                name=get_matter_name(link),
-                                                matter_type=one_matter_type,
-                                                title=get_matter_title(link),
-                                            ),
-                                        )
-                                    )
-                else:
-                    continue
-                break
+        Returns:
+        ----------------
+        str
+            The body name
+        """
+        log.info("start get body name")
+        event = self.remove_extra_type(event)
+        bodyTable = event.find_all("table")[1].find("table")
+        if "CITY COUNCIL" in bodyTable.text:
+            return "City Council"
         else:
-            continue
-        break
+            return bodyTable.find_all("span")[3].text.title()
 
-    # get minutes after matter
-    allTable = remove_extra_type(event).find_all("table")[1].find_all("table")
-    for table in allTable:
-        for td in table.find_all("td", id="column2"):
-            if "END OF CONSENT AGENDA" in td.text:
-                all_afterm_minutes = table_link.find_all_next("a", href=True)
-                for minutes in all_afterm_minutes:
-                    if minutes is not None and minutes.text != "VIDEO":
-                        minutes_link = (
-                            "https://houston.novusagenda.com/agendapublic//"
-                            + minutes["href"]
+    def get_event_Minutes_Item(
+        self, event: Union[Tag, NavigableString, None],
+    ) -> List[ingestion_models.EventMinutesItem]:
+        """
+        Parse the page and gather the event minute items
+
+        Parameter:
+        ----------------
+        event: Union[Tag, NavigableString, None]
+            All elements in the page that we want to scrape
+
+        Returns:
+        ----------------
+        List[ingestion_models.EventMinutesItem]
+            All the event minute items gathered from the event on the page
+        """
+        log.info("start get items")
+        event_minutes_items = []
+        all_items = self.remove_extra_type(event).find_all("td", {"class": "style4"})
+        for item in all_items:
+            name = ''
+
+            for i in item.stripped_strings:
+                name = name + " " + repr(i).replace('\'', '')
+
+            if name is not None and name != "":
+                event_minutes_items.append(
+                    ingestion_models.EventMinutesItem(
+                        minutes_item=ingestion_models.MinutesItem(
+                            name.strip()
                         )
-                        minute_types = minutes.find_all_previous(
-                            "td", id="column2", class_="style1"
-                        )
-                        one_minute_type = ""
-                        for minute_type in minute_types:
-                            if minute_type is not None and minute_type.text != "":
-                                one_minute_type = minute_type.text.split("-")[0].strip()
-                                break
-                        if "MATTERS HELD" not in one_minute_type:
-                            event_minutes_items.append(
-                                ingestion_models.EventMinutesItem(
-                                    minutes_item=ingestion_models.MinutesItem(
-                                        get_matter_name(minutes_link)
-                                    )
-                                )
-                            )
-    log.info("end get items")
-    return event_minutes_items
+                    )
+                )
+
+        return event_minutes_items
+
+    # Big Functions
+    def get_diff_yearid(self, time: datetime) -> str:
+        """
+        Get the events in different years as the events for different
+        years are stored in different tabs. Can get multiple events
+        across years.
+
+        Parameters:
+        ---------------
+        time: datetime
+            The date of the event we are trying to parse
+
+        Returns:
+        ---------------
+        str
+            The year id that can locate the year tab where the event is stored
+        """
+        year = str(time.year)
+        year_id = "city-council-" + year
+        return year_id
+
+    def get_date_mainlink(self, element: BeautifulSoup) -> str:
+        """
+        Find the main link for one event.
+
+        Parameters:
+        --------------
+        time: datetime
+            The date of one event
+
+        Returns:
+        --------------
+        str
+            The main link, make agenda and video url in other function
+        """
+        link_post = element.find("a")["href"]
+        link = f"https://houstontx.new.swagit.com/{link_post}"
+        return link
+
+    def get_agenda(self, element: BeautifulSoup) -> Union[Tag, NavigableString, None]:
+        """
+        Get event agenda for a specific details page
+
+        Parameters:
+        ----------------
+        event_time: datetime
+            The date we want to get agenda
+
+        Returns:
+        ----------------
+        Tag
+            The agenda web page we want parse
+        """
+        link = self.get_date_mainlink(element)
+        agenda_link = link + "/agenda"
+        page = requests.get(agenda_link)
+        event = BeautifulSoup(page.content, "html.parser")
+        form1 = event.find("form", id="Form1")
+        return form1
+
+    def get_event(self, element_list) -> ingestion_models.EventIngestionModel:
+        """
+        Parse one event at a specific date. City council meeting information for
+        a specific date
+
+        Parameters:
+        --------------
+        event_time: datetime
+            Meeting date
+
+        Returns:
+        --------------
+        ingestion_models.EventIngestionModel
+            EventIngestionModel for one meeting date
+        """
+        log.info("start get one event")
+        date, element = element_list
+        main_uri = self.get_date_mainlink(element)
+        agenda = self.get_agenda(element)
+        event = ingestion_models.EventIngestionModel(
+            body=ingestion_models.Body(name=self.get_body_name(agenda), is_active=True),
+            sessions=[
+                ingestion_models.Session(
+                    session_datetime=date,
+                    video_uri=main_uri + "/embed",
+                    session_index=0,
+                )
+            ],
+            event_minutes_items=self.get_event_Minutes_Item(agenda),
+            agenda_uri=main_uri + "/agenda",
+        )
+        return event
+
+    def get_all_elements_in_range(self, time_from: datetime, time_to: datetime) -> List[BeautifulSoup]:
+        """
+        Get all the meetings in a range of dates
+
+        Parameters:
+        --------------
+        time_from: datetime
+            Earliest meeting date to look at
+        time_to: datetime
+            Latest meeting date to look at
+
+        Returns:
+        --------------
+        List[BeautifulSoup]
+            Elements that contain different meetings
+        """
+        if time_from.year != time_to.year:
+            raise ValueError(f"time_from and time_to are in different years, which is not")
+        elements = []
+        main_URL = "https://houstontx.new.swagit.com/views/408"
+        main_page = requests.get(main_URL)
+        main = BeautifulSoup(main_page.content, "html.parser")
+        main_div = self.remove_extra_type(main.find("div", id=self.get_diff_yearid(time_from)))
+        main_table = self.remove_extra_type(main_div.find("table", id="video-table"))
+        main_tbody = self.remove_extra_type(main_table.find("tbody"))
+        main_year = main_tbody.find_all("tr")
+        for year in main_year:
+            cells = year.find_all("td")
+            date = cells[1].text.replace(",", "").strip()
+            date = datetime.strptime(date, "%b %d %Y").date()
+            if date >= time_from.date() and date <= time_to.date():
+                element = [date, year]
+                elements.append(element)
+        return elements
+
+    def get_events(
+        self,
+        from_dt: datetime, to_dt: datetime
+    ) -> List[ingestion_models.EventIngestionModel]:
+        """
+        Get all city council meetings information within a specific time range
+
+        Parameters:
+        --------------
+        from_dt: datetime
+            The start date of the time range
+        to_dt: datetime
+            The end date of the time range
+
+        Returns:
+        --------------
+        list[ingestion_models.EventIngestionModel]
+            A list of EventIngestionModel that contains all city council
+            meetings information within a specific time range
+        """
+        events = []
+        elements = self.get_all_elements_in_range(from_dt, to_dt)
+        for element in elements:
+            events.append(self.get_event(element))
+        return events
 
 
-# Big Functions
-
-
-def get_diff_yearid(time: datetime) -> str:
+def get_houston_events(
+    from_dt: Optional[datetime] = None,
+    to_dt: Optional[datetime] = None,
+    **kwargs: Any,
+) -> List[EventIngestionModel]:
     """
-    Get the events in different years as the events for different
-    years are stored in different tabs. Can get multiple events
-    across years.
+    Public API for use in instances.__init__ so that this func can be attached
+    as an attribute to cdp_scrapers.instances module.
+    Thus the outside world like cdp-backend can get at this by asking for
+    "get_portland_events".
 
-    Parameters:
-    ---------------
-    time: datetime
-        The date of the event we are trying to parse
+    Parameters
+    ----------
+    from_dt: datetime, optional
+        The timespan beginning datetime to query for events after.
+        Default is 2 days from UTC now
+    to_dt: datetime, optional
+        The timespan end datetime to query for events before.
+        Default is UTC now
 
-    Returns:
-    ---------------
-    str
-        The year id that can locate the year tab where the event is stored
+    Returns
+    -------
+    events: List[EventIngestionModel]
+
+    See Also
+    --------
+    cdp_scrapers.instances.__init__.py
     """
-    year = str(time.year)
-    year_id = "city-council-" + year
-    return year_id
+    scraper = HoustonScraper()
+    return scraper.get_events(begin=from_dt, end=to_dt, **kwargs)
 
-
-def get_date_mainlink(time: datetime) -> str:
-    """
-    Find the main link for one event. Only find link in a specific year
-    * 1)loop through all date
-    * 2)change each into datetime format
-    * 3)if match, get the 3rd td
-    * 4)get the href in first a
-
-    Parameters:
-    --------------
-    time: datetime
-        The date of one event
-
-    Returns:
-    --------------
-    str
-        The main link, make agenda and video url in other function
-    """
-    main_URL = "https://houstontx.new.swagit.com/views/408"
-    main_page = requests.get(main_URL)
-    main = BeautifulSoup(main_page.content, "html.parser")
-    # all events in a specific year
-    main_div = remove_extra_type(main.find("div", id=get_diff_yearid(time)))
-    main_table = remove_extra_type(main_div.find("table", id="video-table"))
-    main_tbody = remove_extra_type(main_table.find("tbody"))
-    main_year = main_tbody.find_all("tr")
-    link = ""
-    for year in main_year:
-        cells = year.find_all("td")
-        date = cells[1].text.replace(",", "").strip()
-        date = datetime.strptime(date, "%b %d %Y").date()
-        if date == time:
-            link_post = cells[3].find("a")["href"]
-            link = f"https://houstontx.new.swagit.com/{link_post}"
-    return link
-
-
-def check_in_range(time: datetime) -> bool:
-    """
-    Check if the date is in the time range we want
-
-    Parameters:
-    --------------
-    time: datetime
-        The date of one event
-
-    Returns:
-    --------------
-    bool
-        True if the event is in the time range we want; false otherwise
-    """
-    main_URL = "https://houstontx.new.swagit.com/views/408"
-    main_page = requests.get(main_URL)
-    main = BeautifulSoup(main_page.content, "html.parser")
-    main_div = remove_extra_type(main.find("div", id=get_diff_yearid(time)))
-    main_table = remove_extra_type(main_div.find("table", id="video-table"))
-    main_tbody = remove_extra_type(main_table.find("tbody"))
-    main_year = main_tbody.find_all("tr")
-    in_range = False
-    for year in main_year:
-        cells = year.find_all("td")
-        date = cells[1].text.replace(",", "").strip()
-        date = datetime.strptime(date, "%b %d %Y").date()
-        if date == time:
-            in_range = True
-    return in_range
-
-
-def get_agenda(event_time: datetime) -> Union[Tag, NavigableString, None]:
-    """
-    Get event agenda for a specific date
-
-    Parameters:
-    ----------------
-    event_time: datetime
-        The date we want to get agenda
-
-    Returns:
-    ----------------
-    Tag
-        The agenda web page we want parse
-    """
-    link = get_date_mainlink(event_time)
-    agenda_link = link + "/agenda"
-    page = requests.get(agenda_link)
-    event = BeautifulSoup(page.content, "html.parser")
-    form1 = event.find("form", id="Form1")
-    return form1
-
-
-def get_event(event_time: datetime) -> ingestion_models.EventIngestionModel:
-    """
-    Parse one event at a specific date. City council meeting information for
-    a specific date
-
-    Parameters:
-    --------------
-    event_time: datetime
-        Meeting date
-
-    Returns:
-    --------------
-    ingestion_models.EventIngestionModel
-        EventIngestionModel for one meeting date
-    """
-    log.info("start get one event")
-    agenda = get_agenda(event_time)
-    event = ingestion_models.EventIngestionModel(
-        body=ingestion_models.Body(name=get_body_name(agenda), is_active=True),
-        sessions=[
-            ingestion_models.Session(
-                session_datetime=event_time,
-                video_uri=get_date_mainlink(event_time) + "/embed",
-                session_index=0,
-            )
-        ],
-        event_minutes_items=get_event_Minutes_Item(agenda),
-        agenda_uri=get_date_mainlink(event_time) + "/agenda",
-    )
-    return event
-
-
-def get_events(
-    from_dt: datetime, to_dt: datetime
-) -> List[ingestion_models.EventIngestionModel]:
-    """
-    Get all city council meetings information within a specific time range
-
-    Parameters:
-    --------------
-    from_dt: datetime
-        The start date of the time range
-    to_dt: datetime
-        The end date of the time range
-
-    Returns:
-    --------------
-    list[ingestion_models.EventIngestionModel]
-        A list of EventIngestionModel that contains all city council
-        meetings information within a specific time range
-    """
-    events = []
-    for day in range((to_dt.date() - from_dt.date()).days + 1):
-        date = from_dt.date() + timedelta(days=day)
-        if check_in_range(date):
-            event = get_event(date)
-            events.append(event)
-    return events

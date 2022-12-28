@@ -5,8 +5,36 @@ import pytest
 from cdp_scrapers.instances.kingcounty import KingCountyScraper
 from cdp_scrapers.instances.portland import PortlandScraper
 from cdp_scrapers.instances.seattle import SeattleScraper
+from cdp_scrapers.instances.houston import HoustonScraper
 
 
+@pytest.mark.parametrize(
+    "start_date_time, end_date_time, expected_meetings,"
+    "expected_minutes_item_in_first_meeting",
+    [
+        (
+            datetime(2022, 1, 10),
+            datetime(2022, 1, 12),
+            1,
+            29,
+        ),
+        (
+            datetime(2022, 11, 7),
+            datetime(2022, 11, 16),
+            2,
+            33,
+        )
+    ]
+)
+def test_houston_scraper(start_date_time: datetime, end_date_time: datetime,
+                         expected_meetings, expected_minutes_item_in_first_meeting):
+    houston = HoustonScraper()
+    houston_events = houston.get_events(start_date_time, end_date_time)
+    assert len(houston_events) == expected_meetings
+    assert len(houston_events[0].event_minutes_items) == expected_minutes_item_in_first_meeting
+
+
+"""
 @pytest.mark.parametrize(
     "start_date_time, end_date_time, number_of_events,"
     "number_of_sessions_in_first_event, number_of_event_minute_items,"
@@ -244,3 +272,4 @@ def test_portland_scraper(
             == number_of_votes
         )
         assert portland_events[0].agenda_uri == expected_agenda_uri
+"""
