@@ -204,7 +204,7 @@ class HoustonScraper(IngestionModelScraper):
         """
         if time_from.year != time_to.year:
             raise ValueError(
-                f"time_from and time_to are in different years, which is not"
+                "time_from and time_to are in different years, which is not supported"
             )
         elements = []
         main_URL = "https://houstontx.new.swagit.com/views/408"
