@@ -41,7 +41,6 @@ def test_houston_scraper(
     )
 
 
-"""
 @pytest.mark.parametrize(
     "start_date_time, end_date_time, number_of_events,"
     "number_of_sessions_in_first_event, number_of_event_minute_items,"
@@ -279,4 +278,3 @@ def test_portland_scraper(
             == number_of_votes
         )
         assert portland_events[0].agenda_uri == expected_agenda_uri
-"""
