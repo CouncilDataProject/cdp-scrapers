@@ -5,11 +5,7 @@ from typing import Any, List, Optional, Union
 import requests
 from bs4 import BeautifulSoup, NavigableString, Tag
 from cdp_backend.pipeline import ingestion_models
-from cdp_backend.pipeline.ingestion_models import (Body, EventIngestionModel,
-                                                   EventMinutesItem, Matter,
-                                                   MinutesItem, Person,
-                                                   Session, SupportingFile,
-                                                   Vote)
+from cdp_backend.pipeline.ingestion_models import (EventIngestionModel)
 
 from cdp_scrapers.scraper_utils import IngestionModelScraper
 
