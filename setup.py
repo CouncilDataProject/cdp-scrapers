@@ -7,8 +7,14 @@ from setuptools import find_packages, setup
 
 with open("README.md") as readme_file:
     readme = readme_file.read()
+    
+atlanta_reqs = [
+    "selenium~=4.3",
+    "webdriver-manager~=3.8",
+]
 
 test_requirements = [
+    *atlanta_reqs,
     "black>=19.10b0",
     "flake8>=3.8.3",
     "flake8-debugger>=3.2.1",
@@ -32,14 +38,16 @@ dev_requirements = [
 
 requirements = [
     "beautifulsoup4~=4.9",
-    "cdp-backend~=3.0",
+    "cdp-backend~=3.2.4",
     "defusedxml~=0.7.1",
     "pytz~=2021.1",
     "requests~=2.25",
     "clean-text~=0.6.0",
+    "civic-scraper~=0.2.5",
 ]
 
 extra_requirements = {
+    "atlanta": atlanta_reqs,
     "test": test_requirements,
     "dev": dev_requirements,
     "all": [
@@ -49,8 +57,8 @@ extra_requirements = {
 }
 
 setup(
-    author="Jackson Maxfield Brown, Sung Cho",
-    author_email="jmaxfieldbrown@gmail.com",
+    author="Eva Maxfield Brown, Sung Cho, Shak Ragoler",
+    author_email="evamaxfieldbrown@gmail.com",
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
@@ -78,6 +86,6 @@ setup(
     url="https://github.com/CouncilDataProject/cdp-scrapers",
     # Do not edit this string manually, always use bumpversion
     # Details in CONTRIBUTING.rst
-    version="0.4.1",
+    version="0.5.0",
     zip_safe=False,
 )
