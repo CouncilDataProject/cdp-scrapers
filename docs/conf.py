@@ -71,8 +71,8 @@ master_doc = "index"
 
 # General information about the project.
 project = u"cdp-scrapers"
-copyright = u"2021, Jackson Maxfield Brown"
-author = u"Jackson Maxfield Brown"
+copyright = u"2021, Eva Maxfield Brown"
+author = u"Eva Maxfield Brown"
 
 # The version info for the project you"re documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
@@ -155,7 +155,7 @@ latex_documents = [
         master_doc,
         "cdp_scrapers.tex",
         u"cdp-scrapers Documentation",
-        u"Jackson Maxfield Brown",
+        u"Eva Maxfield Brown",
         "manual",
     ),
 ]

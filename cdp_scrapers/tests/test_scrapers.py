@@ -129,7 +129,7 @@ def test_seattle_scraper(
             -1,
             -1,
             -1,
-            "http://archive-media.granicus.com:443/OnDemand/king/"
+            "https://archive-video.granicus.com/king/"
             "king_80aac332-5f77-43b4-9259-79d108cdbff1.mp4",
         ),
         # Check for 6 events, with the first event having 1 minute item.
@@ -143,7 +143,7 @@ def test_seattle_scraper(
             4,
             4,
             4,
-            "http://archive-media.granicus.com:443/OnDemand/king/"
+            "https://archive-video.granicus.com/king/"
             "king_b2529fca-1b29-4f3e-b0c5-aa9f4bbb27d9.mp4",
         ),
     ],
