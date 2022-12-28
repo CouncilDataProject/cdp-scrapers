@@ -1,22 +1,15 @@
-from bs4 import BeautifulSoup, Tag, NavigableString
-import requests
-from cdp_backend.pipeline import ingestion_models
-from cdp_backend.pipeline.ingestion_models import (
-    Body,
-    EventIngestionModel,
-    EventMinutesItem,
-    Matter,
-    MinutesItem,
-    Person,
-    Session,
-    SupportingFile,
-    Vote,
-)
-
-
-from datetime import datetime
-from typing import List, Union, Optional, Any
 import logging
+from datetime import datetime
+from typing import Any, List, Optional, Union
+
+import requests
+from bs4 import BeautifulSoup, NavigableString, Tag
+from cdp_backend.pipeline import ingestion_models
+from cdp_backend.pipeline.ingestion_models import (Body, EventIngestionModel,
+                                                   EventMinutesItem, Matter,
+                                                   MinutesItem, Person,
+                                                   Session, SupportingFile,
+                                                   Vote)
 
 from cdp_scrapers.scraper_utils import IngestionModelScraper
 
@@ -68,7 +61,8 @@ class HoustonScraper(IngestionModelScraper):
             return bodyTable.find_all("span")[3].text.title()
 
     def get_event_Minutes_Item(
-        self, event: Union[Tag, NavigableString, None],
+        self,
+        event: Union[Tag, NavigableString, None],
     ) -> List[ingestion_models.EventMinutesItem]:
         """
         Parse the page and gather the event minute items
@@ -87,17 +81,15 @@ class HoustonScraper(IngestionModelScraper):
         event_minutes_items = []
         all_items = self.remove_extra_type(event).find_all("td", {"class": "style4"})
         for item in all_items:
-            name = ''
+            name = ""
 
             for i in item.stripped_strings:
-                name = name + " " + repr(i).replace('\'', '')
+                name = name + " " + repr(i).replace("'", "")
 
             if name is not None and name != "":
                 event_minutes_items.append(
                     ingestion_models.EventMinutesItem(
-                        minutes_item=ingestion_models.MinutesItem(
-                            name.strip()
-                        )
+                        minutes_item=ingestion_models.MinutesItem(name.strip())
                     )
                 )
 
@@ -196,7 +188,9 @@ class HoustonScraper(IngestionModelScraper):
         )
         return event
 
-    def get_all_elements_in_range(self, time_from: datetime, time_to: datetime) -> List[BeautifulSoup]:
+    def get_all_elements_in_range(
+        self, time_from: datetime, time_to: datetime
+    ) -> List[BeautifulSoup]:
         """
         Get all the meetings in a range of dates
 
@@ -213,12 +207,16 @@ class HoustonScraper(IngestionModelScraper):
             Elements that contain different meetings
         """
         if time_from.year != time_to.year:
-            raise ValueError(f"time_from and time_to are in different years, which is not")
+            raise ValueError(
+                f"time_from and time_to are in different years, which is not"
+            )
         elements = []
         main_URL = "https://houstontx.new.swagit.com/views/408"
         main_page = requests.get(main_URL)
         main = BeautifulSoup(main_page.content, "html.parser")
-        main_div = self.remove_extra_type(main.find("div", id=self.get_diff_yearid(time_from)))
+        main_div = self.remove_extra_type(
+            main.find("div", id=self.get_diff_yearid(time_from))
+        )
         main_table = self.remove_extra_type(main_div.find("table", id="video-table"))
         main_tbody = self.remove_extra_type(main_table.find("tbody"))
         main_year = main_tbody.find_all("tr")
@@ -232,8 +230,7 @@ class HoustonScraper(IngestionModelScraper):
         return elements
 
     def get_events(
-        self,
-        from_dt: datetime, to_dt: datetime
+        self, from_dt: datetime, to_dt: datetime
     ) -> List[ingestion_models.EventIngestionModel]:
         """
         Get all city council meetings information within a specific time range
@@ -288,4 +285,3 @@ def get_houston_events(
     """
     scraper = HoustonScraper()
     return scraper.get_events(begin=from_dt, end=to_dt, **kwargs)
-
