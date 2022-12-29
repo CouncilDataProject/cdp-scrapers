@@ -600,6 +600,7 @@ class SeattleScraper(LegistarScraper):
         -------
         bool
             True if some data was saved in file_path
+            False otherwise
 
         See Also
         --------
