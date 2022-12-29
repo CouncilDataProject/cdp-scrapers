@@ -32,9 +32,6 @@
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/sphinx_highlight.js"></script>
     
@@ -906,9 +903,9 @@
             <span class="p">):</span>
                 <span class="k">yield</span> <span class="n">_get_output_id</span><span class="p">(</span><span class="n">agenda</span><span class="p">[</span><span class="s2">&quot;compiledMeetingDocumentFiles&quot;</span><span class="p">])</span>
 
-        <span class="k">def</span> <span class="nf">_get_agenda_and_minutes_tables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
-            <span class="n">Optional</span><span class="p">[</span><span class="n">Agenda</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tag</span><span class="p">]]</span>
-        <span class="p">]:</span>
+        <span class="k">def</span> <span class="nf">_get_agenda_and_minutes_tables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="p">(</span>
+            <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">Agenda</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tag</span><span class="p">]]]</span>
+        <span class="p">):</span>
             <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Get agenda web page parsed into memory</span>
 <span class="sd">            along with html &lt;table&gt; tags describing the event minutes.</span>
