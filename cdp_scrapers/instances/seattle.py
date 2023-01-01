@@ -311,10 +311,7 @@ class SeattleScraper(LegistarScraper):
         # href attribute that contains videoid
 
         soup = BeautifulSoup(response, "html.parser")
-        for link in soup.find(
-            "div",
-            class_="paginationContainer",
-        ).find_all(
+        for link in soup.find("div", class_="paginationContainer",).find_all(
             "a",
             href=re.compile("videoid"),
             onclick=re.compile("loadJWPlayer"),
