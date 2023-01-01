@@ -653,9 +653,9 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
             ):
                 yield _get_output_id(agenda["compiledMeetingDocumentFiles"])
 
-        def _get_agenda_and_minutes_tables() -> Tuple[
-            Optional[Agenda], Optional[List[Tag]]
-        ]:
+        def _get_agenda_and_minutes_tables() -> (
+            Tuple[Optional[Agenda], Optional[List[Tag]]]
+        ):
             """
             Get agenda web page parsed into memory
             along with html <table> tags describing the event minutes.

@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from bs4 import BeautifulSoup
-from typing import Optional, List
+import re
+from typing import List, Optional
 from urllib.parse import unquote
 from urllib.request import urlopen
-from defusedxml import ElementTree
-import re
 
-from .types import ContentURIs, LegistarContentParser
+from bs4 import BeautifulSoup
+from defusedxml import ElementTree
+
 from .scraper_utils import str_simplified
+from .types import ContentURIs, LegistarContentParser
 
 
 def _parse_format_1(client: str, soup: BeautifulSoup) -> Optional[List[ContentURIs]]:

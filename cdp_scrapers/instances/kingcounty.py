@@ -1,21 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import json
 import logging
 import re
-import json
+from pathlib import Path
 from typing import Dict
 from urllib.request import urlopen
-from pathlib import Path
 
 from bs4 import BeautifulSoup
-
-from cdp_backend.pipeline.ingestion_models import Person, Seat
 from cdp_backend.database.constants import RoleTitle
-from ..legistar_utils import (
-    LegistarScraper,
-)
-from ..scraper_utils import str_simplified, parse_static_file
+from cdp_backend.pipeline.ingestion_models import Person, Seat
+
+from ..legistar_utils import LegistarScraper
+from ..scraper_utils import parse_static_file, str_simplified
 
 ###############################################################################
 
