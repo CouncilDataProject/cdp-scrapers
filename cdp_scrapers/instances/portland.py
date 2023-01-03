@@ -7,29 +7,16 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 from bs4 import BeautifulSoup, Tag
-from cdp_backend.database.constants import (
-    EventMinutesItemDecision,
-    MatterStatusDecision,
-    VoteDecision,
-)
-from cdp_backend.pipeline.ingestion_models import (
-    Body,
-    EventIngestionModel,
-    EventMinutesItem,
-    Matter,
-    MinutesItem,
-    Person,
-    Session,
-    SupportingFile,
-    Vote,
-)
+from cdp_backend.database.constants import (EventMinutesItemDecision,
+                                            MatterStatusDecision, VoteDecision)
+from cdp_backend.pipeline.ingestion_models import (Body, EventIngestionModel,
+                                                   EventMinutesItem, Matter,
+                                                   MinutesItem, Person,
+                                                   Session, SupportingFile,
+                                                   Vote)
 
-from ..scraper_utils import (
-    IngestionModelScraper,
-    parse_static_file,
-    reduced_list,
-    str_simplified,
-)
+from ..scraper_utils import (IngestionModelScraper, parse_static_file,
+                             reduced_list, str_simplified)
 
 ###############################################################################
 
@@ -179,19 +166,24 @@ def separate_name_from_title(title_and_name: str) -> str:
     Returns
     -------
     name: str
-        tile_name_name with first word removed e.g. Ted Wheeler
+        tile_name_name with all title-related words removed e.g. Ted Wheeler
 
-    Notes
-    -----
-    first word in title_and_name is presumed to be title
     """
     # title_and_name:
     #   The title (Mayor of Commissioner) and name of a Portland City Commission
     #   member.
-    #   e.g., Mayor Ted Wheeler, Commissioner Carmen Rubio
+    #   e.g., Mayor Ted Wheeler, Commissioner Carmen Rubio,
+    #   Former Commissioner Commissioner Jo Ann Hardesty
 
-    name_index = title_and_name.find(" ")
-    return title_and_name[name_index + 1 :]
+    while (
+        "Former" in title_and_name
+        or "Mayor" in title_and_name
+        or "Commissioner" in title_and_name
+    ):
+        name_index = title_and_name.find(" ")
+        title_and_name = title_and_name[name_index + 1 :]
+
+    return title_and_name.strip()
 
 
 class PortlandScraper(IngestionModelScraper):
