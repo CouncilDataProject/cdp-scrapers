@@ -774,7 +774,7 @@ def get_date(
     Returns:
     --------------
     list
-        all the ingestion models for the selected date ranges
+        all the ingestion models for the selected date range
     """
     from selenium.webdriver.common.by import By
 

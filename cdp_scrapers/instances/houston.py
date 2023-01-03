@@ -22,8 +22,8 @@ class HoustonScraper(IngestionModelScraper):
 
         Parameter:
         ----------------
-        event: Union[Tag, NavigableString, None]
-            All elements in the page that we want to scrape
+        element: Union[Tag, NavigableString, None]
+            The element in the page that we want to scrape
 
         Returns:
         ----------------
@@ -56,7 +56,7 @@ class HoustonScraper(IngestionModelScraper):
         else:
             return bodyTable.find_all("span")[3].text.title()
 
-    def get_event_Minutes_Item(
+    def get_event_minutes_item(
         self,
         event: Union[Tag, NavigableString, None],
     ) -> List[ingestion_models.EventMinutesItem]:
@@ -91,8 +91,7 @@ class HoustonScraper(IngestionModelScraper):
 
         return event_minutes_items
 
-    # Big Functions
-    def get_diff_yearid(self, time: datetime) -> str:
+    def get_diff_yearid(self, event_date: datetime) -> str:
         """
         Get the events in different years as the events for different
         years are stored in different tabs. Can get multiple events
@@ -100,7 +99,7 @@ class HoustonScraper(IngestionModelScraper):
 
         Parameters:
         ---------------
-        time: datetime
+        event_date: datetime
             The date of the event we are trying to parse
 
         Returns:
@@ -108,7 +107,7 @@ class HoustonScraper(IngestionModelScraper):
         str
             The year id that can locate the year tab where the event is stored
         """
-        year = str(time.year)
+        year = str(event_date.year)
         year_id = "city-council-" + year
         return year_id
 
@@ -124,7 +123,7 @@ class HoustonScraper(IngestionModelScraper):
         Returns:
         --------------
         str
-            The main link, make agenda and video url in other function
+            The main link for this event
         """
         link_post = element.find("a")["href"]
         link = f"https://houstontx.new.swagit.com/{link_post}"
@@ -151,15 +150,15 @@ class HoustonScraper(IngestionModelScraper):
         form1 = event.find("form", id="Form1")
         return form1
 
-    def get_event(self, element_list) -> ingestion_models.EventIngestionModel:
+    def get_event(self, element_list: []) -> ingestion_models.EventIngestionModel:
         """
         Parse one event at a specific date. City council meeting information for
         a specific date
 
         Parameters:
         --------------
-        event_time: datetime
-            Meeting date
+        event_list: array
+            Array that includes the date and the element
 
         Returns:
         --------------
@@ -179,7 +178,7 @@ class HoustonScraper(IngestionModelScraper):
                     session_index=0,
                 )
             ],
-            event_minutes_items=self.get_event_Minutes_Item(agenda),
+            event_minutes_items=self.get_event_minutes_item(agenda),
             agenda_uri=main_uri + "/agenda",
         )
         return event
@@ -207,8 +206,8 @@ class HoustonScraper(IngestionModelScraper):
                 "time_from and time_to are in different years, which is not supported"
             )
         elements = []
-        main_URL = "https://houstontx.new.swagit.com/views/408"
-        main_page = requests.get(main_URL)
+        main_url = "https://houstontx.new.swagit.com/views/408"
+        main_page = requests.get(main_url)
         main = BeautifulSoup(main_page.content, "html.parser")
         main_div = self.remove_extra_type(
             main.find("div", id=self.get_diff_yearid(time_from))
