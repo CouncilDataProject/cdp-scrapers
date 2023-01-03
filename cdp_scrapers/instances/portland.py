@@ -7,16 +7,29 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 from bs4 import BeautifulSoup, Tag
-from cdp_backend.database.constants import (EventMinutesItemDecision,
-                                            MatterStatusDecision, VoteDecision)
-from cdp_backend.pipeline.ingestion_models import (Body, EventIngestionModel,
-                                                   EventMinutesItem, Matter,
-                                                   MinutesItem, Person,
-                                                   Session, SupportingFile,
-                                                   Vote)
+from cdp_backend.database.constants import (
+    EventMinutesItemDecision,
+    MatterStatusDecision,
+    VoteDecision,
+)
+from cdp_backend.pipeline.ingestion_models import (
+    Body,
+    EventIngestionModel,
+    EventMinutesItem,
+    Matter,
+    MinutesItem,
+    Person,
+    Session,
+    SupportingFile,
+    Vote,
+)
 
-from ..scraper_utils import (IngestionModelScraper, parse_static_file,
-                             reduced_list, str_simplified)
+from ..scraper_utils import (
+    IngestionModelScraper,
+    parse_static_file,
+    reduced_list,
+    str_simplified,
+)
 
 ###############################################################################
 
