@@ -82,10 +82,14 @@ class HoustonScraper(IngestionModelScraper):
             for i in item.stripped_strings:
                 name = name + " " + repr(i).replace("'", "")
 
+            for a in item.find_all("a", href=True):
+                href = "https://houston.novusagenda.com/agendapublic/" + a["href"]
+
             if name is not None and name != "":
                 event_minutes_items.append(
                     ingestion_models.EventMinutesItem(
-                        minutes_item=ingestion_models.MinutesItem(name.strip())
+                        minutes_item=ingestion_models.MinutesItem(name.strip()),
+                        supporting_files=href,
                     )
                 )
 
