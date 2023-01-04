@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from typing import Any, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import requests
 from bs4 import BeautifulSoup, NavigableString, Tag
@@ -150,15 +150,17 @@ class HoustonScraper(IngestionModelScraper):
         form1 = event.find("form", id="Form1")
         return form1
 
-    def get_event(self, element_list: []) -> ingestion_models.EventIngestionModel:
+    def get_event(
+        self, date: str, element: Tag
+    ) -> ingestion_models.EventIngestionModel:
         """
         Parse one event at a specific date. City council meeting information for
         a specific date
 
         Parameters:
         --------------
-        event_list: array
-            Array that includes the date and the element
+        date: the date of this meeting
+        element: the meeting Tag element
 
         Returns:
         --------------
@@ -166,7 +168,6 @@ class HoustonScraper(IngestionModelScraper):
             EventIngestionModel for one meeting date
         """
         log.info("start get one event")
-        date, element = element_list
         main_uri = self.get_date_mainlink(element)
         agenda = self.get_agenda(element)
         event = ingestion_models.EventIngestionModel(
@@ -185,7 +186,7 @@ class HoustonScraper(IngestionModelScraper):
 
     def get_all_elements_in_range(
         self, time_from: datetime, time_to: datetime
-    ) -> List[BeautifulSoup]:
+    ) -> Dict[str, Tag]:
         """
         Get all the meetings in a range of dates
 
@@ -198,14 +199,14 @@ class HoustonScraper(IngestionModelScraper):
 
         Returns:
         --------------
-        List[BeautifulSoup]
-            Elements that contain different meetings
+        Dict[str, Tag]
+            Dictionary of mapping between the date and the element for the meeting in that date
         """
         if time_from.year != time_to.year:
             raise ValueError(
                 "time_from and time_to are in different years, which is not supported"
             )
-        elements = []
+        date_years = dict()
         main_url = "https://houstontx.new.swagit.com/views/408"
         main_page = requests.get(main_url)
         main = BeautifulSoup(main_page.content, "html.parser")
@@ -214,15 +215,16 @@ class HoustonScraper(IngestionModelScraper):
         )
         main_table = self.remove_extra_type(main_div.find("table", id="video-table"))
         main_tbody = self.remove_extra_type(main_table.find("tbody"))
-        main_year = main_tbody.find_all("tr")
-        for year in main_year:
-            cells = year.find_all("td")
+        main_year_elem = main_tbody.find_all("tr")
+        for year_elem in main_year_elem:
+            cells = year_elem.find_all("td")
             date = cells[1].text.replace(",", "").strip()
             date = datetime.strptime(date, "%b %d %Y").date()
             if date >= time_from.date() and date <= time_to.date():
-                element = [date, year]
-                elements.append(element)
-        return elements
+                # date_year = [date, year_elem]
+                # date_years.append(date_year)
+                date_years[date] = year_elem
+        return date_years
 
     def get_events(
         self, from_dt: datetime, to_dt: datetime
@@ -244,9 +246,9 @@ class HoustonScraper(IngestionModelScraper):
             meetings information within a specific time range
         """
         events = []
-        elements = self.get_all_elements_in_range(from_dt, to_dt)
-        for element in elements:
-            events.append(self.get_event(element))
+        d = self.get_all_elements_in_range(from_dt, to_dt)
+        for date in d.keys():
+            events.append(self.get_event(date, d[date]))
         return events
 
 
