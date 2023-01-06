@@ -204,8 +204,8 @@ class HoustonScraper(IngestionModelScraper):
         Returns:
         --------------
         Dict[str, Tag]
-            Dictionary of mapping between the date and the element for the meeting in
-            that date
+            Dictionary of mapping between the date of the meeting and the element for
+            the meeting in that date
         """
         if time_from.year != time_to.year:
             raise ValueError(
