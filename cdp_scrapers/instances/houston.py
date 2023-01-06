@@ -115,7 +115,7 @@ class HoustonScraper(IngestionModelScraper):
         year_id = "city-council-" + year
         return year_id
 
-    def get_date_mainlink(self, element: BeautifulSoup) -> str:
+    def get_date_mainlink(self, element: Tag) -> str:
         """
         Find the main link for one event.
 
@@ -133,7 +133,7 @@ class HoustonScraper(IngestionModelScraper):
         link = f"https://houstontx.new.swagit.com/{link_post}"
         return link
 
-    def get_agenda(self, element: BeautifulSoup) -> Union[Tag, NavigableString, None]:
+    def get_agenda(self, element: Tag) -> Union[Tag, NavigableString, None]:
         """
         Get event agenda for a specific details page
 
@@ -252,7 +252,7 @@ class HoustonScraper(IngestionModelScraper):
         """
         events = []
         d = self.get_all_elements_in_range(from_dt, to_dt)
-        for date in d.keys():
+        for date, element in d.items():
             events.append(self.get_event(date, d[date]))
         return events
 
