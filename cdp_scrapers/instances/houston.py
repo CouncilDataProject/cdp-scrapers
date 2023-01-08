@@ -121,8 +121,8 @@ class HoustonScraper(IngestionModelScraper):
 
         Parameters:
         --------------
-        time: datetime
-            The date of one event
+        element: Tag
+            The element of one event
 
         Returns:
         --------------
@@ -139,8 +139,8 @@ class HoustonScraper(IngestionModelScraper):
 
         Parameters:
         ----------------
-        event_time: datetime
-            The date we want to get agenda
+        element: Tag
+            The element from which we want to get agenda
 
         Returns:
         ----------------
