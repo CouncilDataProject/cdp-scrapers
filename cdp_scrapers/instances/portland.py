@@ -179,19 +179,24 @@ def separate_name_from_title(title_and_name: str) -> str:
     Returns
     -------
     name: str
-        tile_name_name with first word removed e.g. Ted Wheeler
+        tile_name_name with all title-related words removed e.g. Ted Wheeler
 
-    Notes
-    -----
-    first word in title_and_name is presumed to be title
     """
     # title_and_name:
     #   The title (Mayor of Commissioner) and name of a Portland City Commission
     #   member.
-    #   e.g., Mayor Ted Wheeler, Commissioner Carmen Rubio
+    #   e.g., Mayor Ted Wheeler, Commissioner Carmen Rubio,
+    #   Former Commissioner Commissioner Jo Ann Hardesty
 
-    name_index = title_and_name.find(" ")
-    return title_and_name[name_index + 1 :]
+    while (
+        "Former" in title_and_name
+        or "Mayor" in title_and_name
+        or "Commissioner" in title_and_name
+    ):
+        name_index = title_and_name.find(" ")
+        title_and_name = title_and_name[name_index + 1 :]
+
+    return title_and_name.strip()
 
 
 class PortlandScraper(IngestionModelScraper):
