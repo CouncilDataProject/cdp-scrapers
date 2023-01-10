@@ -295,7 +295,7 @@
     <span class="n">PYTHON_MUNICIPALITY_SLUG</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;seattle&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Seattle specific implementation of LegistarScraper.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
@@ -334,7 +334,7 @@
 <div class="viewcode-block" id="SeattleScraper.parse_content_uris"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.SeattleScraper.parse_content_uris">[docs]</a>    <span class="k">def</span> <span class="nf">parse_content_uris</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">video_page_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">event_short_date</span><span class="p">:</span> <span class="nb">str</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ContentURIs</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return URLs for videos and captions parsed from seattlechannel.org web page</span>
 
 <span class="sd">        Parameters</span>
@@ -471,7 +471,7 @@
 
 <div class="viewcode-block" id="SeattleScraper.roman_to_int"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.SeattleScraper.roman_to_int">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">roman_to_int</span><span class="p">(</span><span class="n">roman</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Roman numeral to an integer</span>
 
 <span class="sd">        Parameters</span>
@@ -501,7 +501,7 @@
 <div class="viewcode-block" id="SeattleScraper.get_video_page_urls"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.SeattleScraper.get_video_page_urls">[docs]</a>    <span class="k">def</span> <span class="nf">get_video_page_urls</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">video_list_page_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">event_short_date</span><span class="p">:</span> <span class="nb">str</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return URLs to web pages hosting videos for meetings from event_short_date</span>
 
 <span class="sd">        Parameters</span>
@@ -597,7 +597,7 @@
         <span class="p">]</span></div>
 
 <div class="viewcode-block" id="SeattleScraper.get_content_uris"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.SeattleScraper.get_content_uris">[docs]</a>    <span class="k">def</span> <span class="nf">get_content_uris</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_ev</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ContentURIs</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return URLs for videos and captions parsed from seattlechannel.org web page</span>
 
 <span class="sd">        Parameters</span>
@@ -685,7 +685,7 @@
 
 <div class="viewcode-block" id="SeattleScraper.get_person_picture_url"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.SeattleScraper.get_person_picture_url">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">get_person_picture_url</span><span class="p">(</span><span class="n">person_www</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parse person_www and return banner image used on the web page</span>
 
 <span class="sd">        Parameters</span>
@@ -726,7 +726,7 @@
 
 <div class="viewcode-block" id="SeattleScraper.get_static_person_info"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.SeattleScraper.get_static_person_info">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">get_static_person_info</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Person</span><span class="p">]]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return partial Persons with static long-term information</span>
 
 <span class="sd">        Returns</span>
@@ -840,7 +840,7 @@
 
 <div class="viewcode-block" id="SeattleScraper.dump_static_info"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.seattle.SeattleScraper.dump_static_info">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">dump_static_info</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Save static data in json format</span>
 
 <span class="sd">        Parameters</span>

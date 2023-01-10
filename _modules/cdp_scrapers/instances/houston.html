@@ -1,0 +1,585 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>cdp_scrapers.instances.houston &mdash; cdp-scrapers 0.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> cdp-scrapers
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.5.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#stable-release">Stable release</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#from-sources">From sources</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finding_legistar_id.html">Searching for your Municipality's Legistar ID</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../legistar_scraper.html">LegistarScraper</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../legistar_scraper.html#filtering">Filtering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../legistar_scraper.html#legistar-to-cdp-ingestionmodel">Legistar to CDP <code class="docutils literal notranslate"><span class="pre">IngestionModel</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../legistar_scraper.html#instance-specific-scraping">Instance-Specific Scraping</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../legistar_scraper.html#scraping-for-session-video-uri">Scraping for <code class="docutils literal notranslate"><span class="pre">Session.video_uri</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../legistar_scraper.html#information-from-other-sources">Information From Other Sources</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../legistar_scraper.html#other-notes">Other Notes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Package Modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../cdp_scrapers.html">cdp_scrapers package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../cdp_scrapers.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../cdp_scrapers.instances.html">cdp_scrapers.instances package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../cdp_scrapers.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../cdp_scrapers.html#module-cdp_scrapers.legistar_content_parsers">cdp_scrapers.legistar_content_parsers module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../cdp_scrapers.html#module-cdp_scrapers.legistar_utils">cdp_scrapers.legistar_utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../cdp_scrapers.html#cdp_scrapers.legistar_utils.ContentUriScrapeResult"><code class="docutils literal notranslate"><span class="pre">ContentUriScrapeResult</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper"><code class="docutils literal notranslate"><span class="pre">LegistarScraper</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../cdp_scrapers.html#cdp_scrapers.legistar_utils.get_legistar_body"><code class="docutils literal notranslate"><span class="pre">get_legistar_body()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../cdp_scrapers.html#cdp_scrapers.legistar_utils.get_legistar_content_uris"><code class="docutils literal notranslate"><span class="pre">get_legistar_content_uris()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../cdp_scrapers.html#cdp_scrapers.legistar_utils.get_legistar_events_for_timespan"><code class="docutils literal notranslate"><span class="pre">get_legistar_events_for_timespan()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../cdp_scrapers.html#cdp_scrapers.legistar_utils.get_legistar_person"><code class="docutils literal notranslate"><span class="pre">get_legistar_person()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../cdp_scrapers.html#cdp_scrapers.legistar_utils.parse_video_page_url"><code class="docutils literal notranslate"><span class="pre">parse_video_page_url()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../cdp_scrapers.html#module-cdp_scrapers.prime_gov_utils">cdp_scrapers.prime_gov_utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper"><code class="docutils literal notranslate"><span class="pre">PrimeGovScraper</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_matter"><code class="docutils literal notranslate"><span class="pre">get_matter()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_minutes_item"><code class="docutils literal notranslate"><span class="pre">get_minutes_item()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_minutes_tables"><code class="docutils literal notranslate"><span class="pre">get_minutes_tables()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_support_files"><code class="docutils literal notranslate"><span class="pre">get_support_files()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_support_files_div"><code class="docutils literal notranslate"><span class="pre">get_support_files_div()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.load_agenda"><code class="docutils literal notranslate"><span class="pre">load_agenda()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.primegov_strftime"><code class="docutils literal notranslate"><span class="pre">primegov_strftime()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.primegov_strptime"><code class="docutils literal notranslate"><span class="pre">primegov_strptime()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../cdp_scrapers.html#module-cdp_scrapers.scraper_utils">cdp_scrapers.scraper_utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../cdp_scrapers.html#cdp_scrapers.scraper_utils.IngestionModelScraper"><code class="docutils literal notranslate"><span class="pre">IngestionModelScraper</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../cdp_scrapers.html#cdp_scrapers.scraper_utils.parse_static_file"><code class="docutils literal notranslate"><span class="pre">parse_static_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../cdp_scrapers.html#cdp_scrapers.scraper_utils.parse_static_person"><code class="docutils literal notranslate"><span class="pre">parse_static_person()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../cdp_scrapers.html#cdp_scrapers.scraper_utils.reduced_list"><code class="docutils literal notranslate"><span class="pre">reduced_list()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../cdp_scrapers.html#cdp_scrapers.scraper_utils.sanitize_roles"><code class="docutils literal notranslate"><span class="pre">sanitize_roles()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../cdp_scrapers.html#cdp_scrapers.scraper_utils.str_simplified"><code class="docutils literal notranslate"><span class="pre">str_simplified()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../cdp_scrapers.html#module-cdp_scrapers.types">cdp_scrapers.types module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../cdp_scrapers.html#cdp_scrapers.types.ContentURIs"><code class="docutils literal notranslate"><span class="pre">ContentURIs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../cdp_scrapers.html#cdp_scrapers.types.LegistarContentParser"><code class="docutils literal notranslate"><span class="pre">LegistarContentParser</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../cdp_scrapers.html#cdp_scrapers.types.ScraperStaticData"><code class="docutils literal notranslate"><span class="pre">ScraperStaticData</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../cdp_scrapers.html#module-cdp_scrapers">Module contents</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../cdp_scrapers.html#cdp_scrapers.get_module_version"><code class="docutils literal notranslate"><span class="pre">get_module_version()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../contributing.html#get-started">Get Started!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../contributing.html#deploying">Deploying</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Core Components:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cdp_scrapers.instances.empty.get_events.html">cdp_scrapers.instances.empty.get_events</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../cdp_scrapers.instances.empty.get_events.html#cdp_scrapers.instances.empty.get_events"><code class="docutils literal notranslate"><span class="pre">get_events()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cdp_scrapers.legistar_utils.LegistarScraper.html">cdp_scrapers.legistar_utils.LegistarScraper</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../cdp_scrapers.legistar_utils.LegistarScraper.html#cdp_scrapers.legistar_utils.LegistarScraper"><code class="docutils literal notranslate"><span class="pre">LegistarScraper</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../cdp_scrapers.legistar_utils.LegistarScraper.html#cdp_scrapers.legistar_utils.LegistarScraper.__init__"><code class="docutils literal notranslate"><span class="pre">LegistarScraper.__init__()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">cdp-scrapers</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../cdp_scrapers.html">cdp_scrapers</a> &raquo;</li>
+        
+      <li>cdp_scrapers.instances.houston</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for cdp_scrapers.instances.houston</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span><span class="p">,</span> <span class="n">NavigableString</span><span class="p">,</span> <span class="n">Tag</span>
+<span class="kn">from</span> <span class="nn">cdp_backend.pipeline</span> <span class="kn">import</span> <span class="n">ingestion_models</span>
+<span class="kn">from</span> <span class="nn">cdp_backend.pipeline.ingestion_models</span> <span class="kn">import</span> <span class="n">EventIngestionModel</span>
+
+<span class="kn">from</span> <span class="nn">cdp_scrapers.scraper_utils</span> <span class="kn">import</span> <span class="n">IngestionModelScraper</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="HoustonScraper"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.HoustonScraper">[docs]</a><span class="k">class</span> <span class="nc">HoustonScraper</span><span class="p">(</span><span class="n">IngestionModelScraper</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">timezone</span><span class="o">=</span><span class="s2">&quot;America/Chicago&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="HoustonScraper.remove_extra_type"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.HoustonScraper.remove_extra_type">[docs]</a>    <span class="k">def</span> <span class="nf">remove_extra_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tag</span><span class="p">,</span> <span class="n">NavigableString</span><span class="p">,</span> <span class="kc">None</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tag</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove types that are not useful</span>
+
+<span class="sd">        Parameter:</span>
+<span class="sd">        ----------------</span>
+<span class="sd">        element: Union[Tag, NavigableString, None]</span>
+<span class="sd">            The element in the page that we want to scrape</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        ----------------</span>
+<span class="sd">        Tag</span>
+<span class="sd">            Same elements as received, assuming the elements are not null</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">NavigableString</span><span class="p">)</span> <span class="ow">or</span> <span class="n">element</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wrong Type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">element</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">element</span></div>
+
+<div class="viewcode-block" id="HoustonScraper.get_body_name"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.HoustonScraper.get_body_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_body_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tag</span><span class="p">,</span> <span class="n">NavigableString</span><span class="p">,</span> <span class="kc">None</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the body name for an event</span>
+
+<span class="sd">        Parameter:</span>
+<span class="sd">        ----------------</span>
+<span class="sd">        event: Union[Tag, NavigableString, None]</span>
+<span class="sd">            All elements in the page that we want to scrape</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        ----------------</span>
+<span class="sd">        str</span>
+<span class="sd">            The body name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;start get body name&quot;</span><span class="p">)</span>
+        <span class="n">event</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_extra_type</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+        <span class="n">bodyTable</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s2">&quot;table&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;table&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;CITY COUNCIL&quot;</span> <span class="ow">in</span> <span class="n">bodyTable</span><span class="o">.</span><span class="n">text</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;City Council&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">bodyTable</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s2">&quot;span&quot;</span><span class="p">)[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">title</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="HoustonScraper.get_event_minutes_item"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.HoustonScraper.get_event_minutes_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_event_minutes_item</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tag</span><span class="p">,</span> <span class="n">NavigableString</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ingestion_models</span><span class="o">.</span><span class="n">EventMinutesItem</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse the page and gather the event minute items</span>
+
+<span class="sd">        Parameter:</span>
+<span class="sd">        ----------------</span>
+<span class="sd">        event: Union[Tag, NavigableString, None]</span>
+<span class="sd">            All elements in the page that we want to scrape</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        ----------------</span>
+<span class="sd">        List[ingestion_models.EventMinutesItem]</span>
+<span class="sd">            All the event minute items gathered from the event on the page</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;start get items&quot;</span><span class="p">)</span>
+        <span class="n">event_minutes_items</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">all_items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_extra_type</span><span class="p">(</span><span class="n">event</span><span class="p">)</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s2">&quot;td&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;style4&quot;</span><span class="p">})</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">all_items</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">item</span><span class="o">.</span><span class="n">stripped_strings</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">item</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">href</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                <span class="n">href</span> <span class="o">=</span> <span class="s2">&quot;https://houston.novusagenda.com/agendapublic/&quot;</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="s2">&quot;href&quot;</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="n">event_minutes_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">ingestion_models</span><span class="o">.</span><span class="n">EventMinutesItem</span><span class="p">(</span>
+                        <span class="n">minutes_item</span><span class="o">=</span><span class="n">ingestion_models</span><span class="o">.</span><span class="n">MinutesItem</span><span class="p">(</span><span class="n">name</span><span class="o">.</span><span class="n">strip</span><span class="p">()),</span>
+                        <span class="n">supporting_files</span><span class="o">=</span><span class="n">href</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">event_minutes_items</span></div>
+
+<div class="viewcode-block" id="HoustonScraper.get_diff_yearid"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.HoustonScraper.get_diff_yearid">[docs]</a>    <span class="k">def</span> <span class="nf">get_diff_yearid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_date</span><span class="p">:</span> <span class="n">datetime</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the events in different years as the events for different</span>
+<span class="sd">        years are stored in different tabs. Can get multiple events</span>
+<span class="sd">        across years.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        event_date: datetime</span>
+<span class="sd">            The date of the event we are trying to parse</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        str</span>
+<span class="sd">            The year id that can locate the year tab where the event is stored</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">year</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">event_date</span><span class="o">.</span><span class="n">year</span><span class="p">)</span>
+        <span class="n">year_id</span> <span class="o">=</span> <span class="s2">&quot;city-council-&quot;</span> <span class="o">+</span> <span class="n">year</span>
+        <span class="k">return</span> <span class="n">year_id</span></div>
+
+<div class="viewcode-block" id="HoustonScraper.get_date_mainlink"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.HoustonScraper.get_date_mainlink">[docs]</a>    <span class="k">def</span> <span class="nf">get_date_mainlink</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find the main link for one event.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        --------------</span>
+<span class="sd">        element: Tag</span>
+<span class="sd">            The element of one event</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        --------------</span>
+<span class="sd">        str</span>
+<span class="sd">            The main link for this event</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">link_post</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">)[</span><span class="s2">&quot;href&quot;</span><span class="p">]</span>
+        <span class="n">link</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://houstontx.new.swagit.com/</span><span class="si">{</span><span class="n">link_post</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="n">link</span></div>
+
+<div class="viewcode-block" id="HoustonScraper.get_agenda"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.HoustonScraper.get_agenda">[docs]</a>    <span class="k">def</span> <span class="nf">get_agenda</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tag</span><span class="p">,</span> <span class="n">NavigableString</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get event agenda for a specific details page</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        ----------------</span>
+<span class="sd">        element: Tag</span>
+<span class="sd">            The element from which we want to get agenda</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        ----------------</span>
+<span class="sd">        Tag</span>
+<span class="sd">            The agenda web page we want parse</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">link</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_date_mainlink</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+        <span class="n">agenda_link</span> <span class="o">=</span> <span class="n">link</span> <span class="o">+</span> <span class="s2">&quot;/agenda&quot;</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">agenda_link</span><span class="p">)</span>
+        <span class="n">event</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">page</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="s2">&quot;html.parser&quot;</span><span class="p">)</span>
+        <span class="n">form1</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;form&quot;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;Form1&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">form1</span></div>
+
+<div class="viewcode-block" id="HoustonScraper.get_event"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.HoustonScraper.get_event">[docs]</a>    <span class="k">def</span> <span class="nf">get_event</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">element</span><span class="p">:</span> <span class="n">Tag</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ingestion_models</span><span class="o">.</span><span class="n">EventIngestionModel</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse one event at a specific date. City council meeting information for</span>
+<span class="sd">        a specific date</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        --------------</span>
+<span class="sd">        date: the date of this meeting</span>
+<span class="sd">        element: the meeting Tag element</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        --------------</span>
+<span class="sd">        ingestion_models.EventIngestionModel</span>
+<span class="sd">            EventIngestionModel for one meeting date</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;start get one event&quot;</span><span class="p">)</span>
+        <span class="n">main_uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_date_mainlink</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+        <span class="n">agenda</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_agenda</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+        <span class="n">event</span> <span class="o">=</span> <span class="n">ingestion_models</span><span class="o">.</span><span class="n">EventIngestionModel</span><span class="p">(</span>
+            <span class="n">body</span><span class="o">=</span><span class="n">ingestion_models</span><span class="o">.</span><span class="n">Body</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_body_name</span><span class="p">(</span><span class="n">agenda</span><span class="p">),</span> <span class="n">is_active</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">sessions</span><span class="o">=</span><span class="p">[</span>
+                <span class="n">ingestion_models</span><span class="o">.</span><span class="n">Session</span><span class="p">(</span>
+                    <span class="n">session_datetime</span><span class="o">=</span><span class="n">date</span><span class="p">,</span>
+                    <span class="n">video_uri</span><span class="o">=</span><span class="n">main_uri</span> <span class="o">+</span> <span class="s2">&quot;/embed&quot;</span><span class="p">,</span>
+                    <span class="n">session_index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">],</span>
+            <span class="n">event_minutes_items</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event_minutes_item</span><span class="p">(</span><span class="n">agenda</span><span class="p">),</span>
+            <span class="n">agenda_uri</span><span class="o">=</span><span class="n">main_uri</span> <span class="o">+</span> <span class="s2">&quot;/agenda&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">event</span></div>
+
+<div class="viewcode-block" id="HoustonScraper.get_all_elements_in_range"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.HoustonScraper.get_all_elements_in_range">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_elements_in_range</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">time_from</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">time_to</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tag</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get all the meetings in a range of dates</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        --------------</span>
+<span class="sd">        time_from: datetime</span>
+<span class="sd">            Earliest meeting date to look at</span>
+<span class="sd">        time_to: datetime</span>
+<span class="sd">            Latest meeting date to look at</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        --------------</span>
+<span class="sd">        Dict[str, Tag]</span>
+<span class="sd">            Dictionary of mapping between the date of the meeting and the element for</span>
+<span class="sd">            the meeting in that date</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">time_from</span><span class="o">.</span><span class="n">year</span> <span class="o">!=</span> <span class="n">time_to</span><span class="o">.</span><span class="n">year</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;time_from and time_to are in different years, which is not supported&quot;</span>
+            <span class="p">)</span>
+        <span class="n">date_years</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">main_url</span> <span class="o">=</span> <span class="s2">&quot;https://houstontx.new.swagit.com/views/408&quot;</span>
+        <span class="n">main_page</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">main_url</span><span class="p">)</span>
+        <span class="n">main</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">main_page</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="s2">&quot;html.parser&quot;</span><span class="p">)</span>
+        <span class="n">main_div</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_extra_type</span><span class="p">(</span>
+            <span class="n">main</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_diff_yearid</span><span class="p">(</span><span class="n">time_from</span><span class="p">))</span>
+        <span class="p">)</span>
+        <span class="n">main_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_extra_type</span><span class="p">(</span><span class="n">main_div</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;table&quot;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;video-table&quot;</span><span class="p">))</span>
+        <span class="n">main_tbody</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_extra_type</span><span class="p">(</span><span class="n">main_table</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;tbody&quot;</span><span class="p">))</span>
+        <span class="n">main_year_elem</span> <span class="o">=</span> <span class="n">main_tbody</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s2">&quot;tr&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">year_elem</span> <span class="ow">in</span> <span class="n">main_year_elem</span><span class="p">:</span>
+            <span class="n">cells</span> <span class="o">=</span> <span class="n">year_elem</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s2">&quot;td&quot;</span><span class="p">)</span>
+            <span class="n">date</span> <span class="o">=</span> <span class="n">cells</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="s2">&quot;%b </span><span class="si">%d</span><span class="s2"> %Y&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">date</span> <span class="o">&gt;=</span> <span class="n">time_from</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="ow">and</span> <span class="n">date</span> <span class="o">&lt;=</span> <span class="n">time_to</span><span class="o">.</span><span class="n">date</span><span class="p">():</span>
+                <span class="c1"># date_year = [date, year_elem]</span>
+                <span class="c1"># date_years.append(date_year)</span>
+                <span class="n">date_years</span><span class="p">[</span><span class="n">date</span><span class="p">]</span> <span class="o">=</span> <span class="n">year_elem</span>
+        <span class="k">return</span> <span class="n">date_years</span></div>
+
+<div class="viewcode-block" id="HoustonScraper.get_events"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.HoustonScraper.get_events">[docs]</a>    <span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">from_dt</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">to_dt</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ingestion_models</span><span class="o">.</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get all city council meetings information within a specific time range</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        --------------</span>
+<span class="sd">        from_dt: datetime</span>
+<span class="sd">            The start date of the time range</span>
+<span class="sd">        to_dt: datetime</span>
+<span class="sd">            The end date of the time range</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        --------------</span>
+<span class="sd">        list[ingestion_models.EventIngestionModel]</span>
+<span class="sd">            A list of EventIngestionModel that contains all city council</span>
+<span class="sd">            meetings information within a specific time range</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">events</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_all_elements_in_range</span><span class="p">(</span><span class="n">from_dt</span><span class="p">,</span> <span class="n">to_dt</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">date</span><span class="p">,</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">d</span><span class="p">[</span><span class="n">date</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="n">events</span></div></div>
+
+
+<div class="viewcode-block" id="get_houston_events"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.get_houston_events">[docs]</a><span class="k">def</span> <span class="nf">get_houston_events</span><span class="p">(</span>
+    <span class="n">from_dt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">to_dt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Public API for use in instances.__init__ so that this func can be attached</span>
+<span class="sd">    as an attribute to cdp_scrapers.instances module.</span>
+<span class="sd">    Thus the outside world like cdp-backend can get at this by asking for</span>
+<span class="sd">    &quot;get_portland_events&quot;.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    from_dt: datetime, optional</span>
+<span class="sd">        The timespan beginning datetime to query for events after.</span>
+<span class="sd">        Default is 2 days from UTC now</span>
+<span class="sd">    to_dt: datetime, optional</span>
+<span class="sd">        The timespan end datetime to query for events before.</span>
+<span class="sd">        Default is UTC now</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    events: List[EventIngestionModel]</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    cdp_scrapers.instances.__init__.py</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">scraper</span> <span class="o">=</span> <span class="n">HoustonScraper</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">scraper</span><span class="o">.</span><span class="n">get_events</span><span class="p">(</span><span class="n">begin</span><span class="o">=</span><span class="n">from_dt</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">to_dt</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Eva Maxfield Brown.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

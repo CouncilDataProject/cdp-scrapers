@@ -297,7 +297,7 @@
 
 
 <div class="viewcode-block" id="primegov_strftime"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.primegov_strftime">[docs]</a><span class="k">def</span> <span class="nf">primegov_strftime</span><span class="p">(</span><span class="n">dt</span><span class="p">:</span> <span class="n">datetime</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    strftime() in format expected for search by primegov api</span>
 
 <span class="sd">    Parameters</span>
@@ -318,7 +318,7 @@
 
 
 <div class="viewcode-block" id="primegov_strptime"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.primegov_strptime">[docs]</a><span class="k">def</span> <span class="nf">primegov_strptime</span><span class="p">(</span><span class="n">meeting</span><span class="p">:</span> <span class="n">Meeting</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    strptime() on meeting_date_time using expected format commonly used in primegov api</span>
 
 <span class="sd">    Parameters</span>
@@ -357,7 +357,7 @@
 
 
 <div class="viewcode-block" id="load_agenda"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.load_agenda">[docs]</a><span class="k">def</span> <span class="nf">load_agenda</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Agenda</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Load the agenda web page.</span>
 
 <span class="sd">    Parameters</span>
@@ -379,7 +379,7 @@
 
 
 <div class="viewcode-block" id="get_minutes_tables"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_minutes_tables">[docs]</a><span class="k">def</span> <span class="nf">get_minutes_tables</span><span class="p">(</span><span class="n">agenda</span><span class="p">:</span> <span class="n">Agenda</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tag</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return iterator over tables for minutes items.</span>
 
 <span class="sd">    Parameters</span>
@@ -398,7 +398,7 @@
 
 
 <div class="viewcode-block" id="get_minutes_item"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_minutes_item">[docs]</a><span class="k">def</span> <span class="nf">get_minutes_item</span><span class="p">(</span><span class="n">minutes_table</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MinutesItem</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract minutes item name and description.</span>
 
 <span class="sd">    Parameters</span>
@@ -436,7 +436,7 @@
 
 
 <div class="viewcode-block" id="get_support_files_div"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_support_files_div">[docs]</a><span class="k">def</span> <span class="nf">get_support_files_div</span><span class="p">(</span><span class="n">minutes_table</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tag</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Find the &lt;div&gt; containing a minutes item&#39;s support document URLs</span>
 
 <span class="sd">    Parameters</span>
@@ -455,7 +455,7 @@
 
 
 <div class="viewcode-block" id="get_support_files"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_support_files">[docs]</a><span class="k">def</span> <span class="nf">get_support_files</span><span class="p">(</span><span class="n">minutes_table</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">SupportingFile</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract the minutes item&#39;s support file URLs</span>
 
 <span class="sd">    Parameters</span>
@@ -514,7 +514,7 @@
 <div class="viewcode-block" id="get_matter"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_matter">[docs]</a><span class="k">def</span> <span class="nf">get_matter</span><span class="p">(</span>
     <span class="n">minutes_table</span><span class="p">:</span> <span class="n">Tag</span><span class="p">,</span> <span class="n">minutes_item</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">MinutesItem</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Matter</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract matter info from a minutes item &lt;table&gt;</span>
 
 <span class="sd">    Parameters</span>
@@ -544,7 +544,7 @@
     <span class="c1"># ex 2. APPROVED Motion (Buscaino - Lee) - (3) Yes; (0) No</span>
 
     <span class="k">def</span> <span class="nf">_get_matter_text</span><span class="p">(</span><span class="n">minutes_table</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Matter text blob from minutes item &lt;table&gt;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">this_div</span> <span class="o">=</span> <span class="n">minutes_table</span><span class="o">.</span><span class="n">parent</span>
@@ -559,7 +559,7 @@
         <span class="k">return</span> <span class="n">str_simplified</span><span class="p">(</span><span class="n">matter_div</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_extract_status</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        (matter text blob, result status)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">uppercase_word</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^\s*([A-Z]+)&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
@@ -572,7 +572,7 @@
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_name</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Keep just the name in the matter text blob</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">name_end</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s2">&quot; dated&quot;</span><span class="p">)</span>
@@ -584,7 +584,7 @@
         <span class="k">return</span> <span class="n">str_simplified</span><span class="p">(</span><span class="n">text</span><span class="p">[:</span><span class="n">name_end</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">_get_type</span><span class="p">(</span><span class="n">matter_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Last word seems to be appropriate to use as type</span>
 <span class="sd">        e.g. report, motion</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -615,7 +615,7 @@
 
 
 <div class="viewcode-block" id="PrimeGovScraper"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper">[docs]</a><span class="k">class</span> <span class="nc">PrimeGovScraper</span><span class="p">(</span><span class="n">PrimeGovSite</span><span class="p">,</span> <span class="n">IngestionModelScraper</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Adapter for civic_scraper PrimeGovSite in cdp-scrapers</span>
 
 <span class="sd">    See Also</span>
@@ -635,7 +635,7 @@
         <span class="n">matter_rejected_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;rejected|dropped&quot;</span><span class="p">,</span>
         <span class="n">person_aliases</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        client_id: str</span>
@@ -688,7 +688,7 @@
         <span class="p">)</span>
 
 <div class="viewcode-block" id="PrimeGovScraper.get_session"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_session">[docs]</a>    <span class="k">def</span> <span class="nf">get_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meeting</span><span class="p">:</span> <span class="n">Meeting</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Session</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract a Session from a primegov meeting dictionary</span>
 
 <span class="sd">        Parameters</span>
@@ -710,7 +710,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PrimeGovScraper.get_body"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_body">[docs]</a>    <span class="k">def</span> <span class="nf">get_body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meeting</span><span class="p">:</span> <span class="n">Meeting</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Body</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract a Body from a primegov meeting dictionary</span>
 
 <span class="sd">        Parameters</span>
@@ -726,7 +726,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span><span class="n">Body</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">meeting</span><span class="p">[</span><span class="n">BODY_NAME</span><span class="p">])))</span></div>
 
 <div class="viewcode-block" id="PrimeGovScraper.get_minutes_item"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_minutes_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_minutes_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">minutes_table</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">MinutesItem</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract a minutes item from a &lt;table&gt; on agenda web page</span>
 
 <span class="sd">        Parameters</span>
@@ -748,7 +748,7 @@
 <div class="viewcode-block" id="PrimeGovScraper.get_matter"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_matter">[docs]</a>    <span class="k">def</span> <span class="nf">get_matter</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">minutes_table</span><span class="p">:</span> <span class="n">Tag</span><span class="p">,</span> <span class="n">minutes_item</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">MinutesItem</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Matter</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract matter info from a minutes item &lt;table&gt; on agenda web page</span>
 
 <span class="sd">        Parameters</span>
@@ -799,7 +799,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span><span class="n">matter</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PrimeGovScraper.get_event_minutes_item"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_event_minutes_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_event_minutes_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">minutes_table</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EventMinutesItem</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract event minutes item info from a minutes item &lt;table&gt; on agenda web page</span>
 
 <span class="sd">        Parameters</span>
@@ -850,7 +850,7 @@
 <div class="viewcode-block" id="PrimeGovScraper.get_event_minutes_items"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_event_minutes_items">[docs]</a>    <span class="k">def</span> <span class="nf">get_event_minutes_items</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">meeting</span><span class="p">:</span> <span class="n">Meeting</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">EventMinutesItem</span><span class="p">]]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        First find a web page for the given meeting&#39;s agenda.</span>
 <span class="sd">        Then scrape minutes items.</span>
 
@@ -870,7 +870,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">def</span> <span class="nf">_get_output_id</span><span class="p">(</span><span class="n">output_docs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-            <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Extract an agenda output document id</span>
 <span class="sd">            &quot;compiledMeetingDocumentFiles&quot;: [{&quot;id&quot;: 41005, ...}, ...]</span>
 <span class="sd">            &quot;&quot;&quot;</span>
@@ -906,7 +906,7 @@
         <span class="k">def</span> <span class="nf">_get_agenda_and_minutes_tables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="p">(</span>
             <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">Agenda</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tag</span><span class="p">]]]</span>
         <span class="p">):</span>
-            <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Get agenda web page parsed into memory</span>
 <span class="sd">            along with html &lt;table&gt; tags describing the event minutes.</span>
 <span class="sd">            &quot;&quot;&quot;</span>
@@ -927,7 +927,7 @@
         <span class="k">return</span> <span class="n">reduced_list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event_minutes_item</span><span class="p">,</span> <span class="n">minutes_tables</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="PrimeGovScraper.get_event"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_event">[docs]</a>    <span class="k">def</span> <span class="nf">get_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meeting</span><span class="p">:</span> <span class="n">Meeting</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract a EventIngestionModel from a primegov meeting dictionary</span>
 
 <span class="sd">        Parameters</span>
@@ -959,7 +959,7 @@
         <span class="n">begin</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span>
         <span class="n">end</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Meeting</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Query meetings from primegov api endpoint</span>
 
 <span class="sd">        Parameters</span>
@@ -995,7 +995,7 @@
 <div class="viewcode-block" id="PrimeGovScraper.get_events"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_events">[docs]</a>    <span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">begin</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return list of ingested events for the given time period.</span>
 
 <span class="sd">        Parameters</span>

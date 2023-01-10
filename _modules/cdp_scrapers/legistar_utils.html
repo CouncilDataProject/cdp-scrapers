@@ -373,7 +373,7 @@
     <span class="n">body_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return information for a single legistar body in JSON.</span>
 
 <span class="sd">    Parameters</span>
@@ -426,7 +426,7 @@
     <span class="n">person_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return information for a single legistar person in JSON.</span>
 
 <span class="sd">    Parameters</span>
@@ -503,7 +503,7 @@
     <span class="n">begin</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">end</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get all legistar events and each events minutes items, people, and votes, for a</span>
 <span class="sd">    client for a given timespan.</span>
 
@@ -646,7 +646,7 @@
 
 
 <div class="viewcode-block" id="parse_video_page_url"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.parse_video_page_url">[docs]</a><span class="k">def</span> <span class="nf">parse_video_page_url</span><span class="p">(</span><span class="n">video_page_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ContentURIs</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return URLs for videos and captions from a Legistar/Granicus-hosted video web page</span>
 
 <span class="sd">    Parameters</span>
@@ -683,7 +683,7 @@
 
 
 <div class="viewcode-block" id="get_legistar_content_uris"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.get_legistar_content_uris">[docs]</a><span class="k">def</span> <span class="nf">get_legistar_content_uris</span><span class="p">(</span><span class="n">client</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">legistar_ev</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ContentUriScrapeResult</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return URLs for videos and captions from a Legistar/Granicus-hosted video web page</span>
 
 <span class="sd">    Parameters</span>
@@ -784,7 +784,7 @@
 
 
 <div class="viewcode-block" id="LegistarScraper"><a class="viewcode-back" href="../../cdp_scrapers.legistar_utils.LegistarScraper.html#cdp_scrapers.legistar_utils.LegistarScraper">[docs]</a><span class="k">class</span> <span class="nc">LegistarScraper</span><span class="p">(</span><span class="n">IngestionModelScraper</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Base class for transforming Legistar API data to CDP IngestionModel.</span>
 
 <span class="sd">    If get_events() naively fails and raises an error, a given installation must define</span>
@@ -915,7 +915,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">role_replacements</span> <span class="o">=</span> <span class="n">role_replacements</span> <span class="ow">or</span> <span class="p">{}</span></div>
 
 <div class="viewcode-block" id="LegistarScraper.get_matter_status"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_matter_status">[docs]</a>    <span class="k">def</span> <span class="nf">get_matter_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_matter_status</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return appropriate MatterStatusDecision constant from EventItemMatterStatus.</span>
 
 <span class="sd">        Parameters</span>
@@ -975,7 +975,7 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">legistar_item_passed_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return appropriate EventMinutesItemDecision constant from</span>
 <span class="sd">        EventItemPassedFlagName.</span>
 
@@ -1022,7 +1022,7 @@
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="LegistarScraper.get_vote_decision"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_vote_decision">[docs]</a>    <span class="k">def</span> <span class="nf">get_vote_decision</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_vote</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return appropriate VoteDecision constant based on Legistar Vote.</span>
 
 <span class="sd">        Parameters</span>
@@ -1116,7 +1116,7 @@
         <span class="k">return</span> <span class="n">decision</span></div>
 
 <div class="viewcode-block" id="LegistarScraper.get_body"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_body">[docs]</a>    <span class="k">def</span> <span class="nf">get_body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_body</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Body</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return CDP Body for Legistar body.</span>
 
 <span class="sd">        Parameters</span>
@@ -1146,7 +1146,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="LegistarScraper.use_or_replace_role"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.use_or_replace_role">[docs]</a>    <span class="k">def</span> <span class="nf">use_or_replace_role</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">role_title</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Lookup if the provided role title should be replaced with a CDP standard value.</span>
 <span class="sd">        If the provided role title should be replaced, then return the proper</span>
 <span class="sd">        replacement title, otherwise if the title wasn&#39;t found in the role replacement</span>
@@ -1171,7 +1171,7 @@
 <div class="viewcode-block" id="LegistarScraper.get_roles"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_roles">[docs]</a>    <span class="k">def</span> <span class="nf">get_roles</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">legistar_office_records</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Role</span><span class="p">]]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return list of CDP Role from list of legistar OfficeRecord</span>
 
 <span class="sd">        Parameters</span>
@@ -1223,7 +1223,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="LegistarScraper.resolve_person_alias"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.resolve_person_alias">[docs]</a>    <span class="k">def</span> <span class="nf">resolve_person_alias</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">person</span><span class="p">:</span> <span class="n">Person</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Person</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        If input person is in fact an alias of a reference known person,</span>
 <span class="sd">        return the reference person instead.</span>
 <span class="sd">        Else return person as-is.</span>
@@ -1284,7 +1284,7 @@
         <span class="k">return</span> <span class="n">person</span></div>
 
 <div class="viewcode-block" id="LegistarScraper.get_person"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_person">[docs]</a>    <span class="k">def</span> <span class="nf">get_person</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_person</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Person</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return CDP Person for Legistar Person.</span>
 
 <span class="sd">        Parameters</span>
@@ -1331,7 +1331,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="LegistarScraper.get_votes"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_votes">[docs]</a>    <span class="k">def</span> <span class="nf">get_votes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_votes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Vote</span><span class="p">]]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return List[Vote] for Legistar API Votes.</span>
 
 <span class="sd">        Parameters</span>
@@ -1362,7 +1362,7 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">legistar_ev_attachments</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">SupportingFile</span><span class="p">]]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return List[SupportingFile] for Legistar API MatterAttachments.</span>
 
 <span class="sd">        Parameters</span>
@@ -1401,7 +1401,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="LegistarScraper.get_matter"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_matter">[docs]</a>    <span class="k">def</span> <span class="nf">get_matter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_ev</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Matter</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return Matter from Legistar API EventItem.</span>
 
 <span class="sd">        Parameters</span>
@@ -1432,7 +1432,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="LegistarScraper.get_minutes_item"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_minutes_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_minutes_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_ev_item</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">MinutesItem</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return MinutesItem from parts of Legistar API EventItem.</span>
 
 <span class="sd">        Parameters</span>
@@ -1456,7 +1456,7 @@
 <div class="viewcode-block" id="LegistarScraper.fix_event_minutes"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.fix_event_minutes">[docs]</a>    <span class="k">def</span> <span class="nf">fix_event_minutes</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">ev_minutes_item</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EventMinutesItem</span><span class="p">],</span> <span class="n">legistar_ev_item</span><span class="p">:</span> <span class="n">Dict</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EventMinutesItem</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Inspect the MinutesItem and Matter in ev_minutes_item.</span>
 <span class="sd">        - Move some fields between them to make the information more meaningful.</span>
 <span class="sd">        - Enforce matter.result_status when appropriate.</span>
@@ -1503,7 +1503,7 @@
 <div class="viewcode-block" id="LegistarScraper.filter_event_minutes"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.filter_event_minutes">[docs]</a>    <span class="k">def</span> <span class="nf">filter_event_minutes</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">ev_minutes_item</span><span class="p">:</span> <span class="n">EventMinutesItem</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EventMinutesItem</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return None if minutes_item.name contains unimportant text</span>
 <span class="sd">        that we want to ignore</span>
 
@@ -1526,7 +1526,7 @@
 <div class="viewcode-block" id="LegistarScraper.get_event_minutes"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_event_minutes">[docs]</a>    <span class="k">def</span> <span class="nf">get_event_minutes</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">legistar_ev_items</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">EventMinutesItem</span><span class="p">]]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return List[EventMinutesItem] for Legistar API EventItems.</span>
 
 <span class="sd">        Parameters</span>
@@ -1569,7 +1569,7 @@
 
 <div class="viewcode-block" id="LegistarScraper.date_and_time_to_datetime"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.date_and_time_to_datetime">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">date_and_time_to_datetime</span><span class="p">(</span><span class="n">ev_date</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ev_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return datetime from ev_date and ev_time</span>
 
 <span class="sd">        Parameters</span>
@@ -1610,7 +1610,7 @@
             <span class="p">)</span></div>
 
 <div class="viewcode-block" id="LegistarScraper.get_content_uris"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_content_uris">[docs]</a>    <span class="k">def</span> <span class="nf">get_content_uris</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_ev</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ContentURIs</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Must implement in class derived from LegistarScraper.</span>
 <span class="sd">        If Legistar Event.EventVideoPath is used, return an empty list in the override.</span>
 
@@ -1643,7 +1643,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="LegistarScraper.inject_known_person"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.inject_known_person">[docs]</a>    <span class="k">def</span> <span class="nf">inject_known_person</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">person</span><span class="p">:</span> <span class="n">Person</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Person</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Inject information if person exists in static_data.persons</span>
 
 <span class="sd">        Parameters</span>
@@ -1692,7 +1692,7 @@
 <div class="viewcode-block" id="LegistarScraper.inject_known_data"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.inject_known_data">[docs]</a>    <span class="k">def</span> <span class="nf">inject_known_data</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">events</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Augment with long-term static data that changes very infrequently.</span>
 <span class="sd">        e.e. self.static_data which includes Person.picture_uri, Person.seat</span>
 
@@ -1730,7 +1730,7 @@
 <div class="viewcode-block" id="LegistarScraper.post_process_ingestion_models"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.post_process_ingestion_models">[docs]</a>    <span class="k">def</span> <span class="nf">post_process_ingestion_models</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">events</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Called at the end of get_events() for fully custom site-specific prcessing.</span>
 <span class="sd">        inject_known_data() already operated on input events.</span>
 
@@ -1751,7 +1751,7 @@
         <span class="n">begin</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">end</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calls get_legistar_events_for_timespan to retrieve Legistar API data</span>
 <span class="sd">        and return as List[EventIngestionModel]</span>
 
@@ -1834,7 +1834,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_legistar_compatible</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check that Legistar API recognizes client name.</span>
 
 <span class="sd">        Returns</span>
@@ -1850,7 +1850,7 @@
             <span class="k">return</span> <span class="kc">False</span>
 
 <div class="viewcode-block" id="LegistarScraper.check_for_cdp_min_ingestion"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.check_for_cdp_min_ingestion">[docs]</a>    <span class="k">def</span> <span class="nf">check_for_cdp_min_ingestion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">check_days</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">7</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Test if can obtain at least one minimally defined EventIngestionModel</span>
 
 <span class="sd">        Parameters</span>
