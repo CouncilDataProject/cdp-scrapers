@@ -6,7 +6,7 @@ from typing import Callable, Dict, List, NamedTuple, Optional
 
 from bs4 import BeautifulSoup
 from cdp_backend.pipeline.ingestion_models import Body, Person, Seat
-from dataclasses_json import dataclass_json
+from dataclasses_json import DataClassJsonMixin
 
 ###############################################################################
 
@@ -16,9 +16,8 @@ class ContentURIs(NamedTuple):
     caption_uri: Optional[str] = None
 
 
-@dataclass_json
 @dataclass
-class ScraperStaticData:
+class ScraperStaticData(DataClassJsonMixin):
     seats: Dict[str, Seat] = None
     primary_bodies: Dict[str, Body] = None
     persons: Dict[str, Person] = None
