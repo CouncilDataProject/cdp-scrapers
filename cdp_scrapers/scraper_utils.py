@@ -197,7 +197,8 @@ def parse_static_file(file_path: Path) -> ScraperStaticData:
         # as "name" is a required field in Seat class.
         for k in persons:
             if "name" not in persons[k]["seat"]:
-                # assuming that the original persons[k]["seat"] is a single string (like Mayor, etc).
+                # assuming that the original persons[k]["seat"] 
+                # is a single string (like Mayor, etc).
                 persons[k]["seat"] = {"name": persons[k]["seat"]}
 
         static_json = {
@@ -205,7 +206,6 @@ def parse_static_file(file_path: Path) -> ScraperStaticData:
             "persons": persons,
             "primary_bodies": primary_bodies,
         }
-        
         log.debug(
             f"ScraperStaticData parsed from {file_path}:\n"
             f"    seats: {list(seats.keys())}\n"
