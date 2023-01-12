@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from dataclasses import dataclass
 from typing import Callable, Dict, List, NamedTuple, Optional
 
 from bs4 import BeautifulSoup
 from cdp_backend.pipeline.ingestion_models import Body, Person, Seat
+from dataclasses_json import dataclass_json
 
 ###############################################################################
 
@@ -14,7 +16,9 @@ class ContentURIs(NamedTuple):
     caption_uri: Optional[str] = None
 
 
-class ScraperStaticData(NamedTuple):
+@dataclass_json
+@dataclass
+class ScraperStaticData:
     seats: Dict[str, Seat] = None
     primary_bodies: Dict[str, Body] = None
     persons: Dict[str, Person] = None

@@ -188,41 +188,32 @@ def parse_static_file(file_path: Path) -> ScraperStaticData:
     Function looks for "seats", "primary_bodies", "persons" top-level keys
     """
     with open(file_path) as static_file:
-        static_json: Dict[str, Dict[str, Any]] = json.load(static_file)
+        static_json = json.load(static_file)
+        seats = static_json["seats"]
+        persons = dict(dict(static_json)["persons"])
+        primary_bodies = static_json["primary_bodies"]
 
-        if "seats" not in static_json:
-            seats: Dict[str, Seat] = {}
-        else:
-            seats: Dict[str, Seat] = {
-                seat_name: Seat.from_dict(seat)
-                for seat_name, seat in static_json["seats"].items()
-            }
+        # This is necessary for deserialization
+        # as "name" is a required field in Seat class.
+        for k in persons:
+            if "name" not in persons[k]["seat"]:
+                # assuming that the original persons[k]["seat"] is a single string (like Mayor, etc).
+                persons[k]["seat"] = {"name": persons[k]["seat"]}
 
-        if "primary_bodies" not in static_json:
-            primary_bodies: Dict[str, Body] = {}
-        else:
-            primary_bodies: Dict[str, Body] = {
-                body_name: Body.from_dict(body)
-                for body_name, body in static_json["primary_bodies"].items()
-            }
-
-        if "persons" not in static_json:
-            known_persons: Dict[str, Person] = {}
-        else:
-            known_persons: Dict[str, Person] = {
-                person_name: parse_static_person(person, seats, primary_bodies)
-                for person_name, person in static_json["persons"].items()
-            }
-
+        static_json = {
+            "seats": seats,
+            "persons": persons,
+            "primary_bodies": primary_bodies,
+        }
+        
         log.debug(
             f"ScraperStaticData parsed from {file_path}:\n"
             f"    seats: {list(seats.keys())}\n"
             f"    primary_bodies: {list(primary_bodies.keys())}\n"
-            f"    persons: {list(known_persons.keys())}\n"
+            f"    persons: {list(persons.keys())}\n"
         )
-        return ScraperStaticData(
-            seats=seats, primary_bodies=primary_bodies, persons=known_persons
-        )
+
+        return ScraperStaticData.from_dict(static_json)
 
 
 def sanitize_roles(

@@ -19,7 +19,7 @@ Ready to contribute? Here's how to set up `cdp-scrapers` for local development.
 
     ```bash
     cd cdp-scrapers/
-    pip install -e .[dev]
+    pip install -e '.[dev]'
     ```
 
 4. Create a branch for local development:
