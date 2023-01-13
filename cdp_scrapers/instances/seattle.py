@@ -72,14 +72,11 @@ class SeattleScraper(LegistarScraper):
         )
 
         try:
+            url = "https://seattlechannel.org/"
             urlopen("https://seattlechannel.org/")
-        except URLError:
-            pass
-        else:
-            raise Exception(
-                "seattlechannel.org may have fixed their SSL cert. "
-                "Check and fix 'requests.get(*, verify=False)' calls"
-            )
+        except URLError as ue:
+            log.error(f"Unable to reach {url}", ue)
+            return
 
     def parse_content_uris(
         self, video_page_url: str, event_short_date: str
