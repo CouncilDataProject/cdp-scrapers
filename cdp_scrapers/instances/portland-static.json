@@ -45,7 +45,9 @@
             "phone": "503-823-4120",
             "website": "https://www.portland.gov/wheeler",
             "picture_uri": "https://www.portland.gov/sites/default/files/styles/4x5_320w/public/2020-03/mayor-wheeler-headshot-4x5-3-5-2020.jpg",
-            "seat": "Mayor",
+            "seat": {
+                "name": "Mayor"
+            },
             "roles": [
                 {
                     "title":  "Council President",
@@ -112,7 +114,9 @@
             "phone": "503-823-3008",
             "website": "https://www.portland.gov/rubio",
             "picture_uri": "https://www.portland.gov/sites/default/files/styles/4x5_320w/public/2021/carmen-rubio.jpg",
-            "seat": "Position 1",
+            "seat": {
+                "name": "Position 1"
+            },
             "roles": [
                 {
                     "title":  "Councilmember",
@@ -155,7 +159,9 @@
             "phone": "503-823-3589",
             "website": "https://www.portland.gov/ryan",
             "picture_uri": "https://www.portland.gov/sites/default/files/styles/4x5_320w/public/2021/katalina-berbari-2_0.jpg",
-            "seat": "Position 2",
+            "seat": {
+                "name": "Position 2"
+            },
             "roles": [
                 {
                     "title":  "Councilmember",
@@ -192,7 +198,9 @@
             "phone": "503-823-4151",
             "website": "https://www.portland.gov/hardesty",
             "picture_uri": "https://www.portland.gov/sites/default/files/styles/max_540w/public/2020-01/jo-ann-hardesty-portrait-about-page.jpg",
-            "seat": "Position 3",
+            "seat": {
+                "name": "Position 3"
+            },
             "roles": [
                 {
                     "title":  "Councilmember",
@@ -235,7 +243,9 @@
             "phone": "503-823-4682",
             "website": "https://www.portland.gov/mapps",
             "picture_uri": "https://www.portland.gov/sites/default/files/styles/4x5_320w/public/2021/minguswattributionjpegcrop2_0.jpg",
-            "seat": "Position 4",
+            "seat": {
+                "name": "Position 4"
+            },
             "roles": [
                 {
                     "title":  "Councilmember",
@@ -272,7 +282,9 @@
             "phone": "503-823-4078",
             "website": "https://www.portland.gov/auditor/hull-caballero",
             "picture_uri": "https://www.portland.gov/sites/default/files/styles/4x5_640w/public/2021/mary-hull-caballero_headshot.jpg",
-            "seat": "Auditor",
+            "seat": {
+                "name": "Auditor"
+            },
             "roles": [
                 {
                     "title":  "Councilmember",

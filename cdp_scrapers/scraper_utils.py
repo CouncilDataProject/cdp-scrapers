@@ -1,4 +1,3 @@
-import json
 import re
 from copy import deepcopy
 from datetime import datetime, timedelta
@@ -187,33 +186,8 @@ def parse_static_file(file_path: Path) -> ScraperStaticData:
     -----
     Function looks for "seats", "primary_bodies", "persons" top-level keys
     """
-    with open(file_path) as static_file:
-        static_json = json.load(static_file)
-        seats = static_json["seats"]
-        persons = dict(dict(static_json)["persons"])
-        primary_bodies = static_json["primary_bodies"]
-
-        # This is necessary for deserialization
-        # as "name" is a required field in Seat class.
-        for k in persons:
-            if "name" not in persons[k]["seat"]:
-                # assuming that the original persons[k]["seat"] 
-                # is a single string (like Mayor, etc).
-                persons[k]["seat"] = {"name": persons[k]["seat"]}
-
-        static_json = {
-            "seats": seats,
-            "persons": persons,
-            "primary_bodies": primary_bodies,
-        }
-        log.debug(
-            f"ScraperStaticData parsed from {file_path}:\n"
-            f"    seats: {list(seats.keys())}\n"
-            f"    primary_bodies: {list(primary_bodies.keys())}\n"
-            f"    persons: {list(persons.keys())}\n"
-        )
-
-        return ScraperStaticData.from_dict(static_json)
+    with open(file_path, "r") as static_file:
+        return ScraperStaticData.from_json(static_file.read())
 
 
 def sanitize_roles(

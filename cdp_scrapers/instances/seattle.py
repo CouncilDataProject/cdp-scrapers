@@ -73,10 +73,9 @@ class SeattleScraper(LegistarScraper):
 
         try:
             url = "https://seattlechannel.org/"
-            urlopen("https://seattlechannel.org/")
+            urlopen(url)
         except URLError as ue:
-            log.error(f"Unable to reach {url}", ue)
-            return
+            raise Exception(f"Unable to reach {url}: {ue}")
 
     def parse_content_uris(
         self, video_page_url: str, event_short_date: str

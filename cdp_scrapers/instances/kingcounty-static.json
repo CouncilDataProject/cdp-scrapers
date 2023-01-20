@@ -63,7 +63,9 @@
             "phone": "206-477-1001",
             "website": "https://kingcounty.gov/council/dembowski.aspx",
             "picture_uri": "https://kingcounty.gov/~/media/council/images/2018/Dembowski_2x3_print.ashx",
-            "seat": "Position 1",
+            "seat": {
+                "name": "Position 1"
+            },
             "roles": [
                 {
                     "body": "Metropolitan King County Council",
@@ -88,7 +90,9 @@
             "phone": "206-477-1002",
             "website": "https://kingcounty.gov/council/zahilay",
             "picture_uri": "https://kingcounty.gov/~/media/council/Zahilay/Zahilay_DSC8834_2x3.ashx",
-            "seat": "Position 2",
+            "seat": {
+                "name": "Position 2"
+            },
             "roles": [
                 {
                     "body": "Metropolitan King County Council",
@@ -113,7 +117,9 @@
             "phone": "206-477-1003",
             "website": "https://kingcounty.gov/council/lambert",
             "picture_uri": "https://kingcounty.gov/~/media/Lambert/images/2019/Lambert_2020_2x3.ashx",
-            "seat": "Position 3",
+            "seat": {
+                "name": "Position 3"
+            },
             "roles": [
                 {
                     "body": "Metropolitan King County Council",
@@ -138,7 +144,9 @@
             "phone": "206-477-1003",
             "website": "https://kingcounty.gov/council/perry.aspx",
             "picture_uri": "https://kingcounty.gov/council/~/media/council/perry/KCC_SarahPerry.ashx",
-            "seat": "Position 3",
+            "seat": {
+                "name": "Position 3"
+            },
             "roles": [
                 {
                     "body": "Metropolitan King County Council",
@@ -163,7 +171,9 @@
             "phone": "206-477-1004",
             "website": "https://kingcounty.gov/council/kohl-welles.aspx",
             "picture_uri": "https://kingcounty.gov/~/media/council/kohl-welles/images/2020/Kohl_Wells_2x3_print.ashx",
-            "seat": "Position 4",
+            "seat": {
+                "name": "Position 4"
+            },
             "roles": [
                 {
                     "body": "Metropolitan King County Council",
@@ -194,7 +204,9 @@
             "phone": "206-477-1005",
             "website": "https://kingcounty.gov/council/upthegrove.aspx",
             "picture_uri": "https://kingcounty.gov/~/media/council/images/2018/Upthegove_2x3_print.ashx",
-            "seat": "Position 5",
+            "seat": {
+                "name": "Position 5"
+            },
             "roles": [
                 {
                     "body": "Metropolitan King County Council",
@@ -219,7 +231,9 @@
             "phone": "206-477-1006",
             "website": "https://kingcounty.gov/council/balducci.aspx",
             "picture_uri": "https://kingcounty.gov/~/media/council/balducci/images/2021/Balducci_highres.ashx",
-            "seat": "Position 6",
+            "seat": {
+                "name": "Position 6"
+            },
             "roles": [
                 {
                     "body": "Metropolitan King County Council",
@@ -250,7 +264,9 @@
             "phone": "206-477-1007",
             "website": "https://kingcounty.gov/council/vonreichbauer",
             "picture_uri": "https://kingcounty.gov/~/media/council/images/2018/von_Reichbauer_2x3_print.ashx",
-            "seat": "Position 7",
+            "seat": {
+                "name": "Position 7"
+            },
             "roles": [
                 {
                     "body": "Metropolitan King County Council",
@@ -275,7 +291,9 @@
             "phone": "206-477-1008",
             "website": "https://kingcounty.gov/council/mcdermott.aspx",
             "picture_uri": "https://kingcounty.gov/~/media/council/images/joecropped.ashx",
-            "seat": "Position 8",
+            "seat": {
+                "name": "Position 8"
+            },
             "roles": [
                 {
                     "body": "Metropolitan King County Council",
@@ -300,7 +318,9 @@
             "phone": "206-477-1009",
             "website": "https://kingcounty.gov/council/dunn",
             "picture_uri": "https://kingcounty.gov/~/media/Dunn/images/2019/Dunn_DSC8750_2x3.ashx",
-            "seat": "Position 9",
+            "seat": {
+                "name": "Position 9"
+            },
             "roles": [
                 {
                     "body": "Metropolitan King County Council",
