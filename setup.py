@@ -86,6 +86,6 @@ setup(
     url="https://github.com/CouncilDataProject/cdp-scrapers",
     # Do not edit this string manually, always use bumpversion
     # Details in CONTRIBUTING.rst
-    version="0.6.0",
+    version="0.6.1",
     zip_safe=False,
 )
