@@ -44,6 +44,7 @@ requirements = [
     "requests~=2.25",
     "clean-text~=0.6.0",
     "civic-scraper~=0.2.5",
+    "yt-dlp~=2023.3.4",
 ]
 
 extra_requirements = {
