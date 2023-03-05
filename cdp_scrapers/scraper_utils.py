@@ -108,10 +108,9 @@ def parse_static_person(
     """
     log.debug(f"Begin parsing static data for {person_json['name']}")
 
-    person: Person = Person.from_dict(
-        # "seat" and "roles" are not direct serializations of Seat/Role
-        {k: v for k, v in person_json.items() if k != "seat" and k != "roles"}
-    )
+    # "seat" and "roles" are not direct serializations of Seat/Role
+    kwargs = {k: v for k, v in person_json.items() if k != "seat" and k != "roles"}
+    person: Person = Person(**kwargs)
     if "seat" not in person_json:
         log.debug("Seat name not given")
         return person
@@ -145,16 +144,16 @@ def parse_static_person(
                 f"{role_json['title']} is not a RoleTitle constant."
             )
         else:
-            role: Role = Role.from_dict(
-                {k: v for k, v in role_json.items() if k != "body"}
-            )
+            kwargs = {k: v for k, v in role_json.items() if k != "body"}
+            role: Role = Role(**kwargs)
             if isinstance(role_json["body"], str):
                 role.body = primary_bodies[role_json["body"]]
             else:
                 # This role.body is a dictionary and defines a non-primary one
                 # e.g. like a committee such as Transportation
                 # that is not the main/full council
-                role.body = Body.from_dict(role_json["body"])
+                kwargs = role_json["body"]
+                role.body = Body(**kwargs)
 
             if person.seat.roles is None:
                 person.seat.roles = [role]
@@ -194,7 +193,7 @@ def parse_static_file(file_path: Path) -> ScraperStaticData:
             seats: Dict[str, Seat] = {}
         else:
             seats: Dict[str, Seat] = {
-                seat_name: Seat.from_dict(seat)
+                seat_name: Seat(**seat)
                 for seat_name, seat in static_json["seats"].items()
             }
 
@@ -202,7 +201,7 @@ def parse_static_file(file_path: Path) -> ScraperStaticData:
             primary_bodies: Dict[str, Body] = {}
         else:
             primary_bodies: Dict[str, Body] = {
-                body_name: Body.from_dict(body)
+                body_name: Body(**body)
                 for body_name, body in static_json["primary_bodies"].items()
             }
 
