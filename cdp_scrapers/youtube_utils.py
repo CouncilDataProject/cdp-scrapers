@@ -8,6 +8,7 @@ from logging import getLogger
 from typing import Any, Dict, Iterator, List, Optional
 from urllib.parse import quote_plus
 
+import pytz
 from cdp_backend.pipeline.ingestion_models import Body, EventIngestionModel, Session
 from yt_dlp import YoutubeDL
 
@@ -136,7 +137,9 @@ class YoutubeIngestionScraper(IngestionModelScraper):
         e.g. January 1, 1960
         """
         date_match = re.search(r"[a-z]+ \d{1,2}, \d{4}", title, re.I)
-        return datetime.strptime(date_match.group(), "%B %d, %Y")
+        date_time = datetime.strptime(date_match.group(), "%B %d, %Y")
+        date_time = self.localize_datetime(date_time)
+        return date_time
 
     def get_session(self, video_info: Dict[str, Any]) -> Optional[Session]:
         """
@@ -259,6 +262,8 @@ class YoutubeIngestionScraper(IngestionModelScraper):
         if end is None:
             end = datetime.utcnow()
 
+        begin = pytz.utc.localize(begin)
+        end = pytz.utc.localize(end)
         events = self.iter_events(begin=begin, end=end)
         events = reduced_list(events, collapse=False)
         return events
