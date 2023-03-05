@@ -66,21 +66,25 @@ from cdp_scrapers.legistar_utils import parse_video_page_url
             # parser4
             "https://longbeach.granicus.com/MediaPlayer.php?view_id=84&clip_id=13404",
             "longbeach",
-            None,
-            "https://archive-video.granicus.com/longbeach/"
-            + "longbeach_cf37b162-9817-428a-9fcd-b72daca8062a.mp4",
+            "http://longbeach.granicus.com//videos/13404/captions.vtt",
+            (
+                "https://archive-stream.granicus.com/OnDemand/_definst_/"
+                "mp4:archive/longbeach/longbeach_cf37b162-9817-428a-9fcd-b72daca8062a.mp4/playlist.m3u8"
+            ),
         ),
         (
             # parser4
             "https://richmondva.granicus.com/MediaPlayer.php?view_id=1&clip_id=3271",
             "richmondva",
-            None,
-            "https://archive-video.granicus.com/richmondva/"
-            + "richmondva_870c84ae-9614-44a3-a65b-a3e79c56426d.mp4",
+            "http://richmondva.granicus.com//videos/3271/captions.vtt",
+            (
+                "https://archive-stream.granicus.com/OnDemand/_definst_/"
+                "mp4:archive/richmondva/richmondva_870c84ae-9614-44a3-a65b-a3e79c56426d.mp4/playlist.m3u8"
+            ),
         ),
     ],
 )
-def test_str_simplifed(
+def test_parse_video_page_url(
     video_page_url: str, client: str, expected_caption_uri: str, expected_video_uri: str
 ):
     assert (
