@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from itertools import groupby
 from logging import getLogger
 from typing import Any, Dict, Iterator, List, Optional
-from urllib.parse import quote_plus, urljoin
+from urllib.parse import quote_plus
 
 from cdp_backend.pipeline.ingestion_models import Body, EventIngestionModel, Session
 from yt_dlp import YoutubeDL
@@ -61,7 +61,7 @@ def urljoin_search_query(
     if not any(search_term):
         raise ValueError("Empty search terms")
 
-    channel_url = urljoin("https://www.youtube.com", f"@{channel_name}")
+    channel_url = f"https://www.youtube.com/@{channel_name}"
     query = f"search?query={search_term}"
     url = f"{channel_url}/{query}"
     return url
