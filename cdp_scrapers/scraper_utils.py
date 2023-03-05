@@ -83,6 +83,7 @@ def parse_static_person(
     person_json: Dict[str, Any],
     all_seats: Dict[str, Seat],
     primary_bodies: Dict[str, Body],
+    timezone: pytz.timezone,
 ) -> Person:
     """
     Parse Dict[str, Any] for a person in static data file to a Person instance.
@@ -145,6 +146,18 @@ def parse_static_person(
             )
         else:
             kwargs = {k: v for k, v in role_json.items() if k != "body"}
+            try:
+                log.debug(f"{kwargs} -> {Role.from_dict(kwargs)}")
+            except:
+                pass
+            else:
+                raise NotImplementedError("We can resume using from_dict")
+
+            dt_val = kwargs.get("start_datetime")
+            kwargs["start_datetime"] = dt_val if dt_val is None else timezone.localize(datetime.fromtimestamp(dt_val))
+            dt_val = kwargs.get("end_datetime")
+            kwargs["end_datetime"] = dt_val if dt_val is None else timezone.localize(datetime.fromtimestamp(dt_val))
+
             role: Role = Role(**kwargs)
             if isinstance(role_json["body"], str):
                 role.body = primary_bodies[role_json["body"]]
@@ -163,7 +176,7 @@ def parse_static_person(
     return person
 
 
-def parse_static_file(file_path: Path) -> ScraperStaticData:
+def parse_static_file(file_path: Path, timezone: str) -> ScraperStaticData:
     """
     Parse Seats, Bodies and Persons from static data JSON
 
@@ -208,8 +221,9 @@ def parse_static_file(file_path: Path) -> ScraperStaticData:
         if "persons" not in static_json:
             known_persons: Dict[str, Person] = {}
         else:
+            timezone = pytz.timezone(timezone)
             known_persons: Dict[str, Person] = {
-                person_name: parse_static_person(person, seats, primary_bodies)
+                person_name: parse_static_person(person, seats, primary_bodies, timezone)
                 for person_name, person in static_json["persons"].items()
             }
 

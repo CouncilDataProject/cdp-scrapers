@@ -56,7 +56,7 @@ class KingCountyScraper(LegistarScraper):
                 "This is a mandatory referral to the",
                 "Watch King County TV Channel 22",
             ],
-            static_data=parse_static_file(STATIC_FILE_DEFAULT_PATH),
+            static_data=parse_static_file(STATIC_FILE_DEFAULT_PATH, "America/Los_Angeles"),
             role_replacements={
                 "Boardmember": RoleTitle.MEMBER,
                 "Mr.": RoleTitle.MEMBER,

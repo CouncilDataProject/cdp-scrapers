@@ -204,8 +204,12 @@ class YoutubeIngestionScraper(IngestionModelScraper):
             )
 
             video_info_list = get_video_info(query_url=url)
+            # YouTube search _can_ include results that do not include the search terms.
+            # We need to double-check the video title
+            # for the body name and event date
+
             video_info_list = filter(
-                lambda info: re.search(search_terms, info["title"], re.I) is not None,
+                lambda info: search_terms in info["title"].lower(),
                 video_info_list,
             )
 
