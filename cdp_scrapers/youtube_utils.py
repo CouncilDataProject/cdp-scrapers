@@ -212,7 +212,7 @@ class YoutubeIngestionScraper(IngestionModelScraper):
             # for the body name and event date
 
             video_info_list = filter(
-                lambda info: search_terms in info["title"].lower(),
+                lambda info: search_terms.lower() in info["title"].lower(),
                 video_info_list,
             )
 
