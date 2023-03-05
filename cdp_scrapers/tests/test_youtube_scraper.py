@@ -22,7 +22,7 @@ from cdp_scrapers.youtube_utils import (
             (
                 "https://www.youtube.com/@BellevueTelevision/"
                 "search?query=city+council+meeting+"
-                "after%3A2023-02-05+before%3A2023-02-10",
+                "after%3A2023-02-05+before%3A2023-02-10"
             ),
         ),
         (
@@ -32,7 +32,7 @@ from cdp_scrapers.youtube_utils import (
             None,
             (
                 "https://www.youtube.com/@BellevueTelevision/"
-                "search?query=city+council+meeting+after%3A2023-02-05",
+                "search?query=city+council+meeting+after%3A2023-02-05"
             ),
         ),
         (
@@ -42,7 +42,7 @@ from cdp_scrapers.youtube_utils import (
             datetime(2023, 2, 10),
             (
                 "https://www.youtube.com/@BellevueTelevision/"
-                "search?query=city+council+meeting+before%3A2023-02-10",
+                "search?query=city+council+meeting+before%3A2023-02-10"
             ),
         ),
         ("BellevueTelevision", "city council meeting", None, None, None),
@@ -53,7 +53,7 @@ def test_search_url(channel, search_terms, begin, end, expected_url):
         query_url = urljoin_search_query(
             channel_name=channel, search_terms=search_terms, begin=begin, end=end
         )
-        assert query_url == expected_url
+        assert query_url == str(expected_url)
     except ValueError:
         assert expected_url is None
 
@@ -65,7 +65,7 @@ def test_search_url(channel, search_terms, begin, end, expected_url):
             (
                 "https://www.youtube.com/@BellevueTelevision/"
                 "search?query=city+council+meeting+"
-                "after%3A2023-02-05+before%3A2023-02-10",
+                "after%3A2023-02-05+before%3A2023-02-10"
             ),
             ["axUJRaHfgTc"],
         ),
