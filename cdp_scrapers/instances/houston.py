@@ -18,15 +18,15 @@ class HoustonScraper(IngestionModelScraper):
 
     def remove_extra_type(self, element: Union[Tag, NavigableString, None]) -> Tag:
         """
-        Remove types that are not useful
+        Remove types that are not useful.
 
         Parameter:
         ----------------
         element: Union[Tag, NavigableString, None]
             The element in the page that we want to scrape
 
-        Returns:
-        ----------------
+        Returns
+        -------
         Tag
             Same elements as received, assuming the elements are not null
         """
@@ -36,40 +36,40 @@ class HoustonScraper(IngestionModelScraper):
 
     def get_body_name(self, event: Union[Tag, NavigableString, None]) -> str:
         """
-        Get the body name for an event
+        Get the body name for an event.
 
         Parameter:
         ----------------
         event: Union[Tag, NavigableString, None]
             All elements in the page that we want to scrape
 
-        Returns:
-        ----------------
+        Returns
+        -------
         str
             The body name
         """
         log.info("start get body name")
         event = self.remove_extra_type(event)
-        bodyTable = event.find_all("table")[1].find("table")
-        if "CITY COUNCIL" in bodyTable.text:
+        body_table = event.find_all("table")[1].find("table")
+        if "CITY COUNCIL" in body_table.text:
             return "City Council"
         else:
-            return bodyTable.find_all("span")[3].text.title()
+            return body_table.find_all("span")[3].text.title()
 
     def get_event_minutes_item(
         self,
         event: Union[Tag, NavigableString, None],
     ) -> List[ingestion_models.EventMinutesItem]:
         """
-        Parse the page and gather the event minute items
+        Parse the page and gather the event minute items.
 
         Parameter:
         ----------------
         event: Union[Tag, NavigableString, None]
             All elements in the page that we want to scrape
 
-        Returns:
-        ----------------
+        Returns
+        -------
         List[ingestion_models.EventMinutesItem]
             All the event minute items gathered from the event on the page
         """
@@ -101,13 +101,13 @@ class HoustonScraper(IngestionModelScraper):
         years are stored in different tabs. Can get multiple events
         across years.
 
-        Parameters:
-        ---------------
+        Parameters
+        ----------
         event_date: datetime
             The date of the event we are trying to parse
 
-        Returns:
-        ---------------
+        Returns
+        -------
         str
             The year id that can locate the year tab where the event is stored
         """
@@ -119,13 +119,13 @@ class HoustonScraper(IngestionModelScraper):
         """
         Find the main link for one event.
 
-        Parameters:
-        --------------
+        Parameters
+        ----------
         element: Tag
             The element of one event
 
-        Returns:
-        --------------
+        Returns
+        -------
         str
             The main link for this event
         """
@@ -135,15 +135,15 @@ class HoustonScraper(IngestionModelScraper):
 
     def get_agenda(self, element: Tag) -> Union[Tag, NavigableString, None]:
         """
-        Get event agenda for a specific details page
+        Get event agenda for a specific details page.
 
-        Parameters:
-        ----------------
+        Parameters
+        ----------
         element: Tag
             The element from which we want to get agenda
 
-        Returns:
-        ----------------
+        Returns
+        -------
         Tag
             The agenda web page we want parse
         """
@@ -159,15 +159,17 @@ class HoustonScraper(IngestionModelScraper):
     ) -> ingestion_models.EventIngestionModel:
         """
         Parse one event at a specific date. City council meeting information for
-        a specific date
+        a specific date.
 
-        Parameters:
-        --------------
-        date: the date of this meeting
-        element: the meeting Tag element
+        Parameters
+        ----------
+        date: str
+            the date of this meeting
+        element: Tag
+            the meeting Tag element
 
-        Returns:
-        --------------
+        Returns
+        -------
         ingestion_models.EventIngestionModel
             EventIngestionModel for one meeting date
         """
@@ -192,17 +194,17 @@ class HoustonScraper(IngestionModelScraper):
         self, time_from: datetime, time_to: datetime
     ) -> Dict[str, Tag]:
         """
-        Get all the meetings in a range of dates
+        Get all the meetings in a range of dates.
 
-        Parameters:
-        --------------
+        Parameters
+        ----------
         time_from: datetime
             Earliest meeting date to look at
         time_to: datetime
             Latest meeting date to look at
 
-        Returns:
-        --------------
+        Returns
+        -------
         Dict[str, Tag]
             Dictionary of mapping between the date of the meeting and the element for
             the meeting in that date
@@ -211,7 +213,7 @@ class HoustonScraper(IngestionModelScraper):
             raise ValueError(
                 "time_from and time_to are in different years, which is not supported"
             )
-        date_years = dict()
+        date_years = {}
         main_url = "https://houstontx.new.swagit.com/views/408"
         main_page = requests.get(main_url)
         main = BeautifulSoup(main_page.content, "html.parser")
@@ -235,24 +237,24 @@ class HoustonScraper(IngestionModelScraper):
         self, from_dt: datetime, to_dt: datetime
     ) -> List[ingestion_models.EventIngestionModel]:
         """
-        Get all city council meetings information within a specific time range
+        Get all city council meetings information within a specific time range.
 
-        Parameters:
-        --------------
+        Parameters
+        ----------
         from_dt: datetime
             The start date of the time range
         to_dt: datetime
             The end date of the time range
 
-        Returns:
-        --------------
+        Returns
+        -------
         list[ingestion_models.EventIngestionModel]
             A list of EventIngestionModel that contains all city council
             meetings information within a specific time range
         """
         events = []
         d = self.get_all_elements_in_range(from_dt, to_dt)
-        for date, element in d.items():
+        for date, _element in d.items():
             events.append(self.get_event(date, d[date]))
         return events
 
@@ -276,6 +278,8 @@ def get_houston_events(
     to_dt: datetime, optional
         The timespan end datetime to query for events before.
         Default is UTC now
+    kwargs: Any
+        Any extra keyword arguments to pass to the get_events function.
 
     Returns
     -------

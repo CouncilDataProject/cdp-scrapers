@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+
+from __future__ import annotations
 
 import enum
 import logging
@@ -7,7 +8,7 @@ import re
 from copy import deepcopy
 from datetime import datetime, timedelta
 from json import JSONDecodeError
-from typing import Any, Dict, List, NamedTuple, Optional, Set
+from typing import Any, NamedTuple
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote_plus
 from urllib.request import urlopen
@@ -112,17 +113,17 @@ LEGISTAR_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
 ###############################################################################
 
 
-known_legistar_persons: Dict[int, Dict[str, Any]] = {}
-known_legistar_bodies: Dict[int, Dict[str, Any]] = {}
+known_legistar_persons: dict[int, dict[str, Any]] = {}
+known_legistar_bodies: dict[int, dict[str, Any]] = {}
 # video web page parser type per municipality
-video_page_parser: Dict[str, LegistarContentParser] = {}
+video_page_parser: dict[str, LegistarContentParser] = {}
 
 
 def get_legistar_body(
     client: str,
     body_id: int,
     use_cache: bool = False,
-) -> Optional[Dict[str, Any]]:
+) -> dict[str, Any] | None:
     """
     Return information for a single legistar body in JSON.
 
@@ -175,7 +176,7 @@ def get_legistar_person(
     client: str,
     person_id: int,
     use_cache: bool = False,
-) -> Optional[Dict[str, Any]]:
+) -> dict[str, Any] | None:
     """
     Return information for a single legistar person in JSON.
 
@@ -235,7 +236,7 @@ def get_legistar_person(
             known_legistar_persons[person_id] = person
         return person
 
-    office_records: List[Dict[str, Any]] = response.json()
+    office_records: list[dict[str, Any]] = response.json()
     for record in office_records:
         # body for this role
         record[LEGISTAR_ROLE_BODY] = get_legistar_body(
@@ -250,9 +251,9 @@ def get_legistar_person(
 
 def get_legistar_events_for_timespan(
     client: str,
-    begin: Optional[datetime] = None,
-    end: Optional[datetime] = None,
-) -> List[Dict]:
+    begin: datetime | None = None,
+    end: datetime | None = None,
+) -> list[dict]:
     """
     Get all legistar events and each events minutes items, people, and votes, for a
     client for a given timespan.
@@ -382,6 +383,8 @@ def get_legistar_events_for_timespan(
 
 class ContentUriScrapeResult(NamedTuple):
     class Status(enum.IntEnum):
+        """Status of content parsing."""
+
         # Web page(s) are in unrecognized structure
         UnrecognizedPatternError = -1
         # Error in accessing some resource
@@ -392,12 +395,12 @@ class ContentUriScrapeResult(NamedTuple):
         Ok = 0
 
     status: Status
-    uris: Optional[List[ContentURIs]] = None
+    uris: list[ContentURIs] | None = None
 
 
-def parse_video_page_url(video_page_url: str, client: str) -> List[ContentURIs]:
+def parse_video_page_url(video_page_url: str, client: str) -> list[ContentURIs]:
     """
-    Return URLs for videos and captions from a Legistar/Granicus-hosted video web page
+    Return URLs for videos and captions from a Legistar/Granicus-hosted video web page.
 
     Parameters
     ----------
@@ -432,9 +435,9 @@ def parse_video_page_url(video_page_url: str, client: str) -> List[ContentURIs]:
     return uris
 
 
-def get_legistar_content_uris(client: str, legistar_ev: Dict) -> ContentUriScrapeResult:
+def get_legistar_content_uris(client: str, legistar_ev: dict) -> ContentUriScrapeResult:
     """
-    Return URLs for videos and captions from a Legistar/Granicus-hosted video web page
+    Return URLs for videos and captions from a Legistar/Granicus-hosted video web page.
 
     Parameters
     ----------
@@ -534,7 +537,7 @@ def get_legistar_content_uris(client: str, legistar_ev: Dict) -> ContentUriScrap
 
 
 class LegistarScraper(IngestionModelScraper):
-    """
+    r"""
     Base class for transforming Legistar API data to CDP IngestionModel.
 
     If get_events() naively fails and raises an error, a given installation must define
@@ -613,13 +616,13 @@ class LegistarScraper(IngestionModelScraper):
     --------
     cdp_scrapers.legistar_utils.LegistarScraper.get_content_uris
     cdp_scrapers.instances.seattle.SeattleScraper
-    """  # noqa: W605
+    """
 
     def __init__(
         self,
         client: str,
         timezone: str,
-        ignore_minutes_item_patterns: List[str] = [],
+        ignore_minutes_item_patterns: list[str] | None = None,
         vote_approve_pattern: str = r"approve|favor|yes",
         vote_abstain_pattern: str = r"abstain|refuse|refrain",
         vote_reject_pattern: str = r"reject|oppose|no",
@@ -632,14 +635,17 @@ class LegistarScraper(IngestionModelScraper):
         matter_rejected_pattern: str = r"rejected|dropped",
         minutes_item_decision_passed_pattern: str = r"pass",
         minutes_item_decision_failed_pattern: str = r"not|fail",
-        static_data: Optional[ScraperStaticData] = None,
-        person_aliases: Optional[Dict[str, Set[str]]] = None,
-        role_replacements: Optional[Dict[str, str]] = None,
+        static_data: ScraperStaticData | None = None,
+        person_aliases: dict[str, set[str]] | None = None,
+        role_replacements: dict[str, str] | None = None,
     ):
         super().__init__(timezone=timezone, person_aliases=person_aliases)
 
+        if ignore_minutes_item_patterns is None:
+            ignore_minutes_item_patterns = []
+
         self.client_name: str = client
-        self.ignore_minutes_item_patterns: List[str] = ignore_minutes_item_patterns
+        self.ignore_minutes_item_patterns: list[str] = ignore_minutes_item_patterns
 
         # regex patterns used to infer cdp_backend.database.constants
         # from Legistar string fields
@@ -664,7 +670,7 @@ class LegistarScraper(IngestionModelScraper):
         self.static_data = static_data
         self.role_replacements = role_replacements or {}
 
-    def get_matter_status(self, legistar_matter_status: str) -> Optional[str]:
+    def get_matter_status(self, legistar_matter_status: str) -> str | None:
         """
         Return appropriate MatterStatusDecision constant from EventItemMatterStatus.
 
@@ -724,7 +730,7 @@ class LegistarScraper(IngestionModelScraper):
     def get_minutes_item_decision(
         self,
         legistar_item_passed_name: str,
-    ) -> Optional[str]:
+    ) -> str | None:
         """
         Return appropriate EventMinutesItemDecision constant from
         EventItemPassedFlagName.
@@ -771,7 +777,7 @@ class LegistarScraper(IngestionModelScraper):
         log.debug(f"no EventMinutesItemDecision filter for {legistar_item_passed_name}")
         return None
 
-    def get_vote_decision(self, legistar_vote: Dict) -> Optional[str]:
+    def get_vote_decision(self, legistar_vote: dict) -> str | None:  # noqa: C901
         """
         Return appropriate VoteDecision constant based on Legistar Vote.
 
@@ -865,7 +871,7 @@ class LegistarScraper(IngestionModelScraper):
             log.debug(f"no VoteDecision filter for {vote_value}")
         return decision
 
-    def get_body(self, legistar_body: Dict[str, Any]) -> Optional[Body]:
+    def get_body(self, legistar_body: dict[str, Any]) -> Body | None:
         """
         Return CDP Body for Legistar body.
 
@@ -919,10 +925,10 @@ class LegistarScraper(IngestionModelScraper):
         return role_title
 
     def get_roles(
-        self, legistar_office_records: List[Dict[str, Any]]
-    ) -> Optional[List[Role]]:
+        self, legistar_office_records: list[dict[str, Any]]
+    ) -> list[Role] | None:
         """
-        Return list of CDP Role from list of legistar OfficeRecord
+        Return list of CDP Role from list of legistar OfficeRecord.
 
         Parameters
         ----------
@@ -972,7 +978,7 @@ class LegistarScraper(IngestionModelScraper):
             ]
         )
 
-    def resolve_person_alias(self, person: Person) -> Optional[Person]:
+    def resolve_person_alias(self, person: Person) -> Person | None:
         """
         If input person is in fact an alias of a reference known person,
         return the reference person instead.
@@ -1006,13 +1012,13 @@ class LegistarScraper(IngestionModelScraper):
                 try:
                     # query to get PersonId for the reference person we want to use
                     # in place of the input person
-                    response: List[Dict[str, Any]] = requests.get(
+                    response: list[dict[str, Any]] = requests.get(
                         request_format.format(
                             client=self.client_name, name=quote_plus(name)
                         ),
                     ).json()
                 except JSONDecodeError:
-                    response: List[Dict[str, Any]] = []
+                    response: list[dict[str, Any]] = []
 
                 if len(response) == 0 or LEGISTAR_PERSON_EXT_ID not in response[0]:
                     log.error(
@@ -1033,7 +1039,7 @@ class LegistarScraper(IngestionModelScraper):
         # input person is not an alias of a reference Person
         return person
 
-    def get_person(self, legistar_person: Dict) -> Optional[Person]:
+    def get_person(self, legistar_person: dict) -> Person | None:
         """
         Return CDP Person for Legistar Person.
 
@@ -1080,7 +1086,7 @@ class LegistarScraper(IngestionModelScraper):
             )
         )
 
-    def get_votes(self, legistar_votes: List[Dict]) -> Optional[List[Vote]]:
+    def get_votes(self, legistar_votes: list[dict]) -> list[Vote] | None:
         """
         Return List[Vote] for Legistar API Votes.
 
@@ -1110,8 +1116,8 @@ class LegistarScraper(IngestionModelScraper):
 
     def get_event_supporting_files(
         self,
-        legistar_ev_attachments: List[Dict],
-    ) -> Optional[List[SupportingFile]]:
+        legistar_ev_attachments: list[dict],
+    ) -> list[SupportingFile] | None:
         """
         Return List[SupportingFile] for Legistar API MatterAttachments.
 
@@ -1139,7 +1145,8 @@ class LegistarScraper(IngestionModelScraper):
             ]
         )
 
-    def get_sponsors(self, legistar_sponsors: List[Dict]) -> Optional[List[Person]]:
+    def get_sponsors(self, legistar_sponsors: list[dict]) -> list[Person] | None:
+        """Get legislation sponsors."""
         if not legistar_sponsors:
             return None
 
@@ -1150,7 +1157,7 @@ class LegistarScraper(IngestionModelScraper):
             ]
         )
 
-    def get_matter(self, legistar_ev: Dict) -> Optional[Matter]:
+    def get_matter(self, legistar_ev: dict) -> Matter | None:
         """
         Return Matter from Legistar API EventItem.
 
@@ -1181,7 +1188,7 @@ class LegistarScraper(IngestionModelScraper):
             )
         )
 
-    def get_minutes_item(self, legistar_ev_item: Dict) -> Optional[MinutesItem]:
+    def get_minutes_item(self, legistar_ev_item: dict) -> MinutesItem | None:
         """
         Return MinutesItem from parts of Legistar API EventItem.
 
@@ -1195,7 +1202,6 @@ class LegistarScraper(IngestionModelScraper):
         minutes_item: Optional[MinutesItem]
             None if could not get nonempty MinutesItem.name from EventItem.
         """
-
         return self.get_none_if_empty(
             MinutesItem(
                 external_source_id=str(legistar_ev_item[LEGISTAR_MINUTE_EXT_ID]),
@@ -1204,8 +1210,8 @@ class LegistarScraper(IngestionModelScraper):
         )
 
     def fix_event_minutes(
-        self, ev_minutes_item: Optional[EventMinutesItem], legistar_ev_item: Dict
-    ) -> Optional[EventMinutesItem]:
+        self, ev_minutes_item: EventMinutesItem | None, legistar_ev_item: dict
+    ) -> EventMinutesItem | None:
         """
         Inspect the MinutesItem and Matter in ev_minutes_item.
         - Move some fields between them to make the information more meaningful.
@@ -1252,14 +1258,15 @@ class LegistarScraper(IngestionModelScraper):
 
     def filter_event_minutes(
         self, ev_minutes_item: EventMinutesItem
-    ) -> Optional[EventMinutesItem]:
+    ) -> EventMinutesItem | None:
         """
         Return None if minutes_item.name contains unimportant text
-        that we want to ignore
+        that we want to ignore.
 
         Parameters
         ----------
         ev_minutes_item: EventMinutesItem
+            The minutes item to filter.
 
         Returns
         -------
@@ -1268,14 +1275,14 @@ class LegistarScraper(IngestionModelScraper):
         """
         if not ev_minutes_item.minutes_item or not ev_minutes_item.minutes_item.name:
             return ev_minutes_item
-        for filter in self.ignore_minutes_item_patterns:
-            if re.search(filter, ev_minutes_item.minutes_item.name, re.IGNORECASE):
+        for filter_ in self.ignore_minutes_item_patterns:
+            if re.search(filter_, ev_minutes_item.minutes_item.name, re.IGNORECASE):
                 return None
         return ev_minutes_item
 
     def get_event_minutes(
-        self, legistar_ev_items: List[Dict]
-    ) -> Optional[List[EventMinutesItem]]:
+        self, legistar_ev_items: list[dict]
+    ) -> list[EventMinutesItem] | None:
         """
         Return List[EventMinutesItem] for Legistar API EventItems.
 
@@ -1318,9 +1325,9 @@ class LegistarScraper(IngestionModelScraper):
         )
 
     @staticmethod
-    def date_and_time_to_datetime(ev_date: str, ev_time: Optional[str]) -> datetime:
+    def date_and_time_to_datetime(ev_date: str, ev_time: str | None) -> datetime:
         """
-        Return datetime from ev_date and ev_time
+        Return datetime from ev_date and ev_time.
 
         Parameters
         ----------
@@ -1359,7 +1366,7 @@ class LegistarScraper(IngestionModelScraper):
                 second=0,
             )
 
-    def get_content_uris(self, legistar_ev: Dict) -> List[ContentURIs]:
+    def get_content_uris(self, legistar_ev: dict) -> list[ContentURIs]:
         """
         Must implement in class derived from LegistarScraper.
         If Legistar Event.EventVideoPath is used, return an empty list in the override.
@@ -1394,7 +1401,7 @@ class LegistarScraper(IngestionModelScraper):
 
     def inject_known_person(self, person: Person) -> Person:
         """
-        Inject information if person exists in static_data.persons
+        Inject information if person exists in static_data.persons.
 
         Parameters
         ----------
@@ -1440,11 +1447,11 @@ class LegistarScraper(IngestionModelScraper):
         return person
 
     def inject_known_data(
-        self, events: List[EventIngestionModel]
-    ) -> List[EventIngestionModel]:
+        self, events: list[EventIngestionModel]
+    ) -> list[EventIngestionModel]:
         """
         Augment with long-term static data that changes very infrequently.
-        e.e. self.static_data which includes Person.picture_uri, Person.seat
+        e.e. self.static_data which includes Person.picture_uri, Person.seat.
 
         Parameters
         ----------
@@ -1478,8 +1485,8 @@ class LegistarScraper(IngestionModelScraper):
         return events
 
     def post_process_ingestion_models(
-        self, events: List[EventIngestionModel]
-    ) -> List[EventIngestionModel]:
+        self, events: list[EventIngestionModel]
+    ) -> list[EventIngestionModel]:
         """
         Called at the end of get_events() for fully custom site-specific prcessing.
         inject_known_data() already operated on input events.
@@ -1498,12 +1505,12 @@ class LegistarScraper(IngestionModelScraper):
 
     def get_events(
         self,
-        begin: Optional[datetime] = None,
-        end: Optional[datetime] = None,
-    ) -> List[EventIngestionModel]:
+        begin: datetime | None = None,
+        end: datetime | None = None,
+    ) -> list[EventIngestionModel]:
         """
         Calls get_legistar_events_for_timespan to retrieve Legistar API data
-        and return as List[EventIngestionModel]
+        and return as List[EventIngestionModel].
 
         Parameters
         ----------
@@ -1601,7 +1608,7 @@ class LegistarScraper(IngestionModelScraper):
 
     def check_for_cdp_min_ingestion(self, check_days: int = 7) -> bool:
         """
-        Test if can obtain at least one minimally defined EventIngestionModel
+        Test if can obtain at least one minimally defined EventIngestionModel.
 
         Parameters
         ----------

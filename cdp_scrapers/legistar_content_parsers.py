@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import re
 from typing import List, Optional
@@ -15,13 +14,13 @@ from .types import ContentURIs, LegistarContentParser
 
 def _parse_format_1(client: str, soup: BeautifulSoup) -> Optional[List[ContentURIs]]:
     """
-    Works for milwaukee, kingcounty, phoenix
+    Works for milwaukee, kingcounty, phoenix.
 
     Parameters
     ----------
     client: str
         Which legistar client to target. Ex: "seattle"
-    video web page: BeautifulSoup
+    soup: BeautifulSoup
         Video web page loaded into bs4
 
     Returns
@@ -52,8 +51,8 @@ def _parse_format_1(client: str, soup: BeautifulSoup) -> Optional[List[ContentUR
     # Below two lines of code tries to extract video url from downLoadLinks variable
     # "http:\/\/archive-media.granicus.com:443\/OnDemand\/king\/king_e560cf63-5570-416e-a47d-0e1e13652224.mp4"
     try:
-        downloadLinks = video_script_text.split("[[")[1]
-        video_url = downloadLinks.split('",')[1].strip('"')
+        download_links = video_script_text.split("[[")[1]
+        video_url = download_links.split('",')[1].strip('"')
     except IndexError:
         # split() did not yield expected # items
         return None
@@ -65,13 +64,13 @@ def _parse_format_1(client: str, soup: BeautifulSoup) -> Optional[List[ContentUR
 
 def _parse_format_2(client: str, soup: BeautifulSoup) -> Optional[List[ContentURIs]]:
     """
-    Works for denver
+    Works for denver.
 
     Parameters
     ----------
     client: str
         Which legistar client to target. Ex: "seattle"
-    video web page: BeautifulSoup
+    soup: BeautifulSoup
         Video web page loaded into bs4
 
     Returns
@@ -94,13 +93,13 @@ def _parse_format_2(client: str, soup: BeautifulSoup) -> Optional[List[ContentUR
 
 def _parse_format_3(client: str, soup: BeautifulSoup) -> Optional[List[ContentURIs]]:
     """
-    Works for boston, corpuschristi, elpasotexas
+    Works for boston, corpuschristi, elpasotexas.
 
     Parameters
     ----------
     client: str
         Which legistar client to target. Ex: "seattle"
-    video web page: BeautifulSoup
+    soup: BeautifulSoup
         Video web page loaded into bs4
 
     Returns
@@ -143,13 +142,13 @@ def _parse_format_3(client: str, soup: BeautifulSoup) -> Optional[List[ContentUR
 
 def _parse_format_4(client: str, soup: BeautifulSoup) -> Optional[List[ContentURIs]]:
     """
-    Works for longbeach, richmondva
+    Works for longbeach, richmondva.
 
     Parameters
     ----------
     client: str
         Which legistar client to target. Ex: "seattle"
-    video web page: BeautifulSoup
+    soup: BeautifulSoup
         Video web page loaded into bs4
 
     Returns

@@ -22,7 +22,7 @@ clean:
 
 # install with all deps
 install:
-	pip install -e '.[lint,test,docs,dev]'
+	pip install -e '.[lint,test,docs,dev,all_cities]'
 
 # lint, format, and check all files
 lint:

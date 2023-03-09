@@ -74,7 +74,7 @@ class WebPageSoup(NamedTuple):
 
 def load_web_page(url: Union[str, Request]) -> WebPageSoup:
     """
-    Load web page at url and return content soupified
+    Load web page at url and return content soupified.
 
     Parameters
     ----------
@@ -99,7 +99,7 @@ def load_web_page(url: Union[str, Request]) -> WebPageSoup:
 def make_efile_url(efile_page_url: str) -> str:
     """
     Helper function to get file download link
-    on a Portland EFile hosting web page
+    on a Portland EFile hosting web page.
 
     Parameters
     ----------
@@ -121,7 +121,7 @@ def make_efile_url(efile_page_url: str) -> str:
 def get_disposition(minute_section: Tag) -> str:
     """
     Return disposition string given within minute_section <div>
-    on the event web page
+    on the event web page.
 
     Parameters
     ----------
@@ -145,7 +145,7 @@ def disposition_to_minute_decision(
     disposition: str,
 ) -> Optional[EventMinutesItemDecision]:
     """
-    Decide EventMinutesItemDecision constant from event minute item disposition
+    Decide EventMinutesItemDecision constant from event minute item disposition.
 
     Parameters
     ----------
@@ -169,7 +169,7 @@ def disposition_to_minute_decision(
 
 def separate_name_from_title(title_and_name: str) -> str:
     """
-    Return just name
+    Return just name.
 
     Parameters
     ----------
@@ -205,7 +205,7 @@ class PortlandScraper(IngestionModelScraper):
 
     def get_person(self, name: str) -> Person:
         """
-        Return matching Person from portland-static.json
+        Return matching Person from portland-static.json.
 
         Parameters
         ----------
@@ -293,7 +293,7 @@ class PortlandScraper(IngestionModelScraper):
         self, minute_section: Tag, event_page: BeautifulSoup
     ) -> Optional[Matter]:
         """
-        Make Matter from information in minute_section
+        Make Matter from information in minute_section.
 
         Parameters
         ----------
@@ -307,7 +307,6 @@ class PortlandScraper(IngestionModelScraper):
         matter: Optional[Matter]
             Matter if required information could be parsed from minute_section
         """
-
         # Find title
         title_div = minute_section.find("div", class_="council-document__title")
 
@@ -383,7 +382,7 @@ class PortlandScraper(IngestionModelScraper):
         self, minute_section: Tag
     ) -> Optional[List[SupportingFile]]:
         """
-        Return SupportingFiles for a given EventMinutesItem
+        Return SupportingFiles for a given EventMinutesItem.
 
         Parameters
         ----------
@@ -475,7 +474,7 @@ class PortlandScraper(IngestionModelScraper):
     def get_votes(self, minute_section: Tag) -> Optional[List[Vote]]:
         """
         Look for 'Votes:' in minute_section and
-        create a Vote object for each line
+        create a Vote object for each line.
 
         Parameters
         ----------
@@ -533,7 +532,7 @@ class PortlandScraper(IngestionModelScraper):
     ) -> Optional[List[EventMinutesItem]]:
         """
         Make EventMinutesItem from each relation--type-agenda-item <div>
-        on event_page
+        on event_page.
 
         Parameters
         ----------
@@ -631,7 +630,7 @@ class PortlandScraper(IngestionModelScraper):
     def get_agenda_uri(self, event_page: BeautifulSoup) -> Optional[str]:
         """
         Find the uri for the file containing the agenda for a Portland, OR city
-        council meeting
+        council meeting.
 
         Parameters
         ----------
@@ -659,7 +658,7 @@ class PortlandScraper(IngestionModelScraper):
 
     def get_event(self, event_time: datetime) -> Optional[EventIngestionModel]:
         """
-        Portland, OR city council meeting information for a specific date
+        Portland, OR city council meeting information for a specific date.
 
         Parameters
         ----------
@@ -701,7 +700,7 @@ class PortlandScraper(IngestionModelScraper):
     ) -> List[EventIngestionModel]:
         """
         Portland, OR city council meeting information over given time span
-        as List[EventIngestionModel]
+        as List[EventIngestionModel].
 
         Parameters
         ----------
@@ -755,6 +754,8 @@ def get_portland_events(
     to_dt: datetime, optional
         The timespan end datetime to query for events before.
         Default is UTC now
+    kwargs: Any
+        Any extra keywords arguments to pass to the get events function.
 
     Returns
     -------

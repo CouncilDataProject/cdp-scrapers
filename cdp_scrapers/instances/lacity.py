@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import logging
 from datetime import datetime
@@ -20,9 +19,7 @@ class LosAngelesScraper(PrimeGovScraper):
     PYTHON_MUNICIPALITY_SLUG: str = "lacity"
 
     def __init__(self):
-        """
-        LA, CA specific implementation of PrimeGovScraper.
-        """
+        """LA, CA specific implementation of PrimeGovScraper."""
         super().__init__(
             client_id="lacity",
             timezone="America/Los_Angeles",
@@ -48,6 +45,8 @@ def get_lacity_events(
     to_dt: datetime, optional
         The timespan end datetime to query for events before.
         Default is UTC now
+    kwargs: Any
+        Any extra keyword arguments to pass to the get events function.
 
     Returns
     -------

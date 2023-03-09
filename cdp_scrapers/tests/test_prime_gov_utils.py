@@ -32,8 +32,8 @@ urls = [
         "?compiledMeetingDocumentFileId=41088"
     ),
 ]
-agendas = list(map(load_agenda, urls))
-minutes_tables = list(map(lambda agenda: list(get_minutes_tables(agenda)), agendas))
+agendas = [load_agenda(url) for url in urls]
+minutes_tables = [list(get_minutes_tables(agenda)) for agenda in agendas]
 minutes_items = [
     MinutesItem(
         name="22-0600-S29",

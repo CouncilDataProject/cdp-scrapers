@@ -1,8 +1,4 @@
-# -*- coding: utf-8 -*-
-
-"""
-Individual scratchpad and maybe up-to-date CDP instance scrapers.
-"""
+"""Individual scratchpad and maybe up-to-date CDP instance scrapers."""
 
 import importlib
 import inspect
@@ -17,8 +13,8 @@ from cdp_backend.pipeline.mock_get_events import (
     get_events as get_test_deployment_events,
 )
 
-from cdp_scrapers.instances.houston import get_houston_events
 from cdp_scrapers.instances.atlanta import get_events as get_atlanta_events
+from cdp_scrapers.instances.houston import get_houston_events
 from cdp_scrapers.instances.lacity import LosAngelesScraper, get_lacity_events
 from cdp_scrapers.instances.portland import get_portland_events
 from cdp_scrapers.legistar_utils import LegistarScraper
@@ -42,7 +38,7 @@ for submodule in iter_modules(__path__):
     mod = importlib.import_module(f"{__name__}.{submodule.name}")
 
     # Get the scraper from the module
-    for a, member_cls in inspect.getmembers(mod, inspect.isclass):
+    for _a, member_cls in inspect.getmembers(mod, inspect.isclass):
         if (
             issubclass(member_cls, LegistarScraper)
             and member_cls is not LegistarScraper
