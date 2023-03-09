@@ -1,11 +1,16 @@
 # cdp-scrapers
 
-[![Build Status](https://github.com/CouncilDataProject/cdp-scrapers/workflows/Build%20Main/badge.svg)](https://github.com/CouncilDataProject/cdp-scrapers/actions)
-[![Documentation](https://github.com/CouncilDataProject/cdp-scrapers/workflows/Documentation/badge.svg)](https://CouncilDataProject.github.io/cdp-scrapers/)
+[![Build Status](https://github.com/CouncilDataProject/cdp-scrapers/workflows/CI/badge.svg)](https://github.com/CouncilDataProject/cdp-scrapers/actions)
+[![Documentation](https://github.com/CouncilDataProject/cdp-scrapers/workflows/Documentation/badge.svg)](https://CouncilDataProject.github.io/cdp-scrapers)
 
 Scratchpad for scraper development and general utilities.
 
 ---
+
+## Installation
+
+**Stable Release:** `pip install cdp-scrapers`<br>
+**Development Head:** `pip install git+https://github.com/CouncilDataProject/cdp-scrapers.git`
 
 ## Council Data Project
 
@@ -114,4 +119,4 @@ For full package documentation please visit [councildataproject.org/cdp-scrapers
 
 Refer to [CONTRIBUTING.md](CONTRIBUTING.md) for information related to developing the code.
 
-**MIT license**
+**MPLv2 License**

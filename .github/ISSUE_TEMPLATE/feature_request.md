@@ -13,16 +13,16 @@ labels: enhancement
 
 ### Feature Description
 
-_A clear and concise description of the feature you're requesting._
+<!-- A clear and concise description of the feature you're requesting. -->
 
 ### Use Case
 
-_Please provide a use case to help us understand your request in context._
+<!-- Please provide a use case to help us understand your request in context. -->
 
 ### Solution
 
-_Please describe your ideal solution._
+<!-- Please describe your ideal solution. -->
 
 ### Alternatives
 
-_Please describe any alternatives you've considered, even if you've dismissed them._
+<!-- Please describe any alternatives you've considered, even if you've dismissed them. -->

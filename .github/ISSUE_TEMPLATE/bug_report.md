@@ -13,19 +13,19 @@ labels: bug
 
 ### Describe the Bug
 
-_A clear and concise description of the bug._
+<!-- A clear and concise description of the bug. -->
 
 ### Expected Behavior
 
-_What did you expect to happen instead?_
+<!-- What did you expect to happen instead? -->
 
 ### Reproduction
 
-_Steps to reproduce the behavior and/or a minimal example that exhibits the behavior._
+<!-- Steps to reproduce the behavior and/or a minimal example that exhibits the behavior. -->
 
 ### Environment
 
-_Any additional information about your environment._
+<!-- Any additional information about your environment. -->
 
 -   OS Version: _[e.g. macOS 11.3.1]_
--   CDP Backend Version: _[e.g. 0.5.0]_
+-   cdp-scrapers Version: _[e.g. 0.5.0]_

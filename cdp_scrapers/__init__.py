@@ -1,13 +1,11 @@
-# -*- coding: utf-8 -*-
+"""Top-level package for cdp_scrapers."""
 
-"""Top-level package for cdp-scrapers."""
+from importlib.metadata import PackageNotFoundError, version
 
-__author__ = "Eva Maxfield Brown"
+try:
+    __version__ = version("cdp-scrapers")
+except PackageNotFoundError:
+    __version__ = "uninstalled"
+
+__author__ = "Eva Maxfield Brown, Sung Cho, Shak Ragoler"
 __email__ = "evamaxfieldbrown@gmail.com"
-# Do not edit this string manually, always use bumpversion
-# Details in CONTRIBUTING.md
-__version__ = "0.6.1"
-
-
-def get_module_version():
-    return __version__

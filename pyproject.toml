@@ -1,0 +1,159 @@
+# package build
+# https://peps.python.org/pep-0517/
+[build-system]
+requires = ["setuptools>=65", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+
+# package basics
+# https://peps.python.org/pep-0621/
+[project]
+name = "cdp-scrapers"
+description = "Scratchpad for scraper development and general utilities."
+keywords = []
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT License" }
+authors = [
+  { email = "evamaxfieldbrown@gmail.com", name = "Eva Maxfield Brown" },
+  { name = "Sung Cho" },
+  { name = "Shak Ragoler" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Natural Language :: English",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+]
+dynamic = ["version"]
+dependencies = [
+  "beautifulsoup4~=4.9",
+  "cdp-backend>=3.2.4",
+  "defusedxml~=0.7.1",
+  "pytz~=2021.1",
+  "requests~=2.25",
+  "clean-text~=0.6.0",
+  "civic-scraper~=0.2.5",
+]
+
+[project.urls]
+Homepage = "https://github.com/CouncilDataProject/cdp-scrapers"
+"Bug Tracker" = "https://github.com/CouncilDataProject/cdp-scrapers/issues"
+Documentation = "https://CouncilDataProject.github.io/cdp-scrapers"
+"User Support" = "https://github.com/CouncilDataProject/cdp-scrapers/issues"
+
+# extra dependencies
+# https://peps.python.org/pep-0621/#dependencies-optional-dependencies
+[project.optional-dependencies]
+atlanta = [
+  "selenium~=4.3",
+  "webdriver-manager~=3.8",
+]
+all_cities = [
+  "selenium~=4.3",
+  "webdriver-manager~=3.8",
+]
+lint = [
+  "black>=22.3.0",
+  "check-manifest>=0.48",
+  "ruff>=0.0.216",
+  "mypy>=0.790",
+  "pre-commit>=2.20.0",
+]
+test = [
+  "coverage>=5.1",
+  "pytest>=5.4.3",
+  "pytest-cov>=2.9.0",
+  "pytest-raises>=0.11",
+]
+docs = [
+  # Sphinx + Doc Gen + Styling
+  "m2r2>=0.2.7",
+  "Sphinx>=4.0.0",
+  "furo>=2022.4.7",
+  # Extensions
+  "numpydoc",
+  "sphinx-copybutton",
+  # TODO: Pins
+  "docutils>=0.18,<0.19",
+]
+dev = [
+  "ipython>=8.4.0",
+]
+
+# entry points
+# https://peps.python.org/pep-0621/#entry-points
+# [project.entry-points."console_scripts"]
+# calc-string-length = "cdp_scrapers.bin.str_len:main"
+
+# build settings
+# https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
+[tool.setuptools]
+zip-safe = false
+include-package-data = true
+
+[tool.setuptools.packages.find]
+exclude = ["*docs/*", "*tests/*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.yaml", "py.typed", "*.json"]
+
+# tools
+[tool.black]
+line-length = 88
+
+# https://github.com/charliermarsh/ruff
+[tool.ruff]
+line-length = 88
+target-version = "py38"
+extend-select = [
+    "E",      # style errors
+    "F",      # flakes
+    "D",      # pydocstyle
+    "I001",   # isort
+    "UP",     # pyupgrade
+    "N",      # pep8-naming
+    # "S",    # bandit
+    "C",      # flake8-comprehensions
+    "B",      # flake8-bugbear
+    "A001",   # flake8-builtins
+    "RUF",    # ruff-specific rules
+    "RUF100", # Unused noqa directive
+]
+extend-ignore = [
+    "D100", # Missing docstring in public module
+    "D101", # Missing docstring in public class
+    "D103", # Missing docstring in public function
+    "D107", # Missing docstring in __init__
+    "D203", # 1 blank line required before class docstring
+    "D205", # 1 blank line required between summary line and description
+    "D212", # Multi-line docstring summary should start at the first line
+    "D213", # Multi-line docstring summary should start at the second line
+    "D413", # Missing blank line after last section
+    "D416", # Section name should end with a colon
+]
+
+[tool.ruff.per-file-ignores]
+"tests/*.py" = ["D"]
+
+# https://github.com/mgedmin/check-manifest#configuration
+[tool.check-manifest]
+ignore = [
+  ".editorconfig",
+  ".pre-commit-config.yaml",
+  "CODE_OF_CONDUCT.md",
+  "CONTRIBUTING.md",
+  "Justfile",
+  ".cookiecutter.yaml",
+  "*docs/*",
+]
+
+[tool.mypy]
+files = "cdp_scrapers/*.py"
+ignore_missing_imports = true
+disallow_untyped_defs = true
+check_untyped_defs = true
+show_error_codes = true
