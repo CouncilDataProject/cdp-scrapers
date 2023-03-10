@@ -94,7 +94,7 @@ jobs:
           python .github/workflows/scripts/run-scraper.py ${{ github.event.comment.body }}
 
       - name: Upload Results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: scraper-test-results
           # default 90 seems unnecessary for these test results
