@@ -96,10 +96,10 @@ zip-safe = false
 include-package-data = true
 
 [tool.setuptools.packages.find]
-exclude = ["*docs/*", "*tests/*", "**/*.png", "**/*.md"]
+exclude = ["*docs/*", "*tests/*"]
 
 [tool.setuptools.package-data]
-"*" = ["*.yaml", "py.typed", "*.json"]
+"*" = ["*.yaml", "py.typed", "*.json", "*.md", "*png"]
 
 # tools
 [tool.black]
