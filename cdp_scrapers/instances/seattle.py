@@ -64,7 +64,9 @@ class SeattleScraper(LegistarScraper):
                 r".+:$",
                 "Pursuant to Washington State",
             ],
-            static_data=parse_static_file(STATIC_FILE_DEFAULT_PATH),
+            static_data=parse_static_file(
+                STATIC_FILE_DEFAULT_PATH, "America/Los_Angeles"
+            ),
             person_aliases=PERSON_ALIASES,
         )
 
