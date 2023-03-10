@@ -259,7 +259,7 @@ def get_support_files(minutes_table: Tag) -> Iterator[SupportingFile]:
 
     contents_div = get_support_files_div(minutes_table)
     file_divs = contents_div.find_all("div", class_="attachment-holder")
-    return map(extract_file, file_divs)
+    return [extract_file(file_div) for file_div in file_divs]
 
 
 def get_matter(  # noqa: C901
