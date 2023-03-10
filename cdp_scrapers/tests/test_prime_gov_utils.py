@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import List
 
 import pytest
 from bs4 import Tag
@@ -100,7 +99,7 @@ def test_strftime(date_time: datetime):
     "num_meetings, meetings",
     zip(meeting_counts, all_meetings),
 )
-def test_get_meetings(num_meetings: int, meetings: List[Meeting]):
+def test_get_meetings(num_meetings: int, meetings: list[Meeting]):
     assert len(meetings) == num_meetings
 
 
@@ -108,7 +107,7 @@ def test_get_meetings(num_meetings: int, meetings: List[Meeting]):
     "scraper, meetings",
     zip(scrapers, all_meetings),
 )
-def test_get_session(scraper: PrimeGovScraper, meetings: List[Meeting]):
+def test_get_session(scraper: PrimeGovScraper, meetings: list[Meeting]):
     sessions = reduced_list(map(scraper.get_session, meetings))
     assert len(sessions) == len(meetings)
 
@@ -117,7 +116,7 @@ def test_get_session(scraper: PrimeGovScraper, meetings: List[Meeting]):
     "scraper, meetings",
     zip(scrapers, all_meetings),
 )
-def test_get_body(scraper: PrimeGovScraper, meetings: List[Meeting]):
+def test_get_body(scraper: PrimeGovScraper, meetings: list[Meeting]):
     bodies = reduced_list(map(scraper.get_body, meetings))
     assert len(bodies) == len(meetings)
 
@@ -127,7 +126,7 @@ def test_get_body(scraper: PrimeGovScraper, meetings: List[Meeting]):
     zip(scrapers, minutes_tables, minutes_items),
 )
 def test_get_minutes_item(
-    scraper: PrimeGovScraper, minutes_tbls: List[Tag], minutes_item: MinutesItem
+    scraper: PrimeGovScraper, minutes_tbls: list[Tag], minutes_item: MinutesItem
 ):
     assert scraper.get_minutes_item(minutes_tbls[0]) == minutes_item
 
@@ -138,7 +137,7 @@ def test_get_minutes_item(
 )
 def test_get_matter(
     scraper: PrimeGovScraper,
-    minutes_tbls: List[Tag],
+    minutes_tbls: list[Tag],
     minutes_item: MinutesItem,
     matter: Matter,
 ):
@@ -158,7 +157,7 @@ def test_get_matter(
 )
 def test_get_event_minutes_item(
     scraper: PrimeGovScraper,
-    minutes_tbls: List[Tag],
+    minutes_tbls: list[Tag],
     minutes_item: MinutesItem,
     matter: Matter,
     num_support_files: int,
@@ -178,7 +177,7 @@ def test_get_event_minutes_item(
     "scraper, meetings",
     zip(scrapers, all_meetings),
 )
-def test_get_event(scraper: PrimeGovScraper, meetings: List[Meeting]):
+def test_get_event(scraper: PrimeGovScraper, meetings: list[Meeting]):
     events = reduced_list(map(scraper.get_event, meetings))
     assert len(events) == len(meetings)
 
@@ -200,8 +199,8 @@ def test_get_events(
 )
 def test_get_event_minutes_items(
     scraper: PrimeGovScraper,
-    meetings: List[Meeting],
-    num_event_minutes_items: List[int],
+    meetings: list[Meeting],
+    num_event_minutes_items: list[int],
 ):
     for meeting, num_items in zip(meetings, num_event_minutes_items):
         assert len(scraper.get_event_minutes_items(meeting)) == num_items
@@ -215,7 +214,7 @@ def test_get_lacity_events(
     begin: datetime,
     end: datetime,
     num_meetings: int,
-    num_event_minutes_items: List[int],
+    num_event_minutes_items: list[int],
 ):
     events = get_lacity_events(begin, end)
     assert len(events) == num_meetings
