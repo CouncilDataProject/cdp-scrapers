@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 from copy import deepcopy
 from datetime import datetime, timedelta
 from itertools import filterfalse, groupby
@@ -83,9 +84,9 @@ def str_simplified(input_str: str) -> str:
 
 
 def parse_static_person(
-    person_json: Dict[str, Any],
-    all_seats: Dict[str, Seat],
-    primary_bodies: Dict[str, Body],
+    person_json: dict[str, Any],
+    all_seats: dict[str, Seat],
+    primary_bodies: dict[str, Body],
     timezone: pytz.timezone,
 ) -> Person:
     """
@@ -104,6 +105,11 @@ def parse_static_person(
     primary_bodies: Dict[str, Body]
         Bodies defined as top-level in static data file.
 
+    timezone: str
+        The timezone for the target client.
+        i.e. "America/Los_Angeles" or "America/New_York"
+        See https://en.wikipedia.org/wiki/List_of_tz_database_time_zones for canonical
+        timezones.
 
     See Also
     --------
@@ -154,7 +160,7 @@ def parse_static_person(
             except Exception:
                 pass
             else:
-                raise NotImplementedError("We can resume using from_dict")
+                log.info(f"We can resume using from_dict ({sys.version_info})")
 
             dt_val = kwargs.get("start_datetime")
             kwargs["start_datetime"] = (
@@ -189,12 +195,18 @@ def parse_static_person(
 
 def parse_static_file(file_path: Path, timezone: str) -> ScraperStaticData:
     """
-    Parse Seats, Bodies and Persons from static data JSON
+    Parse Seats, Bodies and Persons from static data JSON.
 
     Parameters
     ----------
     file_path: Path
         Path to file containing static data in JSON
+
+    timezone: str
+        The timezone for the target client.
+        i.e. "America/Los_Angeles" or "America/New_York"
+        See https://en.wikipedia.org/wiki/List_of_tz_database_time_zones for canonical
+        timezones.
 
     Returns
     -------
@@ -211,29 +223,29 @@ def parse_static_file(file_path: Path, timezone: str) -> ScraperStaticData:
     Function looks for "seats", "primary_bodies", "persons" top-level keys
     """
     with open(file_path) as static_file:
-        static_json: Dict[str, Dict[str, Any]] = json.load(static_file)
+        static_json: dict[str, dict[str, Any]] = json.load(static_file)
 
         if "seats" not in static_json:
-            seats: Dict[str, Seat] = {}
+            seats: dict[str, Seat] = {}
         else:
-            seats: Dict[str, Seat] = {
+            seats: dict[str, Seat] = {
                 seat_name: Seat(**seat)
                 for seat_name, seat in static_json["seats"].items()
             }
 
         if "primary_bodies" not in static_json:
-            primary_bodies: Dict[str, Body] = {}
+            primary_bodies: dict[str, Body] = {}
         else:
-            primary_bodies: Dict[str, Body] = {
+            primary_bodies: dict[str, Body] = {
                 body_name: Body(**body)
                 for body_name, body in static_json["primary_bodies"].items()
             }
 
         if "persons" not in static_json:
-            known_persons: Dict[str, Person] = {}
+            known_persons: dict[str, Person] = {}
         else:
             timezone = pytz.timezone(timezone)
-            known_persons: Dict[str, Person] = {
+            known_persons: dict[str, Person] = {
                 person_name: parse_static_person(
                     person, seats, primary_bodies, timezone
                 )
