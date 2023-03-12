@@ -83,7 +83,7 @@ def str_simplified(input_str: str) -> str:
     return input_str
 
 
-def parse_static_person(
+def parse_static_person(  # noqa: C901
     person_json: dict[str, Any],
     all_seats: dict[str, Seat],
     primary_bodies: dict[str, Body],

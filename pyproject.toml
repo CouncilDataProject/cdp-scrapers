@@ -52,7 +52,7 @@ atlanta = [
   "selenium~=4.3",
   "webdriver-manager~=3.8",
 ]
-all_cities = [
+all = [
   "selenium~=4.3",
   "webdriver-manager~=3.8",
 ]
@@ -68,6 +68,7 @@ test = [
   "pytest>=5.4.3",
   "pytest-cov>=2.9.0",
   "pytest-raises>=0.11",
+  "pytest-rerunfailures>=11.1.2",
 ]
 docs = [
   # Sphinx + Doc Gen + Styling
