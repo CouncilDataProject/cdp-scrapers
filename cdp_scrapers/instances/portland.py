@@ -39,7 +39,9 @@ log = logging.getLogger(__name__)
 
 ###############################################################################
 
-SCRAPER_STATIC_DATA = parse_static_file(Path(__file__).parent / "portland-static.json")
+SCRAPER_STATIC_DATA = parse_static_file(
+    Path(__file__).parent / "portland-static.json", "America/Los_Angeles"
+)
 
 ###############################################################################
 
