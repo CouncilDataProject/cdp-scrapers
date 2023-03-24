@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import re
 from datetime import datetime, timedelta
+from functools import partial
 from itertools import groupby
 from logging import getLogger
 from typing import Any, Dict, Iterator, List, Optional
@@ -70,7 +70,7 @@ def urljoin_search_query(
 
 def get_video_info(query_url: str) -> List[Dict[str, Any]]:
     """
-    Return dictionaries of search hit video meta data
+    Return dictionaries of search hit video meta data.
 
     Parameters
     ----------
@@ -94,9 +94,7 @@ def get_video_info(query_url: str) -> List[Dict[str, Any]]:
 
 
 class YoutubeIngestionScraper(IngestionModelScraper):
-    """
-    Base class for scraping CDP event ingestion models from YouTube videos.
-    """
+    """Base class for scraping CDP event ingestion models from YouTube videos."""
 
     def __init__(
         self, channel_name: str, body_search_terms: Dict[str, str], **kwargs: Any
@@ -118,7 +116,7 @@ class YoutubeIngestionScraper(IngestionModelScraper):
 
     def parse_datetime(self, title: str) -> datetime:
         """
-        Parse video datetime from title text
+        Parse video datetime from title text.
 
         Parameters
         ----------
@@ -143,7 +141,7 @@ class YoutubeIngestionScraper(IngestionModelScraper):
 
     def get_session(self, video_info: Dict[str, Any]) -> Optional[Session]:
         """
-        Parse a CDP Session from YouTube video information
+        Parse a CDP Session from YouTube video information.
 
         Parameters
         ----------
@@ -196,6 +194,10 @@ class YoutubeIngestionScraper(IngestionModelScraper):
         If multiple videos are found for a given body on the same day,
         they are treated to be sessions of the same event.
         """
+
+        def title_includes_search_terms(search_terms: str, video_info: Dict[str, Any]):
+            return search_terms.lower() in video_info["title"].lower()
+
         for body_name, search_terms in self.body_search_terms.items():
             body = Body(name=body_name)
             url = urljoin_search_query(
@@ -210,10 +212,8 @@ class YoutubeIngestionScraper(IngestionModelScraper):
             # We need to double-check the video title
             # for the body name and event date
 
-            video_info_list = filter(
-                lambda info: search_terms.lower() in info["title"].lower(),
-                video_info_list,
-            )
+            title_filter = partial(title_includes_search_terms, search_terms)
+            video_info_list = filter(title_filter, video_info_list)
 
             sessions = map(self.get_session, video_info_list)
             sessions = reduced_list(sessions, collapse=False)

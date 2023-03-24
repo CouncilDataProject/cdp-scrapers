@@ -1,13 +1,14 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
-from itertools import chain
-import pytest
 from datetime import datetime
+from itertools import chain
+
+import pytest
+
 from cdp_scrapers.youtube_utils import (
-    urljoin_search_query,
-    get_video_info,
     YoutubeIngestionScraper,
+    get_video_info,
+    urljoin_search_query,
 )
 
 
@@ -73,8 +74,7 @@ def test_search_url(channel, search_terms, begin, end, expected_url):
 )
 def test_get_video_info(query_url, video_ids):
     video_info_list = get_video_info(query_url=query_url)
-    id_list = map(lambda i: i["id"], video_info_list)
-    id_list = list(id_list)
+    id_list = [i["id"] for i in video_info_list]
 
     assert id_list == id_list
 
@@ -101,15 +101,12 @@ def test_get_events(channel, timezone, body, search_terms, begin, end, video_ids
     assert s.body_search_terms[body] == search_terms
 
     events = s.get_events(begin=begin, end=end)
-    sessions = map(lambda e: e.sessions, events)
+    sessions = [e.sessions for e in events]
     sessions = chain.from_iterable(sessions)
     sessions = list(sessions)
     assert len(sessions) == len(video_ids)
 
-    session_uris = map(lambda s: s.video_uri, sessions)
-    session_uris = set(session_uris)
-
-    video_uris = map(lambda id: f"https://www.youtube.com/watch?v={id}", video_ids)
-    video_uris = set(video_uris)
+    session_uris = {s.video_uri for s in sessions}
+    video_uris = {f"https://www.youtube.com/watch?v={i}" for i in video_ids}
 
     assert session_uris == video_uris
