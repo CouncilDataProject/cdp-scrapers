@@ -198,7 +198,6 @@ class YoutubeIngestionScraper(IngestionModelScraper):
         """
         for body_name, search_terms in self.body_search_terms.items():
             body = Body(name=body_name)
-            body = self.get_none_if_empty(body)
             url = urljoin_search_query(
                 channel_name=self.channel_name,
                 search_terms=search_terms,
@@ -222,7 +221,6 @@ class YoutubeIngestionScraper(IngestionModelScraper):
                 lambda s: s.session_datetime >= begin and s.session_datetime <= end,
                 sessions,
             )
-            sessions = list(sessions)
 
             for _, _sessions in groupby(
                 sessions, key=lambda s: s.session_datetime.date()
