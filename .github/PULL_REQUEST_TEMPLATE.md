@@ -20,4 +20,4 @@ This pull request resolves #
 
 ### Description of Changes
 
-_Include a description of the proposed changes._
+<!-- Include a description of the proposed changes. -->

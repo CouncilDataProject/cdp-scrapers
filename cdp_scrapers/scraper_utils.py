@@ -1,11 +1,14 @@
+from __future__ import annotations
+
 import json
 import re
+import sys
 from copy import deepcopy
 from datetime import datetime, timedelta
 from itertools import filterfalse, groupby
 from logging import getLogger
 from pathlib import Path
-from typing import Any, Dict, List, NamedTuple, Optional, Set
+from typing import Any, NamedTuple
 
 import cleantext
 import pytz
@@ -28,7 +31,7 @@ log = getLogger(__name__)
 ###############################################################################
 
 
-def reduced_list(input_list: List[Any], collapse: bool = True) -> Optional[List]:
+def reduced_list(input_list: list[Any], collapse: bool = True) -> list | None:
     """
     Remove all None items from input_list.
 
@@ -60,6 +63,7 @@ def str_simplified(input_str: str) -> str:
     Parameters
     ----------
     input_str: str
+        The string to be cleaned.
 
     Returns
     -------
@@ -79,10 +83,10 @@ def str_simplified(input_str: str) -> str:
     return input_str
 
 
-def parse_static_person(
-    person_json: Dict[str, Any],
-    all_seats: Dict[str, Seat],
-    primary_bodies: Dict[str, Body],
+def parse_static_person(  # noqa: C901
+    person_json: dict[str, Any],
+    all_seats: dict[str, Seat],
+    primary_bodies: dict[str, Body],
     timezone: pytz.timezone,
 ) -> Person:
     """
@@ -101,6 +105,11 @@ def parse_static_person(
     primary_bodies: Dict[str, Body]
         Bodies defined as top-level in static data file.
 
+    timezone: str
+        The timezone for the target client.
+        i.e. "America/Los_Angeles" or "America/New_York"
+        See https://en.wikipedia.org/wiki/List_of_tz_database_time_zones for canonical
+        timezones.
 
     See Also
     --------
@@ -128,7 +137,7 @@ def parse_static_person(
         return person
 
     # Role.title must be a RoleTitle constant so get all allowed values
-    role_titles: List[str] = get_all_class_attr_values(RoleTitle)
+    role_titles: list[str] = get_all_class_attr_values(RoleTitle)
     for role_json in person_json["roles"]:
         if (
             # if str, it is looked-up in primary_bodies
@@ -151,7 +160,7 @@ def parse_static_person(
             except Exception:
                 pass
             else:
-                raise NotImplementedError("We can resume using from_dict")
+                log.info(f"We can resume using from_dict ({sys.version_info})")
 
             dt_val = kwargs.get("start_datetime")
             kwargs["start_datetime"] = (
@@ -186,12 +195,18 @@ def parse_static_person(
 
 def parse_static_file(file_path: Path, timezone: str) -> ScraperStaticData:
     """
-    Parse Seats, Bodies and Persons from static data JSON
+    Parse Seats, Bodies and Persons from static data JSON.
 
     Parameters
     ----------
     file_path: Path
         Path to file containing static data in JSON
+
+    timezone: str
+        The timezone for the target client.
+        i.e. "America/Los_Angeles" or "America/New_York"
+        See https://en.wikipedia.org/wiki/List_of_tz_database_time_zones for canonical
+        timezones.
 
     Returns
     -------
@@ -199,7 +214,7 @@ def parse_static_file(file_path: Path, timezone: str) -> ScraperStaticData:
         Tuple[Dict[str, Seat], Dict[str, Body], Dict[str, Person]]
 
     See Also
-    -----
+    --------
     parse_static_person()
     sanitize_roles()
 
@@ -208,29 +223,29 @@ def parse_static_file(file_path: Path, timezone: str) -> ScraperStaticData:
     Function looks for "seats", "primary_bodies", "persons" top-level keys
     """
     with open(file_path) as static_file:
-        static_json: Dict[str, Dict[str, Any]] = json.load(static_file)
+        static_json: dict[str, dict[str, Any]] = json.load(static_file)
 
         if "seats" not in static_json:
-            seats: Dict[str, Seat] = {}
+            seats: dict[str, Seat] = {}
         else:
-            seats: Dict[str, Seat] = {
+            seats: dict[str, Seat] = {
                 seat_name: Seat(**seat)
                 for seat_name, seat in static_json["seats"].items()
             }
 
         if "primary_bodies" not in static_json:
-            primary_bodies: Dict[str, Body] = {}
+            primary_bodies: dict[str, Body] = {}
         else:
-            primary_bodies: Dict[str, Body] = {
+            primary_bodies: dict[str, Body] = {
                 body_name: Body(**body)
                 for body_name, body in static_json["primary_bodies"].items()
             }
 
         if "persons" not in static_json:
-            known_persons: Dict[str, Person] = {}
+            known_persons: dict[str, Person] = {}
         else:
             timezone = pytz.timezone(timezone)
-            known_persons: Dict[str, Person] = {
+            known_persons: dict[str, Person] = {
                 person_name: parse_static_person(
                     person, seats, primary_bodies, timezone
                 )
@@ -248,16 +263,16 @@ def parse_static_file(file_path: Path, timezone: str) -> ScraperStaticData:
         )
 
 
-def sanitize_roles(
+def sanitize_roles(  # noqa: C901
     person_name: str,
-    roles: Optional[List[Role]] = None,
-    static_data: Optional[ScraperStaticData] = None,
-    council_pres_patterns: List[str] = ["chair", "pres", "super"],
-    chair_patterns: List[str] = ["chair", "pres"],
-) -> Optional[List[Role]]:
+    roles: list[Role] | None = None,
+    static_data: ScraperStaticData | None = None,
+    council_pres_patterns: list[str] | None = None,
+    chair_patterns: list[str] | None = None,
+) -> list[Role] | None:
     """
     1. Standardize roles[i].title to RoleTitle constants
-    2. Ensure only 1 councilmember Role per term
+    2. Ensure only 1 councilmember Role per term.
 
     Parameters
     ----------
@@ -291,6 +306,10 @@ def sanitize_roles(
     """
     if roles is None:
         roles = []
+    if council_pres_patterns is None:
+        council_pres_patterns = ["chair", "pres", "super"]
+    if chair_patterns is None:
+        chair_patterns = ["chair", "pres"]
 
     if not static_data or not static_data.primary_bodies:
         # Primary/full council not defined in static data file.
@@ -307,9 +326,7 @@ def sanitize_roles(
         have_primary_roles = False
 
     def _is_role_period_ok(role: Role) -> bool:
-        """
-        Test that role.[start | end]_datetime is acceptable
-        """
+        """Test that role.[start | end]_datetime is acceptable."""
         if role.start_datetime is None or role.end_datetime is None:
             return False
         if not have_primary_roles:
@@ -331,9 +348,7 @@ def sanitize_roles(
         return False
 
     def _is_primary_body(role: Role) -> bool:
-        """
-        Is role.body one of primary_bodies in static data file
-        """
+        """Is role.body one of primary_bodies in static data file."""
         return (
             role.body is not None
             and role.body.name is not None
@@ -341,9 +356,7 @@ def sanitize_roles(
         )
 
     def _fix_primary_title(role: Role) -> str:
-        """
-        Council president or Councilmember
-        """
+        """Council president or Councilmember."""
         if (
             role.title is None
             or re.search(
@@ -355,9 +368,7 @@ def sanitize_roles(
         return RoleTitle.COUNCILPRESIDENT
 
     def _fix_nonprimary_title(role: Role) -> str:
-        """
-        Not council president or councilmember
-        """
+        """Not council president or councilmember."""
         if role.title is None:
             return RoleTitle.MEMBER
 
@@ -405,7 +416,7 @@ def sanitize_roles(
     # e.g. simultaneous councilmember roles in city council and in council briefing
     # are completely acceptable and common.
 
-    scraped_member_roles_by_body: List[List[Role]] = [
+    scraped_member_roles_by_body: list[list[Role]] = [
         list(roles_for_body)
         for body_name, roles_for_body in groupby(
             sorted(
@@ -450,7 +461,7 @@ def sanitize_roles(
 
 class IngestionModelScraper:
     """
-    Base class for events scrapers providing IngestionModels for cdp-backend pipeline
+    Base class for events scrapers providing IngestionModels for cdp-backend pipeline.
 
     Parameters
     ----------
@@ -468,7 +479,7 @@ class IngestionModelScraper:
     def __init__(
         self,
         timezone: str,
-        person_aliases: Optional[Dict[str, Set[str]]] = None,
+        person_aliases: dict[str, set[str]] | None = None,
     ):
         self.timezone: pytz.timezone = pytz.timezone(timezone)
         self.person_aliases = person_aliases
@@ -476,7 +487,8 @@ class IngestionModelScraper:
     @staticmethod
     def find_time_zone() -> str:
         """
-        Return name for a US time zone matching UTC offset calculated from OS clock.
+        Return name for a US time zone matching UTC
+        offset calculated from OS clock.
         """
         utc_now = pytz.utc.localize(datetime.utcnow())
         local_now = datetime.now()
@@ -521,7 +533,7 @@ class IngestionModelScraper:
             return local_time
 
     @staticmethod
-    def get_required_attrs(model: IngestionModel) -> List[str]:
+    def get_required_attrs(model: IngestionModel) -> list[str]:
         """
         Return list of keys required in model as specified in IngestionModel class
         definition.
@@ -577,7 +589,7 @@ class IngestionModelScraper:
 
         return keys
 
-    def get_none_if_empty(self, model: IngestionModel) -> Optional[IngestionModel]:
+    def get_none_if_empty(self, model: IngestionModel) -> IngestionModel | None:
         """
         Check required keys in model, return None if any such key has no value.
         i.e. If all required keys have valid value, return as-is.

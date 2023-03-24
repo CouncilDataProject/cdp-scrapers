@@ -8,6 +8,7 @@ from cdp_scrapers.instances.portland import PortlandScraper
 from cdp_scrapers.instances.seattle import SeattleScraper
 
 
+@pytest.mark.flaky(reruns=3, reruns_delay=15)
 @pytest.mark.parametrize(
     "start_date_time, end_date_time, expected_meetings,"
     "expected_minutes_item_in_first_meeting, expected_first_supporting_file",
@@ -50,6 +51,7 @@ def test_houston_scraper(
     )
 
 
+@pytest.mark.flaky(reruns=3, reruns_delay=15)
 @pytest.mark.parametrize(
     "start_date_time, end_date_time, number_of_events,"
     "number_of_sessions_in_first_event, number_of_event_minute_items,"
@@ -123,6 +125,7 @@ def test_seattle_scraper(
     )
 
 
+@pytest.mark.flaky(reruns=3, reruns_delay=15)
 @pytest.mark.parametrize(
     "start_date_time, end_date_time, number_of_events, number_of_event_minute_items,"
     "event_with_votes, event_minute_item_with_votes, number_of_votes,"
@@ -187,6 +190,7 @@ def test_king_county_scraper(
     )
 
 
+@pytest.mark.flaky(reruns=3, reruns_delay=15)
 @pytest.mark.parametrize(
     "start_date_time, end_date_time, number_of_events, number_of_event_minute_items,"
     "number_of_sessions, event_with_votes, event_minute_item_with_votes,"

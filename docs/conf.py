@@ -21,11 +21,10 @@
 import os
 import sys
 
-import sphinx_rtd_theme
-
 import cdp_scrapers
 
 sys.path.insert(0, os.path.abspath(".."))
+
 
 
 # -- General configuration ---------------------------------------------
@@ -37,19 +36,24 @@ sys.path.insert(0, os.path.abspath(".."))
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named "sphinx.ext.*") or your custom ones.
 extensions = [
+    # Sphinx lib ext
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
+    "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
-    "sphinx.ext.napoleon",
-    "sphinx.ext.mathjax",
+    # Installed Sphinx ext
+    "sphinx_copybutton",
+    # Doc installs
     "m2r2",
+    "numpydoc", 
 ]
 
-# Control napoleon
-napoleon_google_docstring = False
-napolean_include_init_with_doc = True
-napoleon_use_ivar = True
-napoleon_use_param = False
+copybutton_prompt_text = r">>> |\.\.\. |\$ |In \[\d*\]: | {2,5}\.\.\.: | {5,8}: "
+copybutton_prompt_is_regexp = True
+
+numpydoc_show_class_members = False
+
+sphinx_tabs_disable_tab_closing = True
 
 # Control autodoc
 autoclass_content = "both"  # include init doc with class
@@ -66,13 +70,13 @@ source_suffix = {
     ".md": "markdown",
 }
 
-# The master toctree document.
-master_doc = "index"
+# The main toctree document.
+main_doc = "index"
 
 # General information about the project.
-project = u"cdp-scrapers"
-copyright = u"2021, Eva Maxfield Brown"
-author = u"Eva Maxfield Brown"
+project = "cdp-scrapers"
+copyright = "2023"
+author = "Eva Maxfield Brown, Sung Cho, Shak Ragoler"
 
 # The version info for the project you"re documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
@@ -107,16 +111,13 @@ todo_include_todos = False
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "sphinx_rtd_theme"
+html_theme = "furo"
 
 # Theme options are theme-specific and customize the look and feel of a
 # theme further.  For a list of options available for each theme, see the
 # documentation.
 #
-html_theme_options = {
-    "collapse_navigation": False,
-    "prev_next_buttons_location": "top",
-}
+html_theme_options = {}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -152,10 +153,10 @@ latex_elements = {
 # [howto, manual, or own class]).
 latex_documents = [
     (
-        master_doc,
+        main_doc,
         "cdp_scrapers.tex",
-        u"cdp-scrapers Documentation",
-        u"Eva Maxfield Brown",
+        "cdp-scrapers Documentation",
+        "Eva Maxfield Brown, Sung Cho, Shak Ragoler",
         "manual",
     ),
 ]
@@ -165,7 +166,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, "cdp_scrapers", u"cdp-scrapers Documentation", [author], 1)]
+man_pages = [(main_doc, "cdp_scrapers", "cdp-scrapers Documentation", [author], 1)]
 
 
 # -- Options for Texinfo output ----------------------------------------
@@ -175,12 +176,11 @@ man_pages = [(master_doc, "cdp_scrapers", u"cdp-scrapers Documentation", [author
 #  dir menu entry, description, category)
 texinfo_documents = [
     (
-        master_doc,
+        main_doc,
         "cdp_scrapers",
-        u"cdp-scrapers Documentation",
+        "cdp-scrapers Documentation",
         author,
         "cdp_scrapers",
-        "One line description of project.",
-        "Miscellaneous",
+        "Scratchpad for scraper development and general utilities.",
     ),
 ]

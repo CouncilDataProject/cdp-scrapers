@@ -1,1 +1,1 @@
-.. mdinclude:: ../finding_legistar_id.md
+.. mdinclude:: ../cdp_scrapers/finding_legistar_id.md

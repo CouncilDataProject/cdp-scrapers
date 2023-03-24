@@ -3,6 +3,12 @@
 Contributions are welcome, and they are greatly appreciated! Every little bit
 helps, and credit will always be given.
 
+## Developer Installation
+
+If something goes wrong at any point during installing the library please see how
+[our CI/CD on GitHub Actions](.github/workflows/build-main.yml) installs and builds the
+project as it will always be the most up-to-date.
+
 ## Get Started!
 
 Ready to contribute? Here's how to set up `cdp-scrapers` for local development.
@@ -15,14 +21,22 @@ Ready to contribute? Here's how to set up `cdp-scrapers` for local development.
     git clone git@github.com:{your_name_here}/cdp-scrapers.git
     ```
 
-3. Install the project in editable mode. (It is also recommended to work in a virtualenv or anaconda environment):
+3. Install [just](https://github.com/casey/just).
+
+    Cargo: `cargo install just`
+    Windows: `scoop install just` or `choco install just`
+    MacOS: `brew install just`
+
+4. Install the project in editable mode. (It is also recommended to work in a virtualenv or anaconda environment):
 
     ```bash
     cd cdp-scrapers/
-    pip install -e .[dev]
+    just install
     ```
 
-4. Create a branch for local development:
+    If this doesn't work try: `pip install -e '.[lint,test,docs,dev]'`.
+
+5. Create a branch for local development:
 
     ```bash
     git checkout -b {your_development_type}/short-description
@@ -31,33 +45,57 @@ Ready to contribute? Here's how to set up `cdp-scrapers` for local development.
     Ex: feature/read-tiff-files or bugfix/handle-file-not-found<br>
     Now you can make your changes locally.
 
-5. When you're done making changes, check that your changes pass linting and
-   tests, including testing other Python versions with make:
+6. When you're done making changes, check that your changes pass linting and
+   tests with [just](https://github.com/casey/just):
 
     ```bash
-    make build
+    just build
     ```
 
-6. Commit your changes and push your branch to GitHub:
+7. Commit your changes and push your branch to GitHub:
 
     ```bash
     git add .
-    git commit -m "Resolves gh-###. Your detailed description of your changes."
+    git commit -m "Your detailed description of your changes."
     git push origin {your_development_type}/short-description
     ```
 
-7. Submit a pull request through the GitHub website.
+8. Submit a pull request through the GitHub website.
+
+## Just Commands
+
+For development commands we use [just](https://github.com/casey/just).
+
+```bash
+just
+```
+```
+Available recipes:
+    build                    # run lint and then run tests
+    clean                    # clean all build, python, and lint files
+    default                  # list all available commands
+    generate-docs            # generate Sphinx HTML documentation
+    install                  # install with all deps
+    lint                     # lint, format, and check all files
+    release                  # release a new version
+    serve-docs               # generate Sphinx HTML documentation and serve to browser
+    tag-for-release version  # tag a new version
+    test                     # run tests
+    update-from-cookiecutter # update this repo using latest cookiecutter-py-package
+```
 
 ## Deploying
 
 A reminder for the maintainers on how to deploy.
-Make sure all your changes are committed.
-Then run:
+Make sure the main branch is checked out and all desired changes
+are merged. Then run:
 
 ```bash
-bump2version patch # possible: major / minor / patch
-git push
-git push --tags
+just tag-for-release "vX.Y.Z"
+just release
 ```
 
-This will release a new package version on Git + GitHub and publish to PyPI.
+The presence of a tag starting with "v" will trigger the `publish` step in the
+main github workflow, which will build the package and upload it to PyPI. The
+version will be injected into the package metadata by
+[`setuptools-scm`](https://github.com/pypa/setuptools_scm)

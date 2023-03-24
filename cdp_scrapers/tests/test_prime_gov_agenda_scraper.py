@@ -16,7 +16,7 @@ urls = [
         "?compiledMeetingDocumentFileId=41088"
     ),
 ]
-agendas = list(map(load_agenda, urls))
+agendas = [load_agenda(url) for url in urls]
 minutes_counts = [8]
 support_file_counts = [4]
 first_minutes_items = [
@@ -58,7 +58,7 @@ def test_get_minutes_tables(
     agenda: Agenda,
     num_minutes: int,
 ):
-    assert len(list(get_minutes_tables(agenda))) == num_minutes
+    assert len(get_minutes_tables(agenda)) == num_minutes
 
 
 @pytest.mark.parametrize(
@@ -69,7 +69,7 @@ def test_get_minutes_item(
     agenda: Agenda,
     minutes_item: MinutesItem,
 ):
-    assert get_minutes_item(next(get_minutes_tables(agenda))) == minutes_item
+    assert get_minutes_item(get_minutes_tables(agenda)[0]) == minutes_item
 
 
 @pytest.mark.parametrize(
@@ -77,7 +77,7 @@ def test_get_minutes_item(
     zip(agendas, support_file_counts),
 )
 def test_get_support_files(agenda: Agenda, num_files: int):
-    assert len(list(get_support_files(next(get_minutes_tables(agenda))))) == num_files
+    assert len(get_support_files(get_minutes_tables(agenda)[0])) == num_files
 
 
 @pytest.mark.parametrize(
@@ -85,6 +85,6 @@ def test_get_support_files(agenda: Agenda, num_files: int):
     zip(agendas, matters),
 )
 def test_get_matter(agenda: Agenda, matter: Matter):
-    minutes_table = next(get_minutes_tables(agenda))
+    minutes_table = get_minutes_tables(agenda)[0]
     minutes_item = get_minutes_item(minutes_table)
     assert get_matter(minutes_table, minutes_item) == matter

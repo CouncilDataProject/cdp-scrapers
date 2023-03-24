@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import json
 import logging
@@ -31,9 +30,7 @@ class KingCountyScraper(LegistarScraper):
     PYTHON_MUNICIPALITY_SLUG: str = "king_county"
 
     def __init__(self):
-        """
-        King County specific implementation of LegistarScraper.
-        """
+        """King County specific implementation of LegistarScraper."""
         super().__init__(
             client="kingcounty",
             timezone="America/Los_Angeles",
@@ -72,7 +69,7 @@ class KingCountyScraper(LegistarScraper):
     @staticmethod
     def get_static_person_info() -> Dict[str, Person]:
         """
-        Scrape current council members information from kingcounty.gov
+        Scrape current council members information from kingcounty.gov.
 
         Returns
         -------
@@ -163,5 +160,5 @@ class KingCountyScraper(LegistarScraper):
             # save under top-level key "persons" in the file
             static_info_json[STATIC_FILE_KEY_PERSONS][name] = person.to_dict()
 
-        with open(file_path, "wt") as dump:
+        with open(file_path, "w") as dump:
             dump.write(json.dumps(static_info_json, indent=4))

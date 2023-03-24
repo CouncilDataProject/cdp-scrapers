@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import re
 from datetime import datetime, timedelta
@@ -48,7 +47,7 @@ Agenda = BeautifulSoup
 
 def primegov_strftime(dt: datetime) -> str:
     """
-    strftime() in format expected for search by primegov api
+    strftime() in format expected for search by primegov api.
 
     Parameters
     ----------
@@ -69,7 +68,7 @@ def primegov_strftime(dt: datetime) -> str:
 
 def primegov_strptime(meeting: Meeting) -> Optional[datetime]:
     """
-    strptime() on meeting_date_time using expected format commonly used in primegov api
+    strptime() on meeting_date_time using expected format commonly used in primegov api.
 
     Parameters
     ----------
@@ -144,7 +143,7 @@ def get_minutes_tables(agenda: Agenda) -> Iterator[Tag]:
     """
     # look for <div> with certain class then get the <table> inside the <div>
     divs = agenda.find_all("div", class_="agenda-item")
-    return map(lambda d: d.find("table"), divs)
+    return [d.find("table") for d in divs]
 
 
 def get_minutes_item(minutes_table: Tag) -> MinutesItem:
@@ -176,18 +175,18 @@ def get_minutes_item(minutes_table: Tag) -> MinutesItem:
         # minutes item name in the first row, description in the second row
         name = rows[0].find("td").string
         desc = rows[1].find("div").string
-    except (IndexError, AttributeError):
+    except (IndexError, AttributeError) as e:
         # rows is empty; find*() returned None
         raise ValueError(
             f"Minutes item <table> is no longer recognized: {minutes_table}"
-        )
+        ) from e
 
     return MinutesItem(name=str_simplified(name), description=str_simplified(desc))
 
 
 def get_support_files_div(minutes_table: Tag) -> Tag:
     """
-    Find the <div> containing a minutes item's support document URLs
+    Find the <div> containing a minutes item's support document URLs.
 
     Parameters
     ----------
@@ -206,7 +205,7 @@ def get_support_files_div(minutes_table: Tag) -> Tag:
 
 def get_support_files(minutes_table: Tag) -> Iterator[SupportingFile]:
     """
-    Extract the minutes item's support file URLs
+    Extract the minutes item's support file URLs.
 
     Parameters
     ----------
@@ -232,10 +231,12 @@ def get_support_files(minutes_table: Tag) -> Iterator[SupportingFile]:
         try:
             # the second <a> tag in each file <div> has the file url.
             url_tag = file_div.find_all("a")[1]
-        except IndexError:
+        except IndexError as e:
             # if here, we found <div> with correct class
             # so if we didn't find expected <a>, probably means HTML changed
-            raise ValueError(f"Support file <div> is no longer recognized: {file_div}")
+            raise ValueError(
+                f"Support file <div> is no longer recognized: {file_div}"
+            ) from e
 
         # they sometimes include file suffix in the document title
         # e.g. Budget Recommendation dated 5-18-22.pdf
@@ -248,24 +249,24 @@ def get_support_files(minutes_table: Tag) -> Iterator[SupportingFile]:
         url = url[: url.find("?")]
 
         # use as id if file name is just a number
-        id = Path(url).stem
-        if re.match(r"\d+", id) is None:
-            id = None
+        id_ = Path(url).stem
+        if re.match(r"\d+", id_) is None:
+            id_ = None
 
         return SupportingFile(
-            external_source_id=id, name=str_simplified(name), uri=str_simplified(url)
+            external_source_id=id_, name=str_simplified(name), uri=str_simplified(url)
         )
 
     contents_div = get_support_files_div(minutes_table)
     file_divs = contents_div.find_all("div", class_="attachment-holder")
-    return map(extract_file, file_divs)
+    return [extract_file(file_div) for file_div in file_divs]
 
 
-def get_matter(
+def get_matter(  # noqa: C901
     minutes_table: Tag, minutes_item: Optional[MinutesItem] = None
 ) -> Optional[Matter]:
     """
-    Extract matter info from a minutes item <table>
+    Extract matter info from a minutes item <table>.
 
     Parameters
     ----------
@@ -294,9 +295,7 @@ def get_matter(
     # ex 2. APPROVED Motion (Buscaino - Lee) - (3) Yes; (0) No
 
     def _get_matter_text(minutes_table: Tag) -> Optional[str]:
-        """
-        Matter text blob from minutes item <table>
-        """
+        """Matter text blob from minutes item <table>."""
         this_div = minutes_table.parent
         matter_div = this_div.next_sibling
         files_div = get_support_files_div(minutes_table)
@@ -309,9 +308,7 @@ def get_matter(
         return str_simplified(matter_div.text)
 
     def _extract_status(text: str) -> Tuple[str, Optional[str]]:
-        """
-        (matter text blob, result status)
-        """
+        """(matter text blob, result status)."""
         uppercase_word = re.search(r"^\s*([A-Z]+)", text)
         if uppercase_word is None:
             return text, None
@@ -322,9 +319,7 @@ def get_matter(
         )
 
     def _get_name(text: str) -> str:
-        """
-        Keep just the name in the matter text blob
-        """
+        """Keep just the name in the matter text blob."""
         name_end = text.rfind(" dated")
         if name_end < 0:
             name_end = text.rfind(" - (")
@@ -336,7 +331,7 @@ def get_matter(
     def _get_type(matter_name: str) -> Optional[str]:
         """
         Last word seems to be appropriate to use as type
-        e.g. report, motion
+        e.g. report, motion.
         """
         type_end = matter_name.rfind("(")
         if type_end < 0:
@@ -366,7 +361,7 @@ def get_matter(
 
 class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
     """
-    Adapter for civic_scraper PrimeGovSite in cdp-scrapers
+    Adapter for civic_scraper PrimeGovSite in cdp-scrapers.
 
     See Also
     --------
@@ -385,7 +380,7 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
         matter_rejected_pattern: str = r"rejected|dropped",
         person_aliases: Optional[Dict[str, Set[str]]] = None,
     ):
-        """
+        r"""
         Parameters
         ----------
         client_id: str
@@ -395,7 +390,7 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
         matter_adopted_pattern: str
             Regex pattern used to convert matter was adopted to CDP constant value.
             Default: "approved|confirmed|passed|adopted"
-        matter_in_progess_pattern: str
+        matter_in_progress_pattern: str
             Regex pattern used to convert matter is in-progress to CDP constant value.
             Default: "heard|ready|filed|held|(?:in\\s*committee)"
         matter_rejected_pattern: str
@@ -439,7 +434,7 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
 
     def get_session(self, meeting: Meeting) -> Optional[Session]:
         """
-        Extract a Session from a primegov meeting dictionary
+        Extract a Session from a primegov meeting dictionary.
 
         Parameters
         ----------
@@ -461,7 +456,7 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
 
     def get_body(self, meeting: Meeting) -> Optional[Body]:
         """
-        Extract a Body from a primegov meeting dictionary
+        Extract a Body from a primegov meeting dictionary.
 
         Parameters
         ----------
@@ -477,7 +472,7 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
 
     def get_minutes_item(self, minutes_table: Tag) -> Optional[MinutesItem]:
         """
-        Extract a minutes item from a <table> on agenda web page
+        Extract a minutes item from a <table> on agenda web page.
 
         Parameters
         ----------
@@ -499,7 +494,7 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
         self, minutes_table: Tag, minutes_item: Optional[MinutesItem] = None
     ) -> Optional[Matter]:
         """
-        Extract matter info from a minutes item <table> on agenda web page
+        Extract matter info from a minutes item <table> on agenda web page.
 
         Parameters
         ----------
@@ -550,7 +545,7 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
 
     def get_event_minutes_item(self, minutes_table: Tag) -> Optional[EventMinutesItem]:
         """
-        Extract event minutes item info from a minutes item <table> on agenda web page
+        Extract event minutes item info from a minutes item <table> on agenda web page.
 
         Parameters
         ----------
@@ -597,7 +592,7 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
         )
         return self.get_none_if_empty(event_minutes_item)
 
-    def get_event_minutes_items(
+    def get_event_minutes_items(  # noqa: C901
         self, meeting: Meeting
     ) -> Optional[List[EventMinutesItem]]:
         """
@@ -622,11 +617,11 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
         def _get_output_id(output_docs: List[Dict]) -> int:
             """
             Extract an agenda output document id
-            "compiledMeetingDocumentFiles": [{"id": 41005, ...}, ...]
+            "compiledMeetingDocumentFiles": [{"id": 41005, ...}, ...].
             """
-            WEB_PAGE_TYPE = 3
+            web_page_type = 3
             web_pages = list(
-                filter(lambda d: d["compileOutputType"] == WEB_PAGE_TYPE, output_docs)
+                filter(lambda d: d["compileOutputType"] == web_page_type, output_docs)
             )
             # it appears that, when there are multiple, we want output type 3
             if any(web_pages):
@@ -636,7 +631,7 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
             return document["id"]
 
         def _find_agenda_urls() -> Iterator[str]:
-            output_templates = meeting.get("templates", list())
+            output_templates = meeting.get("templates", [])
             # These 2 output file templates refer to potential agenda web pages
             # meeting["templates"] = [
             #     {"title": "Journal", ...},
@@ -678,7 +673,7 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
 
     def get_event(self, meeting: Meeting) -> Optional[EventIngestionModel]:
         """
-        Extract a EventIngestionModel from a primegov meeting dictionary
+        Extract a EventIngestionModel from a primegov meeting dictionary.
 
         Parameters
         ----------
@@ -710,7 +705,7 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
         end: datetime,
     ) -> Iterator[Meeting]:
         """
-        Query meetings from primegov api endpoint
+        Query meetings from primegov api endpoint.
 
         Parameters
         ----------

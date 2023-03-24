@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import json
 import logging
@@ -36,7 +35,7 @@ STATIC_FILE_DEFAULT_PATH = Path(__file__).parent / "seattle-static.json"
 
 # we have discovered the city clerk accidentally entered Daniel Strauss
 # instead of the correct Dan Strauss for a few events
-PERSON_ALIASES = {"Dan Strauss": set(["Daniel Strauss"])}
+PERSON_ALIASES = {"Dan Strauss": {"Daniel Strauss"}}
 
 ###############################################################################
 
@@ -45,9 +44,7 @@ class SeattleScraper(LegistarScraper):
     PYTHON_MUNICIPALITY_SLUG: str = "seattle"
 
     def __init__(self):
-        """
-        Seattle specific implementation of LegistarScraper.
-        """
+        """Seattle specific implementation of LegistarScraper."""
         super().__init__(
             client="seattle",
             timezone="America/Los_Angeles",
@@ -89,7 +86,7 @@ class SeattleScraper(LegistarScraper):
         self, video_page_url: str, event_short_date: str
     ) -> List[ContentURIs]:
         """
-        Return URLs for videos and captions parsed from seattlechannel.org web page
+        Return URLs for videos and captions parsed from seattlechannel.org web page.
 
         Parameters
         ----------
@@ -202,10 +199,8 @@ class SeattleScraper(LegistarScraper):
 
         # use max count between videos and captions
         # so we don't lose any (e.g. caption = None if < # videos)
-        iter = range(max(len(video_uris), len(caption_uris)))
         list_uri = []
-
-        for i in iter:
+        for i in range(max(len(video_uris), len(caption_uris))):
             # just in case # videos != # captions
             try:
                 video_uri = video_uris[i]
@@ -226,7 +221,7 @@ class SeattleScraper(LegistarScraper):
     @staticmethod
     def roman_to_int(roman: str):
         """
-        Roman numeral to an integer
+        Roman numeral to an integer.
 
         Parameters
         ----------
@@ -256,7 +251,7 @@ class SeattleScraper(LegistarScraper):
         self, video_list_page_url: str, event_short_date: str
     ) -> List[str]:
         """
-        Return URLs to web pages hosting videos for meetings from event_short_date
+        Return URLs to web pages hosting videos for meetings from event_short_date.
 
         Parameters
         ----------
@@ -315,10 +310,7 @@ class SeattleScraper(LegistarScraper):
         # href attribute that contains videoid
 
         soup = BeautifulSoup(response, "html.parser")
-        for link in soup.find(
-            "div",
-            class_="paginationContainer",
-        ).find_all(
+        for link in soup.find("div", class_="paginationContainer",).find_all(
             "a",
             href=re.compile("videoid"),
             onclick=re.compile("loadJWPlayer"),
@@ -352,7 +344,7 @@ class SeattleScraper(LegistarScraper):
 
     def get_content_uris(self, legistar_ev: Dict) -> List[ContentURIs]:
         """
-        Return URLs for videos and captions parsed from seattlechannel.org web page
+        Return URLs for videos and captions parsed from seattlechannel.org web page.
 
         Parameters
         ----------
@@ -440,7 +432,7 @@ class SeattleScraper(LegistarScraper):
     @staticmethod
     def get_person_picture_url(person_www: str) -> Optional[str]:
         """
-        Parse person_www and return banner image used on the web page
+        Parse person_www and return banner image used on the web page.
 
         Parameters
         ----------
@@ -479,9 +471,9 @@ class SeattleScraper(LegistarScraper):
         return None
 
     @staticmethod
-    def get_static_person_info() -> Optional[List[Person]]:
+    def get_static_person_info() -> Optional[List[Person]]:  # noqa: C901
         """
-        Return partial Persons with static long-term information
+        Return partial Persons with static long-term information.
 
         Returns
         -------
@@ -595,7 +587,7 @@ class SeattleScraper(LegistarScraper):
     @staticmethod
     def dump_static_info(file_path: str) -> bool:
         """
-        Save static data in json format
+        Save static data in json format.
 
         Parameters
         ----------
@@ -619,7 +611,7 @@ class SeattleScraper(LegistarScraper):
         if not static_person_info:
             return False
 
-        with open(file_path, "wt") as dump:
+        with open(file_path, "w") as dump:
             dump.write(
                 json.dumps({STATIC_FILE_KEY_PERSONS: static_person_info}, indent=4)
             )

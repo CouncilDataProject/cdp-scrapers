@@ -1,0 +1,10 @@
+default_context:
+    author_name: "Eva Maxfield Brown, Sung Cho, Shak Ragoler"
+    author_email: "evamaxfieldbrown@gmail.com"
+    hosting_github_username_or_org: "CouncilDataProject"
+    project_name: "cdp-scrapers"
+    project_slug: "cdp-scrapers"
+    python_slug: "cdp_scrapers"
+    project_short_description: "Scratchpad for scraper development and general utilities."
+    hosting_pypi_username: "CouncilDataProject"
+    license: "MIT License"

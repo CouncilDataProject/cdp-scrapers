@@ -15,7 +15,7 @@ log = logging.getLogger(__name__)
 def get_single_person(driver: "WebDriver", member_name: str) -> ingestion_models.Person:
     """
     Get all the information fot one person
-    Includes: role, seat, picture, phone, email
+    Includes: role, seat, picture, phone, email.
 
     Parameter:
     ----------------
@@ -24,8 +24,8 @@ def get_single_person(driver: "WebDriver", member_name: str) -> ingestion_models
     member_name:
         person's name
 
-    Returns:
-    --------------
+    Returns
+    -------
     ingestion_models
         the ingestion model for the person's part
     """
@@ -83,10 +83,10 @@ def get_single_person(driver: "WebDriver", member_name: str) -> ingestion_models
 
 def get_person() -> dict:
     """
-    Put the informtion get by get_single_person() to dictionary
+    Put the informtion get by get_single_person() to dictionary.
 
-    Returns:
-    --------------
+    Returns
+    -------
     dictionary
         key: person's name
         value: person's ingestion model
@@ -134,15 +134,15 @@ def get_person() -> dict:
 
 def get_new_person(name: str) -> ingestion_models.Person:
     """
-    Creates the person ingestion model for the people that are not recored
+    Creates the person ingestion model for the people that are not recored.
 
     Parameter:
     ----------------
     name:str
         the name of the person
 
-    Returns:
-    --------------
+    Returns
+    -------
     ingestion model
         the person ingestion model for the newly appeared person
     """
@@ -152,15 +152,15 @@ def get_new_person(name: str) -> ingestion_models.Person:
 
 def convert_status_constant(decision: str) -> str:
     """
-    Converts the matter result status to the exsiting constants
+    Converts the matter result status to the exsiting constants.
 
     Parameter:
     ----------------
     decision: str
         decision of the matter
 
-    Returns:
-    --------------
+    Returns
+    -------
     db_constants
         result status constants
     """
@@ -188,10 +188,10 @@ def assign_constant(
     vote_decision: str,
     voting_list: list,
     body_name: str,
-    PERSONS: dict,
+    persons: dict,
 ):
     """
-    Assign constants and add Vote to the ingestion models based on the vote decision
+    Assign constants and add Vote to the ingestion models based on the vote decision.
 
     Parameter:
     ----------------
@@ -207,7 +207,7 @@ def assign_constant(
         the list that contains vote ingestion models
     body_name: str
         the body name of the current meeting
-    PERSONS: dict
+    persons: dict
         Dict[str, ingestion_models.Person]
     """
     from selenium.webdriver.common.by import By
@@ -235,8 +235,8 @@ def assign_constant(
             else:
                 raise ValueError("Person name could not be constructed.")
         person = get_new_person(n)
-        if n in PERSONS:
-            person = PERSONS[n]
+        if n in persons:
+            person = persons[n]
             if person.seat is not None:
                 if person.seat.roles is not None:
                     person.seat.roles[0].body = ingestion_models.Body(
@@ -264,10 +264,10 @@ def get_voting_result(
     sub_sections_len: int,
     i: int,
     body_name: str,
-    PERSONS: dict,
+    persons: dict,
 ) -> list:
     """
-    Scrapes and converts the voting decisions to the exsiting constants
+    Scrapes and converts the voting decisions to the exsiting constants.
 
     Parameter:
     ----------------
@@ -279,11 +279,11 @@ def get_voting_result(
         tr[i] is the matter we are looking at
     body_name: str
         the body name of the current meeting
-    PERSONS: dict
+    persons: dict
         Dict[str, ingestion_models.Person]
 
-    Returns:
-    --------------
+    Returns
+    -------
     list
         contains the Vote ingestion model for each person
     """
@@ -304,12 +304,12 @@ def get_voting_result(
         if "AYES" in sub_content_role:
             vote_decision = db_constants.VoteDecision.APPROVE
             assign_constant(
-                driver, i, j, vote_decision, voting_list, body_name, PERSONS
+                driver, i, j, vote_decision, voting_list, body_name, persons
             )
         if "NAYS" in sub_content_role:
             vote_decision = db_constants.VoteDecision.REJECT
             assign_constant(
-                driver, i, j, vote_decision, voting_list, body_name, PERSONS
+                driver, i, j, vote_decision, voting_list, body_name, persons
             )
         if (
             "ABSENT" in sub_content_role
@@ -318,19 +318,19 @@ def get_voting_result(
         ):
             vote_decision = db_constants.VoteDecision.ABSENT_NON_VOTING
             assign_constant(
-                driver, i, j, vote_decision, voting_list, body_name, PERSONS
+                driver, i, j, vote_decision, voting_list, body_name, persons
             )
         if "ABSTAIN" in sub_content_role:
             vote_decision = db_constants.VoteDecision.ABSTAIN_NON_VOTING
             assign_constant(
-                driver, i, j, vote_decision, voting_list, body_name, PERSONS
+                driver, i, j, vote_decision, voting_list, body_name, persons
             )
     return voting_list
 
 
 def get_matter_status(driver: "WebDriver", i: int) -> Tuple[list, str]:
     """
-    Find the matter result status
+    Find the matter result status.
 
     Parameter:
     ----------------
@@ -339,8 +339,8 @@ def get_matter_status(driver: "WebDriver", i: int) -> Tuple[list, str]:
     i: int
         tracker used to loop the rows in the matter page
 
-    Returns:
-    --------------
+    Returns
+    -------
     sub_sections: element
         the block under the matter for the current date
     decision_constant: element
@@ -366,16 +366,16 @@ def get_matter_status(driver: "WebDriver", i: int) -> Tuple[list, str]:
     return sub_sections, status_constant
 
 
-def parse_single_matter(
+def parse_single_matter(  # noqa: C901
     driver: "WebDriver",
     test: str,
     item: str,
     body_name: str,
     s_word_formated: datetime,
-    PERSONS: dict,
+    persons: dict,
 ) -> ingestion_models.EventMinutesItem:
     """
-    Get the minute items that contains a matter
+    Get the minute items that contains a matter.
 
     Parameter:
     ----------------
@@ -387,16 +387,16 @@ def parse_single_matter(
         the body name of the current meeting
     s_word_formated: datetime
         the date of the current meeting
-    PERSONS: dict
+    persons: dict
         Dict[str, ingestion_models.Person]
 
-    Returns:
-    --------------
+    Returns
+    -------
     ingestion model
         minutes ingestion model with the matters information
     """
     from selenium.webdriver.common.by import By
-    from selenium.webdriver.support import expected_conditions as EC
+    from selenium.webdriver.support import expected_conditions as ec
     from selenium.webdriver.support.ui import WebDriverWait
 
     log.info("start get ingestion model for a matter")
@@ -416,7 +416,7 @@ def parse_single_matter(
     link.click()
     # get to the specific page for each matter
     s_matter = WebDriverWait(driver, 10).until(
-        EC.presence_of_all_elements_located(
+        ec.presence_of_all_elements_located(
             (
                 By.XPATH,
                 '//*[@id="ContentPlaceHolder1_divHistory"]/div/table/tbody/tr',
@@ -444,8 +444,8 @@ def parse_single_matter(
                     current = f"{current_name.group(1)} {current_name.group(5)}"
                 else:
                     raise ValueError("Person name could not be constructed.")
-                if current in PERSONS:
-                    sponsors.append(PERSONS[current])
+                if current in persons:
+                    sponsors.append(persons[current])
                 else:
                     sponsors.append(get_new_person(current))
             elif "Post" in s:
@@ -458,8 +458,8 @@ def parse_single_matter(
                     current = f"{current_name.group(1)} {current_name.group(5)}"
                 else:
                     raise ValueError("Person name could not be constructed.")
-                if current in PERSONS:
-                    sponsors.append(PERSONS[current])
+                if current in persons:
+                    sponsors.append(persons[current])
                 else:
                     sponsors.append(get_new_person(current))
             elif "President" in s:
@@ -472,8 +472,8 @@ def parse_single_matter(
                     current = f"{current_name.group(1)} {current_name.group(5)}"
                 else:
                     raise ValueError("Person name could not be constructed.")
-                if current in PERSONS:
-                    sponsors.append(PERSONS[current])
+                if current in persons:
+                    sponsors.append(persons[current])
                 else:
                     sponsors.append(get_new_person(current))
         s_rows = len(s_matter)
@@ -499,7 +499,7 @@ def parse_single_matter(
                     decision = db_constants.EventMinutesItemDecision.FAILED
                 if "[" in test:
                     voting_list = get_voting_result(
-                        driver, len(sub_sections), i, body_name, PERSONS
+                        driver, len(sub_sections), i, body_name, persons
                     )
 
         if len(sponsors) != 0:
@@ -533,19 +533,19 @@ def parse_single_matter(
     )
 
 
-def parse_event(
+def parse_event(  # noqa: C901
     url: str,
 ) -> ingestion_models.EventIngestionModel:
     """
-    Scrapes all the information for a meeting
+    Scrapes all the information for a meeting.
 
     Parameter:
     ----------------
     url:str
         the url of the meeting that we want to scrape
 
-    Returns:
-    --------------
+    Returns
+    -------
     ingestion model
         the ingestion model for the meeting
     """
@@ -554,14 +554,14 @@ def parse_event(
     from selenium.webdriver.chrome.options import Options
     from selenium.webdriver.chrome.service import Service
     from selenium.webdriver.common.by import By
-    from selenium.webdriver.support import expected_conditions as EC
+    from selenium.webdriver.support import expected_conditions as ec
     from selenium.webdriver.support.ui import WebDriverWait
     from webdriver_manager.chrome import ChromeDriverManager
 
     log.info("start get ingestion model for a event")
 
-    MINUTE_INDEX = [chr(i) for i in range(ord("A"), ord("Z") + 1)]
-    PERSONS = get_person()
+    minute_index = [chr(i) for i in range(ord("A"), ord("Z") + 1)]
+    persons = get_person()
 
     chrome_options = Options()
     chrome_options.add_argument("--headless")
@@ -573,7 +573,7 @@ def parse_event(
     driver.get(url)
 
     WebDriverWait(driver, 10).until(
-        EC.presence_of_all_elements_located(
+        ec.presence_of_all_elements_located(
             (By.XPATH, '//*[@id="MeetingDetail"]/tbody/tr')
         )
     )
@@ -627,7 +627,7 @@ def parse_event(
                         + str(i)
                         + "]/td[1]/strong",
                     ).text
-                )[0] in MINUTE_INDEX:
+                )[0] in minute_index:
                     if (
                         len(
                             driver.find_elements(
@@ -664,7 +664,7 @@ def parse_event(
                 item = matter.find_element(By.CLASS_NAME, "AgendaOutlineLink").text
                 if len(item) != 0:
                     matter_model = parse_single_matter(
-                        driver, test, item, body_name, s_word_formated, PERSONS
+                        driver, test, item, body_name, s_word_formated, persons
                     )
                     event_minutes_items.append(matter_model)
             elif (
@@ -682,7 +682,7 @@ def parse_event(
                 item = matter.find_element(By.CLASS_NAME, "AgendaOutlineLink").text
                 if len(item) != 0:
                     matter_model = parse_single_matter(
-                        driver, test, item, body_name, s_word_formated, PERSONS
+                        driver, test, item, body_name, s_word_formated, persons
                     )
                     event_minutes_items.append(matter_model)
             i += 1
@@ -725,7 +725,7 @@ def parse_event(
 
 def get_year(driver: "WebDriver", url: str, from_dt: datetime) -> str:
     """
-    Navigate to the year that we are looking for
+    Navigate to the year that we are looking for.
 
     Parameter:
     ----------------
@@ -734,8 +734,8 @@ def get_year(driver: "WebDriver", url: str, from_dt: datetime) -> str:
     url:str
         the url of the calender page
 
-    Returns:
-    --------------
+    Returns
+    -------
     link:str
         the link to the calender of the year that we are looking for
     """
@@ -758,7 +758,7 @@ def get_date(
     to_dt: datetime,
 ) -> list:
     """
-    Get a list of ingestion models for the meetings hold during the selected time range
+    Get a list of ingestion models for the meetings hold during the selected time range.
 
     Parameter:
     ----------------
@@ -771,8 +771,8 @@ def get_date(
     to_date:
         the end date
 
-    Returns:
-    --------------
+    Returns
+    -------
     list
         all the ingestion models for the selected date range
     """
@@ -803,7 +803,7 @@ def get_date(
 def get_events(from_dt: datetime, to_dt: datetime) -> list:
     """
     gets the right calender link
-    feed it to the function that get a list of ingestion models
+    feed it to the function that get a list of ingestion models.
 
     Parameter:
     ----------------
@@ -812,8 +812,8 @@ def get_events(from_dt: datetime, to_dt: datetime) -> list:
     to_date:
         the end date
 
-    Returns:
-    --------------
+    Returns
+    -------
     list
         all the ingestion models for the selected date range
     """
