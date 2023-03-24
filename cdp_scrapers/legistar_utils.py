@@ -10,9 +10,8 @@ from datetime import datetime, timedelta
 from json import JSONDecodeError
 from typing import Any, NamedTuple
 from urllib.error import HTTPError, URLError
-from urllib.parse import quote_plus
+from urllib.parse import quote_plus, urlsplit
 from urllib.request import urlopen
-from urllib.parse import urlsplit
 
 import requests
 from bs4 import BeautifulSoup
@@ -492,18 +491,19 @@ def get_legistar_content_uris(client: str, legistar_ev: dict) -> ContentUriScrap
         with urlopen(legistar_ev[LEGISTAR_EV_SITE_URL]) as resp:
             soup = BeautifulSoup(resp.read(), "html.parser")
 
+            if "server error" in soup.text.lower():
+                try:
+                    url_attrs = urlsplit(legistar_ev[LEGISTAR_EV_SITE_URL])
+                    netloc = url_attrs.netloc
+                except ValueError:
+                    netloc = legistar_ev[LEGISTAR_EV_SITE_URL]
+                raise Exception(
+                    f"{netloc} appears to be down: {str_simplified(soup.text)}"
+                )
+
     except (URLError, HTTPError) as e:
         log.debug(f"{legistar_ev[LEGISTAR_EV_SITE_URL]}: {str(e)}")
         return (ContentUriScrapeResult.Status.ResourceAccessError, None)
-
-    if "server error" in soup.text.lower():
-        try:
-            url_attrs = urlsplit(legistar_ev[LEGISTAR_EV_SITE_URL])
-            netloc = url_attrs.netloc
-        except ValueError:
-            netloc = legistar_ev[LEGISTAR_EV_SITE_URL]
-
-        raise URLError(f"{netloc} appears to be down: {str_simplified(soup.text)}")
 
     # this gets us the url for the web PAGE containing the video
     # video link is provided in the window.open()command inside onclick event
