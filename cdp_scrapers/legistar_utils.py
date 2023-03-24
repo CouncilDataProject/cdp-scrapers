@@ -459,7 +459,7 @@ def get_legistar_content_uris(client: str, legistar_ev: dict) -> ContentUriScrap
     NotImplementedError
         Means the content structure of the web page hosting session video has changed.
         We need explicit review and update the scraping code.
-    URLError
+    ConnectionError
         When the Legistar site (e.g. *.legistar.com) itself may be down.
 
     See Also
@@ -497,7 +497,7 @@ def get_legistar_content_uris(client: str, legistar_ev: dict) -> ContentUriScrap
                     netloc = url_attrs.netloc
                 except ValueError:
                     netloc = legistar_ev[LEGISTAR_EV_SITE_URL]
-                raise Exception(
+                raise ConnectionError(
                     f"{netloc} appears to be down: {str_simplified(soup.text)}"
                 )
 
