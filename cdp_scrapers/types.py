@@ -39,5 +39,5 @@ uris: Optional[List[ContentURIs]]
 See Also
 --------
 cdp_scrapers.legistar_content_parsers
-cdp_scrapers.legistar_utils.get_legistar_content_uris()
+cdp_scrapers.legistar_utils.get_legistar_content_uris
 """

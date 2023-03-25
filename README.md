@@ -60,9 +60,7 @@ seattle_cdp_parsed_events = get_seattle_events(
 
 #### Event Scraper Structure
 
-![get_events](./images/get_events.png)
-
-Our current event scraper structure is as shown above. The main function `get_events` 
+Our current event scraper structure is as follows. The main function `get_events` 
 gets all the required data and it calls the `get_content_uris` function to return the 
 required video data.
 

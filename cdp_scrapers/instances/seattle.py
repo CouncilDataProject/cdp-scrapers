@@ -103,7 +103,7 @@ class SeattleScraper(LegistarScraper):
 
         See Also
         --------
-        get_content_uris()
+        get_content_uris
         """
         with warnings.catch_warnings():
             warnings.simplefilter(
@@ -270,7 +270,7 @@ class SeattleScraper(LegistarScraper):
 
         See Also
         --------
-        get_content_uris()
+        get_content_uris
         """
         with warnings.catch_warnings():
             warnings.simplefilter(
@@ -358,7 +358,7 @@ class SeattleScraper(LegistarScraper):
 
         See Also
         --------
-        parse_content_uris()
+        parse_content_uris
 
         Notes
         -----
@@ -601,7 +601,7 @@ class SeattleScraper(LegistarScraper):
 
         See Also
         --------
-        LegistarScraper.inject_known_data()
+        LegistarScraper.inject_known_data
         """
         static_person_info = {}
         for person in SeattleScraper.get_static_person_info():

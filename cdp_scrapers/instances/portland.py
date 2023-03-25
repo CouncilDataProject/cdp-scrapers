@@ -403,7 +403,7 @@ class PortlandScraper(IngestionModelScraper):
 
         See Also
         --------
-        make_efile_url()
+        make_efile_url
         """
         try:
             # on the event page, event minute item titles are listed

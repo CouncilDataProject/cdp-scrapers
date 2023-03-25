@@ -61,7 +61,7 @@ def primegov_strftime(dt: datetime) -> str:
 
     See Also
     --------
-    civic_scraper.platforms.primegov.site.PrimeGovSite.scrape()
+    civic_scraper.platforms.primegov.site.PrimeGovSite.scrape
     """
     return dt.strftime(DATE_FORMAT)
 
@@ -167,7 +167,7 @@ def get_minutes_item(minutes_table: Tag) -> MinutesItem:
 
     See Also
     --------
-    get_minutes_tables()
+    get_minutes_tables
     """
     rows = minutes_table.find_all("tr")
 
@@ -224,7 +224,7 @@ def get_support_files(minutes_table: Tag) -> Iterator[SupportingFile]:
 
     See Also
     --------
-    get_minutes_tables()
+    get_minutes_tables
     """
 
     def extract_file(file_div: Tag) -> SupportingFile:
@@ -288,7 +288,7 @@ def get_matter(  # noqa: C901
 
     See Also
     --------
-    get_minutes_tables()
+    get_minutes_tables
     """
     # ex 1. APPROVED Information Technology Agency report dated July 26, 2022
     #       - (3) Yes; (0) No
@@ -486,7 +486,7 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
 
         See Also
         --------
-        get_minutes_item()
+        get_minutes_item
         """
         return self.get_none_if_empty(get_minutes_item(minutes_table))
 
@@ -516,7 +516,7 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
         See Also
         --------
         matter_status_pattern_map
-        get_matter()
+        get_matter
         """
 
         def _standardize_type(matter: Matter) -> Matter:
@@ -559,9 +559,9 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
 
         See Also
         --------
-        get_matter()
-        get_minutes_item()
-        get_support_files()
+        get_matter
+        get_minutes_item
+        get_support_files
         """
 
         def _get_index(minutes_table: Tag) -> Optional[int]:
@@ -611,7 +611,7 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
 
         See Also
         --------
-        get_event_minutes_item()
+        get_event_minutes_item
         """
 
         def _get_output_id(output_docs: List[Dict]) -> int:
@@ -687,8 +687,8 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
 
         See Also
         --------
-        get_body()
-        get_session()
+        get_body
+        get_session
         """
         return self.get_none_if_empty(
             EventIngestionModel(
@@ -726,7 +726,7 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
 
         See Also
         --------
-        get_events()
+        get_events
         """
         resp = self.session.get(
             API_URL.format(
@@ -759,7 +759,7 @@ class PrimeGovScraper(PrimeGovSite, IngestionModelScraper):
 
         See Also
         --------
-        get_meetings()
+        get_meetings
         """
         if end is None:
             end = datetime.utcnow()

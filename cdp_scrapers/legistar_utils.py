@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 from json import JSONDecodeError
 from typing import Any, NamedTuple
 from urllib.error import HTTPError, URLError
-from urllib.parse import quote_plus
+from urllib.parse import quote_plus, urlsplit
 from urllib.request import urlopen
 
 import requests
@@ -459,10 +459,12 @@ def get_legistar_content_uris(client: str, legistar_ev: dict) -> ContentUriScrap
     NotImplementedError
         Means the content structure of the web page hosting session video has changed.
         We need explicit review and update the scraping code.
+    ConnectionError
+        When the Legistar site (e.g. *.legistar.com) itself may be down.
 
     See Also
     --------
-    LegistarScraper.get_content_uris()
+    LegistarScraper.get_content_uris
     cdp_scrapers.legistar_content_parsers
     """
     global video_page_parser
@@ -488,6 +490,16 @@ def get_legistar_content_uris(client: str, legistar_ev: dict) -> ContentUriScrap
         # that is a summary-like page for a meeting
         with urlopen(legistar_ev[LEGISTAR_EV_SITE_URL]) as resp:
             soup = BeautifulSoup(resp.read(), "html.parser")
+
+            if "server error" in soup.text.lower():
+                try:
+                    url_attrs = urlsplit(legistar_ev[LEGISTAR_EV_SITE_URL])
+                    netloc = url_attrs.netloc
+                except ValueError:
+                    netloc = legistar_ev[LEGISTAR_EV_SITE_URL]
+                raise ConnectionError(
+                    f"{netloc} appears to be down: {str_simplified(soup.text)}"
+                )
 
     except (URLError, HTTPError) as e:
         log.debug(f"{legistar_ev[LEGISTAR_EV_SITE_URL]}: {str(e)}")
@@ -888,7 +900,7 @@ class LegistarScraper(IngestionModelScraper):
 
         See Also
         --------
-        get_legistar_body()
+        get_legistar_body
         """
         if not legistar_body:
             return None
@@ -1056,7 +1068,7 @@ class LegistarScraper(IngestionModelScraper):
 
         See Also
         --------
-        get_legistar_person()
+        get_legistar_person
         """
         if (
             not legistar_person
@@ -1416,7 +1428,7 @@ class LegistarScraper(IngestionModelScraper):
 
         See Also
         --------
-        scraper_utils.sanitize_roles()
+        scraper_utils.sanitize_roles
         """
         try:
             known_person = self.static_data.persons[person.name]

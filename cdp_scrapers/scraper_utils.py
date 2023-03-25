@@ -113,8 +113,8 @@ def parse_static_person(  # noqa: C901
 
     See Also
     --------
-    parse_static_file()
-    sanitize_roles()
+    parse_static_file
+    sanitize_roles
     """
     log.debug(f"Begin parsing static data for {person_json['name']}")
 
@@ -215,8 +215,8 @@ def parse_static_file(file_path: Path, timezone: str) -> ScraperStaticData:
 
     See Also
     --------
-    parse_static_person()
-    sanitize_roles()
+    parse_static_person
+    sanitize_roles
 
     Notes
     -----
