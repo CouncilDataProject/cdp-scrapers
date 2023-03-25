@@ -464,7 +464,7 @@ def get_legistar_content_uris(client: str, legistar_ev: dict) -> ContentUriScrap
 
     See Also
     --------
-    LegistarScraper.get_content_uris()
+    LegistarScraper.get_content_uris
     cdp_scrapers.legistar_content_parsers
     """
     global video_page_parser
@@ -900,7 +900,7 @@ class LegistarScraper(IngestionModelScraper):
 
         See Also
         --------
-        get_legistar_body()
+        get_legistar_body
         """
         if not legistar_body:
             return None
@@ -1068,7 +1068,7 @@ class LegistarScraper(IngestionModelScraper):
 
         See Also
         --------
-        get_legistar_person()
+        get_legistar_person
         """
         if (
             not legistar_person
@@ -1428,7 +1428,7 @@ class LegistarScraper(IngestionModelScraper):
 
         See Also
         --------
-        scraper_utils.sanitize_roles()
+        scraper_utils.sanitize_roles
         """
         try:
             known_person = self.static_data.persons[person.name]

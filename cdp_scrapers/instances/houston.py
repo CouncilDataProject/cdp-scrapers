@@ -20,8 +20,8 @@ class HoustonScraper(IngestionModelScraper):
         """
         Remove types that are not useful.
 
-        Parameter:
-        ----------------
+        Parameters
+        ----------
         element: Union[Tag, NavigableString, None]
             The element in the page that we want to scrape
 
@@ -38,8 +38,8 @@ class HoustonScraper(IngestionModelScraper):
         """
         Get the body name for an event.
 
-        Parameter:
-        ----------------
+        Parameters
+        ----------
         event: Union[Tag, NavigableString, None]
             All elements in the page that we want to scrape
 
@@ -63,8 +63,8 @@ class HoustonScraper(IngestionModelScraper):
         """
         Parse the page and gather the event minute items.
 
-        Parameter:
-        ----------------
+        Parameters
+        ----------
         event: Union[Tag, NavigableString, None]
             All elements in the page that we want to scrape
 

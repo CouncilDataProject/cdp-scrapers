@@ -17,8 +17,8 @@ def get_single_person(driver: "WebDriver", member_name: str) -> ingestion_models
     Get all the information fot one person
     Includes: role, seat, picture, phone, email.
 
-    Parameter:
-    ----------------
+    Parameters
+    ----------
     driver:
         webdriver calling the people's dictionary page
     member_name:
@@ -136,8 +136,8 @@ def get_new_person(name: str) -> ingestion_models.Person:
     """
     Creates the person ingestion model for the people that are not recored.
 
-    Parameter:
-    ----------------
+    Parameters
+    ----------
     name:str
         the name of the person
 
@@ -154,8 +154,8 @@ def convert_status_constant(decision: str) -> str:
     """
     Converts the matter result status to the exsiting constants.
 
-    Parameter:
-    ----------------
+    Parameters
+    ----------
     decision: str
         decision of the matter
 
@@ -193,8 +193,8 @@ def assign_constant(
     """
     Assign constants and add Vote to the ingestion models based on the vote decision.
 
-    Parameter:
-    ----------------
+    Parameters
+    ----------
     driver:webdriver
         webdriver of the matter page
     i: int
@@ -269,8 +269,8 @@ def get_voting_result(
     """
     Scrapes and converts the voting decisions to the exsiting constants.
 
-    Parameter:
-    ----------------
+    Parameters
+    ----------
     driver:webdriver
         webdriver of the matter page
     sub_sections_len: int
@@ -332,8 +332,8 @@ def get_matter_status(driver: "WebDriver", i: int) -> Tuple[list, str]:
     """
     Find the matter result status.
 
-    Parameter:
-    ----------------
+    Parameters
+    ----------
     driver:webdriver
         webdriver of the matter page
     i: int
@@ -366,7 +366,7 @@ def get_matter_status(driver: "WebDriver", i: int) -> Tuple[list, str]:
     return sub_sections, status_constant
 
 
-def parse_single_matter(  # noqa: C901
+def parse_single_matter(  # noqa: C901 D417
     driver: "WebDriver",
     test: str,
     item: str,
@@ -377,8 +377,8 @@ def parse_single_matter(  # noqa: C901
     """
     Get the minute items that contains a matter.
 
-    Parameter:
-    ----------------
+    Parameters
+    ----------
     driver:webdriver
         webdriver of the matter page
     matter:element
@@ -539,8 +539,8 @@ def parse_event(  # noqa: C901
     """
     Scrapes all the information for a meeting.
 
-    Parameter:
-    ----------------
+    Parameters
+    ----------
     url:str
         the url of the meeting that we want to scrape
 
@@ -727,12 +727,14 @@ def get_year(driver: "WebDriver", url: str, from_dt: datetime) -> str:
     """
     Navigate to the year that we are looking for.
 
-    Parameter:
-    ----------------
+    Parameters
+    ----------
     driver:webdriver
         empty webdriver
     url:str
         the url of the calender page
+    from_dt:datetime
+        the datetime object for the search target year
 
     Returns
     -------
@@ -760,15 +762,15 @@ def get_date(
     """
     Get a list of ingestion models for the meetings hold during the selected time range.
 
-    Parameter:
-    ----------------
+    Parameters
+    ----------
     driver:webdriver
         empty webdriver
     url:str
         the url of the calender page
     from_dt:
         the begin date
-    to_date:
+    to_dt:
         the end date
 
     Returns
@@ -805,11 +807,11 @@ def get_events(from_dt: datetime, to_dt: datetime) -> list:
     gets the right calender link
     feed it to the function that get a list of ingestion models.
 
-    Parameter:
-    ----------------
+    Parameters
+    ----------
     from_dt:
         the begin date
-    to_date:
+    to_dt:
         the end date
 
     Returns
