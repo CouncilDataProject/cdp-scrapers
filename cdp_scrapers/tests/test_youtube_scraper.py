@@ -54,9 +54,10 @@ def test_search_url(channel, search_terms, begin, end, expected_url):
         query_url = urljoin_search_query(
             channel_name=channel, search_terms=search_terms, begin=begin, end=end
         )
-        assert query_url == str(expected_url)
     except ValueError:
-        assert expected_url is None
+        query_url = None
+
+    assert query_url == expected_url
 
 
 @pytest.mark.parametrize(
@@ -76,7 +77,7 @@ def test_get_video_info(query_url, video_ids):
     video_info_list = get_video_info(query_url=query_url)
     id_list = [i["id"] for i in video_info_list]
 
-    assert id_list == id_list
+    assert id_list == video_ids
 
 
 @pytest.mark.parametrize(
