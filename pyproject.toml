@@ -37,6 +37,7 @@ dependencies = [
   "requests~=2.25",
   "clean-text~=0.6.0",
   "civic-scraper~=0.2.5",
+  "yt-dlp>=2023.2.17",
 ]
 
 [project.urls]
