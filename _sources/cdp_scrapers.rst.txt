@@ -52,6 +52,14 @@ cdp\_scrapers.types module
    :undoc-members:
    :show-inheritance:
 
+cdp\_scrapers.youtube\_utils module
+-----------------------------------
+
+.. automodule:: cdp_scrapers.youtube_utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

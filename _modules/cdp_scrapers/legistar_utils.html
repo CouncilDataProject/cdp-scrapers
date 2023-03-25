@@ -1,255 +1,215 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
-
-<!DOCTYPE html>
-<html class="writer-html5" lang="en" >
-<head>
-  <meta charset="utf-8" />
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>cdp_scrapers.legistar_utils &mdash; cdp-scrapers 0.5.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
+    <!-- Generated with Sphinx 6.1.3 and Furo 2023.03.23 -->
+        <title>cdp_scrapers.legistar_utils - cdp-scrapers 0.1.dev1+g0b1f149 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=fad236701ea90a88636c2a8c73b44ae642ed2a53" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
     
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
     
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
-</head>
-
-<body class="wy-body-for-nav">
-
-   
-  <div class="wy-grid-for-nav">
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
     
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-          
 
-          
-            <a href="../../index.html" class="icon icon-home"> cdp-scrapers
-          
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
 
-          
-          </a>
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
 
-          
-            
-            
-              <div class="version">
-                0.5.0
-              </div>
-            
-          
 
-          
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
 
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">cdp-scrapers 0.1.dev1+g0b1f149 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  
+  <span class="sidebar-brand-text">cdp-scrapers 0.1.dev1+g0b1f149 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../index.html">Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../installation.html#stable-release">Stable release</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../installation.html#from-sources">From sources</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../finding_legistar_id.html">Searching for your Municipality's Legistar ID</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../legistar_scraper.html">LegistarScraper</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../legistar_scraper.html#filtering">Filtering</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../legistar_scraper.html#legistar-to-cdp-ingestionmodel">Legistar to CDP <code class="docutils literal notranslate"><span class="pre">IngestionModel</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../legistar_scraper.html#instance-specific-scraping">Instance-Specific Scraping</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../legistar_scraper.html#scraping-for-session-video-uri">Scraping for <code class="docutils literal notranslate"><span class="pre">Session.video_uri</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../legistar_scraper.html#information-from-other-sources">Information From Other Sources</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../legistar_scraper.html#other-notes">Other Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../legistar_scraper.html">LegistarScraper</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../modules.html">Package modules</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../cdp_scrapers.html">cdp_scrapers package</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../cdp_scrapers.instances.html">cdp_scrapers.instances package</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Package Modules</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../cdp_scrapers.html">cdp_scrapers package</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../cdp_scrapers.html#subpackages">Subpackages</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.instances.html">cdp_scrapers.instances package</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../cdp_scrapers.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../cdp_scrapers.html#module-cdp_scrapers.legistar_content_parsers">cdp_scrapers.legistar_content_parsers module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../cdp_scrapers.html#module-cdp_scrapers.legistar_utils">cdp_scrapers.legistar_utils module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.ContentUriScrapeResult"><code class="docutils literal notranslate"><span class="pre">ContentUriScrapeResult</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper"><code class="docutils literal notranslate"><span class="pre">LegistarScraper</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.get_legistar_body"><code class="docutils literal notranslate"><span class="pre">get_legistar_body()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.get_legistar_content_uris"><code class="docutils literal notranslate"><span class="pre">get_legistar_content_uris()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.get_legistar_events_for_timespan"><code class="docutils literal notranslate"><span class="pre">get_legistar_events_for_timespan()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.get_legistar_person"><code class="docutils literal notranslate"><span class="pre">get_legistar_person()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.parse_video_page_url"><code class="docutils literal notranslate"><span class="pre">parse_video_page_url()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../cdp_scrapers.html#module-cdp_scrapers.prime_gov_utils">cdp_scrapers.prime_gov_utils module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper"><code class="docutils literal notranslate"><span class="pre">PrimeGovScraper</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_matter"><code class="docutils literal notranslate"><span class="pre">get_matter()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_minutes_item"><code class="docutils literal notranslate"><span class="pre">get_minutes_item()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_minutes_tables"><code class="docutils literal notranslate"><span class="pre">get_minutes_tables()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_support_files"><code class="docutils literal notranslate"><span class="pre">get_support_files()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_support_files_div"><code class="docutils literal notranslate"><span class="pre">get_support_files_div()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.load_agenda"><code class="docutils literal notranslate"><span class="pre">load_agenda()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.primegov_strftime"><code class="docutils literal notranslate"><span class="pre">primegov_strftime()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.primegov_strptime"><code class="docutils literal notranslate"><span class="pre">primegov_strptime()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../cdp_scrapers.html#module-cdp_scrapers.scraper_utils">cdp_scrapers.scraper_utils module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.scraper_utils.IngestionModelScraper"><code class="docutils literal notranslate"><span class="pre">IngestionModelScraper</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.scraper_utils.parse_static_file"><code class="docutils literal notranslate"><span class="pre">parse_static_file()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.scraper_utils.parse_static_person"><code class="docutils literal notranslate"><span class="pre">parse_static_person()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.scraper_utils.reduced_list"><code class="docutils literal notranslate"><span class="pre">reduced_list()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.scraper_utils.sanitize_roles"><code class="docutils literal notranslate"><span class="pre">sanitize_roles()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.scraper_utils.str_simplified"><code class="docutils literal notranslate"><span class="pre">str_simplified()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../cdp_scrapers.html#module-cdp_scrapers.types">cdp_scrapers.types module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.types.ContentURIs"><code class="docutils literal notranslate"><span class="pre">ContentURIs</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.types.LegistarContentParser"><code class="docutils literal notranslate"><span class="pre">LegistarContentParser</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.types.ScraperStaticData"><code class="docutils literal notranslate"><span class="pre">ScraperStaticData</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../cdp_scrapers.html#module-cdp_scrapers">Module contents</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../cdp_scrapers.html#cdp_scrapers.get_module_version"><code class="docutils literal notranslate"><span class="pre">get_module_version()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#get-started">Get Started!</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#deploying">Deploying</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Core Components:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../cdp_scrapers.instances.empty.get_events.html">cdp_scrapers.instances.empty.get_events</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../cdp_scrapers.instances.empty.get_events.html#cdp_scrapers.instances.empty.get_events"><code class="docutils literal notranslate"><span class="pre">get_events()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../../cdp_scrapers.legistar_utils.LegistarScraper.html">cdp_scrapers.legistar_utils.LegistarScraper</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../cdp_scrapers.legistar_utils.LegistarScraper.html#cdp_scrapers.legistar_utils.LegistarScraper"><code class="docutils literal notranslate"><span class="pre">LegistarScraper</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../cdp_scrapers.legistar_utils.LegistarScraper.html#cdp_scrapers.legistar_utils.LegistarScraper.__init__"><code class="docutils literal notranslate"><span class="pre">LegistarScraper.__init__()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../cdp_scrapers.instances.empty.get_events.html">cdp_scrapers.instances.empty.get_events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cdp_scrapers.legistar_utils.LegistarScraper.html">cdp_scrapers.legistar_utils.LegistarScraper</a></li>
 </ul>
 
-            
-          
-        </div>
-        
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">cdp-scrapers</a>
-        
-      </nav>
-
-
-      <div class="wy-nav-content">
-        
-        <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
-  <ul class="wy-breadcrumbs">
-    
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-        
-          <li><a href="../cdp_scrapers.html">cdp_scrapers</a> &raquo;</li>
-        
-      <li>cdp_scrapers.legistar_utils</li>
-    
-    
-      <li class="wy-breadcrumbs-aside">
-        
-      </li>
-    
-  </ul>
-
-  
-  <hr/>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-            
-  <h1>Source code for cdp_scrapers.legistar_utils</h1><div class="highlight"><pre>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <h1>Source code for cdp_scrapers.legistar_utils</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python</span>
-<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span> <span class="nn">enum</span>
 <span class="kn">import</span> <span class="nn">logging</span>
@@ -257,9 +217,9 @@
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
 <span class="kn">from</span> <span class="nn">json</span> <span class="kn">import</span> <span class="n">JSONDecodeError</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">NamedTuple</span>
 <span class="kn">from</span> <span class="nn">urllib.error</span> <span class="kn">import</span> <span class="n">HTTPError</span><span class="p">,</span> <span class="n">URLError</span>
-<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">quote_plus</span>
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">quote_plus</span><span class="p">,</span> <span class="n">urlsplit</span>
 <span class="kn">from</span> <span class="nn">urllib.request</span> <span class="kn">import</span> <span class="n">urlopen</span>
 
 <span class="kn">import</span> <span class="nn">requests</span>
@@ -362,17 +322,17 @@
 <span class="c1">###############################################################################</span>
 
 
-<span class="n">known_legistar_persons</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="n">known_legistar_bodies</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">known_legistar_persons</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">known_legistar_bodies</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="c1"># video web page parser type per municipality</span>
-<span class="n">video_page_parser</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">LegistarContentParser</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">video_page_parser</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">LegistarContentParser</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
 
 <div class="viewcode-block" id="get_legistar_body"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.get_legistar_body">[docs]</a><span class="k">def</span> <span class="nf">get_legistar_body</span><span class="p">(</span>
     <span class="n">client</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">body_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return information for a single legistar body in JSON.</span>
 
@@ -425,7 +385,7 @@
     <span class="n">client</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">person_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return information for a single legistar person in JSON.</span>
 
@@ -485,7 +445,7 @@
             <span class="n">known_legistar_persons</span><span class="p">[</span><span class="n">person_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">person</span>
         <span class="k">return</span> <span class="n">person</span>
 
-    <span class="n">office_records</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+    <span class="n">office_records</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">office_records</span><span class="p">:</span>
         <span class="c1"># body for this role</span>
         <span class="n">record</span><span class="p">[</span><span class="n">LEGISTAR_ROLE_BODY</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_legistar_body</span><span class="p">(</span>
@@ -500,9 +460,9 @@
 
 <div class="viewcode-block" id="get_legistar_events_for_timespan"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.get_legistar_events_for_timespan">[docs]</a><span class="k">def</span> <span class="nf">get_legistar_events_for_timespan</span><span class="p">(</span>
     <span class="n">client</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">begin</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">end</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+    <span class="n">begin</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">end</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get all legistar events and each events minutes items, people, and votes, for a</span>
 <span class="sd">    client for a given timespan.</span>
@@ -632,6 +592,8 @@
 
 <div class="viewcode-block" id="ContentUriScrapeResult"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.ContentUriScrapeResult">[docs]</a><span class="k">class</span> <span class="nc">ContentUriScrapeResult</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
 <div class="viewcode-block" id="ContentUriScrapeResult.Status"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.ContentUriScrapeResult.Status">[docs]</a>    <span class="k">class</span> <span class="nc">Status</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Status of content parsing.&quot;&quot;&quot;</span>
+
         <span class="c1"># Web page(s) are in unrecognized structure</span>
         <span class="n">UnrecognizedPatternError</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
         <span class="c1"># Error in accessing some resource</span>
@@ -642,12 +604,12 @@
         <span class="n">Ok</span> <span class="o">=</span> <span class="mi">0</span></div>
 
     <span class="n">status</span><span class="p">:</span> <span class="n">Status</span>
-    <span class="n">uris</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">ContentURIs</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span></div>
+    <span class="n">uris</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ContentURIs</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 
-<div class="viewcode-block" id="parse_video_page_url"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.parse_video_page_url">[docs]</a><span class="k">def</span> <span class="nf">parse_video_page_url</span><span class="p">(</span><span class="n">video_page_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ContentURIs</span><span class="p">]:</span>
+<div class="viewcode-block" id="parse_video_page_url"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.parse_video_page_url">[docs]</a><span class="k">def</span> <span class="nf">parse_video_page_url</span><span class="p">(</span><span class="n">video_page_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">ContentURIs</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Return URLs for videos and captions from a Legistar/Granicus-hosted video web page</span>
+<span class="sd">    Return URLs for videos and captions from a Legistar/Granicus-hosted video web page.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -682,9 +644,9 @@
     <span class="k">return</span> <span class="n">uris</span></div>
 
 
-<div class="viewcode-block" id="get_legistar_content_uris"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.get_legistar_content_uris">[docs]</a><span class="k">def</span> <span class="nf">get_legistar_content_uris</span><span class="p">(</span><span class="n">client</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">legistar_ev</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ContentUriScrapeResult</span><span class="p">:</span>
+<div class="viewcode-block" id="get_legistar_content_uris"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.get_legistar_content_uris">[docs]</a><span class="k">def</span> <span class="nf">get_legistar_content_uris</span><span class="p">(</span><span class="n">client</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">legistar_ev</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ContentUriScrapeResult</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Return URLs for videos and captions from a Legistar/Granicus-hosted video web page</span>
+<span class="sd">    Return URLs for videos and captions from a Legistar/Granicus-hosted video web page.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -706,10 +668,12 @@
 <span class="sd">    NotImplementedError</span>
 <span class="sd">        Means the content structure of the web page hosting session video has changed.</span>
 <span class="sd">        We need explicit review and update the scraping code.</span>
+<span class="sd">    ConnectionError</span>
+<span class="sd">        When the Legistar site (e.g. *.legistar.com) itself may be down.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
-<span class="sd">    LegistarScraper.get_content_uris()</span>
+<span class="sd">    LegistarScraper.get_content_uris</span>
 <span class="sd">    cdp_scrapers.legistar_content_parsers</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">video_page_parser</span>
@@ -735,6 +699,16 @@
         <span class="c1"># that is a summary-like page for a meeting</span>
         <span class="k">with</span> <span class="n">urlopen</span><span class="p">(</span><span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_EV_SITE_URL</span><span class="p">])</span> <span class="k">as</span> <span class="n">resp</span><span class="p">:</span>
             <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">resp</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="s2">&quot;html.parser&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="s2">&quot;server error&quot;</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">url_attrs</span> <span class="o">=</span> <span class="n">urlsplit</span><span class="p">(</span><span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_EV_SITE_URL</span><span class="p">])</span>
+                    <span class="n">netloc</span> <span class="o">=</span> <span class="n">url_attrs</span><span class="o">.</span><span class="n">netloc</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="n">netloc</span> <span class="o">=</span> <span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_EV_SITE_URL</span><span class="p">]</span>
+                <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">netloc</span><span class="si">}</span><span class="s2"> appears to be down: </span><span class="si">{</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">soup</span><span class="o">.</span><span class="n">text</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
 
     <span class="k">except</span> <span class="p">(</span><span class="n">URLError</span><span class="p">,</span> <span class="n">HTTPError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">legistar_ev</span><span class="p">[</span><span class="n">LEGISTAR_EV_SITE_URL</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -784,7 +758,7 @@
 
 
 <div class="viewcode-block" id="LegistarScraper"><a class="viewcode-back" href="../../cdp_scrapers.legistar_utils.LegistarScraper.html#cdp_scrapers.legistar_utils.LegistarScraper">[docs]</a><span class="k">class</span> <span class="nc">LegistarScraper</span><span class="p">(</span><span class="n">IngestionModelScraper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Base class for transforming Legistar API data to CDP IngestionModel.</span>
 
 <span class="sd">    If get_events() naively fails and raises an error, a given installation must define</span>
@@ -863,13 +837,13 @@
 <span class="sd">    --------</span>
 <span class="sd">    cdp_scrapers.legistar_utils.LegistarScraper.get_content_uris</span>
 <span class="sd">    cdp_scrapers.instances.seattle.SeattleScraper</span>
-<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: W605</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="LegistarScraper.__init__"><a class="viewcode-back" href="../../cdp_scrapers.legistar_utils.LegistarScraper.html#cdp_scrapers.legistar_utils.LegistarScraper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">client</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">timezone</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">ignore_minutes_item_patterns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span>
+        <span class="n">ignore_minutes_item_patterns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">vote_approve_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;approve|favor|yes&quot;</span><span class="p">,</span>
         <span class="n">vote_abstain_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;abstain|refuse|refrain&quot;</span><span class="p">,</span>
         <span class="n">vote_reject_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;reject|oppose|no&quot;</span><span class="p">,</span>
@@ -882,14 +856,17 @@
         <span class="n">matter_rejected_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;rejected|dropped&quot;</span><span class="p">,</span>
         <span class="n">minutes_item_decision_passed_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;pass&quot;</span><span class="p">,</span>
         <span class="n">minutes_item_decision_failed_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;not|fail&quot;</span><span class="p">,</span>
-        <span class="n">static_data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ScraperStaticData</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">person_aliases</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">role_replacements</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">static_data</span><span class="p">:</span> <span class="n">ScraperStaticData</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">person_aliases</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">role_replacements</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">timezone</span><span class="o">=</span><span class="n">timezone</span><span class="p">,</span> <span class="n">person_aliases</span><span class="o">=</span><span class="n">person_aliases</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="n">ignore_minutes_item_patterns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ignore_minutes_item_patterns</span> <span class="o">=</span> <span class="p">[]</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">client_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">client</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ignore_minutes_item_patterns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">ignore_minutes_item_patterns</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ignore_minutes_item_patterns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">ignore_minutes_item_patterns</span>
 
         <span class="c1"># regex patterns used to infer cdp_backend.database.constants</span>
         <span class="c1"># from Legistar string fields</span>
@@ -914,7 +891,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">static_data</span> <span class="o">=</span> <span class="n">static_data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">role_replacements</span> <span class="o">=</span> <span class="n">role_replacements</span> <span class="ow">or</span> <span class="p">{}</span></div>
 
-<div class="viewcode-block" id="LegistarScraper.get_matter_status"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_matter_status">[docs]</a>    <span class="k">def</span> <span class="nf">get_matter_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_matter_status</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="LegistarScraper.get_matter_status"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_matter_status">[docs]</a>    <span class="k">def</span> <span class="nf">get_matter_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_matter_status</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return appropriate MatterStatusDecision constant from EventItemMatterStatus.</span>
 
@@ -974,7 +951,7 @@
 <div class="viewcode-block" id="LegistarScraper.get_minutes_item_decision"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_minutes_item_decision">[docs]</a>    <span class="k">def</span> <span class="nf">get_minutes_item_decision</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">legistar_item_passed_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return appropriate EventMinutesItemDecision constant from</span>
 <span class="sd">        EventItemPassedFlagName.</span>
@@ -1021,7 +998,7 @@
         <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;no EventMinutesItemDecision filter for </span><span class="si">{</span><span class="n">legistar_item_passed_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="LegistarScraper.get_vote_decision"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_vote_decision">[docs]</a>    <span class="k">def</span> <span class="nf">get_vote_decision</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_vote</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="LegistarScraper.get_vote_decision"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_vote_decision">[docs]</a>    <span class="k">def</span> <span class="nf">get_vote_decision</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_vote</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># noqa: C901</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return appropriate VoteDecision constant based on Legistar Vote.</span>
 
@@ -1115,7 +1092,7 @@
             <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;no VoteDecision filter for </span><span class="si">{</span><span class="n">vote_value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">decision</span></div>
 
-<div class="viewcode-block" id="LegistarScraper.get_body"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_body">[docs]</a>    <span class="k">def</span> <span class="nf">get_body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_body</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Body</span><span class="p">]:</span>
+<div class="viewcode-block" id="LegistarScraper.get_body"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_body">[docs]</a>    <span class="k">def</span> <span class="nf">get_body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_body</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Body</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return CDP Body for Legistar body.</span>
 
@@ -1132,7 +1109,7 @@
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
-<span class="sd">        get_legistar_body()</span>
+<span class="sd">        get_legistar_body</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">legistar_body</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
@@ -1169,10 +1146,10 @@
         <span class="k">return</span> <span class="n">role_title</span></div>
 
 <div class="viewcode-block" id="LegistarScraper.get_roles"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_roles">[docs]</a>    <span class="k">def</span> <span class="nf">get_roles</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">legistar_office_records</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Role</span><span class="p">]]:</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">legistar_office_records</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Role</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return list of CDP Role from list of legistar OfficeRecord</span>
+<span class="sd">        Return list of CDP Role from list of legistar OfficeRecord.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1222,7 +1199,7 @@
             <span class="p">]</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="LegistarScraper.resolve_person_alias"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.resolve_person_alias">[docs]</a>    <span class="k">def</span> <span class="nf">resolve_person_alias</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">person</span><span class="p">:</span> <span class="n">Person</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Person</span><span class="p">]:</span>
+<div class="viewcode-block" id="LegistarScraper.resolve_person_alias"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.resolve_person_alias">[docs]</a>    <span class="k">def</span> <span class="nf">resolve_person_alias</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">person</span><span class="p">:</span> <span class="n">Person</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Person</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        If input person is in fact an alias of a reference known person,</span>
 <span class="sd">        return the reference person instead.</span>
@@ -1256,13 +1233,13 @@
                 <span class="k">try</span><span class="p">:</span>
                     <span class="c1"># query to get PersonId for the reference person we want to use</span>
                     <span class="c1"># in place of the input person</span>
-                    <span class="n">response</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
                         <span class="n">request_format</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                             <span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">client_name</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">quote_plus</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
                         <span class="p">),</span>
                     <span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
                 <span class="k">except</span> <span class="n">JSONDecodeError</span><span class="p">:</span>
-                    <span class="n">response</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="n">response</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
 
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">response</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">LEGISTAR_PERSON_EXT_ID</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">response</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
                     <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
@@ -1283,7 +1260,7 @@
         <span class="c1"># input person is not an alias of a reference Person</span>
         <span class="k">return</span> <span class="n">person</span></div>
 
-<div class="viewcode-block" id="LegistarScraper.get_person"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_person">[docs]</a>    <span class="k">def</span> <span class="nf">get_person</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_person</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Person</span><span class="p">]:</span>
+<div class="viewcode-block" id="LegistarScraper.get_person"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_person">[docs]</a>    <span class="k">def</span> <span class="nf">get_person</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_person</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Person</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return CDP Person for Legistar Person.</span>
 
@@ -1300,7 +1277,7 @@
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
-<span class="sd">        get_legistar_person()</span>
+<span class="sd">        get_legistar_person</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span>
             <span class="ow">not</span> <span class="n">legistar_person</span>
@@ -1330,7 +1307,7 @@
             <span class="p">)</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="LegistarScraper.get_votes"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_votes">[docs]</a>    <span class="k">def</span> <span class="nf">get_votes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_votes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Vote</span><span class="p">]]:</span>
+<div class="viewcode-block" id="LegistarScraper.get_votes"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_votes">[docs]</a>    <span class="k">def</span> <span class="nf">get_votes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_votes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Vote</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return List[Vote] for Legistar API Votes.</span>
 
@@ -1360,8 +1337,8 @@
 
 <div class="viewcode-block" id="LegistarScraper.get_event_supporting_files"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_event_supporting_files">[docs]</a>    <span class="k">def</span> <span class="nf">get_event_supporting_files</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">legistar_ev_attachments</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">],</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">SupportingFile</span><span class="p">]]:</span>
+        <span class="n">legistar_ev_attachments</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">SupportingFile</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return List[SupportingFile] for Legistar API MatterAttachments.</span>
 
@@ -1389,7 +1366,8 @@
             <span class="p">]</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="LegistarScraper.get_sponsors"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_sponsors">[docs]</a>    <span class="k">def</span> <span class="nf">get_sponsors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_sponsors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Person</span><span class="p">]]:</span>
+<div class="viewcode-block" id="LegistarScraper.get_sponsors"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_sponsors">[docs]</a>    <span class="k">def</span> <span class="nf">get_sponsors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_sponsors</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Person</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get legislation sponsors.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">legistar_sponsors</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
@@ -1400,7 +1378,7 @@
             <span class="p">]</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="LegistarScraper.get_matter"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_matter">[docs]</a>    <span class="k">def</span> <span class="nf">get_matter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_ev</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Matter</span><span class="p">]:</span>
+<div class="viewcode-block" id="LegistarScraper.get_matter"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_matter">[docs]</a>    <span class="k">def</span> <span class="nf">get_matter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_ev</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Matter</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return Matter from Legistar API EventItem.</span>
 
@@ -1431,7 +1409,7 @@
             <span class="p">)</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="LegistarScraper.get_minutes_item"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_minutes_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_minutes_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_ev_item</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">MinutesItem</span><span class="p">]:</span>
+<div class="viewcode-block" id="LegistarScraper.get_minutes_item"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_minutes_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_minutes_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_ev_item</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MinutesItem</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return MinutesItem from parts of Legistar API EventItem.</span>
 
@@ -1445,7 +1423,6 @@
 <span class="sd">        minutes_item: Optional[MinutesItem]</span>
 <span class="sd">            None if could not get nonempty MinutesItem.name from EventItem.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span>
             <span class="n">MinutesItem</span><span class="p">(</span>
                 <span class="n">external_source_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">legistar_ev_item</span><span class="p">[</span><span class="n">LEGISTAR_MINUTE_EXT_ID</span><span class="p">]),</span>
@@ -1454,8 +1431,8 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="LegistarScraper.fix_event_minutes"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.fix_event_minutes">[docs]</a>    <span class="k">def</span> <span class="nf">fix_event_minutes</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">ev_minutes_item</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EventMinutesItem</span><span class="p">],</span> <span class="n">legistar_ev_item</span><span class="p">:</span> <span class="n">Dict</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EventMinutesItem</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">ev_minutes_item</span><span class="p">:</span> <span class="n">EventMinutesItem</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">legistar_ev_item</span><span class="p">:</span> <span class="nb">dict</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EventMinutesItem</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Inspect the MinutesItem and Matter in ev_minutes_item.</span>
 <span class="sd">        - Move some fields between them to make the information more meaningful.</span>
@@ -1502,14 +1479,15 @@
 
 <div class="viewcode-block" id="LegistarScraper.filter_event_minutes"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.filter_event_minutes">[docs]</a>    <span class="k">def</span> <span class="nf">filter_event_minutes</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">ev_minutes_item</span><span class="p">:</span> <span class="n">EventMinutesItem</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EventMinutesItem</span><span class="p">]:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EventMinutesItem</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return None if minutes_item.name contains unimportant text</span>
-<span class="sd">        that we want to ignore</span>
+<span class="sd">        that we want to ignore.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        ev_minutes_item: EventMinutesItem</span>
+<span class="sd">            The minutes item to filter.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1518,14 +1496,14 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">ev_minutes_item</span><span class="o">.</span><span class="n">minutes_item</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">ev_minutes_item</span><span class="o">.</span><span class="n">minutes_item</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">ev_minutes_item</span>
-        <span class="k">for</span> <span class="nb">filter</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_minutes_item_patterns</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="nb">filter</span><span class="p">,</span> <span class="n">ev_minutes_item</span><span class="o">.</span><span class="n">minutes_item</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">filter_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_minutes_item_patterns</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">filter_</span><span class="p">,</span> <span class="n">ev_minutes_item</span><span class="o">.</span><span class="n">minutes_item</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">):</span>
                 <span class="k">return</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="n">ev_minutes_item</span></div>
 
 <div class="viewcode-block" id="LegistarScraper.get_event_minutes"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_event_minutes">[docs]</a>    <span class="k">def</span> <span class="nf">get_event_minutes</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">legistar_ev_items</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">EventMinutesItem</span><span class="p">]]:</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">legistar_ev_items</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">EventMinutesItem</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return List[EventMinutesItem] for Legistar API EventItems.</span>
 
@@ -1568,9 +1546,9 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="LegistarScraper.date_and_time_to_datetime"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.date_and_time_to_datetime">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">date_and_time_to_datetime</span><span class="p">(</span><span class="n">ev_date</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ev_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">date_and_time_to_datetime</span><span class="p">(</span><span class="n">ev_date</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ev_time</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return datetime from ev_date and ev_time</span>
+<span class="sd">        Return datetime from ev_date and ev_time.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1609,7 +1587,7 @@
                 <span class="n">second</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
             <span class="p">)</span></div>
 
-<div class="viewcode-block" id="LegistarScraper.get_content_uris"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_content_uris">[docs]</a>    <span class="k">def</span> <span class="nf">get_content_uris</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_ev</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ContentURIs</span><span class="p">]:</span>
+<div class="viewcode-block" id="LegistarScraper.get_content_uris"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_content_uris">[docs]</a>    <span class="k">def</span> <span class="nf">get_content_uris</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legistar_ev</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">ContentURIs</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Must implement in class derived from LegistarScraper.</span>
 <span class="sd">        If Legistar Event.EventVideoPath is used, return an empty list in the override.</span>
@@ -1644,7 +1622,7 @@
 
 <div class="viewcode-block" id="LegistarScraper.inject_known_person"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.inject_known_person">[docs]</a>    <span class="k">def</span> <span class="nf">inject_known_person</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">person</span><span class="p">:</span> <span class="n">Person</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Person</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Inject information if person exists in static_data.persons</span>
+<span class="sd">        Inject information if person exists in static_data.persons.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1659,7 +1637,7 @@
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
-<span class="sd">        scraper_utils.sanitize_roles()</span>
+<span class="sd">        scraper_utils.sanitize_roles</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">known_person</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">static_data</span><span class="o">.</span><span class="n">persons</span><span class="p">[</span><span class="n">person</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
@@ -1690,11 +1668,11 @@
         <span class="k">return</span> <span class="n">person</span></div>
 
 <div class="viewcode-block" id="LegistarScraper.inject_known_data"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.inject_known_data">[docs]</a>    <span class="k">def</span> <span class="nf">inject_known_data</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">events</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">events</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Augment with long-term static data that changes very infrequently.</span>
-<span class="sd">        e.e. self.static_data which includes Person.picture_uri, Person.seat</span>
+<span class="sd">        e.e. self.static_data which includes Person.picture_uri, Person.seat.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1728,8 +1706,8 @@
         <span class="k">return</span> <span class="n">events</span></div>
 
 <div class="viewcode-block" id="LegistarScraper.post_process_ingestion_models"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.post_process_ingestion_models">[docs]</a>    <span class="k">def</span> <span class="nf">post_process_ingestion_models</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">events</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">events</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Called at the end of get_events() for fully custom site-specific prcessing.</span>
 <span class="sd">        inject_known_data() already operated on input events.</span>
@@ -1748,12 +1726,12 @@
 
 <div class="viewcode-block" id="LegistarScraper.get_events"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.get_events">[docs]</a>    <span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">begin</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">end</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
+        <span class="n">begin</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">end</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calls get_legistar_events_for_timespan to retrieve Legistar API data</span>
-<span class="sd">        and return as List[EventIngestionModel]</span>
+<span class="sd">        and return as List[EventIngestionModel].</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1851,7 +1829,7 @@
 
 <div class="viewcode-block" id="LegistarScraper.check_for_cdp_min_ingestion"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.legistar_utils.LegistarScraper.check_for_cdp_min_ingestion">[docs]</a>    <span class="k">def</span> <span class="nf">check_for_cdp_min_ingestion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">check_days</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">7</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Test if can obtain at least one minimally defined EventIngestionModel</span>
+<span class="sd">        Test if can obtain at least one minimally defined EventIngestionModel.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1906,48 +1884,42 @@
         <span class="c1"># no event in check_days had enough for minimal ingestion model item</span>
         <span class="k">return</span> <span class="kc">False</span></div></div>
 </pre></div>
-
-           </div>
-           
-          </div>
-          <footer>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, Eva Maxfield Brown.
-
-    </p>
-  </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
-
-</footer>
-        </div>
+        </article>
       </div>
-
-    </section>
-
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
   </div>
-  
-
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script>
-
-  
-  
-    
-   
-
-</body>
+</div><script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/scripts/furo.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    </body>
 </html>
