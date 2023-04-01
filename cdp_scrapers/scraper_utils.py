@@ -23,7 +23,7 @@ from cdp_backend.pipeline.ingestion_models import (
 )
 from cdp_backend.utils.constants_utils import get_all_class_attr_values
 
-from .types import ScraperStaticData
+from .types import ScraperStaticData, PersonsComparison
 
 ###############################################################################
 
@@ -460,6 +460,55 @@ def sanitize_roles(  # noqa: C901
     return roles
 
 
+def extract_persons(events):
+    def extract_sponsors(event_item):
+        sponsors = event_item.matter.sponsors if event_item.matter else []
+        sponsors = sponsors or []
+        sponsors = reduced_list(sponsors, collapse=False)
+        return sponsors
+
+    def extract_voters(event_item):
+        votes = event_item.votes or []
+        voters = map(lambda v: v.person, votes)
+        voters = reduced_list(voters, collapse=False)
+        return voters
+
+    events = reduced_list(events, collapse=False)
+    items = map(lambda e: e.event_minutes_items or [], events)
+    items = chain.from_iterable(items)
+    items = reduced_list(items, collapse=False)
+
+    sponsors = map(extract_sponsors, items)
+    sponsors = chain.from_iterable(sponsors)
+    voters = map(extract_voters, items)
+    voters = chain.from_iterable(voters)
+
+    persons = chain(sponsors, voters)
+    persons = {p.name: p for p in persons}
+    persons = list(persons.values())
+    return persons
+
+
+def compare_persons(scraped_persons, known_persons, primary_bodies) -> PersonsComparison:
+    def holds_primary_role(person):
+        roles = person.seat.roles if person.seat and person.seat.roles else []
+        active_roles = filter(lambda r: r.end_datetime is None or datetime.today() <= r.end_datetime.date(), roles)
+
+        body_names = map(lambda r: r.body.name if r.body else None, active_roles)
+        body_names = reduced_list(body_names, collapse=False)
+        primary_body_names = filter(lambda b: b.name in body_names, primary_bodies)
+        return any(primary_body_names)
+
+    active_persons = filter(lambda p: p.is_active, scraped_persons)
+    primary_persons = filter(holds_primary_role, active_persons)
+    names = set([p.name for p in primary_persons])
+
+    known_names = set([p.name for p in known_persons])
+    old_names = known_names - names
+    new_names = names - known_names
+    return PersonsComparison(old_names, new_names)
+
+
 class IngestionModelScraper:
     """
     Base class for events scrapers providing IngestionModels for cdp-backend pipeline.
@@ -664,32 +713,3 @@ class IngestionModelScraper:
         instances.seattle.person_aliases
         """
         return person
-
-
-def extract_persons(events):
-    def extract_sponsors(event_item):
-        sponsors = event_item.matter.sponsors if event_item.matter else []
-        sponsors = sponsors or []
-        sponsors = reduced_list(sponsors, collapse=False)
-        return sponsors
-
-    def extract_voters(event_item):
-        votes = event_item.votes or []
-        voters = map(lambda v: v.person, votes)
-        voters = reduced_list(voters, collapse=False)
-        return voters
-
-    events = reduced_list(events, collapse=False)
-    items = map(lambda e: e.event_minutes_items or [], events)
-    items = chain.from_iterable(items)
-    items = reduced_list(items, collapse=False)
-
-    sponsors = map(extract_sponsors, items)
-    sponsors = chain.from_iterable(sponsors)
-    voters = map(extract_voters, items)
-    voters = chain.from_iterable(voters)
-
-    persons = chain(sponsors, voters)
-    persons = {p.name: p for p in persons}
-    persons = list(persons.values())
-    return persons

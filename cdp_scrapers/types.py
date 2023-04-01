@@ -19,6 +19,11 @@ class ScraperStaticData(NamedTuple):
     persons: Dict[str, Person] = None
 
 
+class PersonsComparison(NamedTuple):
+    old_names: List[str] = []
+    new_names: List[str] = []
+
+
 LegistarContentParser = Callable[[str, BeautifulSoup], Optional[List[ContentURIs]]]
 """
 Function that returns URLs for videos and captions

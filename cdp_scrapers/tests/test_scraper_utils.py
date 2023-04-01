@@ -1,3 +1,4 @@
+from copy import deepcopy
 from itertools import chain
 import random
 
@@ -32,6 +33,7 @@ class TestExtractPersons:
         return [Person(name=f"person_{i}") for i in range(num_persons)]
 
     def make_matters(self, num_matters, sponsors):
+        """Make N Matters. Sponsors are randomly distributed"""
         if num_matters:
             num_sponsors = [random.randrange(len(sponsors) + 1) for _ in range(num_matters)]
             # At least one matter has all sponsors
@@ -47,6 +49,7 @@ class TestExtractPersons:
                 yield matter
 
     def make_votes(self, num_items, voters):
+        """Make N Votes. Voters are randomly distributed"""
         if num_items:
             num_voters = [random.randrange(len(voters) + 1) for _ in range(num_items)]
             # At least one minutes item has all voters
@@ -58,6 +61,7 @@ class TestExtractPersons:
                 yield votes
 
     def make_events_from_items(self, matters, votes):
+        """Combine Matters and Votes into EventIngestionModels. EventMinutesItems are randomly distributed"""
         matters_votes = zip(matters, votes)
         items = [
             EventMinutesItem(
@@ -82,6 +86,7 @@ class TestExtractPersons:
                 items.remove(item)
 
     def make_events(self, persons, num_matters, num_sponsors, num_voters):
+        """Make EventIngestionModels. Sponsors and voters are randomly distributed."""
         num_persons = len(persons)
 
         sponsors = [] if num_persons == 0 else random.sample(persons, num_sponsors)
@@ -98,6 +103,7 @@ class TestExtractPersons:
     @pytest.mark.parametrize("num_sponsors", [0, 1, 3])
     @pytest.mark.parametrize("num_voters", [0, 1, 3])
     def test_helpers(self, num_persons, num_matters, num_sponsors, num_voters):
+        """Sanity tests for the above helper methods"""
         persons = self.make_persons(num_persons)
         assert len(persons) == num_persons
 
@@ -141,6 +147,7 @@ class TestExtractPersons:
     @pytest.mark.parametrize("num_matters", [1, 3])
     @pytest.mark.parametrize("num_sponsors", [1, 3])
     def test_extract_sponsors(self, num_persons, num_matters, num_sponsors):
+        """Test that matter sponsors are extracted from events"""
         persons = self.make_persons(num_persons)
         assert len(persons) == num_persons
 
@@ -154,6 +161,7 @@ class TestExtractPersons:
     @pytest.mark.parametrize("num_matters", [1, 3])
     @pytest.mark.parametrize("num_voters", [1, 3])
     def test_extract_voters(self, num_persons, num_matters, num_voters):
+        """Test that voters are extractd from events"""
         persons = self.make_persons(num_persons)
         assert len(persons) == num_persons
 
@@ -167,6 +175,7 @@ class TestExtractPersons:
     @pytest.mark.parametrize("num_sponsors", [0, 1, 3])
     @pytest.mark.parametrize("num_voters", [0, 1, 3])
     def test_extract_persons(self, num_matters, num_sponsors, num_voters):
+        """Test that sponsors and voters are extracted from events"""
         num_persons = max(num_sponsors, num_voters)
         persons = self.make_persons(num_persons)
         assert len(persons) == num_persons
