@@ -109,7 +109,7 @@ class TestExtractPersons:
         items = [e.event_minutes_items for e in events]
         items = list(chain.from_iterable(items))
 
-        # Compare input and output sponsors
+        # Test that the fake events contain input sponsors
         matters = [i.matter for i in items]
         sponsors = [m.sponsors for m in matters]
         sponsors = chain.from_iterable(sponsors)
@@ -123,7 +123,7 @@ class TestExtractPersons:
         for sponsor in sponsors:
             assert sponsor in persons
 
-        # Compare input and output voters
+        # Test that the fake events contain input voters
         votes = [i.votes for i in items]
         votes = chain.from_iterable(votes)
         voters = [v.person for v in votes]
@@ -149,3 +149,16 @@ class TestExtractPersons:
 
         extracted_persons = extract_persons(events)
         assert len(extracted_persons) == num_sponsors
+
+    @pytest.mark.parametrize("num_persons", [1, 3])
+    @pytest.mark.parametrize("num_matters", [1, 3])
+    @pytest.mark.parametrize("num_voters", [1, 3])
+    def test_extract_voters(self, num_persons, num_matters, num_voters):
+        persons = self.make_persons(num_persons)
+        assert len(persons) == num_persons
+
+        num_voters = min(num_voters, num_persons)
+        events = self.make_events(persons, num_matters, num_sponsors=0, num_voters=num_voters)
+
+        extracted_persons = extract_persons(events)
+        assert len(extracted_persons) == num_voters
