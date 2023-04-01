@@ -675,7 +675,7 @@ def extract_persons(events):
 
     def extract_voters(event_item):
         votes = event_item.votes or []
-        voters = map(Vote.Person, votes)
+        voters = map(lambda v: v.person, votes)
         voters = reduced_list(voters, collapse=False)
         return voters
 
@@ -685,7 +685,11 @@ def extract_persons(events):
     items = reduced_list(items, collapse=False)
 
     sponsors = map(extract_sponsors, items)
+    sponsors = chain.from_iterable(sponsors)
     voters = map(extract_voters, items)
-    persons = set(sponsors) | set(voters)
+    voters = chain.from_iterable(voters)
 
+    persons = chain(sponsors, voters)
+    persons = {p.name: p for p in persons}
+    persons = list(persons.values())
     return persons

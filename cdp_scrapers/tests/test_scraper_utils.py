@@ -4,7 +4,7 @@ import random
 from cdp_backend.pipeline.ingestion_models import Matter, Person, Vote, EventMinutesItem, EventIngestionModel, MinutesItem
 import pytest
 
-from cdp_scrapers.scraper_utils import str_simplified
+from cdp_scrapers.scraper_utils import str_simplified, extract_persons
 
 
 @pytest.mark.parametrize(
@@ -57,7 +57,7 @@ class TestExtractPersons:
                 votes = [Vote(person=p, decision="Approve") for p in item_voters]
                 yield votes
 
-    def make_events(self, matters, votes):
+    def make_events_from_items(self, matters, votes):
         matters_votes = zip(matters, votes)
         items = [
             EventMinutesItem(
@@ -81,6 +81,18 @@ class TestExtractPersons:
             for item in event_items:
                 items.remove(item)
 
+    def make_events(self, persons, num_matters, num_sponsors, num_voters):
+        num_persons = len(persons)
+
+        sponsors = [] if num_persons == 0 else random.sample(persons, num_sponsors)
+        matters = self.make_matters(num_matters, sponsors)
+
+        voters = [] if num_persons == 0 else random.sample(persons, num_voters)
+        votes = self.make_votes(num_matters, voters)
+
+        events = self.make_events_from_items(matters, votes)
+        return events
+
     @pytest.mark.parametrize("num_persons", [0, 1, 3])
     @pytest.mark.parametrize("num_matters", [0, 1, 3])
     @pytest.mark.parametrize("num_sponsors", [0, 1, 3])
@@ -91,14 +103,14 @@ class TestExtractPersons:
 
         num_sponsors = min(num_sponsors, num_persons)
         num_voters = min(num_voters, num_persons)
-        _matters = [] if num_persons == 0 else self.make_matters(num_matters, random.sample(persons, num_sponsors))
-        _votes = [] if num_persons == 0 else self.make_votes(num_matters, random.sample(persons, num_voters))
-        events = self.make_events(_matters, _votes)
+        # Make fake events from sponsors and voters
+        events = self.make_events(persons, num_matters, num_sponsors, num_voters)
 
         items = [e.event_minutes_items for e in events]
         items = list(chain.from_iterable(items))
-        matters = [i.matter for i in items]
 
+        # Compare input and output sponsors
+        matters = [i.matter for i in items]
         sponsors = [m.sponsors for m in matters]
         sponsors = chain.from_iterable(sponsors)
         names = set([p.name for p in sponsors])
@@ -111,6 +123,7 @@ class TestExtractPersons:
         for sponsor in sponsors:
             assert sponsor in persons
 
+        # Compare input and output voters
         votes = [i.votes for i in items]
         votes = chain.from_iterable(votes)
         voters = [v.person for v in votes]
@@ -123,3 +136,16 @@ class TestExtractPersons:
 
         for voter in voters:
             assert voter in persons
+
+    @pytest.mark.parametrize("num_persons", [1, 3])
+    @pytest.mark.parametrize("num_matters", [1, 3])
+    @pytest.mark.parametrize("num_sponsors", [1, 3])
+    def test_extract_sponsors(self, num_persons, num_matters, num_sponsors):
+        persons = self.make_persons(num_persons)
+        assert len(persons) == num_persons
+
+        num_sponsors = min(num_sponsors, num_persons)
+        events = self.make_events(persons, num_matters, num_sponsors, num_voters=0)
+
+        extracted_persons = extract_persons(events)
+        assert len(extracted_persons) == num_sponsors
