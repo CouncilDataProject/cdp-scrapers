@@ -5,7 +5,7 @@ import re
 import sys
 from copy import deepcopy
 from datetime import datetime, timedelta
-from itertools import filterfalse, groupby
+from itertools import chain, filterfalse, groupby
 from logging import getLogger
 from pathlib import Path
 from typing import Any, NamedTuple
@@ -19,6 +19,7 @@ from cdp_backend.pipeline.ingestion_models import (
     Person,
     Role,
     Seat,
+    Vote,
 )
 from cdp_backend.utils.constants_utils import get_all_class_attr_values
 
@@ -663,3 +664,28 @@ class IngestionModelScraper:
         instances.seattle.person_aliases
         """
         return person
+
+
+def extract_persons(events):
+    def extract_sponsors(event_item):
+        sponsors = event_item.matter.sponsors if event_item.matter else []
+        sponsors = sponsors or []
+        sponsors = reduced_list(sponsors, collapse=False)
+        return sponsors
+
+    def extract_voters(event_item):
+        votes = event_item.votes or []
+        voters = map(Vote.Person, votes)
+        voters = reduced_list(voters, collapse=False)
+        return voters
+
+    events = reduced_list(events, collapse=False)
+    items = map(lambda e: e.event_minutes_items or [], events)
+    items = chain.from_iterable(items)
+    items = reduced_list(items, collapse=False)
+
+    sponsors = map(extract_sponsors, items)
+    voters = map(extract_voters, items)
+    persons = set(sponsors) | set(voters)
+
+    return persons
