@@ -162,3 +162,18 @@ class TestExtractPersons:
 
         extracted_persons = extract_persons(events)
         assert len(extracted_persons) == num_voters
+
+    @pytest.mark.parametrize("num_matters", [1, 3])
+    @pytest.mark.parametrize("num_sponsors", [0, 1, 3])
+    @pytest.mark.parametrize("num_voters", [0, 1, 3])
+    def test_extract_persons(self, num_matters, num_sponsors, num_voters):
+        num_persons = max(num_sponsors, num_voters)
+        persons = self.make_persons(num_persons)
+        assert len(persons) == num_persons
+
+        num_sponsors = min(num_sponsors, num_persons)
+        num_voters = min(num_voters, num_persons)
+        events = self.make_events(persons, num_matters, num_sponsors, num_voters)
+
+        extracted_persons = extract_persons(events)
+        assert len(extracted_persons) == num_persons
