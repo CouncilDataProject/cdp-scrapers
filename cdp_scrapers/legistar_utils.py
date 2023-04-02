@@ -1604,15 +1604,17 @@ class LegistarScraper(IngestionModelScraper):
             and any(self.static_data.persons)
             and any(self.static_data.primary_bodies)
         ):
-            persons = extract_persons(events)
-            old_new = compare_persons(
-                scraped_persons=persons,
-                known_persons=self.static_data.persons.values(),
-                primary_bodies=self.static_data.primary_bodies.values(),
-            )
-            self.handle_old_new_council(
-                old_names=old_new.old_names, new_names=old_new.new_names
-            )
+            have_primary_events = any(filter(lambda e: e.body.name in self.static_data.primary_bodies, events))
+            if have_primary_events:
+                persons = extract_persons(events)
+                old_new = compare_persons(
+                    scraped_persons=persons,
+                    known_persons=self.static_data.persons.values(),
+                    primary_bodies=self.static_data.primary_bodies.values(),
+                )
+                self.handle_old_new_council(
+                    old_names=old_new.old_names, new_names=old_new.new_names
+                )
 
         events = self.inject_known_data(events)
         events = self.post_process_ingestion_models(events)
