@@ -29,13 +29,13 @@ def test_str_simplifed(input_string: str, expected_output: str):
     assert str_simplified(input_string) == expected_output
 
 
-class TestExtractPersons:
+class TestCompareExtractPersons:
     PRIMARY_BODY = "primary_body"
 
     def make_persons(self, num_persons):
         end_datetime=datetime.today() + timedelta(days=2)
         roles = [
-            Role(title=f"primary_role", body=Body(name=TestExtractPersons.PRIMARY_BODY), end_datetime=end_datetime),
+            Role(title=f"primary_role", body=Body(name=TestCompareExtractPersons.PRIMARY_BODY), end_datetime=end_datetime),
             Role(title=f"role", body=Body(name="body"), end_datetime=end_datetime)
         ]
         seat = Seat(name="seat", roles=roles)
@@ -197,21 +197,20 @@ class TestExtractPersons:
         assert len(extracted_persons) == num_persons
 
 
-    def detect_old_new(self, num_persons, num_changed, modifier, is_unmodified):
-        persons = self.make_persons(num_persons)
-
+    def detect_old(self, persons, num_changed, modifier, is_new):
+        num_persons = len(persons)
         scraped_persons = deepcopy(persons)
         num_changed = min(num_changed, num_persons)
+
         if num_changed:
             for i in random.sample(range(num_persons), num_changed):
                 scraped_persons[i] = modifier(scraped_persons[i])
 
-        old_new = compare_persons(scraped_persons, persons, [Body(name=TestExtractPersons.PRIMARY_BODY)])
+        old_new = compare_persons(scraped_persons, persons, [Body(name=TestCompareExtractPersons.PRIMARY_BODY)])
 
         assert len(old_new.old_names) == num_changed
         for p in scraped_persons:
-            assert (not p or p.name in old_new.old_names) or is_unmodified(p)
-
+            assert (not p or p.name in old_new.old_names) or is_new(p)
 
     @pytest.mark.parametrize("num_persons", [1, 3])
     @pytest.mark.parametrize("num_inactive", [0, 1, 3])
@@ -221,7 +220,7 @@ class TestExtractPersons:
             person.is_active = False
             return person
 
-        self.detect_old_new(num_persons, num_inactive, make_inactive, lambda p: p.is_active)
+        self.detect_old(self.make_persons(num_persons), num_inactive, make_inactive, lambda p: p.is_active)
 
     @pytest.mark.parametrize("num_persons", [1, 3])
     @pytest.mark.parametrize("num_term_end", [0, 1, 3])
@@ -231,7 +230,7 @@ class TestExtractPersons:
             person.seat.roles[0].end_datetime = datetime.today() - timedelta(days=2)
             return person
 
-        self.detect_old_new(num_persons, num_term_end, make_term_end, lambda p: datetime.today().date() <= p.seat.roles[0].end_datetime.date())
+        self.detect_old(self.make_persons(num_persons), num_term_end, make_term_end, lambda p: datetime.today().date() <= p.seat.roles[0].end_datetime.date())
 
     @pytest.mark.parametrize("num_persons", [1, 3])
     @pytest.mark.parametrize("num_not_found", [0, 1, 3])
@@ -241,4 +240,25 @@ class TestExtractPersons:
             person = None
             return person
 
-        self.detect_old_new(num_persons, num_not_found, make_not_found, lambda p: p is not None)
+        self.detect_old(self.make_persons(num_persons), num_not_found, make_not_found, lambda p: p is not None)
+
+    @pytest.mark.parametrize("num_persons", [1])
+    @pytest.mark.parametrize("num_new", [0])
+    def test_detect_new(self, num_persons, num_new):
+        """Test that we detect new persons"""
+        persons = self.make_persons(num_persons)
+        num_persons = len(persons)
+        scraped_persons = deepcopy(persons)
+        num_new = min(num_new, num_persons)
+
+        while len(scraped_persons) - len(persons) < num_new:
+            del persons[random.randrange(len(persons))]
+
+        old_new = compare_persons(scraped_persons, persons, [Body(name=TestCompareExtractPersons.PRIMARY_BODY)])
+
+        assert len(old_new.new_names) == num_new
+        for p in scraped_persons:
+            if p not in persons:
+                num_new -= 1
+
+        assert num_new == 0

@@ -499,8 +499,8 @@ def compare_persons(scraped_persons, known_persons, primary_bodies) -> PersonsCo
         primary_body_names = filter(lambda b: b.name in body_names, primary_bodies)
         return any(primary_body_names)
 
-    active_persons = filter(lambda p: p and p.is_active, scraped_persons)
-    primary_persons = filter(holds_primary_role, active_persons)
+    active_persons = list(filter(lambda p: p and p.is_active, scraped_persons))
+    primary_persons = list(filter(holds_primary_role, active_persons))
     names = set([p.name for p in primary_persons])
 
     known_names = set([p.name for p in known_persons])
