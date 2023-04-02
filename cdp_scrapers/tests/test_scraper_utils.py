@@ -197,20 +197,20 @@ class TestExtractPersons:
         assert len(extracted_persons) == num_persons
 
 
-    def detect_old(self, num_persons, num_old, modifier, is_new):
+    def detect_old_new(self, num_persons, num_changed, modifier, is_unmodified):
         persons = self.make_persons(num_persons)
 
         scraped_persons = deepcopy(persons)
-        num_old = min(num_old, num_persons)
-        if num_old:
-            for i in random.sample(range(num_persons), num_old):
+        num_changed = min(num_changed, num_persons)
+        if num_changed:
+            for i in random.sample(range(num_persons), num_changed):
                 scraped_persons[i] = modifier(scraped_persons[i])
 
         old_new = compare_persons(scraped_persons, persons, [Body(name=TestExtractPersons.PRIMARY_BODY)])
 
-        assert len(old_new.old_names) == num_old
+        assert len(old_new.old_names) == num_changed
         for p in scraped_persons:
-            assert (not p or p.name in old_new.old_names) or is_new(p)
+            assert (not p or p.name in old_new.old_names) or is_unmodified(p)
 
 
     @pytest.mark.parametrize("num_persons", [1, 3])
@@ -221,7 +221,7 @@ class TestExtractPersons:
             person.is_active = False
             return person
 
-        self.detect_old(num_persons, num_inactive, make_inactive, lambda p: p.is_active)
+        self.detect_old_new(num_persons, num_inactive, make_inactive, lambda p: p.is_active)
 
     @pytest.mark.parametrize("num_persons", [1, 3])
     @pytest.mark.parametrize("num_term_end", [0, 1, 3])
@@ -231,7 +231,7 @@ class TestExtractPersons:
             person.seat.roles[0].end_datetime = datetime.today() - timedelta(days=2)
             return person
 
-        self.detect_old(num_persons, num_term_end, make_term_end, lambda p: datetime.today().date() <= p.seat.roles[0].end_datetime.date())
+        self.detect_old_new(num_persons, num_term_end, make_term_end, lambda p: datetime.today().date() <= p.seat.roles[0].end_datetime.date())
 
     @pytest.mark.parametrize("num_persons", [1, 3])
     @pytest.mark.parametrize("num_not_found", [0, 1, 3])
@@ -241,4 +241,4 @@ class TestExtractPersons:
             person = None
             return person
 
-        self.detect_old(num_persons, num_not_found, make_not_found, lambda p: p is not None)
+        self.detect_old_new(num_persons, num_not_found, make_not_found, lambda p: p is not None)
