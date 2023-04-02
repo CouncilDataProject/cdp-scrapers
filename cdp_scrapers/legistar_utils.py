@@ -1604,7 +1604,9 @@ class LegistarScraper(IngestionModelScraper):
             and any(self.static_data.persons)
             and any(self.static_data.primary_bodies)
         ):
-            have_primary_events = any(filter(lambda e: e.body.name in self.static_data.primary_bodies, events))
+            have_primary_events = any(
+                filter(lambda e: e.body.name in self.static_data.primary_bodies, events)
+            )
             if have_primary_events:
                 persons = extract_persons(events)
                 old_new = compare_persons(
