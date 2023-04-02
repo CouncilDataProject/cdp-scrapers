@@ -7,6 +7,7 @@ from cdp_backend.pipeline.ingestion_models import Matter, Person, Vote, EventMin
 import pytest
 
 from cdp_scrapers.scraper_utils import str_simplified, extract_persons, compare_persons
+from cdp_scrapers.instances.seattle import SeattleScraper
 
 
 @pytest.mark.parametrize(
@@ -262,3 +263,18 @@ class TestCompareExtractPersons:
                 num_new -= 1
 
         assert num_new == 0
+
+    @pytest.mark.flaky(reruns=3, reruns_delay=15)
+    @pytest.mark.parametrize("scraper, person, begin, end",
+        [(SeattleScraper, "Teresa Mosqueda", datetime(2023, 2, 6), datetime(2023, 2, 8))]
+    )
+    def test_new_council_member(self, scraper, person, begin, end):
+        s = scraper()
+        known_persons = deepcopy(s.static_data.persons)
+        del known_persons[person]
+
+        events = s.get_events(begin=begin, end=end)
+        scraped_persons = extract_persons(events)
+        old_new = compare_persons(scraped_persons, known_persons.values(), s.static_data.primary_bodies.values())
+
+        assert {person,} == old_new.new_names
