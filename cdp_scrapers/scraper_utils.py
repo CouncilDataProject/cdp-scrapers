@@ -492,14 +492,14 @@ def extract_persons(events):
 def compare_persons(scraped_persons, known_persons, primary_bodies) -> PersonsComparison:
     def holds_primary_role(person):
         roles = person.seat.roles if person.seat and person.seat.roles else []
-        active_roles = filter(lambda r: r.end_datetime is None or datetime.today() <= r.end_datetime.date(), roles)
+        active_roles = filter(lambda r: r.end_datetime is None or datetime.today().date() <= r.end_datetime.date(), roles)
 
         body_names = map(lambda r: r.body.name if r.body else None, active_roles)
         body_names = reduced_list(body_names, collapse=False)
         primary_body_names = filter(lambda b: b.name in body_names, primary_bodies)
         return any(primary_body_names)
 
-    active_persons = filter(lambda p: p.is_active, scraped_persons)
+    active_persons = filter(lambda p: p and p.is_active, scraped_persons)
     primary_persons = filter(holds_primary_role, active_persons)
     names = set([p.name for p in primary_persons])
 

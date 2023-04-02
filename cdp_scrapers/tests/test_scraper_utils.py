@@ -1,11 +1,12 @@
 from copy import deepcopy
+from datetime import datetime, timedelta
 from itertools import chain
 import random
 
-from cdp_backend.pipeline.ingestion_models import Matter, Person, Vote, EventMinutesItem, EventIngestionModel, MinutesItem
+from cdp_backend.pipeline.ingestion_models import Matter, Person, Vote, EventMinutesItem, EventIngestionModel, MinutesItem, Role, Body, Seat
 import pytest
 
-from cdp_scrapers.scraper_utils import str_simplified, extract_persons
+from cdp_scrapers.scraper_utils import str_simplified, extract_persons, compare_persons
 
 
 @pytest.mark.parametrize(
@@ -29,8 +30,16 @@ def test_str_simplifed(input_string: str, expected_output: str):
 
 
 class TestExtractPersons:
+    PRIMARY_BODY = "primary_body"
+
     def make_persons(self, num_persons):
-        return [Person(name=f"person_{i}") for i in range(num_persons)]
+        end_datetime=datetime.today() + timedelta(days=2)
+        roles = [
+            Role(title=f"primary_role", body=Body(name=TestExtractPersons.PRIMARY_BODY), end_datetime=end_datetime),
+            Role(title=f"role", body=Body(name="body"), end_datetime=end_datetime)
+        ]
+        seat = Seat(name="seat", roles=roles)
+        return [Person(name=f"person_{i}", seat=deepcopy(seat)) for i in range(num_persons)]
 
     def make_matters(self, num_matters, sponsors):
         """Make N Matters. Sponsors are randomly distributed"""
@@ -186,3 +195,50 @@ class TestExtractPersons:
 
         extracted_persons = extract_persons(events)
         assert len(extracted_persons) == num_persons
+
+
+    def detect_old(self, num_persons, num_old, modifier, is_new):
+        persons = self.make_persons(num_persons)
+
+        scraped_persons = deepcopy(persons)
+        num_old = min(num_old, num_persons)
+        if num_old:
+            for i in random.sample(range(num_persons), num_old):
+                scraped_persons[i] = modifier(scraped_persons[i])
+
+        old_new = compare_persons(scraped_persons, persons, [Body(name=TestExtractPersons.PRIMARY_BODY)])
+
+        assert len(old_new.old_names) == num_old
+        for p in scraped_persons:
+            assert (not p or p.name in old_new.old_names) or is_new(p)
+
+
+    @pytest.mark.parametrize("num_persons", [1, 3])
+    @pytest.mark.parametrize("num_inactive", [0, 1, 3])
+    def test_detect_inactive(self, num_persons, num_inactive):
+        """Test that we detect those with is_inactive = False"""
+        def make_inactive(person):
+            person.is_active = False
+            return person
+
+        self.detect_old(num_persons, num_inactive, make_inactive, lambda p: p.is_active)
+
+    @pytest.mark.parametrize("num_persons", [1, 3])
+    @pytest.mark.parametrize("num_term_end", [0, 1, 3])
+    def test_detect_term_end(self, num_persons, num_term_end):
+        """Test that we detect those with expired council membership"""
+        def make_term_end(person):
+            person.seat.roles[0].end_datetime = datetime.today() - timedelta(days=2)
+            return person
+
+        self.detect_old(num_persons, num_term_end, make_term_end, lambda p: datetime.today().date() <= p.seat.roles[0].end_datetime.date())
+
+    @pytest.mark.parametrize("num_persons", [1, 3])
+    @pytest.mark.parametrize("num_not_found", [0, 1, 3])
+    def test_detect_not_found(self, num_persons, num_not_found):
+        """Test that we detect those not scraped"""
+        def make_not_found(person):
+            person = None
+            return person
+
+        self.detect_old(num_persons, num_not_found, make_not_found, lambda p: p is not None)
