@@ -1,13 +1,22 @@
+import random
 from copy import deepcopy
 from datetime import datetime, timedelta
 from itertools import chain
-import random
 
-from cdp_backend.pipeline.ingestion_models import Matter, Person, Vote, EventMinutesItem, EventIngestionModel, MinutesItem, Role, Body, Seat
 import pytest
+from cdp_backend.pipeline.ingestion_models import (
+    Body,
+    EventIngestionModel,
+    EventMinutesItem,
+    Matter,
+    Person,
+    Role,
+    Seat,
+    Vote,
+)
 
-from cdp_scrapers.scraper_utils import str_simplified, extract_persons, compare_persons
 from cdp_scrapers.instances.seattle import SeattleScraper
+from cdp_scrapers.scraper_utils import compare_persons, extract_persons, str_simplified
 
 
 @pytest.mark.parametrize(
@@ -34,44 +43,56 @@ class TestCompareExtractPersons:
     PRIMARY_BODY = "primary_body"
 
     def make_persons(self, num_persons):
-        end_datetime=datetime.today() + timedelta(days=2)
+        """Make N active councilmembers."""
+        end_datetime = datetime.today() + timedelta(days=2)
         roles = [
-            Role(title=f"primary_role", body=Body(name=TestCompareExtractPersons.PRIMARY_BODY), end_datetime=end_datetime),
-            Role(title=f"role", body=Body(name="body"), end_datetime=end_datetime)
+            Role(
+                title="primary_role",
+                body=Body(name=TestCompareExtractPersons.PRIMARY_BODY),
+                end_datetime=end_datetime,
+            ),
+            Role(title="role", body=Body(name="body"), end_datetime=end_datetime),
         ]
         seat = Seat(name="seat", roles=roles)
-        return [Person(name=f"person_{i}", seat=deepcopy(seat)) for i in range(num_persons)]
+        return [
+            Person(name=f"person_{i}", seat=deepcopy(seat)) for i in range(num_persons)
+        ]
 
     def make_matters(self, num_matters, sponsors):
-        """Make N Matters. Sponsors are randomly distributed"""
+        """Make N Matters. Sponsors are randomly distributed."""
         if num_matters:
-            num_sponsors = [random.randrange(len(sponsors) + 1) for _ in range(num_matters)]
+            num_sponsors = [
+                random.randrange(len(sponsors) + 1) for _ in range(num_matters)
+            ]
             # At least one matter has all sponsors
             num_sponsors[random.randrange(num_matters)] = len(sponsors)
 
             for i, k in enumerate(num_sponsors):
                 matter = Matter(
-                        name=f"matter_{i}",
-                        matter_type=f"type_{i}",
-                        title=f"title_{i}",
-                        sponsors=random.sample(sponsors, k),
-                    )
+                    name=f"matter_{i}",
+                    matter_type=f"type_{i}",
+                    title=f"title_{i}",
+                    sponsors=random.sample(sponsors, k),
+                )
                 yield matter
 
     def make_votes(self, num_items, voters):
-        """Make N Votes. Voters are randomly distributed"""
+        """Make N Votes. Voters are randomly distributed."""
         if num_items:
             num_voters = [random.randrange(len(voters) + 1) for _ in range(num_items)]
             # At least one minutes item has all voters
             num_voters[random.randrange(num_items)] = len(voters)
 
-            for i, k in enumerate(num_voters):
+            for _i, k in enumerate(num_voters):
                 item_voters = random.sample(voters, k)
                 votes = [Vote(person=p, decision="Approve") for p in item_voters]
                 yield votes
 
     def make_events_from_items(self, matters, votes):
-        """Combine Matters and Votes into EventIngestionModels. EventMinutesItems are randomly distributed"""
+        """
+        Combine Matters and Votes into EventIngestionModels.
+        EventMinutesItems are randomly distributed.
+        """
         matters_votes = zip(matters, votes)
         items = [
             EventMinutesItem(
@@ -86,9 +107,7 @@ class TestCompareExtractPersons:
             num_items = random.randrange(len(items) + 1)
             event_items = random.sample(items, num_items)
             event = EventIngestionModel(
-                body=None,
-                sessions=[],
-                event_minutes_items=event_items
+                body=None, sessions=[], event_minutes_items=event_items
             )
             yield event
 
@@ -113,7 +132,7 @@ class TestCompareExtractPersons:
     @pytest.mark.parametrize("num_sponsors", [0, 1, 3])
     @pytest.mark.parametrize("num_voters", [0, 1, 3])
     def test_helpers(self, num_persons, num_matters, num_sponsors, num_voters):
-        """Sanity tests for the above helper methods"""
+        """Sanity tests for the above helper methods."""
         persons = self.make_persons(num_persons)
         assert len(persons) == num_persons
 
@@ -129,7 +148,7 @@ class TestCompareExtractPersons:
         matters = [i.matter for i in items]
         sponsors = [m.sponsors for m in matters]
         sponsors = chain.from_iterable(sponsors)
-        names = set([p.name for p in sponsors])
+        names = {p.name for p in sponsors}
 
         try:
             assert len(names) == num_sponsors
@@ -143,7 +162,7 @@ class TestCompareExtractPersons:
         votes = [i.votes for i in items]
         votes = chain.from_iterable(votes)
         voters = [v.person for v in votes]
-        names = set([p.name for p in voters])
+        names = {p.name for p in voters}
 
         try:
             assert len(names) == num_voters
@@ -157,7 +176,7 @@ class TestCompareExtractPersons:
     @pytest.mark.parametrize("num_matters", [1, 3])
     @pytest.mark.parametrize("num_sponsors", [1, 3])
     def test_extract_sponsors(self, num_persons, num_matters, num_sponsors):
-        """Test that matter sponsors are extracted from events"""
+        """Test that matter sponsors are extracted from events."""
         persons = self.make_persons(num_persons)
         assert len(persons) == num_persons
 
@@ -171,12 +190,14 @@ class TestCompareExtractPersons:
     @pytest.mark.parametrize("num_matters", [1, 3])
     @pytest.mark.parametrize("num_voters", [1, 3])
     def test_extract_voters(self, num_persons, num_matters, num_voters):
-        """Test that voters are extractd from events"""
+        """Test that voters are extractd from events."""
         persons = self.make_persons(num_persons)
         assert len(persons) == num_persons
 
         num_voters = min(num_voters, num_persons)
-        events = self.make_events(persons, num_matters, num_sponsors=0, num_voters=num_voters)
+        events = self.make_events(
+            persons, num_matters, num_sponsors=0, num_voters=num_voters
+        )
 
         extracted_persons = extract_persons(events)
         assert len(extracted_persons) == num_voters
@@ -185,7 +206,7 @@ class TestCompareExtractPersons:
     @pytest.mark.parametrize("num_sponsors", [0, 1, 3])
     @pytest.mark.parametrize("num_voters", [0, 1, 3])
     def test_extract_persons(self, num_matters, num_sponsors, num_voters):
-        """Test that sponsors and voters are extracted from events"""
+        """Test that sponsors and voters are extracted from events."""
         num_persons = max(num_sponsors, num_voters)
         persons = self.make_persons(num_persons)
         assert len(persons) == num_persons
@@ -197,8 +218,8 @@ class TestCompareExtractPersons:
         extracted_persons = extract_persons(events)
         assert len(extracted_persons) == num_persons
 
-
     def detect_old(self, persons, num_changed, modifier, is_new):
+        """Helper function called by below to test we detect outdated members."""
         num_persons = len(persons)
         scraped_persons = deepcopy(persons)
         num_changed = min(num_changed, num_persons)
@@ -207,7 +228,11 @@ class TestCompareExtractPersons:
             for i in random.sample(range(num_persons), num_changed):
                 scraped_persons[i] = modifier(scraped_persons[i])
 
-        old_new = compare_persons(scraped_persons, persons, [Body(name=TestCompareExtractPersons.PRIMARY_BODY)])
+        old_new = compare_persons(
+            scraped_persons,
+            persons,
+            [Body(name=TestCompareExtractPersons.PRIMARY_BODY)],
+        )
 
         assert len(old_new.old_names) == num_changed
         for p in scraped_persons:
@@ -216,37 +241,55 @@ class TestCompareExtractPersons:
     @pytest.mark.parametrize("num_persons", [1, 3])
     @pytest.mark.parametrize("num_inactive", [0, 1, 3])
     def test_detect_inactive(self, num_persons, num_inactive):
-        """Test that we detect those with is_inactive = False"""
+        """Test that we detect those with is_inactive = False."""
+
         def make_inactive(person):
             person.is_active = False
             return person
 
-        self.detect_old(self.make_persons(num_persons), num_inactive, make_inactive, lambda p: p.is_active)
+        self.detect_old(
+            self.make_persons(num_persons),
+            num_inactive,
+            make_inactive,
+            lambda p: p.is_active,
+        )
 
     @pytest.mark.parametrize("num_persons", [1, 3])
     @pytest.mark.parametrize("num_term_end", [0, 1, 3])
     def test_detect_term_end(self, num_persons, num_term_end):
-        """Test that we detect those with expired council membership"""
+        """Test that we detect those with expired council membership."""
+
         def make_term_end(person):
             person.seat.roles[0].end_datetime = datetime.today() - timedelta(days=2)
             return person
 
-        self.detect_old(self.make_persons(num_persons), num_term_end, make_term_end, lambda p: datetime.today().date() <= p.seat.roles[0].end_datetime.date())
+        self.detect_old(
+            self.make_persons(num_persons),
+            num_term_end,
+            make_term_end,
+            lambda p: datetime.today().date() <= p.seat.roles[0].end_datetime.date(),
+        )
 
     @pytest.mark.parametrize("num_persons", [1, 3])
     @pytest.mark.parametrize("num_not_found", [0, 1, 3])
     def test_detect_not_found(self, num_persons, num_not_found):
-        """Test that we detect those not scraped"""
+        """Test that we detect those not scraped."""
+
         def make_not_found(person):
             person = None
             return person
 
-        self.detect_old(self.make_persons(num_persons), num_not_found, make_not_found, lambda p: p is not None)
+        self.detect_old(
+            self.make_persons(num_persons),
+            num_not_found,
+            make_not_found,
+            lambda p: p is not None,
+        )
 
     @pytest.mark.parametrize("num_persons", [1])
     @pytest.mark.parametrize("num_new", [0])
     def test_detect_new(self, num_persons, num_new):
-        """Test that we detect new persons"""
+        """Test that we detect new persons."""
         persons = self.make_persons(num_persons)
         num_persons = len(persons)
         scraped_persons = deepcopy(persons)
@@ -255,7 +298,11 @@ class TestCompareExtractPersons:
         while len(scraped_persons) - len(persons) < num_new:
             del persons[random.randrange(len(persons))]
 
-        old_new = compare_persons(scraped_persons, persons, [Body(name=TestCompareExtractPersons.PRIMARY_BODY)])
+        old_new = compare_persons(
+            scraped_persons,
+            persons,
+            [Body(name=TestCompareExtractPersons.PRIMARY_BODY)],
+        )
 
         assert len(old_new.new_names) == num_new
         for p in scraped_persons:
@@ -265,16 +312,29 @@ class TestCompareExtractPersons:
         assert num_new == 0
 
     @pytest.mark.flaky(reruns=3, reruns_delay=15)
-    @pytest.mark.parametrize("scraper, person, begin, end",
-        [(SeattleScraper, "Teresa Mosqueda", datetime(2023, 2, 6), datetime(2023, 2, 8))]
+    @pytest.mark.parametrize(
+        "scraper, person, begin, end",
+        [
+            (
+                SeattleScraper,
+                "Teresa Mosqueda",
+                datetime(2023, 2, 6),
+                datetime(2023, 2, 8),
+            )
+        ],
     )
     def test_new_council_member(self, scraper, person, begin, end):
+        """Test that we detect new persons in real events."""
         s = scraper()
         known_persons = deepcopy(s.static_data.persons)
         del known_persons[person]
 
         events = s.get_events(begin=begin, end=end)
         scraped_persons = extract_persons(events)
-        old_new = compare_persons(scraped_persons, known_persons.values(), s.static_data.primary_bodies.values())
+        old_new = compare_persons(
+            scraped_persons,
+            known_persons.values(),
+            s.static_data.primary_bodies.values(),
+        )
 
-        assert {person,} == old_new.new_names
+        assert [person] == old_new.new_names

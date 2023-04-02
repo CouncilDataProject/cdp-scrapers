@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
+from __future__ import annotations
+
 import json
 import logging
 import re
 import warnings
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional
 from urllib.error import HTTPError, URLError
 from urllib.parse import parse_qs, quote_plus, urlsplit
 from urllib.request import urlopen
@@ -84,7 +85,7 @@ class SeattleScraper(LegistarScraper):
 
     def parse_content_uris(
         self, video_page_url: str, event_short_date: str
-    ) -> List[ContentURIs]:
+    ) -> list[ContentURIs]:
         """
         Return URLs for videos and captions parsed from seattlechannel.org web page.
 
@@ -249,7 +250,7 @@ class SeattleScraper(LegistarScraper):
 
     def get_video_page_urls(
         self, video_list_page_url: str, event_short_date: str
-    ) -> List[str]:
+    ) -> list[str]:
         """
         Return URLs to web pages hosting videos for meetings from event_short_date.
 
@@ -302,7 +303,7 @@ class SeattleScraper(LegistarScraper):
         # </div>
         #    <div class="row borderBottomNone paginationItem">
 
-        session_video_page_urls: Dict[int, str] = {}
+        session_video_page_urls: dict[int, str] = {}
 
         # want <a> tag in the <div> with
         # title attribute that contains the event date,
@@ -342,7 +343,7 @@ class SeattleScraper(LegistarScraper):
             for session in sorted(session_video_page_urls.keys())
         ]
 
-    def get_content_uris(self, legistar_ev: Dict) -> List[ContentURIs]:
+    def get_content_uris(self, legistar_ev: dict) -> list[ContentURIs]:
         """
         Return URLs for videos and captions parsed from seattlechannel.org web page.
 
@@ -429,8 +430,31 @@ class SeattleScraper(LegistarScraper):
             for uris in self.parse_content_uris(page_url, event_short_date)
         ]
 
+    # def handle_old_new_council(
+    #     self, old_names: list[str], new_names: list[str]
+    # ) -> None:
+    #     """
+    #     Raise on members change
+
+    #     Parameters
+    #     ----------
+    #     old_names: list[str]
+    #         e.g. from scraper_utils.compare_persons
+    #     new_names: list[str]
+    #         e.g. from scraper_utils.compare_persons
+
+    #     Notes
+    #     -----
+    #     Remove this function if this becomes too disruptive with false positives.
+    #     The base implementation in IngestionModelScraper will simply log.
+    #     """
+    #     if any(old_names) or any(new_names):
+    #         raise NotImplementedError(
+    #             f"Update seattle-static.json for: {old_names + new_names}"
+    #     )
+
     @staticmethod
-    def get_person_picture_url(person_www: str) -> Optional[str]:
+    def get_person_picture_url(person_www: str) -> str | None:
         """
         Parse person_www and return banner image used on the web page.
 
@@ -471,7 +495,7 @@ class SeattleScraper(LegistarScraper):
         return None
 
     @staticmethod
-    def get_static_person_info() -> Optional[List[Person]]:  # noqa: C901
+    def get_static_person_info() -> list[Person] | None:  # noqa: C901
         """
         Return partial Persons with static long-term information.
 
@@ -487,7 +511,7 @@ class SeattleScraper(LegistarScraper):
             log.debug("Failed to open https://seattle.legistar.com/MainBody.aspx")
             return None
 
-        static_person_info: List[Person] = []
+        static_person_info: list[Person] = []
 
         # <tr id="ctl00_ContentPlaceHolder1_gridPeople_ctl00__0" ...>
         #     <td class="rgSorted" style="white-space:nowrap;">
