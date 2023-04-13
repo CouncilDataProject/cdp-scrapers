@@ -15,7 +15,8 @@ from cdp_backend.pipeline.ingestion_models import (
     Vote,
 )
 
-from cdp_scrapers.instances.portland import PortlandScraper, SCRAPER_STATIC_DATA as portland_static_data
+from cdp_scrapers.instances.portland import SCRAPER_STATIC_DATA as PORTLAND_STATIC_DATA
+from cdp_scrapers.instances.portland import PortlandScraper
 from cdp_scrapers.instances.seattle import SeattleScraper
 from cdp_scrapers.scraper_utils import compare_persons, extract_persons, str_simplified
 
@@ -353,14 +354,17 @@ class TestCompareExtractPersons:
     )
     @pytest.mark.parametrize("person", ["Jo Ann Hardesty", "Mary Hull Caballero"])
     def test_old_portland_member(self, begin, end, person):
-        """Test that we detect from real events those that are no longer in the council"""
+        """
+        Test that we detect from real events
+        those that are no longer in the council.
+        """
         s = PortlandScraper()
         events = s.get_events(begin=begin, end=end)
         scraped_persons = extract_persons(events)
         old_new = compare_persons(
             scraped_persons,
-            portland_static_data.persons.values(),
-            portland_static_data.primary_bodies.values(),
+            PORTLAND_STATIC_DATA.persons.values(),
+            PORTLAND_STATIC_DATA.primary_bodies.values(),
         )
 
         assert person in old_new.old_names
