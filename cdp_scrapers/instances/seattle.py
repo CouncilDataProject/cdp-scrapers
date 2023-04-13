@@ -430,29 +430,6 @@ class SeattleScraper(LegistarScraper):
             for uris in self.parse_content_uris(page_url, event_short_date)
         ]
 
-    # def handle_old_new_council(
-    #     self, old_names: list[str], new_names: list[str]
-    # ) -> None:
-    #     """
-    #     Raise on members change
-
-    #     Parameters
-    #     ----------
-    #     old_names: list[str]
-    #         e.g. from scraper_utils.compare_persons
-    #     new_names: list[str]
-    #         e.g. from scraper_utils.compare_persons
-
-    #     Notes
-    #     -----
-    #     Remove this function if this becomes too disruptive with false positives.
-    #     The base implementation in IngestionModelScraper will simply log.
-    #     """
-    #     if any(old_names) or any(new_names):
-    #         raise NotImplementedError(
-    #             f"Update seattle-static.json for: {old_names + new_names}"
-    #     )
-
     @staticmethod
     def get_person_picture_url(person_www: str) -> str | None:
         """
