@@ -160,7 +160,7 @@
                 {
                     "title":  "Councilmember",
                     "start_datetime": 1599721200,
-                    "end_datetime": 1672473600,
+                    "end_datetime": 1798704000,
                     "body": "City Council"
                 },
                 {
@@ -178,8 +178,26 @@
                 {
                     "title":  "Member",
                     "start_datetime": 1599721200,
-                    "end_datetime": 1672473600,
+                    "end_datetime": 1798704000,
                     "body": {"name": "Children's Levy"}
+                },
+                {
+                    "title":  "Member",
+                    "start_datetime": 1672560000,
+                    "end_datetime": 1798704000,
+                    "body": {"name": "Community and Civic Life"}
+                },
+                {
+                    "title":  "Member",
+                    "start_datetime": 1672560000,
+                    "end_datetime": 1798704000,
+                    "body": {"name": "Equity and Human Rights"}
+                },
+                {
+                    "title":  "Member",
+                    "start_datetime": 1672560000,
+                    "end_datetime": 1798704000,
+                    "body": {"name": "Parks & Recreation"}
                 }
             ],
             "external_source_id": null
