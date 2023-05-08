@@ -186,7 +186,7 @@
         },
         "Jo Ann Hardesty": {
             "name": "Jo Ann Hardesty",
-            "is_active": true,
+            "is_active": false,
             "router_string": null,
             "email": "joann@portlandoregon.gov",
             "phone": "503-823-4151",
@@ -266,7 +266,7 @@
         },
         "Mary Hull Caballero": {
             "name": "Mary Hull Caballero",
-            "is_active": true,
+            "is_active": false,
             "router_string": null,
             "email": "auditorhullcaballero@portlandoregon.gov",
             "phone": "503-823-4078",
@@ -278,6 +278,25 @@
                     "title":  "Councilmember",
                     "start_datetime": 1420099200,
                     "end_datetime": 1672473600,
+                    "body": "City Council"
+                }
+            ],
+            "external_source_id": null
+        },
+        "Rene Gonzalez": {
+            "name": "Rene Gonzalez",
+            "is_active": true,
+            "router_string": null,
+            "email": "gonzalezoffice@portlandoregon.gov",
+            "phone": "503-823-4151",
+            "website": "https://www.portland.gov/gonzalez",
+            "picture_uri": "https://www.portland.gov/sites/default/files/styles/4x5_320w/public/2022/rene-headshot-1cropped_0.jpg",
+            "seat": "Position 3",
+            "roles": [
+                {
+                    "title":  "Councilmember",
+                    "start_datetime": 1672473600,
+                    "end_datetime": 1735632000,
                     "body": "City Council"
                 }
             ],
