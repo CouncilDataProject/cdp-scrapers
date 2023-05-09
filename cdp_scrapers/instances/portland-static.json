@@ -160,7 +160,7 @@
                 {
                     "title":  "Councilmember",
                     "start_datetime": 1599721200,
-                    "end_datetime": 1672473600,
+                    "end_datetime": 1798704000,
                     "body": "City Council"
                 },
                 {
@@ -178,8 +178,26 @@
                 {
                     "title":  "Member",
                     "start_datetime": 1599721200,
-                    "end_datetime": 1672473600,
+                    "end_datetime": 1798704000,
                     "body": {"name": "Children's Levy"}
+                },
+                {
+                    "title":  "Member",
+                    "start_datetime": 1672560000,
+                    "end_datetime": 1798704000,
+                    "body": {"name": "Community and Civic Life"}
+                },
+                {
+                    "title":  "Member",
+                    "start_datetime": 1672560000,
+                    "end_datetime": 1798704000,
+                    "body": {"name": "Equity and Human Rights"}
+                },
+                {
+                    "title":  "Member",
+                    "start_datetime": 1672560000,
+                    "end_datetime": 1798704000,
+                    "body": {"name": "Parks & Recreation"}
                 }
             ],
             "external_source_id": null
@@ -282,6 +300,23 @@
                 }
             ],
             "external_source_id": null
+        },
+        "Rene Gonzalez": {
+            "name": "Rene Gonzalez",
+            "is_active": true,
+            "email": "gonzalezoffice@portlandoregon.gov",
+            "phone": "503-823-4151",
+            "website": "https://www.portland.gov/gonzalez",
+            "picture_uri": "https://www.portland.gov/sites/default/files/styles/4x5_320w/public/2022/rene-headshot-1cropped_0.jpg?itok=fIOTpP8t",
+            "seat": "Position 3",
+            "roles": [
+                {
+                    "title":  "Councilmember",
+                    "start_datetime": 1672560000,
+                    "end_datetime": 1798704000,
+                    "body": "City Council"
+                }
+            ]
         }
     }
 }

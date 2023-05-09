@@ -5,7 +5,7 @@ import re
 import sys
 from copy import deepcopy
 from datetime import datetime, timedelta
-from itertools import filterfalse, groupby
+from itertools import chain, filterfalse, groupby
 from logging import getLogger
 from pathlib import Path
 from typing import Any, NamedTuple
@@ -22,7 +22,7 @@ from cdp_backend.pipeline.ingestion_models import (
 )
 from cdp_backend.utils.constants_utils import get_all_class_attr_values
 
-from .types import ScraperStaticData
+from .types import PersonsComparison, ScraperStaticData
 
 ###############################################################################
 
@@ -459,6 +459,93 @@ def sanitize_roles(  # noqa: C901
     return roles
 
 
+def extract_persons(events):
+    """
+    Get all sponsors and voters across all events.
+
+    Parameters
+    ----------
+    events: list[EventIngestionModel]
+        Scraped events
+
+    Returns
+    -------
+    list[Person]
+        Unique list of all sponsors and voters found
+    """
+
+    def extract_sponsors(event_item):
+        sponsors = event_item.matter.sponsors if event_item.matter else []
+        sponsors = sponsors or []
+        sponsors = reduced_list(sponsors, collapse=False)
+        return sponsors
+
+    def extract_voters(event_item):
+        votes = event_item.votes or []
+        voters = [v.person for v in votes]
+        voters = reduced_list(voters, collapse=False)
+        return voters
+
+    events = reduced_list(events, collapse=False)
+    items = [e.event_minutes_items or [] for e in events]
+    items = chain.from_iterable(items)
+    items = reduced_list(items, collapse=False)
+
+    sponsors = map(extract_sponsors, items)
+    sponsors = chain.from_iterable(sponsors)
+    voters = map(extract_voters, items)
+    voters = chain.from_iterable(voters)
+
+    persons = chain(sponsors, voters)
+    persons = {p.name: p for p in persons}
+    persons = list(persons.values())
+    return persons
+
+
+def compare_persons(
+    scraped_persons, known_persons, primary_bodies
+) -> PersonsComparison:
+    """
+    Look for old and new councilmembers.
+
+    Parameters
+    ----------
+    scraped_persons: list[Person]
+        e.g. from extract_persons
+    known_persons: list[Person]
+        e.g. from ScraperStaticData
+    primary_bodies: list[Body]
+        e.g. from ScraperStaticData
+
+    Returns
+    -------
+    PersonsComparison
+        Old and new councilmember names
+    """
+
+    def holds_primary_role(person):
+        roles = person.seat.roles if person.seat and person.seat.roles else []
+        active_roles = filter(
+            lambda r: r.end_datetime is None
+            or datetime.today().date() <= r.end_datetime.date(),
+            roles,
+        )
+
+        body_names = [r.body.name if r.body else None for r in active_roles]
+        body_names = reduced_list(body_names, collapse=False)
+        primary_body_names = filter(lambda b: b.name in body_names, primary_bodies)
+        return any(primary_body_names)
+
+    active_persons = list(filter(lambda p: p and p.is_active, scraped_persons))
+    primary_persons = list(filter(holds_primary_role, active_persons))
+    names = {p.name for p in primary_persons}
+
+    known_names = {p.name for p in known_persons}
+    old_names = list(known_names - names)
+    new_names = list(names - known_names)
+    return PersonsComparison(old_names, new_names)
+
+
 class IngestionModelScraper:
     """
     Base class for events scrapers providing IngestionModels for cdp-backend pipeline.
@@ -663,3 +750,25 @@ class IngestionModelScraper:
         instances.seattle.person_aliases
         """
         return person
+
+    def handle_old_new_council(
+        self, old_names: list[str], new_names: list[str]
+    ) -> None:
+        """
+        Override to handle old and new councilmember information.
+
+        Parameters
+        ----------
+        old_names: list[str]
+            e.g. from scraper_utils.compare_persons
+        new_names: list[str]
+            e.g. from scraper_utils.compare_persons
+
+        Notes
+        -----
+        Base implementation simply logs
+        """
+        if any(old_names):
+            log.info(f"{old_names} are no longer found in scraped data")
+        if any(new_names):
+            log.warning(f"{new_names} are new. Update self.static_data.persons.")
