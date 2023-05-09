@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="cdp_scrapers.instances package" href="cdp_scrapers.instances.html" /><link rel="prev" title="cdp_scrapers" href="modules.html" />
 
     <!-- Generated with Sphinx 6.2.1 and Furo 2023.03.27 -->
-        <title>cdp_scrapers package - cdp-scrapers 0.1.dev1+g18a521c documentation</title>
+        <title>cdp_scrapers package - cdp-scrapers 0.1.dev1+g492656c documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=fad236701ea90a88636c2a8c73b44ae642ed2a53" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
@@ -124,7 +124,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">cdp-scrapers 0.1.dev1+g18a521c documentation</div></a>
+      <a href="index.html"><div class="brand">cdp-scrapers 0.1.dev1+g492656c documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -147,7 +147,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   
-  <span class="sidebar-brand-text">cdp-scrapers 0.1.dev1+g18a521c documentation</span>
+  <span class="sidebar-brand-text">cdp-scrapers 0.1.dev1+g492656c documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -1724,6 +1724,24 @@ definition.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="cdp_scrapers.scraper_utils.IngestionModelScraper.handle_old_new_council">
+<span class="sig-name descname"><span class="pre">handle_old_new_council</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">old_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/scraper_utils.html#IngestionModelScraper.handle_old_new_council"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.scraper_utils.IngestionModelScraper.handle_old_new_council" title="Permalink to this definition">#</a></dt>
+<dd><p>Override to handle old and new councilmember information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>old_names: list[str]</strong></dt><dd><p>e.g. from scraper_utils.compare_persons</p>
+</dd>
+<dt><strong>new_names: list[str]</strong></dt><dd><p>e.g. from scraper_utils.compare_persons</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Base implementation simply logs</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="cdp_scrapers.scraper_utils.IngestionModelScraper.localize_datetime">
 <span class="sig-name descname"><span class="pre">localize_datetime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">datetime</span></span></span><a class="reference internal" href="_modules/cdp_scrapers/scraper_utils.html#IngestionModelScraper.localize_datetime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.scraper_utils.IngestionModelScraper.localize_datetime" title="Permalink to this definition">#</a></dt>
 <dd><p>Return input datetime with time zone information.
@@ -1774,6 +1792,50 @@ This base implementation always returns person as-is.</p>
 </div>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cdp_scrapers.scraper_utils.compare_persons">
+<span class="sig-prename descclassname"><span class="pre">cdp_scrapers.scraper_utils.</span></span><span class="sig-name descname"><span class="pre">compare_persons</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scraped_persons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">known_persons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">primary_bodies</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#cdp_scrapers.types.PersonsComparison" title="cdp_scrapers.types.PersonsComparison"><span class="pre">PersonsComparison</span></a></span></span><a class="reference internal" href="_modules/cdp_scrapers/scraper_utils.html#compare_persons"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.scraper_utils.compare_persons" title="Permalink to this definition">#</a></dt>
+<dd><p>Look for old and new councilmembers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>scraped_persons: list[Person]</strong></dt><dd><p>e.g. from extract_persons</p>
+</dd>
+<dt><strong>known_persons: list[Person]</strong></dt><dd><p>e.g. from ScraperStaticData</p>
+</dd>
+<dt><strong>primary_bodies: list[Body]</strong></dt><dd><p>e.g. from ScraperStaticData</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>PersonsComparison</dt><dd><p>Old and new councilmember names</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cdp_scrapers.scraper_utils.extract_persons">
+<span class="sig-prename descclassname"><span class="pre">cdp_scrapers.scraper_utils.</span></span><span class="sig-name descname"><span class="pre">extract_persons</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">events</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cdp_scrapers/scraper_utils.html#extract_persons"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.scraper_utils.extract_persons" title="Permalink to this definition">#</a></dt>
+<dd><p>Get all sponsors and voters across all events.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>events: list[EventIngestionModel]</strong></dt><dd><p>Scraped events</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>list[Person]</dt><dd><p>Unique list of all sponsors and voters found</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -1972,6 +2034,25 @@ from a Legistar/Granicus-hosted video web page</p>
 </dl>
 </div>
 <p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code>[[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">BeautifulSoup</span></code>], <code class="xref py py-obj docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#cdp_scrapers.types.ContentURIs" title="cdp_scrapers.types.ContentURIs"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentURIs</span></code></a>]]]</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cdp_scrapers.types.PersonsComparison">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cdp_scrapers.types.</span></span><span class="sig-name descname"><span class="pre">PersonsComparison</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">old_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_names</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cdp_scrapers/types.html#PersonsComparison"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cdp_scrapers.types.PersonsComparison" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">NamedTuple</span></code></p>
+<p>Create new instance of PersonsComparison(old_names, new_names)</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cdp_scrapers.types.PersonsComparison.new_names">
+<span class="sig-name descname"><span class="pre">new_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cdp_scrapers.types.PersonsComparison.new_names" title="Permalink to this definition">#</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cdp_scrapers.types.PersonsComparison.old_names">
+<span class="sig-name descname"><span class="pre">old_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cdp_scrapers.types.PersonsComparison.old_names" title="Permalink to this definition">#</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -2312,10 +2393,13 @@ e.g. <a class="reference external" href="https://www.youtube.com/&#64;chanel/sea
 <li><a class="reference internal" href="#cdp_scrapers.scraper_utils.IngestionModelScraper.find_time_zone"><code class="docutils literal notranslate"><span class="pre">IngestionModelScraper.find_time_zone()</span></code></a></li>
 <li><a class="reference internal" href="#cdp_scrapers.scraper_utils.IngestionModelScraper.get_none_if_empty"><code class="docutils literal notranslate"><span class="pre">IngestionModelScraper.get_none_if_empty()</span></code></a></li>
 <li><a class="reference internal" href="#cdp_scrapers.scraper_utils.IngestionModelScraper.get_required_attrs"><code class="docutils literal notranslate"><span class="pre">IngestionModelScraper.get_required_attrs()</span></code></a></li>
+<li><a class="reference internal" href="#cdp_scrapers.scraper_utils.IngestionModelScraper.handle_old_new_council"><code class="docutils literal notranslate"><span class="pre">IngestionModelScraper.handle_old_new_council()</span></code></a></li>
 <li><a class="reference internal" href="#cdp_scrapers.scraper_utils.IngestionModelScraper.localize_datetime"><code class="docutils literal notranslate"><span class="pre">IngestionModelScraper.localize_datetime()</span></code></a></li>
 <li><a class="reference internal" href="#cdp_scrapers.scraper_utils.IngestionModelScraper.resolve_person_alias"><code class="docutils literal notranslate"><span class="pre">IngestionModelScraper.resolve_person_alias()</span></code></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#cdp_scrapers.scraper_utils.compare_persons"><code class="docutils literal notranslate"><span class="pre">compare_persons()</span></code></a></li>
+<li><a class="reference internal" href="#cdp_scrapers.scraper_utils.extract_persons"><code class="docutils literal notranslate"><span class="pre">extract_persons()</span></code></a></li>
 <li><a class="reference internal" href="#cdp_scrapers.scraper_utils.parse_static_file"><code class="docutils literal notranslate"><span class="pre">parse_static_file()</span></code></a></li>
 <li><a class="reference internal" href="#cdp_scrapers.scraper_utils.parse_static_person"><code class="docutils literal notranslate"><span class="pre">parse_static_person()</span></code></a></li>
 <li><a class="reference internal" href="#cdp_scrapers.scraper_utils.reduced_list"><code class="docutils literal notranslate"><span class="pre">reduced_list()</span></code></a></li>
@@ -2330,6 +2414,11 @@ e.g. <a class="reference external" href="https://www.youtube.com/&#64;chanel/sea
 </ul>
 </li>
 <li><a class="reference internal" href="#cdp_scrapers.types.LegistarContentParser"><code class="docutils literal notranslate"><span class="pre">LegistarContentParser</span></code></a></li>
+<li><a class="reference internal" href="#cdp_scrapers.types.PersonsComparison"><code class="docutils literal notranslate"><span class="pre">PersonsComparison</span></code></a><ul>
+<li><a class="reference internal" href="#cdp_scrapers.types.PersonsComparison.new_names"><code class="docutils literal notranslate"><span class="pre">PersonsComparison.new_names</span></code></a></li>
+<li><a class="reference internal" href="#cdp_scrapers.types.PersonsComparison.old_names"><code class="docutils literal notranslate"><span class="pre">PersonsComparison.old_names</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#cdp_scrapers.types.ScraperStaticData"><code class="docutils literal notranslate"><span class="pre">ScraperStaticData</span></code></a><ul>
 <li><a class="reference internal" href="#cdp_scrapers.types.ScraperStaticData.persons"><code class="docutils literal notranslate"><span class="pre">ScraperStaticData.persons</span></code></a></li>
 <li><a class="reference internal" href="#cdp_scrapers.types.ScraperStaticData.primary_bodies"><code class="docutils literal notranslate"><span class="pre">ScraperStaticData.primary_bodies</span></code></a></li>

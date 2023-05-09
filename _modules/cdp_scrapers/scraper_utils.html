@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <!-- Generated with Sphinx 6.2.1 and Furo 2023.03.27 -->
-        <title>cdp_scrapers.scraper_utils - cdp-scrapers 0.1.dev1+g18a521c documentation</title>
+        <title>cdp_scrapers.scraper_utils - cdp-scrapers 0.1.dev1+g492656c documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=fad236701ea90a88636c2a8c73b44ae642ed2a53" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">cdp-scrapers 0.1.dev1+g18a521c documentation</div></a>
+      <a href="../../index.html"><div class="brand">cdp-scrapers 0.1.dev1+g492656c documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -146,7 +146,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">cdp-scrapers 0.1.dev1+g18a521c documentation</span>
+  <span class="sidebar-brand-text">cdp-scrapers 0.1.dev1+g492656c documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -214,7 +214,7 @@
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
-<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">filterfalse</span><span class="p">,</span> <span class="n">groupby</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span><span class="p">,</span> <span class="n">filterfalse</span><span class="p">,</span> <span class="n">groupby</span>
 <span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">NamedTuple</span>
@@ -231,7 +231,7 @@
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">cdp_backend.utils.constants_utils</span> <span class="kn">import</span> <span class="n">get_all_class_attr_values</span>
 
-<span class="kn">from</span> <span class="nn">.types</span> <span class="kn">import</span> <span class="n">ScraperStaticData</span>
+<span class="kn">from</span> <span class="nn">.types</span> <span class="kn">import</span> <span class="n">PersonsComparison</span><span class="p">,</span> <span class="n">ScraperStaticData</span>
 
 <span class="c1">###############################################################################</span>
 
@@ -668,6 +668,93 @@
     <span class="k">return</span> <span class="n">roles</span></div>
 
 
+<div class="viewcode-block" id="extract_persons"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.scraper_utils.extract_persons">[docs]</a><span class="k">def</span> <span class="nf">extract_persons</span><span class="p">(</span><span class="n">events</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get all sponsors and voters across all events.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    events: list[EventIngestionModel]</span>
+<span class="sd">        Scraped events</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list[Person]</span>
+<span class="sd">        Unique list of all sponsors and voters found</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">extract_sponsors</span><span class="p">(</span><span class="n">event_item</span><span class="p">):</span>
+        <span class="n">sponsors</span> <span class="o">=</span> <span class="n">event_item</span><span class="o">.</span><span class="n">matter</span><span class="o">.</span><span class="n">sponsors</span> <span class="k">if</span> <span class="n">event_item</span><span class="o">.</span><span class="n">matter</span> <span class="k">else</span> <span class="p">[]</span>
+        <span class="n">sponsors</span> <span class="o">=</span> <span class="n">sponsors</span> <span class="ow">or</span> <span class="p">[]</span>
+        <span class="n">sponsors</span> <span class="o">=</span> <span class="n">reduced_list</span><span class="p">(</span><span class="n">sponsors</span><span class="p">,</span> <span class="n">collapse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sponsors</span>
+
+    <span class="k">def</span> <span class="nf">extract_voters</span><span class="p">(</span><span class="n">event_item</span><span class="p">):</span>
+        <span class="n">votes</span> <span class="o">=</span> <span class="n">event_item</span><span class="o">.</span><span class="n">votes</span> <span class="ow">or</span> <span class="p">[]</span>
+        <span class="n">voters</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">person</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">votes</span><span class="p">]</span>
+        <span class="n">voters</span> <span class="o">=</span> <span class="n">reduced_list</span><span class="p">(</span><span class="n">voters</span><span class="p">,</span> <span class="n">collapse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">voters</span>
+
+    <span class="n">events</span> <span class="o">=</span> <span class="n">reduced_list</span><span class="p">(</span><span class="n">events</span><span class="p">,</span> <span class="n">collapse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">items</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">event_minutes_items</span> <span class="ow">or</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">events</span><span class="p">]</span>
+    <span class="n">items</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">items</span><span class="p">)</span>
+    <span class="n">items</span> <span class="o">=</span> <span class="n">reduced_list</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">collapse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">sponsors</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">extract_sponsors</span><span class="p">,</span> <span class="n">items</span><span class="p">)</span>
+    <span class="n">sponsors</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">sponsors</span><span class="p">)</span>
+    <span class="n">voters</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">extract_voters</span><span class="p">,</span> <span class="n">items</span><span class="p">)</span>
+    <span class="n">voters</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">voters</span><span class="p">)</span>
+
+    <span class="n">persons</span> <span class="o">=</span> <span class="n">chain</span><span class="p">(</span><span class="n">sponsors</span><span class="p">,</span> <span class="n">voters</span><span class="p">)</span>
+    <span class="n">persons</span> <span class="o">=</span> <span class="p">{</span><span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">persons</span><span class="p">}</span>
+    <span class="n">persons</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">persons</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">persons</span></div>
+
+
+<div class="viewcode-block" id="compare_persons"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.scraper_utils.compare_persons">[docs]</a><span class="k">def</span> <span class="nf">compare_persons</span><span class="p">(</span>
+    <span class="n">scraped_persons</span><span class="p">,</span> <span class="n">known_persons</span><span class="p">,</span> <span class="n">primary_bodies</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PersonsComparison</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Look for old and new councilmembers.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    scraped_persons: list[Person]</span>
+<span class="sd">        e.g. from extract_persons</span>
+<span class="sd">    known_persons: list[Person]</span>
+<span class="sd">        e.g. from ScraperStaticData</span>
+<span class="sd">    primary_bodies: list[Body]</span>
+<span class="sd">        e.g. from ScraperStaticData</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    PersonsComparison</span>
+<span class="sd">        Old and new councilmember names</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">holds_primary_role</span><span class="p">(</span><span class="n">person</span><span class="p">):</span>
+        <span class="n">roles</span> <span class="o">=</span> <span class="n">person</span><span class="o">.</span><span class="n">seat</span><span class="o">.</span><span class="n">roles</span> <span class="k">if</span> <span class="n">person</span><span class="o">.</span><span class="n">seat</span> <span class="ow">and</span> <span class="n">person</span><span class="o">.</span><span class="n">seat</span><span class="o">.</span><span class="n">roles</span> <span class="k">else</span> <span class="p">[]</span>
+        <span class="n">active_roles</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">end_datetime</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="ow">or</span> <span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="n">r</span><span class="o">.</span><span class="n">end_datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(),</span>
+            <span class="n">roles</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">body_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">body</span> <span class="k">else</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">active_roles</span><span class="p">]</span>
+        <span class="n">body_names</span> <span class="o">=</span> <span class="n">reduced_list</span><span class="p">(</span><span class="n">body_names</span><span class="p">,</span> <span class="n">collapse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">primary_body_names</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">b</span><span class="p">:</span> <span class="n">b</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">body_names</span><span class="p">,</span> <span class="n">primary_bodies</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">primary_body_names</span><span class="p">)</span>
+
+    <span class="n">active_persons</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">is_active</span><span class="p">,</span> <span class="n">scraped_persons</span><span class="p">))</span>
+    <span class="n">primary_persons</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="n">holds_primary_role</span><span class="p">,</span> <span class="n">active_persons</span><span class="p">))</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="p">{</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">primary_persons</span><span class="p">}</span>
+
+    <span class="n">known_names</span> <span class="o">=</span> <span class="p">{</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">known_persons</span><span class="p">}</span>
+    <span class="n">old_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">known_names</span> <span class="o">-</span> <span class="n">names</span><span class="p">)</span>
+    <span class="n">new_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">names</span> <span class="o">-</span> <span class="n">known_names</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">PersonsComparison</span><span class="p">(</span><span class="n">old_names</span><span class="p">,</span> <span class="n">new_names</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="IngestionModelScraper"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.scraper_utils.IngestionModelScraper">[docs]</a><span class="k">class</span> <span class="nc">IngestionModelScraper</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Base class for events scrapers providing IngestionModels for cdp-backend pipeline.</span>
@@ -871,7 +958,29 @@
 <span class="sd">        --------</span>
 <span class="sd">        instances.seattle.person_aliases</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">person</span></div></div>
+        <span class="k">return</span> <span class="n">person</span></div>
+
+<div class="viewcode-block" id="IngestionModelScraper.handle_old_new_council"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.scraper_utils.IngestionModelScraper.handle_old_new_council">[docs]</a>    <span class="k">def</span> <span class="nf">handle_old_new_council</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">old_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">new_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Override to handle old and new councilmember information.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        old_names: list[str]</span>
+<span class="sd">            e.g. from scraper_utils.compare_persons</span>
+<span class="sd">        new_names: list[str]</span>
+<span class="sd">            e.g. from scraper_utils.compare_persons</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Base implementation simply logs</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">old_names</span><span class="p">):</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">old_names</span><span class="si">}</span><span class="s2"> are no longer found in scraped data&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">new_names</span><span class="p">):</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">new_names</span><span class="si">}</span><span class="s2"> are new. Update self.static_data.persons.&quot;</span><span class="p">)</span></div></div>
 </pre></div>
         </article>
       </div>
