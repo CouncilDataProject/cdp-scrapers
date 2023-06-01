@@ -1,13 +1,10 @@
 #!/usr/bin/env python
 
 from datetime import datetime
-from itertools import chain
 
 import pytest
 
 from cdp_scrapers.youtube_utils import (
-    YoutubeIngestionScraper,
-    get_video_info,
     urljoin_search_query,
 )
 
@@ -96,7 +93,9 @@ def test_search_url(channel, search_terms, begin, end, expected_url):
 # )
 # def test_get_events(channel, timezone, body, search_terms, begin, end, video_ids):
 #     s = YoutubeIngestionScraper(
-#         channel_name=channel, body_search_terms={body: search_terms}, timezone=timezone
+#         channel_name=channel,
+#         body_search_terms={body: search_terms},
+#         timezone=timezone,
 #     )
 #     assert s.channel_name == channel
 #     assert s.body_search_terms[body] == search_terms
