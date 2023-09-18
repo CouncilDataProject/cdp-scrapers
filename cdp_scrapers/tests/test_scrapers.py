@@ -24,10 +24,10 @@ from cdp_scrapers.instances.seattle import SeattleScraper
         (
             datetime(2022, 11, 7),
             datetime(2022, 11, 16),
-            2,
-            33,
+            3,
+            31,
             "https://houston.novusagenda.com/agendapublic/"
-            "CoverSheet.aspx?ItemID=27102&MeetingID=566",
+            "CoverSheet.aspx?ItemID=26951&MeetingID=565",
         ),
     ],
 )
