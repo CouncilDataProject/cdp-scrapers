@@ -158,8 +158,8 @@ class HoustonScraper(IngestionModelScraper):
 
         Returns
         -------
-        Tag
-            The agenda web page we want parse
+        AgendaType, Tag
+            Resource type for the agenda and the agenda resource itself
         """
         link = self.get_date_mainlink(element)
         agenda_link = link + "/agenda"
@@ -240,12 +240,14 @@ class HoustonScraper(IngestionModelScraper):
         """
 
         def get_search_dates():
+            """Return iterator over dates to search."""
             event_date = time_from.date()
             while event_date <= time_to.date():
                 yield event_date
                 event_date += timedelta(days=1)
 
         def query_for_date(event_date):
+            """Return event date and <table> element in search result HTML."""
             # https://houstontx.new.swagit.com/videos/search?q=january+11+2022
             # NOTE: do not use %d for day; the search will not work with zero-padded day
             main_url = (
