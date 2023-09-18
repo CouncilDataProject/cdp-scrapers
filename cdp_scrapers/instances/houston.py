@@ -1,5 +1,5 @@
-import logging
 import enum
+import logging
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional, Union
 
@@ -16,6 +16,7 @@ log = logging.getLogger(__name__)
 class AgendaType(enum.IntEnum):
     WebPage = enum.auto()
     Pdf = enum.auto()
+
 
 class HoustonScraper(IngestionModelScraper):
     def __init__(self):
@@ -62,7 +63,7 @@ class HoustonScraper(IngestionModelScraper):
             # Assuming event is a tr from search results
             # and that the first td contains the committee name
             cell_text = event.find("td").text.strip()
-            return cell_text[:cell_text.find("(")].strip()
+            return cell_text[: cell_text.find("(")].strip()
 
         if "CITY COUNCIL" in body_table.text:
             return "City Council"
@@ -170,7 +171,9 @@ class HoustonScraper(IngestionModelScraper):
             return AgendaType.WebPage, form1
         elif page.content.startswith(b"%PDF"):
             return AgendaType.Pdf, agenda_link
-        raise NotImplementedError(f"{agenda_link} points to unrecognized agenda resource")
+        raise NotImplementedError(
+            f"{agenda_link} points to unrecognized agenda resource"
+        )
 
     def get_event(
         self, date: str, element: Tag
@@ -209,7 +212,9 @@ class HoustonScraper(IngestionModelScraper):
                     session_index=0,
                 )
             ],
-            event_minutes_items=self.get_event_minutes_item(agenda) if agenda_type == AgendaType.WebPage else None,
+            event_minutes_items=self.get_event_minutes_item(agenda)
+            if agenda_type == AgendaType.WebPage
+            else None,
             agenda_uri=main_uri + "/agenda",
         )
         return event
@@ -243,7 +248,10 @@ class HoustonScraper(IngestionModelScraper):
         def query_for_date(event_date):
             # https://houstontx.new.swagit.com/videos/search?q=january+11+2022
             # NOTE: do not use %d for day; the search will not work with zero-padded day
-            main_url = f"https://houstontx.new.swagit.com/videos/search?q={event_date.strftime('%B')}+{event_date.day}+{event_date.year}"
+            main_url = (
+                "https://houstontx.new.swagit.com/videos/search"
+                f"?q={event_date.strftime('%B')}+{event_date.day}+{event_date.year}"
+            )
             main_page = requests.get(main_url)
             main = BeautifulSoup(main_page.content, "html.parser")
             main_table = main.find("table")
