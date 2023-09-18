@@ -1,6 +1,7 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional, Union
+from urllib.parse import quote_plus
 
 import requests
 from bs4 import BeautifulSoup, NavigableString, Tag
@@ -209,28 +210,47 @@ class HoustonScraper(IngestionModelScraper):
             Dictionary of mapping between the date of the meeting and the element for
             the meeting in that date
         """
-        if time_from.year != time_to.year:
-            raise ValueError(
-                "time_from and time_to are in different years, which is not supported"
-            )
+
+        def get_search_dates():
+            event_date = time_from.date()
+            while event_date <= time_to.date():
+                yield event_date
+                event_date += timedelta(days=1)
+
+        def query_for_date(event_date):
+            # https://houstontx.new.swagit.com/videos/search?q=january+11+2022
+            main_url = f"https://houstontx.new.swagit.com/videos/search?q={quote_plus(event_date.strftime('%B %d %Y'))}"
+            main_page = requests.get(main_url)
+            main = BeautifulSoup(main_page.content, "html.parser")
+            main_table = main.find("table")
+            if main_table:
+                main_table = self.remove_extra_type(main_table)
+            return event_date, main_table
+
+        search_dates = get_search_dates()
+        date_search_results = map(query_for_date, search_dates)
+
         date_years = {}
-        main_url = "https://houstontx.new.swagit.com/views/408"
-        main_page = requests.get(main_url)
-        main = BeautifulSoup(main_page.content, "html.parser")
-        main_div = self.remove_extra_type(
-            main.find("div", id=self.get_diff_yearid(time_from))
-        )
-        main_table = self.remove_extra_type(main_div.find("table", id="video-table"))
-        main_tbody = self.remove_extra_type(main_table.find("tbody"))
-        main_year_elem = main_tbody.find_all("tr")
-        for year_elem in main_year_elem:
-            cells = year_elem.find_all("td")
-            date = cells[1].text.replace(",", "").strip()
-            date = datetime.strptime(date, "%b %d %Y").date()
-            if date >= time_from.date() and date <= time_to.date():
-                # date_year = [date, year_elem]
-                # date_years.append(date_year)
-                date_years[date] = year_elem
+        for event_date, main_table in date_search_results:
+            if main_table is None:
+                log.debug(f"No event found for {event_date}")
+                continue
+
+            main_tbody = self.remove_extra_type(main_table.find("tbody"))
+            main_year_elem = main_tbody.find_all("tr")
+            for year_elem in main_year_elem:
+                cells = year_elem.find_all("td")
+                if len(cells) != 3:
+                    # we are interested only in row with video, date, links columns
+                    continue
+
+                date = cells[1].text.replace(",", "").strip()
+                date = datetime.strptime(date, "%b %d %Y").date()
+                if date >= time_from.date() and date <= time_to.date():
+                    # date_year = [date, year_elem]
+                    # date_years.append(date_year)
+                    date_years[date] = year_elem
+
         return date_years
 
     def get_events(
