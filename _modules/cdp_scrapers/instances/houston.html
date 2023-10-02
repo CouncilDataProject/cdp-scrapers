@@ -1,15 +1,15 @@
 <!doctype html>
-<html class="no-js" lang="en">
+<html class="no-js" lang="en" data-content_root="../../../">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-    <!-- Generated with Sphinx 7.0.1 and Furo 2023.05.20 -->
-        <title>cdp_scrapers.instances.houston - cdp-scrapers 0.1.dev1+ge543480 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?digest=e6660623a769aa55fea372102b9bf3151b292993" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
+        <title>cdp_scrapers.instances.houston - cdp-scrapers 0.1.dev1+g03d782a documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=36a5483c" />
     
     
 
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../index.html"><div class="brand">cdp-scrapers 0.1.dev1+ge543480 documentation</div></a>
+      <a href="../../../index.html"><div class="brand">cdp-scrapers 0.1.dev1+g03d782a documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -146,7 +146,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
   
   
-  <span class="sidebar-brand-text">cdp-scrapers 0.1.dev1+ge543480 documentation</span>
+  <span class="sidebar-brand-text">cdp-scrapers 0.1.dev1+g03d782a documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -221,11 +221,15 @@
 <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="HoustonScraper"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.HoustonScraper">[docs]</a><span class="k">class</span> <span class="nc">HoustonScraper</span><span class="p">(</span><span class="n">IngestionModelScraper</span><span class="p">):</span>
+<div class="viewcode-block" id="HoustonScraper">
+<a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.HoustonScraper">[docs]</a>
+<span class="k">class</span> <span class="nc">HoustonScraper</span><span class="p">(</span><span class="n">IngestionModelScraper</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">timezone</span><span class="o">=</span><span class="s2">&quot;America/Chicago&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="HoustonScraper.remove_extra_type"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.HoustonScraper.remove_extra_type">[docs]</a>    <span class="k">def</span> <span class="nf">remove_extra_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tag</span><span class="p">,</span> <span class="n">NavigableString</span><span class="p">,</span> <span class="kc">None</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tag</span><span class="p">:</span>
+<div class="viewcode-block" id="HoustonScraper.remove_extra_type">
+<a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.HoustonScraper.remove_extra_type">[docs]</a>
+    <span class="k">def</span> <span class="nf">remove_extra_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tag</span><span class="p">,</span> <span class="n">NavigableString</span><span class="p">,</span> <span class="kc">None</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tag</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Remove types that are not useful.</span>
 
@@ -243,7 +247,10 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wrong Type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">element</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">element</span></div>
 
-<div class="viewcode-block" id="HoustonScraper.get_body_name"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.HoustonScraper.get_body_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_body_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tag</span><span class="p">,</span> <span class="n">NavigableString</span><span class="p">,</span> <span class="kc">None</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+
+<div class="viewcode-block" id="HoustonScraper.get_body_name">
+<a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.HoustonScraper.get_body_name">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_body_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tag</span><span class="p">,</span> <span class="n">NavigableString</span><span class="p">,</span> <span class="kc">None</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the body name for an event.</span>
 
@@ -265,7 +272,10 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">body_table</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s2">&quot;span&quot;</span><span class="p">)[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">title</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="HoustonScraper.get_event_minutes_item"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.HoustonScraper.get_event_minutes_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_event_minutes_item</span><span class="p">(</span>
+
+<div class="viewcode-block" id="HoustonScraper.get_event_minutes_item">
+<a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.HoustonScraper.get_event_minutes_item">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_event_minutes_item</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tag</span><span class="p">,</span> <span class="n">NavigableString</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ingestion_models</span><span class="o">.</span><span class="n">EventMinutesItem</span><span class="p">]:</span>
@@ -304,7 +314,10 @@
 
         <span class="k">return</span> <span class="n">event_minutes_items</span></div>
 
-<div class="viewcode-block" id="HoustonScraper.get_diff_yearid"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.HoustonScraper.get_diff_yearid">[docs]</a>    <span class="k">def</span> <span class="nf">get_diff_yearid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_date</span><span class="p">:</span> <span class="n">datetime</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+
+<div class="viewcode-block" id="HoustonScraper.get_diff_yearid">
+<a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.HoustonScraper.get_diff_yearid">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_diff_yearid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_date</span><span class="p">:</span> <span class="n">datetime</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the events in different years as the events for different</span>
 <span class="sd">        years are stored in different tabs. Can get multiple events</span>
@@ -324,7 +337,10 @@
         <span class="n">year_id</span> <span class="o">=</span> <span class="s2">&quot;city-council-&quot;</span> <span class="o">+</span> <span class="n">year</span>
         <span class="k">return</span> <span class="n">year_id</span></div>
 
-<div class="viewcode-block" id="HoustonScraper.get_date_mainlink"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.HoustonScraper.get_date_mainlink">[docs]</a>    <span class="k">def</span> <span class="nf">get_date_mainlink</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+
+<div class="viewcode-block" id="HoustonScraper.get_date_mainlink">
+<a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.HoustonScraper.get_date_mainlink">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_date_mainlink</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find the main link for one event.</span>
 
@@ -342,7 +358,10 @@
         <span class="n">link</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://houstontx.new.swagit.com/</span><span class="si">{</span><span class="n">link_post</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">return</span> <span class="n">link</span></div>
 
-<div class="viewcode-block" id="HoustonScraper.get_agenda"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.HoustonScraper.get_agenda">[docs]</a>    <span class="k">def</span> <span class="nf">get_agenda</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tag</span><span class="p">,</span> <span class="n">NavigableString</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+
+<div class="viewcode-block" id="HoustonScraper.get_agenda">
+<a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.HoustonScraper.get_agenda">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_agenda</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tag</span><span class="p">,</span> <span class="n">NavigableString</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get event agenda for a specific details page.</span>
 
@@ -363,7 +382,10 @@
         <span class="n">form1</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;form&quot;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;Form1&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">form1</span></div>
 
-<div class="viewcode-block" id="HoustonScraper.get_event"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.HoustonScraper.get_event">[docs]</a>    <span class="k">def</span> <span class="nf">get_event</span><span class="p">(</span>
+
+<div class="viewcode-block" id="HoustonScraper.get_event">
+<a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.HoustonScraper.get_event">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_event</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">element</span><span class="p">:</span> <span class="n">Tag</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ingestion_models</span><span class="o">.</span><span class="n">EventIngestionModel</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -399,7 +421,10 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">event</span></div>
 
-<div class="viewcode-block" id="HoustonScraper.get_all_elements_in_range"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.HoustonScraper.get_all_elements_in_range">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_elements_in_range</span><span class="p">(</span>
+
+<div class="viewcode-block" id="HoustonScraper.get_all_elements_in_range">
+<a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.HoustonScraper.get_all_elements_in_range">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_all_elements_in_range</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">time_from</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">time_to</span><span class="p">:</span> <span class="n">datetime</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tag</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -442,7 +467,10 @@
                 <span class="n">date_years</span><span class="p">[</span><span class="n">date</span><span class="p">]</span> <span class="o">=</span> <span class="n">year_elem</span>
         <span class="k">return</span> <span class="n">date_years</span></div>
 
-<div class="viewcode-block" id="HoustonScraper.get_events"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.HoustonScraper.get_events">[docs]</a>    <span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span>
+
+<div class="viewcode-block" id="HoustonScraper.get_events">
+<a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.HoustonScraper.get_events">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">from_dt</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">to_dt</span><span class="p">:</span> <span class="n">datetime</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ingestion_models</span><span class="o">.</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -465,10 +493,14 @@
         <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_all_elements_in_range</span><span class="p">(</span><span class="n">from_dt</span><span class="p">,</span> <span class="n">to_dt</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">date</span><span class="p">,</span> <span class="n">_element</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">d</span><span class="p">[</span><span class="n">date</span><span class="p">]))</span>
-        <span class="k">return</span> <span class="n">events</span></div></div>
+        <span class="k">return</span> <span class="n">events</span></div>
+</div>
 
 
-<div class="viewcode-block" id="get_houston_events"><a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.get_houston_events">[docs]</a><span class="k">def</span> <span class="nf">get_houston_events</span><span class="p">(</span>
+
+<div class="viewcode-block" id="get_houston_events">
+<a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.get_houston_events">[docs]</a>
+<span class="k">def</span> <span class="nf">get_houston_events</span><span class="p">(</span>
     <span class="n">from_dt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">to_dt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
@@ -500,6 +532,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">scraper</span> <span class="o">=</span> <span class="n">HoustonScraper</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">scraper</span><span class="o">.</span><span class="n">get_events</span><span class="p">(</span><span class="n">begin</span><span class="o">=</span><span class="n">from_dt</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">to_dt</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
 </pre></div>
         </article>
       </div>
@@ -532,11 +565,11 @@
       
     </aside>
   </div>
-</div><script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/sphinx_highlight.js"></script>
-    <script src="../../../_static/scripts/furo.js"></script>
-    <script src="../../../_static/clipboard.min.js"></script>
-    <script src="../../../_static/copybutton.js"></script>
+</div><script src="../../../_static/documentation_options.js?v=b529634c"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=30646c52"></script>
     </body>
 </html>

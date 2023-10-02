@@ -1,15 +1,15 @@
 <!doctype html>
-<html class="no-js" lang="en">
+<html class="no-js" lang="en" data-content_root="../../">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
-    <!-- Generated with Sphinx 7.0.1 and Furo 2023.05.20 -->
-        <title>cdp_scrapers.prime_gov_utils - cdp-scrapers 0.1.dev1+ge543480 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=e6660623a769aa55fea372102b9bf3151b292993" />
-    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
+        <title>cdp_scrapers.prime_gov_utils - cdp-scrapers 0.1.dev1+g03d782a documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=36a5483c" />
     
     
 
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">cdp-scrapers 0.1.dev1+ge543480 documentation</div></a>
+      <a href="../../index.html"><div class="brand">cdp-scrapers 0.1.dev1+g03d782a documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -146,7 +146,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">cdp-scrapers 0.1.dev1+ge543480 documentation</span>
+  <span class="sidebar-brand-text">cdp-scrapers 0.1.dev1+g03d782a documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -254,7 +254,9 @@
 <span class="n">Agenda</span> <span class="o">=</span> <span class="n">BeautifulSoup</span>
 
 
-<div class="viewcode-block" id="primegov_strftime"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.primegov_strftime">[docs]</a><span class="k">def</span> <span class="nf">primegov_strftime</span><span class="p">(</span><span class="n">dt</span><span class="p">:</span> <span class="n">datetime</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<div class="viewcode-block" id="primegov_strftime">
+<a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.primegov_strftime">[docs]</a>
+<span class="k">def</span> <span class="nf">primegov_strftime</span><span class="p">(</span><span class="n">dt</span><span class="p">:</span> <span class="n">datetime</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    strftime() in format expected for search by primegov api.</span>
 
@@ -275,7 +277,10 @@
     <span class="k">return</span> <span class="n">dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">DATE_FORMAT</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="primegov_strptime"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.primegov_strptime">[docs]</a><span class="k">def</span> <span class="nf">primegov_strptime</span><span class="p">(</span><span class="n">meeting</span><span class="p">:</span> <span class="n">Meeting</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]:</span>
+
+<div class="viewcode-block" id="primegov_strptime">
+<a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.primegov_strptime">[docs]</a>
+<span class="k">def</span> <span class="nf">primegov_strptime</span><span class="p">(</span><span class="n">meeting</span><span class="p">:</span> <span class="n">Meeting</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    strptime() on meeting_date_time using expected format commonly used in primegov api.</span>
 
@@ -314,7 +319,10 @@
     <span class="k">return</span> <span class="kc">None</span></div>
 
 
-<div class="viewcode-block" id="load_agenda"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.load_agenda">[docs]</a><span class="k">def</span> <span class="nf">load_agenda</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Agenda</span><span class="p">]:</span>
+
+<div class="viewcode-block" id="load_agenda">
+<a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.load_agenda">[docs]</a>
+<span class="k">def</span> <span class="nf">load_agenda</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Agenda</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Load the agenda web page.</span>
 
@@ -336,7 +344,10 @@
     <span class="k">return</span> <span class="kc">None</span></div>
 
 
-<div class="viewcode-block" id="get_minutes_tables"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_minutes_tables">[docs]</a><span class="k">def</span> <span class="nf">get_minutes_tables</span><span class="p">(</span><span class="n">agenda</span><span class="p">:</span> <span class="n">Agenda</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tag</span><span class="p">]:</span>
+
+<div class="viewcode-block" id="get_minutes_tables">
+<a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_minutes_tables">[docs]</a>
+<span class="k">def</span> <span class="nf">get_minutes_tables</span><span class="p">(</span><span class="n">agenda</span><span class="p">:</span> <span class="n">Agenda</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tag</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return iterator over tables for minutes items.</span>
 
@@ -355,7 +366,10 @@
     <span class="k">return</span> <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;table&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">divs</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="get_minutes_item"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_minutes_item">[docs]</a><span class="k">def</span> <span class="nf">get_minutes_item</span><span class="p">(</span><span class="n">minutes_table</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MinutesItem</span><span class="p">:</span>
+
+<div class="viewcode-block" id="get_minutes_item">
+<a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_minutes_item">[docs]</a>
+<span class="k">def</span> <span class="nf">get_minutes_item</span><span class="p">(</span><span class="n">minutes_table</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MinutesItem</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract minutes item name and description.</span>
 
@@ -393,7 +407,10 @@
     <span class="k">return</span> <span class="n">MinutesItem</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">name</span><span class="p">),</span> <span class="n">description</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">desc</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="get_support_files_div"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_support_files_div">[docs]</a><span class="k">def</span> <span class="nf">get_support_files_div</span><span class="p">(</span><span class="n">minutes_table</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tag</span><span class="p">:</span>
+
+<div class="viewcode-block" id="get_support_files_div">
+<a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_support_files_div">[docs]</a>
+<span class="k">def</span> <span class="nf">get_support_files_div</span><span class="p">(</span><span class="n">minutes_table</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tag</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Find the &lt;div&gt; containing a minutes item&#39;s support document URLs.</span>
 
@@ -412,7 +429,10 @@
     <span class="k">return</span> <span class="n">minutes_table</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">find_next_sibling</span><span class="p">(</span><span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;item_contents&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_support_files"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_support_files">[docs]</a><span class="k">def</span> <span class="nf">get_support_files</span><span class="p">(</span><span class="n">minutes_table</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">SupportingFile</span><span class="p">]:</span>
+
+<div class="viewcode-block" id="get_support_files">
+<a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_support_files">[docs]</a>
+<span class="k">def</span> <span class="nf">get_support_files</span><span class="p">(</span><span class="n">minutes_table</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">SupportingFile</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract the minutes item&#39;s support file URLs.</span>
 
@@ -471,7 +491,10 @@
     <span class="k">return</span> <span class="p">[</span><span class="n">extract_file</span><span class="p">(</span><span class="n">file_div</span><span class="p">)</span> <span class="k">for</span> <span class="n">file_div</span> <span class="ow">in</span> <span class="n">file_divs</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="get_matter"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_matter">[docs]</a><span class="k">def</span> <span class="nf">get_matter</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
+
+<div class="viewcode-block" id="get_matter">
+<a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.get_matter">[docs]</a>
+<span class="k">def</span> <span class="nf">get_matter</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
     <span class="n">minutes_table</span><span class="p">:</span> <span class="n">Tag</span><span class="p">,</span> <span class="n">minutes_item</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">MinutesItem</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Matter</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -568,7 +591,10 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="PrimeGovScraper"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper">[docs]</a><span class="k">class</span> <span class="nc">PrimeGovScraper</span><span class="p">(</span><span class="n">PrimeGovSite</span><span class="p">,</span> <span class="n">IngestionModelScraper</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PrimeGovScraper">
+<a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper">[docs]</a>
+<span class="k">class</span> <span class="nc">PrimeGovScraper</span><span class="p">(</span><span class="n">PrimeGovSite</span><span class="p">,</span> <span class="n">IngestionModelScraper</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Adapter for civic_scraper PrimeGovSite in cdp-scrapers.</span>
 
@@ -641,7 +667,9 @@
             <span class="sa">f</span><span class="s2">&quot;at url: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
 
-<div class="viewcode-block" id="PrimeGovScraper.get_session"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_session">[docs]</a>    <span class="k">def</span> <span class="nf">get_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meeting</span><span class="p">:</span> <span class="n">Meeting</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Session</span><span class="p">]:</span>
+<div class="viewcode-block" id="PrimeGovScraper.get_session">
+<a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_session">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meeting</span><span class="p">:</span> <span class="n">Meeting</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Session</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract a Session from a primegov meeting dictionary.</span>
 
@@ -663,7 +691,10 @@
             <span class="p">)</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="PrimeGovScraper.get_body"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_body">[docs]</a>    <span class="k">def</span> <span class="nf">get_body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meeting</span><span class="p">:</span> <span class="n">Meeting</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Body</span><span class="p">]:</span>
+
+<div class="viewcode-block" id="PrimeGovScraper.get_body">
+<a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_body">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meeting</span><span class="p">:</span> <span class="n">Meeting</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Body</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract a Body from a primegov meeting dictionary.</span>
 
@@ -679,7 +710,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span><span class="n">Body</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">str_simplified</span><span class="p">(</span><span class="n">meeting</span><span class="p">[</span><span class="n">BODY_NAME</span><span class="p">])))</span></div>
 
-<div class="viewcode-block" id="PrimeGovScraper.get_minutes_item"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_minutes_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_minutes_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">minutes_table</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">MinutesItem</span><span class="p">]:</span>
+
+<div class="viewcode-block" id="PrimeGovScraper.get_minutes_item">
+<a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_minutes_item">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_minutes_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">minutes_table</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">MinutesItem</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract a minutes item from a &lt;table&gt; on agenda web page.</span>
 
@@ -699,7 +733,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span><span class="n">get_minutes_item</span><span class="p">(</span><span class="n">minutes_table</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="PrimeGovScraper.get_matter"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_matter">[docs]</a>    <span class="k">def</span> <span class="nf">get_matter</span><span class="p">(</span>
+
+<div class="viewcode-block" id="PrimeGovScraper.get_matter">
+<a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_matter">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_matter</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">minutes_table</span><span class="p">:</span> <span class="n">Tag</span><span class="p">,</span> <span class="n">minutes_item</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">MinutesItem</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Matter</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -752,7 +789,10 @@
         <span class="n">matter</span> <span class="o">=</span> <span class="n">_standarize_status</span><span class="p">(</span><span class="n">matter</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span><span class="n">matter</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PrimeGovScraper.get_event_minutes_item"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_event_minutes_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_event_minutes_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">minutes_table</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EventMinutesItem</span><span class="p">]:</span>
+
+<div class="viewcode-block" id="PrimeGovScraper.get_event_minutes_item">
+<a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_event_minutes_item">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_event_minutes_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">minutes_table</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EventMinutesItem</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract event minutes item info from a minutes item &lt;table&gt; on agenda web page.</span>
 
@@ -801,7 +841,10 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span><span class="n">event_minutes_item</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PrimeGovScraper.get_event_minutes_items"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_event_minutes_items">[docs]</a>    <span class="k">def</span> <span class="nf">get_event_minutes_items</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
+
+<div class="viewcode-block" id="PrimeGovScraper.get_event_minutes_items">
+<a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_event_minutes_items">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_event_minutes_items</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">meeting</span><span class="p">:</span> <span class="n">Meeting</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">EventMinutesItem</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -880,7 +923,10 @@
 
         <span class="k">return</span> <span class="n">reduced_list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event_minutes_item</span><span class="p">,</span> <span class="n">minutes_tables</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="PrimeGovScraper.get_event"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_event">[docs]</a>    <span class="k">def</span> <span class="nf">get_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meeting</span><span class="p">:</span> <span class="n">Meeting</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
+
+<div class="viewcode-block" id="PrimeGovScraper.get_event">
+<a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_event">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meeting</span><span class="p">:</span> <span class="n">Meeting</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract a EventIngestionModel from a primegov meeting dictionary.</span>
 
@@ -908,7 +954,10 @@
             <span class="p">)</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="PrimeGovScraper.get_meetings"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_meetings">[docs]</a>    <span class="k">def</span> <span class="nf">get_meetings</span><span class="p">(</span>
+
+<div class="viewcode-block" id="PrimeGovScraper.get_meetings">
+<a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_meetings">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_meetings</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">begin</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span>
         <span class="n">end</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span>
@@ -946,7 +995,10 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">m</span><span class="p">:</span> <span class="nb">any</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="n">VIDEO_URL</span><span class="p">]),</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">())</span></div>
 
-<div class="viewcode-block" id="PrimeGovScraper.get_events"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_events">[docs]</a>    <span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span>
+
+<div class="viewcode-block" id="PrimeGovScraper.get_events">
+<a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.prime_gov_utils.PrimeGovScraper.get_events">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">begin</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -976,7 +1028,9 @@
             <span class="n">begin</span> <span class="o">=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
         <span class="n">meetings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_meetings</span><span class="p">(</span><span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">reduced_list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event</span><span class="p">,</span> <span class="n">meetings</span><span class="p">),</span> <span class="n">collapse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="n">reduced_list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event</span><span class="p">,</span> <span class="n">meetings</span><span class="p">),</span> <span class="n">collapse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+</div>
+
 </pre></div>
         </article>
       </div>
@@ -1009,11 +1063,11 @@
       
     </aside>
   </div>
-</div><script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/sphinx_highlight.js"></script>
-    <script src="../../_static/scripts/furo.js"></script>
-    <script src="../../_static/clipboard.min.js"></script>
-    <script src="../../_static/copybutton.js"></script>
+</div><script src="../../_static/documentation_options.js?v=b529634c"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/scripts/furo.js?v=32e29ea5"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=30646c52"></script>
     </body>
 </html>

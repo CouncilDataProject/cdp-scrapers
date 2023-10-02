@@ -1,15 +1,15 @@
 <!doctype html>
-<html class="no-js" lang="en">
+<html class="no-js" lang="en" data-content_root="../../">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
-    <!-- Generated with Sphinx 7.0.1 and Furo 2023.05.20 -->
-        <title>cdp_scrapers.youtube_utils - cdp-scrapers 0.1.dev1+ge543480 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=e6660623a769aa55fea372102b9bf3151b292993" />
-    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
+        <title>cdp_scrapers.youtube_utils - cdp-scrapers 0.1.dev1+g03d782a documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=36a5483c" />
     
     
 
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">cdp-scrapers 0.1.dev1+ge543480 documentation</div></a>
+      <a href="../../index.html"><div class="brand">cdp-scrapers 0.1.dev1+g03d782a documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -146,7 +146,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">cdp-scrapers 0.1.dev1+ge543480 documentation</span>
+  <span class="sidebar-brand-text">cdp-scrapers 0.1.dev1+g03d782a documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -226,7 +226,9 @@
 <span class="n">log</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="urljoin_search_query"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.youtube_utils.urljoin_search_query">[docs]</a><span class="k">def</span> <span class="nf">urljoin_search_query</span><span class="p">(</span>
+<div class="viewcode-block" id="urljoin_search_query">
+<a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.youtube_utils.urljoin_search_query">[docs]</a>
+<span class="k">def</span> <span class="nf">urljoin_search_query</span><span class="p">(</span>
     <span class="n">channel_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">search_terms</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">begin</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -277,7 +279,10 @@
     <span class="k">return</span> <span class="n">url</span></div>
 
 
-<div class="viewcode-block" id="get_video_info"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.youtube_utils.get_video_info">[docs]</a><span class="k">def</span> <span class="nf">get_video_info</span><span class="p">(</span><span class="n">query_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+
+<div class="viewcode-block" id="get_video_info">
+<a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.youtube_utils.get_video_info">[docs]</a>
+<span class="k">def</span> <span class="nf">get_video_info</span><span class="p">(</span><span class="n">query_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return dictionaries of search hit video meta data.</span>
 
@@ -302,7 +307,10 @@
         <span class="k">return</span> <span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;entries&quot;</span><span class="p">,</span> <span class="p">[])</span></div>
 
 
-<div class="viewcode-block" id="YoutubeIngestionScraper"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.youtube_utils.YoutubeIngestionScraper">[docs]</a><span class="k">class</span> <span class="nc">YoutubeIngestionScraper</span><span class="p">(</span><span class="n">IngestionModelScraper</span><span class="p">):</span>
+
+<div class="viewcode-block" id="YoutubeIngestionScraper">
+<a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.youtube_utils.YoutubeIngestionScraper">[docs]</a>
+<span class="k">class</span> <span class="nc">YoutubeIngestionScraper</span><span class="p">(</span><span class="n">IngestionModelScraper</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for scraping CDP event ingestion models from YouTube videos.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -323,7 +331,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">channel_name</span> <span class="o">=</span> <span class="n">channel_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">body_search_terms</span> <span class="o">=</span> <span class="n">body_search_terms</span>
 
-<div class="viewcode-block" id="YoutubeIngestionScraper.parse_datetime"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.youtube_utils.YoutubeIngestionScraper.parse_datetime">[docs]</a>    <span class="k">def</span> <span class="nf">parse_datetime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="p">:</span>
+<div class="viewcode-block" id="YoutubeIngestionScraper.parse_datetime">
+<a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.youtube_utils.YoutubeIngestionScraper.parse_datetime">[docs]</a>
+    <span class="k">def</span> <span class="nf">parse_datetime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parse video datetime from title text.</span>
 
@@ -348,7 +358,10 @@
         <span class="n">date_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">localize_datetime</span><span class="p">(</span><span class="n">date_time</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">date_time</span></div>
 
-<div class="viewcode-block" id="YoutubeIngestionScraper.get_session"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.youtube_utils.YoutubeIngestionScraper.get_session">[docs]</a>    <span class="k">def</span> <span class="nf">get_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">video_info</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Session</span><span class="p">]:</span>
+
+<div class="viewcode-block" id="YoutubeIngestionScraper.get_session">
+<a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.youtube_utils.YoutubeIngestionScraper.get_session">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">video_info</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Session</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parse a CDP Session from YouTube video information.</span>
 
@@ -380,7 +393,10 @@
         <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">session</span></div>
 
-<div class="viewcode-block" id="YoutubeIngestionScraper.iter_events"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.youtube_utils.YoutubeIngestionScraper.iter_events">[docs]</a>    <span class="k">def</span> <span class="nf">iter_events</span><span class="p">(</span>
+
+<div class="viewcode-block" id="YoutubeIngestionScraper.iter_events">
+<a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.youtube_utils.YoutubeIngestionScraper.iter_events">[docs]</a>
+    <span class="k">def</span> <span class="nf">iter_events</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">begin</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="n">datetime</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">EventIngestionModel</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -441,7 +457,10 @@
                 <span class="n">event</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_none_if_empty</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
                 <span class="k">yield</span> <span class="n">event</span></div>
 
-<div class="viewcode-block" id="YoutubeIngestionScraper.get_events"><a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.youtube_utils.YoutubeIngestionScraper.get_events">[docs]</a>    <span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span>
+
+<div class="viewcode-block" id="YoutubeIngestionScraper.get_events">
+<a class="viewcode-back" href="../../cdp_scrapers.html#cdp_scrapers.youtube_utils.YoutubeIngestionScraper.get_events">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">begin</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">end</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -473,7 +492,9 @@
         <span class="n">end</span> <span class="o">=</span> <span class="n">pytz</span><span class="o">.</span><span class="n">utc</span><span class="o">.</span><span class="n">localize</span><span class="p">(</span><span class="n">end</span><span class="p">)</span>
         <span class="n">events</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_events</span><span class="p">(</span><span class="n">begin</span><span class="o">=</span><span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">)</span>
         <span class="n">events</span> <span class="o">=</span> <span class="n">reduced_list</span><span class="p">(</span><span class="n">events</span><span class="p">,</span> <span class="n">collapse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">events</span></div></div>
+        <span class="k">return</span> <span class="n">events</span></div>
+</div>
+
 </pre></div>
         </article>
       </div>
@@ -506,11 +527,11 @@
       
     </aside>
   </div>
-</div><script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/sphinx_highlight.js"></script>
-    <script src="../../_static/scripts/furo.js"></script>
-    <script src="../../_static/clipboard.min.js"></script>
-    <script src="../../_static/copybutton.js"></script>
+</div><script src="../../_static/documentation_options.js?v=b529634c"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/scripts/furo.js?v=32e29ea5"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=30646c52"></script>
     </body>
 </html>
