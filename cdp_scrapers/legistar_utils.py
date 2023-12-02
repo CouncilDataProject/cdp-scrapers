@@ -515,15 +515,10 @@ def get_legistar_content_uris(client: str, legistar_ev: dict) -> ContentUriScrap
     # return false;"
     # href="#" style="color:Blue;font-family:Tahoma;font-size:10pt;">Video</a>
     extract_url = soup.find(
-        "a",
-        id=re.compile(r"ct\S*_ContentPlaceHolder\S*_hypVideo"),
-        class_="videolink",
+        "a", id=re.compile(r"ct\S*_ContentPlaceHolder\S*_hypVideo"), onclick=True
     )
     if extract_url is None:
         return (ContentUriScrapeResult.Status.UnrecognizedPatternError, None)
-    # the <a> tag will not have this attribute if there is no video
-    if "onclick" not in extract_url.attrs:
-        return (ContentUriScrapeResult.Status.ContentNotProvidedError, None)
 
     # NOTE: after this point, failing to scrape video url should raise an exception.
     # we need to be alerted that we probabaly have a new web page structure.
