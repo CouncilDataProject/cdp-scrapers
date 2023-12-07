@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
-        <title>cdp_scrapers.youtube_utils - cdp-scrapers 0.1.dev1+g03d782a documentation</title>
+        <title>cdp_scrapers.youtube_utils - cdp-scrapers 0.1.dev1+ge388fd8 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">cdp-scrapers 0.1.dev1+g03d782a documentation</div></a>
+      <a href="../../index.html"><div class="brand">cdp-scrapers 0.1.dev1+ge388fd8 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -146,7 +146,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">cdp-scrapers 0.1.dev1+g03d782a documentation</span>
+  <span class="sidebar-brand-text">cdp-scrapers 0.1.dev1+ge388fd8 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -219,11 +219,35 @@
 
 <span class="kn">import</span> <span class="nn">pytz</span>
 <span class="kn">from</span> <span class="nn">cdp_backend.pipeline.ingestion_models</span> <span class="kn">import</span> <span class="n">Body</span><span class="p">,</span> <span class="n">EventIngestionModel</span><span class="p">,</span> <span class="n">Session</span>
+<span class="kn">from</span> <span class="nn">dateutil.parser</span> <span class="kn">import</span> <span class="n">ParserError</span> <span class="k">as</span> <span class="n">DateParseError</span>
+<span class="kn">from</span> <span class="nn">dateutil.parser</span> <span class="kn">import</span> <span class="n">parse</span> <span class="k">as</span> <span class="n">date_parse</span>
 <span class="kn">from</span> <span class="nn">yt_dlp</span> <span class="kn">import</span> <span class="n">YoutubeDL</span>
 
 <span class="kn">from</span> <span class="nn">.scraper_utils</span> <span class="kn">import</span> <span class="n">IngestionModelScraper</span><span class="p">,</span> <span class="n">reduced_list</span>
 
 <span class="n">log</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="c1">########################################################################################</span>
+
+<span class="c1"># Source: https://stackoverflow.com/a/55018083</span>
+<span class="n">REGEX_FOR_WRITTEN_MONTH</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="sa">r</span><span class="s2">&quot;(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?&quot;</span>
+    <span class="sa">r</span><span class="s2">&quot;|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?&quot;</span>
+    <span class="sa">r</span><span class="s2">&quot;|Oct(?:ober)?|(?:Nov|Dec)(?:ember)?)&quot;</span>
+<span class="p">)</span>
+<span class="n">REGEX_FOR_WRITTEN_DAY</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;\d{1,2}(?:st|nd|rd|th)?&quot;</span>
+<span class="n">REGEX_FOR_YEAR</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;\b\d</span><span class="si">{2}</span><span class="s2">(?:\d</span><span class="si">{2}</span><span class="s2">)?\b&quot;</span>
+<span class="n">REGEX_DUMMY</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;.*&quot;</span>
+<span class="n">REGEX_FOR_WRITTEN_DATE</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="sa">r</span><span class="s2">&quot;((?:</span><span class="si">{smon}</span><span class="s2">\s+</span><span class="si">{sday}</span><span class="s2">|</span><span class="si">{sday}</span><span class="s2">\s+</span><span class="si">{smon}</span><span class="s2">))(?:</span><span class="si">{sdummy}</span><span class="s2">(</span><span class="si">{syear}</span><span class="s2">))?&quot;</span>
+<span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">smon</span><span class="o">=</span><span class="n">REGEX_FOR_WRITTEN_MONTH</span><span class="p">,</span>
+    <span class="n">sday</span><span class="o">=</span><span class="n">REGEX_FOR_WRITTEN_DAY</span><span class="p">,</span>
+    <span class="n">sdummy</span><span class="o">=</span><span class="n">REGEX_DUMMY</span><span class="p">,</span>
+    <span class="n">syear</span><span class="o">=</span><span class="n">REGEX_FOR_YEAR</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1">########################################################################################</span>
 
 
 <div class="viewcode-block" id="urljoin_search_query">
@@ -353,10 +377,44 @@
 <span class="sd">        Default expects month_name day, year</span>
 <span class="sd">        e.g. January 1, 1960</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">date_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[a-z]+ \d{1,2}, \d</span><span class="si">{4}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
-        <span class="n">date_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date_match</span><span class="o">.</span><span class="n">group</span><span class="p">(),</span> <span class="s2">&quot;%B </span><span class="si">%d</span><span class="s2">, %Y&quot;</span><span class="p">)</span>
-        <span class="n">date_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">localize_datetime</span><span class="p">(</span><span class="n">date_time</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">date_time</span></div>
+        <span class="c1"># Init parsed date</span>
+        <span class="n">parsed_date</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Try written date search</span>
+        <span class="n">written_date_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">REGEX_FOR_WRITTEN_DATE</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">written_date_match</span><span class="p">:</span>
+            <span class="c1"># Try parsing</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">parsed_date</span> <span class="o">=</span> <span class="n">date_parse</span><span class="p">(</span>
+                    <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                        <span class="p">[</span><span class="n">written_date_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">written_date_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
+                    <span class="p">),</span>
+                    <span class="n">fuzzy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="n">DateParseError</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="c1"># Try ISO date search</span>
+        <span class="n">iso_date_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\d</span><span class="si">{4}</span><span class="s2">-\d</span><span class="si">{2}</span><span class="s2">-\d</span><span class="si">{2}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">iso_date_match</span><span class="p">:</span>
+            <span class="n">parsed_date</span> <span class="o">=</span> <span class="n">date_parse</span><span class="p">(</span><span class="n">iso_date_match</span><span class="o">.</span><span class="n">group</span><span class="p">())</span>
+
+        <span class="c1"># Try MM/DD/YYYY date search</span>
+        <span class="n">mmddyyyy_date_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\d</span><span class="si">{2}</span><span class="s2">/\d</span><span class="si">{2}</span><span class="s2">/\d</span><span class="si">{4}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mmddyyyy_date_match</span><span class="p">:</span>
+            <span class="n">parsed_date</span> <span class="o">=</span> <span class="n">date_parse</span><span class="p">(</span><span class="n">mmddyyyy_date_match</span><span class="o">.</span><span class="n">group</span><span class="p">())</span>
+
+        <span class="c1"># Try DD/MM/YYYY date search</span>
+        <span class="n">ddmmyyyy_date_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\d</span><span class="si">{2}</span><span class="s2">/\d</span><span class="si">{2}</span><span class="s2">/\d</span><span class="si">{4}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ddmmyyyy_date_match</span><span class="p">:</span>
+            <span class="n">parsed_date</span> <span class="o">=</span> <span class="n">date_parse</span><span class="p">(</span><span class="n">ddmmyyyy_date_match</span><span class="o">.</span><span class="n">group</span><span class="p">())</span>
+
+        <span class="c1"># If parsed date is not None, return it</span>
+        <span class="k">if</span> <span class="n">parsed_date</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">localize_datetime</span><span class="p">(</span><span class="n">parsed_date</span><span class="p">)</span>
+
+        <span class="c1"># If parsed date is None, raise error</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not parse datetime from title: </span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="YoutubeIngestionScraper.get_session">
@@ -527,7 +585,7 @@
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=b529634c"></script>
+</div><script src="../../_static/documentation_options.js?v=6ddee009"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/scripts/furo.js?v=32e29ea5"></script>
