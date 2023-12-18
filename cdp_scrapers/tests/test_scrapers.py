@@ -2,53 +2,53 @@ from datetime import datetime
 
 import pytest
 
-# from cdp_scrapers.instances.houston import HoustonScraper
+from cdp_scrapers.instances.houston import HoustonScraper
 from cdp_scrapers.instances.kingcounty import KingCountyScraper
 from cdp_scrapers.instances.portland import PortlandScraper
 from cdp_scrapers.instances.seattle import SeattleScraper
 
 
-# @pytest.mark.flaky(reruns=3, reruns_delay=15)
-# @pytest.mark.parametrize(
-#     "start_date_time, end_date_time, expected_meetings,"
-#     "expected_minutes_item_in_first_meeting, expected_first_supporting_file",
-#     [
-#         (
-#             datetime(2022, 1, 10),
-#             datetime(2022, 1, 12),
-#             1,
-#             29,
-#             "https://houston.novusagenda.com/agendapublic/"
-#             "CoverSheet.aspx?ItemID=24626&MeetingID=522",
-#         ),
-#         (
-#             datetime(2022, 11, 7),
-#             datetime(2022, 11, 16),
-#             2,
-#             33,
-#             "https://houston.novusagenda.com/agendapublic/"
-#             "CoverSheet.aspx?ItemID=27102&MeetingID=566",
-#         ),
-#     ],
-# )
-# def test_houston_scraper(
-#     start_date_time: datetime,
-#     end_date_time: datetime,
-#     expected_meetings,
-#     expected_minutes_item_in_first_meeting,
-#     expected_first_supporting_file,
-# ):
-#     houston = HoustonScraper()
-#     houston_events = houston.get_events(start_date_time, end_date_time)
-#     assert len(houston_events) == expected_meetings
-#     assert (
-#         len(houston_events[0].event_minutes_items)
-#         == expected_minutes_item_in_first_meeting
-#     )
-#     assert (
-#         houston_events[0].event_minutes_items[0].supporting_files
-#         == expected_first_supporting_file
-#     )
+@pytest.mark.flaky(reruns=3, reruns_delay=15)
+@pytest.mark.parametrize(
+    "start_date_time, end_date_time, expected_meetings,"
+    "expected_minutes_item_in_first_meeting, expected_first_supporting_file",
+    [
+        (
+            datetime(2022, 1, 10),
+            datetime(2022, 1, 12),
+            1,
+            29,
+            "https://houston.novusagenda.com/agendapublic/"
+            "CoverSheet.aspx?ItemID=24626&MeetingID=522",
+        ),
+        (
+            datetime(2022, 11, 7),
+            datetime(2022, 11, 16),
+            3,
+            31,
+            "https://houston.novusagenda.com/agendapublic/"
+            "CoverSheet.aspx?ItemID=26951&MeetingID=565",
+        ),
+    ],
+)
+def test_houston_scraper(
+    start_date_time: datetime,
+    end_date_time: datetime,
+    expected_meetings,
+    expected_minutes_item_in_first_meeting,
+    expected_first_supporting_file,
+):
+    houston = HoustonScraper()
+    houston_events = houston.get_events(start_date_time, end_date_time)
+    assert len(houston_events) == expected_meetings
+    assert (
+        len(houston_events[0].event_minutes_items)
+        == expected_minutes_item_in_first_meeting
+    )
+    assert (
+        houston_events[0].event_minutes_items[0].supporting_files
+        == expected_first_supporting_file
+    )
 
 
 @pytest.mark.flaky(reruns=3, reruns_delay=15)

@@ -1,5 +1,6 @@
+import enum
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional, Union
 
 import requests
@@ -10,6 +11,11 @@ from cdp_backend.pipeline.ingestion_models import EventIngestionModel
 from cdp_scrapers.scraper_utils import IngestionModelScraper
 
 log = logging.getLogger(__name__)
+
+
+class AgendaType(enum.IntEnum):
+    WebPage = enum.auto()
+    Pdf = enum.auto()
 
 
 class HoustonScraper(IngestionModelScraper):
@@ -50,7 +56,15 @@ class HoustonScraper(IngestionModelScraper):
         """
         log.info("start get body name")
         event = self.remove_extra_type(event)
-        body_table = event.find_all("table")[1].find("table")
+
+        try:
+            body_table = event.find_all("table")[1].find("table")
+        except (AttributeError, IndexError):
+            # Assuming event is a tr from search results
+            # and that the first td contains the committee name
+            cell_text = event.find("td").text.strip()
+            return cell_text[: cell_text.find("(")].strip()
+
         if "CITY COUNCIL" in body_table.text:
             return "City Council"
         else:
@@ -144,15 +158,22 @@ class HoustonScraper(IngestionModelScraper):
 
         Returns
         -------
-        Tag
-            The agenda web page we want parse
+        AgendaType, Tag
+            Resource type for the agenda and the agenda resource itself
         """
         link = self.get_date_mainlink(element)
         agenda_link = link + "/agenda"
         page = requests.get(agenda_link)
         event = BeautifulSoup(page.content, "html.parser")
         form1 = event.find("form", id="Form1")
-        return form1
+
+        if form1:
+            return AgendaType.WebPage, form1
+        elif page.content.startswith(b"%PDF"):
+            return AgendaType.Pdf, agenda_link
+        raise NotImplementedError(
+            f"{agenda_link} points to unrecognized agenda resource"
+        )
 
     def get_event(
         self, date: str, element: Tag
@@ -175,9 +196,15 @@ class HoustonScraper(IngestionModelScraper):
         """
         log.info("start get one event")
         main_uri = self.get_date_mainlink(element)
-        agenda = self.get_agenda(element)
+        agenda_type, agenda = self.get_agenda(element)
+
+        if agenda_type == AgendaType.WebPage:
+            body_name = self.get_body_name(agenda)
+        else:
+            body_name = self.get_body_name(element)
+
         event = ingestion_models.EventIngestionModel(
-            body=ingestion_models.Body(name=self.get_body_name(agenda), is_active=True),
+            body=ingestion_models.Body(name=body_name, is_active=True),
             sessions=[
                 ingestion_models.Session(
                     session_datetime=date,
@@ -185,7 +212,9 @@ class HoustonScraper(IngestionModelScraper):
                     session_index=0,
                 )
             ],
-            event_minutes_items=self.get_event_minutes_item(agenda),
+            event_minutes_items=self.get_event_minutes_item(agenda)
+            if agenda_type == AgendaType.WebPage
+            else None,
             agenda_uri=main_uri + "/agenda",
         )
         return event
@@ -209,28 +238,53 @@ class HoustonScraper(IngestionModelScraper):
             Dictionary of mapping between the date of the meeting and the element for
             the meeting in that date
         """
-        if time_from.year != time_to.year:
-            raise ValueError(
-                "time_from and time_to are in different years, which is not supported"
+
+        def get_search_dates():
+            """Return iterator over dates to search."""
+            event_date = time_from.date()
+            while event_date <= time_to.date():
+                yield event_date
+                event_date += timedelta(days=1)
+
+        def query_for_date(event_date):
+            """Return event date and <table> element in search result HTML."""
+            # https://houstontx.new.swagit.com/videos/search?q=january+11+2022
+            # NOTE: do not use %d for day; the search will not work with zero-padded day
+            main_url = (
+                "https://houstontx.new.swagit.com/videos/search"
+                f"?q={event_date.strftime('%B')}+{event_date.day}+{event_date.year}"
             )
+            main_page = requests.get(main_url)
+            main = BeautifulSoup(main_page.content, "html.parser")
+            main_table = main.find("table")
+            if main_table:
+                main_table = self.remove_extra_type(main_table)
+            return event_date, main_table
+
+        search_dates = get_search_dates()
+        date_search_results = map(query_for_date, search_dates)
+
         date_years = {}
-        main_url = "https://houstontx.new.swagit.com/views/408"
-        main_page = requests.get(main_url)
-        main = BeautifulSoup(main_page.content, "html.parser")
-        main_div = self.remove_extra_type(
-            main.find("div", id=self.get_diff_yearid(time_from))
-        )
-        main_table = self.remove_extra_type(main_div.find("table", id="video-table"))
-        main_tbody = self.remove_extra_type(main_table.find("tbody"))
-        main_year_elem = main_tbody.find_all("tr")
-        for year_elem in main_year_elem:
-            cells = year_elem.find_all("td")
-            date = cells[1].text.replace(",", "").strip()
-            date = datetime.strptime(date, "%b %d %Y").date()
-            if date >= time_from.date() and date <= time_to.date():
-                # date_year = [date, year_elem]
-                # date_years.append(date_year)
-                date_years[date] = year_elem
+        for event_date, main_table in date_search_results:
+            if main_table is None:
+                log.debug(f"No event found for {event_date}")
+                continue
+
+            main_tbody = self.remove_extra_type(main_table.find("tbody"))
+            main_year_elem = main_tbody.find_all("tr")
+            for year_elem in main_year_elem:
+                cells = year_elem.find_all("td")
+                if len(cells) != 3:
+                    # we are interested only in row with video, date, links columns
+                    continue
+
+                date = cells[1].text.replace(",", "").strip()
+                date = datetime.strptime(date, "%b %d %Y").date()
+                if date >= time_from.date() and date <= time_to.date():
+                    # date_year = [date, year_elem]
+                    # date_years.append(date_year)
+                    date_years[date] = year_elem
+
         return date_years
 
     def get_events(
@@ -255,7 +309,7 @@ class HoustonScraper(IngestionModelScraper):
         events = []
         d = self.get_all_elements_in_range(from_dt, to_dt)
         for date, _element in d.items():
-            events.append(self.get_event(date, d[date]))
+            events.append(self.get_event(date, _element))
         return events
 
 
