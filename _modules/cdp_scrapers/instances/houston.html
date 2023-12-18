@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
-        <title>cdp_scrapers.instances.houston - cdp-scrapers 0.1.dev1+g80400a4 documentation</title>
+        <title>cdp_scrapers.instances.houston - cdp-scrapers 0.1.dev1+g167612f documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../index.html"><div class="brand">cdp-scrapers 0.1.dev1+g80400a4 documentation</div></a>
+      <a href="../../../index.html"><div class="brand">cdp-scrapers 0.1.dev1+g167612f documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -146,7 +146,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
   
   
-  <span class="sidebar-brand-text">cdp-scrapers 0.1.dev1+g80400a4 documentation</span>
+  <span class="sidebar-brand-text">cdp-scrapers 0.1.dev1+g167612f documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -207,8 +207,9 @@
         </div>
         <article role="main">
           <h1>Source code for cdp_scrapers.instances.houston</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span></span><span class="kn">import</span> <span class="nn">enum</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">requests</span>
@@ -219,6 +220,14 @@
 <span class="kn">from</span> <span class="nn">cdp_scrapers.scraper_utils</span> <span class="kn">import</span> <span class="n">IngestionModelScraper</span>
 
 <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="AgendaType">
+<a class="viewcode-back" href="../../../cdp_scrapers.instances.html#cdp_scrapers.instances.houston.AgendaType">[docs]</a>
+<span class="k">class</span> <span class="nc">AgendaType</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">WebPage</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">Pdf</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span></div>
+
 
 
 <div class="viewcode-block" id="HoustonScraper">
@@ -266,7 +275,15 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;start get body name&quot;</span><span class="p">)</span>
         <span class="n">event</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_extra_type</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
-        <span class="n">body_table</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s2">&quot;table&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;table&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">body_table</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s2">&quot;table&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;table&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">):</span>
+            <span class="c1"># Assuming event is a tr from search results</span>
+            <span class="c1"># and that the first td contains the committee name</span>
+            <span class="n">cell_text</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;td&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">cell_text</span><span class="p">[:</span> <span class="n">cell_text</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;(&quot;</span><span class="p">)]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
         <span class="k">if</span> <span class="s2">&quot;CITY COUNCIL&quot;</span> <span class="ow">in</span> <span class="n">body_table</span><span class="o">.</span><span class="n">text</span><span class="p">:</span>
             <span class="k">return</span> <span class="s2">&quot;City Council&quot;</span>
         <span class="k">else</span><span class="p">:</span>
@@ -372,15 +389,22 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        Tag</span>
-<span class="sd">            The agenda web page we want parse</span>
+<span class="sd">        AgendaType, Tag</span>
+<span class="sd">            Resource type for the agenda and the agenda resource itself</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">link</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_date_mainlink</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
         <span class="n">agenda_link</span> <span class="o">=</span> <span class="n">link</span> <span class="o">+</span> <span class="s2">&quot;/agenda&quot;</span>
         <span class="n">page</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">agenda_link</span><span class="p">)</span>
         <span class="n">event</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">page</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="s2">&quot;html.parser&quot;</span><span class="p">)</span>
         <span class="n">form1</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;form&quot;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;Form1&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">form1</span></div>
+
+        <span class="k">if</span> <span class="n">form1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">AgendaType</span><span class="o">.</span><span class="n">WebPage</span><span class="p">,</span> <span class="n">form1</span>
+        <span class="k">elif</span> <span class="n">page</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;%PDF&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">AgendaType</span><span class="o">.</span><span class="n">Pdf</span><span class="p">,</span> <span class="n">agenda_link</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">agenda_link</span><span class="si">}</span><span class="s2"> points to unrecognized agenda resource&quot;</span>
+        <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="HoustonScraper.get_event">
@@ -406,9 +430,15 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;start get one event&quot;</span><span class="p">)</span>
         <span class="n">main_uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_date_mainlink</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
-        <span class="n">agenda</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_agenda</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+        <span class="n">agenda_type</span><span class="p">,</span> <span class="n">agenda</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_agenda</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">agenda_type</span> <span class="o">==</span> <span class="n">AgendaType</span><span class="o">.</span><span class="n">WebPage</span><span class="p">:</span>
+            <span class="n">body_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_body_name</span><span class="p">(</span><span class="n">agenda</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">body_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_body_name</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+
         <span class="n">event</span> <span class="o">=</span> <span class="n">ingestion_models</span><span class="o">.</span><span class="n">EventIngestionModel</span><span class="p">(</span>
-            <span class="n">body</span><span class="o">=</span><span class="n">ingestion_models</span><span class="o">.</span><span class="n">Body</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_body_name</span><span class="p">(</span><span class="n">agenda</span><span class="p">),</span> <span class="n">is_active</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">body</span><span class="o">=</span><span class="n">ingestion_models</span><span class="o">.</span><span class="n">Body</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">body_name</span><span class="p">,</span> <span class="n">is_active</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
             <span class="n">sessions</span><span class="o">=</span><span class="p">[</span>
                 <span class="n">ingestion_models</span><span class="o">.</span><span class="n">Session</span><span class="p">(</span>
                     <span class="n">session_datetime</span><span class="o">=</span><span class="n">date</span><span class="p">,</span>
@@ -416,7 +446,9 @@
                     <span class="n">session_index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="p">],</span>
-            <span class="n">event_minutes_items</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event_minutes_item</span><span class="p">(</span><span class="n">agenda</span><span class="p">),</span>
+            <span class="n">event_minutes_items</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event_minutes_item</span><span class="p">(</span><span class="n">agenda</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">agenda_type</span> <span class="o">==</span> <span class="n">AgendaType</span><span class="o">.</span><span class="n">WebPage</span>
+            <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">agenda_uri</span><span class="o">=</span><span class="n">main_uri</span> <span class="o">+</span> <span class="s2">&quot;/agenda&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">event</span></div>
@@ -443,28 +475,53 @@
 <span class="sd">            Dictionary of mapping between the date of the meeting and the element for</span>
 <span class="sd">            the meeting in that date</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">time_from</span><span class="o">.</span><span class="n">year</span> <span class="o">!=</span> <span class="n">time_to</span><span class="o">.</span><span class="n">year</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;time_from and time_to are in different years, which is not supported&quot;</span>
+
+        <span class="k">def</span> <span class="nf">get_search_dates</span><span class="p">():</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Return iterator over dates to search.&quot;&quot;&quot;</span>
+            <span class="n">event_date</span> <span class="o">=</span> <span class="n">time_from</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+            <span class="k">while</span> <span class="n">event_date</span> <span class="o">&lt;=</span> <span class="n">time_to</span><span class="o">.</span><span class="n">date</span><span class="p">():</span>
+                <span class="k">yield</span> <span class="n">event_date</span>
+                <span class="n">event_date</span> <span class="o">+=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">query_for_date</span><span class="p">(</span><span class="n">event_date</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Return event date and &lt;table&gt; element in search result HTML.&quot;&quot;&quot;</span>
+            <span class="c1"># https://houstontx.new.swagit.com/videos/search?q=january+11+2022</span>
+            <span class="c1"># NOTE: do not use %d for day; the search will not work with zero-padded day</span>
+            <span class="n">main_url</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;https://houstontx.new.swagit.com/videos/search&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;?q=</span><span class="si">{</span><span class="n">event_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%B&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">+</span><span class="si">{</span><span class="n">event_date</span><span class="o">.</span><span class="n">day</span><span class="si">}</span><span class="s2">+</span><span class="si">{</span><span class="n">event_date</span><span class="o">.</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
+            <span class="n">main_page</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">main_url</span><span class="p">)</span>
+            <span class="n">main</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">main_page</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="s2">&quot;html.parser&quot;</span><span class="p">)</span>
+            <span class="n">main_table</span> <span class="o">=</span> <span class="n">main</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;table&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">main_table</span><span class="p">:</span>
+                <span class="n">main_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_extra_type</span><span class="p">(</span><span class="n">main_table</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">event_date</span><span class="p">,</span> <span class="n">main_table</span>
+
+        <span class="n">search_dates</span> <span class="o">=</span> <span class="n">get_search_dates</span><span class="p">()</span>
+        <span class="n">date_search_results</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">query_for_date</span><span class="p">,</span> <span class="n">search_dates</span><span class="p">)</span>
+
         <span class="n">date_years</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">main_url</span> <span class="o">=</span> <span class="s2">&quot;https://houstontx.new.swagit.com/views/408&quot;</span>
-        <span class="n">main_page</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">main_url</span><span class="p">)</span>
-        <span class="n">main</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">main_page</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="s2">&quot;html.parser&quot;</span><span class="p">)</span>
-        <span class="n">main_div</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_extra_type</span><span class="p">(</span>
-            <span class="n">main</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_diff_yearid</span><span class="p">(</span><span class="n">time_from</span><span class="p">))</span>
-        <span class="p">)</span>
-        <span class="n">main_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_extra_type</span><span class="p">(</span><span class="n">main_div</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;table&quot;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;video-table&quot;</span><span class="p">))</span>
-        <span class="n">main_tbody</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_extra_type</span><span class="p">(</span><span class="n">main_table</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;tbody&quot;</span><span class="p">))</span>
-        <span class="n">main_year_elem</span> <span class="o">=</span> <span class="n">main_tbody</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s2">&quot;tr&quot;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">year_elem</span> <span class="ow">in</span> <span class="n">main_year_elem</span><span class="p">:</span>
-            <span class="n">cells</span> <span class="o">=</span> <span class="n">year_elem</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s2">&quot;td&quot;</span><span class="p">)</span>
-            <span class="n">date</span> <span class="o">=</span> <span class="n">cells</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-            <span class="n">date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="s2">&quot;%b </span><span class="si">%d</span><span class="s2"> %Y&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">date</span> <span class="o">&gt;=</span> <span class="n">time_from</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="ow">and</span> <span class="n">date</span> <span class="o">&lt;=</span> <span class="n">time_to</span><span class="o">.</span><span class="n">date</span><span class="p">():</span>
-                <span class="c1"># date_year = [date, year_elem]</span>
-                <span class="c1"># date_years.append(date_year)</span>
-                <span class="n">date_years</span><span class="p">[</span><span class="n">date</span><span class="p">]</span> <span class="o">=</span> <span class="n">year_elem</span>
+        <span class="k">for</span> <span class="n">event_date</span><span class="p">,</span> <span class="n">main_table</span> <span class="ow">in</span> <span class="n">date_search_results</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">main_table</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No event found for </span><span class="si">{</span><span class="n">event_date</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="n">main_tbody</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_extra_type</span><span class="p">(</span><span class="n">main_table</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;tbody&quot;</span><span class="p">))</span>
+            <span class="n">main_year_elem</span> <span class="o">=</span> <span class="n">main_tbody</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s2">&quot;tr&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">year_elem</span> <span class="ow">in</span> <span class="n">main_year_elem</span><span class="p">:</span>
+                <span class="n">cells</span> <span class="o">=</span> <span class="n">year_elem</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s2">&quot;td&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cells</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="c1"># we are interested only in row with video, date, links columns</span>
+                    <span class="k">continue</span>
+
+                <span class="n">date</span> <span class="o">=</span> <span class="n">cells</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="n">date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="s2">&quot;%b </span><span class="si">%d</span><span class="s2"> %Y&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">date</span> <span class="o">&gt;=</span> <span class="n">time_from</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="ow">and</span> <span class="n">date</span> <span class="o">&lt;=</span> <span class="n">time_to</span><span class="o">.</span><span class="n">date</span><span class="p">():</span>
+                    <span class="c1"># date_year = [date, year_elem]</span>
+                    <span class="c1"># date_years.append(date_year)</span>
+                    <span class="n">date_years</span><span class="p">[</span><span class="n">date</span><span class="p">]</span> <span class="o">=</span> <span class="n">year_elem</span>
+
         <span class="k">return</span> <span class="n">date_years</span></div>
 
 
@@ -492,7 +549,7 @@
         <span class="n">events</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_all_elements_in_range</span><span class="p">(</span><span class="n">from_dt</span><span class="p">,</span> <span class="n">to_dt</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">date</span><span class="p">,</span> <span class="n">_element</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">d</span><span class="p">[</span><span class="n">date</span><span class="p">]))</span>
+            <span class="n">events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">_element</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">events</span></div>
 </div>
 
@@ -565,7 +622,7 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=e7425516"></script>
+</div><script src="../../../_static/documentation_options.js?v=5877a4f3"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>
