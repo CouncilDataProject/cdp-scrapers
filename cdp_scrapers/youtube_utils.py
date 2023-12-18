@@ -10,11 +10,35 @@ from urllib.parse import quote_plus
 
 import pytz
 from cdp_backend.pipeline.ingestion_models import Body, EventIngestionModel, Session
+from dateutil.parser import ParserError as DateParseError
+from dateutil.parser import parse as date_parse
 from yt_dlp import YoutubeDL
 
 from .scraper_utils import IngestionModelScraper, reduced_list
 
 log = getLogger(__name__)
+
+########################################################################################
+
+# Source: https://stackoverflow.com/a/55018083
+REGEX_FOR_WRITTEN_MONTH = (
+    r"(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?"
+    r"|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?"
+    r"|Oct(?:ober)?|(?:Nov|Dec)(?:ember)?)"
+)
+REGEX_FOR_WRITTEN_DAY = r"\d{1,2}(?:st|nd|rd|th)?"
+REGEX_FOR_YEAR = r"\b\d{2}(?:\d{2})?\b"
+REGEX_DUMMY = r".*"
+REGEX_FOR_WRITTEN_DATE = (
+    r"((?:{smon}\s+{sday}|{sday}\s+{smon}))(?:{sdummy}({syear}))?"
+).format(
+    smon=REGEX_FOR_WRITTEN_MONTH,
+    sday=REGEX_FOR_WRITTEN_DAY,
+    sdummy=REGEX_DUMMY,
+    syear=REGEX_FOR_YEAR,
+)
+
+########################################################################################
 
 
 def urljoin_search_query(
@@ -134,10 +158,44 @@ class YoutubeIngestionScraper(IngestionModelScraper):
         Default expects month_name day, year
         e.g. January 1, 1960
         """
-        date_match = re.search(r"[a-z]+ \d{1,2}, \d{4}", title, re.I)
-        date_time = datetime.strptime(date_match.group(), "%B %d, %Y")
-        date_time = self.localize_datetime(date_time)
-        return date_time
+        # Init parsed date
+        parsed_date = None
+
+        # Try written date search
+        written_date_match = re.search(REGEX_FOR_WRITTEN_DATE, title)
+        if written_date_match:
+            # Try parsing
+            try:
+                parsed_date = date_parse(
+                    " ".join(
+                        [written_date_match.group(1), written_date_match.group(2)]
+                    ),
+                    fuzzy=True,
+                )
+            except DateParseError:
+                pass
+
+        # Try ISO date search
+        iso_date_match = re.search(r"\d{4}-\d{2}-\d{2}", title)
+        if iso_date_match:
+            parsed_date = date_parse(iso_date_match.group())
+
+        # Try MM/DD/YYYY date search
+        mmddyyyy_date_match = re.search(r"\d{2}/\d{2}/\d{4}", title)
+        if mmddyyyy_date_match:
+            parsed_date = date_parse(mmddyyyy_date_match.group())
+
+        # Try DD/MM/YYYY date search
+        ddmmyyyy_date_match = re.search(r"\d{2}/\d{2}/\d{4}", title)
+        if ddmmyyyy_date_match:
+            parsed_date = date_parse(ddmmyyyy_date_match.group())
+
+        # If parsed date is not None, return it
+        if parsed_date is not None:
+            return self.localize_datetime(parsed_date)
+
+        # If parsed date is None, raise error
+        raise ValueError(f"Could not parse datetime from title: {title}")
 
     def get_session(self, video_info: Dict[str, Any]) -> Optional[Session]:
         """

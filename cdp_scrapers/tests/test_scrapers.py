@@ -2,7 +2,7 @@ from datetime import datetime
 
 import pytest
 
-from cdp_scrapers.instances.houston import HoustonScraper
+# from cdp_scrapers.instances.houston import HoustonScraper
 from cdp_scrapers.instances.kingcounty import KingCountyScraper
 from cdp_scrapers.instances.portland import PortlandScraper
 from cdp_scrapers.instances.seattle import SeattleScraper

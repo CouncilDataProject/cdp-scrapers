@@ -71,13 +71,13 @@ jobs:
       # when triggered by comment in pull request
       - name: Check Out Merge Repository
         if: ${{ github.event.issue.pull_request }}
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           ref: refs/pull/${{ github.event.issue.number }}/merge
 
       - name: Check Out Reference Repository
         if: ${{ ! github.event.issue.pull_request }}
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set Up Python
         uses: actions/setup-python@v2
