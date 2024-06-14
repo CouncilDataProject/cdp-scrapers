@@ -366,15 +366,20 @@ def get_legistar_events_for_timespan(
                     )
                 ).json()
 
+
+                visited = []
                 # legistar MatterSponsor just has a reference to a Person
                 # so further obtain the actual Person information
                 for sponsor in sponsors:
+                    if sponsor["MatterSponsorNameId"] in visited:
+                        continue
+                    else:
+                        visited.add(sponsor["MatterSponsorNameId"])
                     sponsor[LEGISTAR_SPONSOR_PERSON] = get_legistar_person(
                         client=client,
                         person_id=sponsor["MatterSponsorNameId"],
                         use_cache=True,
                     )
-
                 event_item[LEGISTAR_MATTER_SPONSORS] = sponsors
 
     log.debug(f"Collected {len(response)} Legistar events")
