@@ -138,11 +138,16 @@ def get_disposition(minute_section: Tag) -> str:
         Disposition string for the event minute item
         e.g. Accepted, Passed, Placed on file
     """
-    result_status_element_sibling = minute_section.find(
-        "div", text=re.compile("Disposition"), attrs={"class": "field__label"}
-    )
-    result_status_element = result_status_element_sibling.next_sibling
-    return result_status_element.text
+    def _get_disposition(keyword: str):
+        result_status_element_sibling = minute_section.find(
+            "div", text=re.compile(keyword), attrs={"class": "field__label"}
+        )
+        result_status_element = result_status_element_sibling.next_sibling if result_status_element_sibling is not None else None
+        return result_status_element.text if result_status_element is not None else None
+
+    disposition = _get_disposition("Disposition")
+    disposition = disposition or _get_disposition("Council action")
+    return disposition or ""
 
 
 def disposition_to_minute_decision(
