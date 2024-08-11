@@ -319,9 +319,9 @@ class TestCompareExtractPersons:
         [
             (
                 SeattleScraper,
-                "Teresa Mosqueda",
-                datetime(2023, 2, 6),
-                datetime(2023, 2, 8),
+                "Maritza Rivera",
+                datetime(2024, 8, 6),
+                datetime(2024, 8, 7),
             )
         ],
     )

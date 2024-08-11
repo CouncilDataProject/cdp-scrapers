@@ -55,9 +55,249 @@
         }
     },
     "persons": {
+        "Maritza Rivera": {
+            "name": "Maritza Rivera",
+            "is_active": true,
+            "router_string": null,
+            "email": null,
+            "phone": "206-684-8804",
+            "website": null,
+            "picture_uri": "https://seattle.gov/images/Council/Members/SquareHeadshots/rivera_300.jpg",
+            "seat": "Position 4",
+            "roles": [
+                {
+                    "body": "City Council",
+                    "start_datetime": 1704182400,
+                    "end_datetime": 1830240000,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "Council Briefing",
+                    "start_datetime": 1704182400,
+                    "end_datetime": 1830240000,
+                    "title": "Councilmember"
+                }
+            ]
+        },
+        "Robert Kettle": {
+            "name": "Robert Kettle",
+            "is_active": true,
+            "router_string": null,
+            "email": null,
+            "phone": "206-684-8807",
+            "website": null,
+            "picture_uri": "https://seattle.gov/images/Council/Members/SquareHeadshots/kettle_300.jpg",
+            "seat": "Position 7",
+            "roles": [
+                {
+                    "body": "City Council",
+                    "start_datetime": 1704182400,
+                    "end_datetime": 1830240000,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "Council Briefing",
+                    "start_datetime": 1704182400,
+                    "end_datetime": 1830240000,
+                    "title": "Councilmember"
+                }
+            ]
+        },
+        "Cathy Moore": {
+            "name": "Cathy Moore",
+            "is_active": true,
+            "router_string": null,
+            "email": null,
+            "phone": "206-684-8805",
+            "website": null,
+            "picture_uri": "https://seattle.gov/images/Council/Members/SquareHeadshots/moore_300.jpg",
+            "seat": "Position 5",
+            "roles": [
+                {
+                    "body": "City Council",
+                    "start_datetime": 1704182400,
+                    "end_datetime": 1830240000,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "Council Briefing",
+                    "start_datetime": 1704182400,
+                    "end_datetime": 1830240000,
+                    "title": "Councilmember"
+                }
+            ]
+        },
+        "Joy Hollingsworth": {
+            "name": "Joy Hollingsworth",
+            "is_active": true,
+            "router_string": null,
+            "email": null,
+            "phone": "206-684-8803",
+            "website": null,
+            "picture_uri": "https://seattle.gov/images/Council/Members/SquareHeadshots/hollingsworth_300.jpg",
+            "seat": "Position 3",
+            "roles": [
+                {
+                    "body": "City Council",
+                    "start_datetime": 1704182400,
+                    "end_datetime": 1830240000,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "Council Briefing",
+                    "start_datetime": 1704182400,
+                    "end_datetime": 1830240000,
+                    "title": "Councilmember"
+                }
+            ]
+        },
+        "Rob Saka": {
+            "name": "Rob Saka",
+            "is_active": true,
+            "router_string": null,
+            "email": null,
+            "phone": "206-684-8801",
+            "website": null,
+            "picture_uri": "https://seattle.gov/images/Council/Members/SquareHeadshots/saka_300.jpg",
+            "seat": "Position 1",
+            "roles": [
+                {
+                    "body": "City Council",
+                    "start_datetime": 1704182400,
+                    "end_datetime": 1830240000,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "Council Briefing",
+                    "start_datetime": 1704182400,
+                    "end_datetime": 1830240000,
+                    "title": "Councilmember"
+                }
+            ]
+        },
+        "Tanya Woo": {
+            "name": "Tanya Woo",
+            "is_active": true,
+            "router_string": null,
+            "email": null,
+            "phone": "206-684-8808",
+            "website": null,
+            "picture_uri": "https://seattle.gov/images/Council/Members/SquareHeadshots/woo_300.jpg",
+            "seat": "Position 8",
+            "roles": [
+                {
+                    "body": "City Council",
+                    "start_datetime": 1705996800,
+                    "end_datetime": 1732694400,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "Council Briefing",
+                    "start_datetime": 1705996800,
+                    "end_datetime": 1732694400,
+                    "title": "Councilmember"
+                }
+            ]
+        },
+        "Dan Strauss": {
+            "name": "Dan Strauss",
+            "is_active": true,
+            "router_string": null,
+            "email": null,
+            "phone": "206-684-8806",
+            "website": null,
+            "picture_uri": "https://www.seattle.gov/assets/Images/Council/Members/Strauss/strauss_headshot_300x300.jpg",
+            "seat": "Position 6",
+            "roles": [
+                {
+                    "body": "City Council",
+                    "start_datetime": 1577865600,
+                    "end_datetime": 1830240000,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "Council Briefing",
+                    "start_datetime": 1577865600,
+                    "end_datetime": 1704009600,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "Council Briefing",
+                    "start_datetime": 1704182400,
+                    "end_datetime": 1830240000,
+                    "title": "Councilmember"
+                }
+            ]
+        },
+        "Sara Nelson": {
+            "name": "Sara Nelson",
+            "is_active": true,
+            "router_string": null,
+            "email": null,
+            "phone": "206-684-8809",
+            "website": null,
+            "picture_uri": "https://www.seattle.gov/images/Council/Members/Nelson/nelson_300x300.jpg",
+            "seat": "Position 9",
+            "roles": [
+                {
+                    "body": "City Council",
+                    "start_datetime": 1641024000,
+                    "end_datetime": 1704009600,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "City Council",
+                    "start_datetime": 1641024000,
+                    "end_datetime": 1735632000,
+                    "title": "Council President"
+                },
+                {
+                    "body": "Council Briefing",
+                    "start_datetime": 1641024000,
+                    "end_datetime": 1704009600,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "Council Briefing",
+                    "start_datetime": 1641024000,
+                    "end_datetime": 1767168000,
+                    "title": "Council President"
+                }
+            ]
+        },
+        "Tammy J. Morales": {
+            "name": "Tammy J. Morales",
+            "is_active": true,
+            "router_string": null,
+            "email": null,
+            "phone": "206-684-8802",
+            "website": null,
+            "picture_uri": "https://www.seattle.gov/assets/Images/Council/Members/Morales/Tammy-Morales_headshot_final_300x300.jpg",
+            "seat": "Position 2",
+            "roles": [
+                {
+                    "body": "City Council",
+                    "start_datetime": 1577865600,
+                    "end_datetime": 1830240000,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "Council Briefing",
+                    "start_datetime": 1577865600,
+                    "end_datetime": 1704009600,
+                    "title": "Councilmember"
+                },
+                {
+                    "body": "Council Briefing",
+                    "start_datetime": 1704182400,
+                    "end_datetime": 1830240000,
+                    "title": "Councilmember"
+                }
+            ]
+        },
         "Alex Pedersen": {
             "name": "Alex Pedersen",
-            "is_active": true,
+            "is_active": false,
             "router_string": null,
             "email": null,
             "phone": "206-684-8804",
@@ -81,7 +321,7 @@
         },
         "Andrew Lewis": {
             "name": "Andrew Lewis",
-            "is_active": true,
+            "is_active": false,
             "router_string": null,
             "email": null,
             "phone": "206-684-8807",
@@ -103,33 +343,9 @@
                 }
             ]
         },
-        "Dan Strauss": {
-            "name": "Dan Strauss",
-            "is_active": true,
-            "router_string": null,
-            "email": null,
-            "phone": "206-684-8806",
-            "website": null,
-            "picture_uri": "https://www.seattle.gov/assets/Images/Council/Members/Strauss/strauss_headshot_300x300.jpg",
-            "seat": "Position 6",
-            "roles": [
-                {
-                    "body": "City Council",
-                    "start_datetime": 1577865600,
-                    "end_datetime": 1704009600,
-                    "title": "Councilmember"
-                },
-                {
-                    "body": "Council Briefing",
-                    "start_datetime": 1577865600,
-                    "end_datetime": 1704009600,
-                    "title": "Councilmember"
-                }
-            ]
-        },
         "Debora Juarez": {
             "name": "Debora Juarez",
-            "is_active": true,
+            "is_active": false,
             "router_string": null,
             "email": null,
             "phone": "206-684-8805",
@@ -165,7 +381,7 @@
         },
         "Kshama Sawant": {
             "name": "Kshama Sawant",
-            "is_active": true,
+            "is_active": false,
             "router_string": null,
             "email": null,
             "phone": "206-684-8803",
@@ -189,7 +405,7 @@
         },
         "Lisa Herbold": {
             "name": "Lisa Herbold",
-            "is_active": true,
+            "is_active": false,
             "router_string": null,
             "email": null,
             "phone": "206-684-8801",
@@ -242,57 +458,9 @@
                 }
             ]
         },
-        "Sara Nelson": {
-            "name": "Sara Nelson",
-            "is_active": true,
-            "router_string": null,
-            "email": null,
-            "phone": "206-684-8809",
-            "website": null,
-            "picture_uri": "https://www.seattle.gov/images/Council/Members/Nelson/nelson_300x300.jpg",
-            "seat": "Position 9",
-            "roles": [
-                {
-                    "body": "City Council",
-                    "start_datetime": 1641024000,
-                    "end_datetime": 1704009600,
-                    "title": "Councilmember"
-                },
-                {
-                    "body": "Council Briefing",
-                    "start_datetime": 1641024000,
-                    "end_datetime": 1704009600,
-                    "title": "Councilmember"
-                }
-            ]
-        },
-        "Tammy J. Morales": {
-            "name": "Tammy J. Morales",
-            "is_active": true,
-            "router_string": null,
-            "email": null,
-            "phone": "206-684-8802",
-            "website": null,
-            "picture_uri": "https://www.seattle.gov/assets/Images/Council/Members/Morales/Tammy-Morales_headshot_final_300x300.jpg",
-            "seat": "Position 2",
-            "roles": [
-                {
-                    "body": "City Council",
-                    "start_datetime": 1577865600,
-                    "end_datetime": 1704009600,
-                    "title": "Councilmember"
-                },
-                {
-                    "body": "Council Briefing",
-                    "start_datetime": 1577865600,
-                    "end_datetime": 1704009600,
-                    "title": "Councilmember"
-                }
-            ]
-        },
         "Teresa Mosqueda": {
             "name": "Teresa Mosqueda",
-            "is_active": true,
+            "is_active": false,
             "router_string": null,
             "email": null,
             "phone": "206-684-8808",

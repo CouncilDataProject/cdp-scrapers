@@ -41,6 +41,10 @@ PERSON_ALIASES = {"Dan Strauss": {"Daniel Strauss"}}
 ###############################################################################
 
 
+class VideoIdMismatchError(ValueError):
+    pass
+
+
 class SeattleScraper(LegistarScraper):
     PYTHON_MUNICIPALITY_SLUG: str = "seattle"
 
@@ -102,6 +106,11 @@ class SeattleScraper(LegistarScraper):
         content_uris: List[ContentURIs]
             List of ContentURIs objects for each session found.
 
+        Raises
+        ------
+        VideoIdMismatchError
+            If date on the video web page does not match the event date.
+
         See Also
         --------
         get_content_uris
@@ -155,10 +164,12 @@ class SeattleScraper(LegistarScraper):
         # e.g. idstring:'Select Budget Committee Session II 10/14/21'
         #      idstring:'City Council 10/11/21'
         if not re.search(f"idstring:.+{event_short_date}.+", video_script_text):
-            raise ValueError(
+            video_id_error = VideoIdMismatchError(
                 f"event date {event_short_date} not in video idstring.\n"
                 f"{video_page_url} may be for a different event's video.\n"
             )
+            log.warning(str(video_id_error))
+            raise video_id_error
 
         # playerSetup({...
         #             ^
@@ -343,7 +354,7 @@ class SeattleScraper(LegistarScraper):
             for session in sorted(session_video_page_urls.keys())
         ]
 
-    def get_content_uris(self, legistar_ev: dict) -> list[ContentURIs]:
+    def get_content_uris(self, legistar_ev: dict) -> list[ContentURIs]:  # noqa: C901
         """
         Return URLs for videos and captions parsed from seattlechannel.org web page.
 
@@ -395,40 +406,55 @@ class SeattleScraper(LegistarScraper):
             log.debug(f"No URL for video page on {legistar_ev[LEGISTAR_EV_SITE_URL]}")
             return []
 
-        event_short_date = datetime.fromisoformat(legistar_ev[LEGISTAR_SESSION_DATE])
-        # want no leading zero for month or day
-        event_short_date = (
-            f"{event_short_date.month}/"
-            f"{event_short_date.day}/"
-            f"{event_short_date.strftime('%y')}"
-        )
+        def get_uris_for_date(event_date: datetime, year_str: str) -> list[ContentURIs]:
+            # want no leading zero for month or day
+            event_short_date = f"{event_date.month}/" f"{event_date.day}/" f"{year_str}"
 
-        # Some meetings will have text like "Session II" in "Meeting location".
-        # For those, don't bother verifying video page URL.
-        # They are multi-session and we need to call get_video_page_urls()
-        if (
-            "session ii"
-            not in soup.find(
-                "span", id=re.compile(r"ctl\S*_ContentPlaceHolder\S*_lblLocation$")
-            ).text.lower()
-        ):
             try:
-                if parse_qs(urlsplit(video_page_url).query)["videoid"]:
-                    # video link contains specific videoid
-                    return self.parse_content_uris(video_page_url, event_short_date)
-            except KeyError:
-                pass
+                # Some meetings will have text like "Session II" in "Meeting location".
+                # For those, don't bother verifying video page URL.
+                # They are multi-session and we need to call get_video_page_urls()
+                if (
+                    "session ii"
+                    not in soup.find(
+                        "span",
+                        id=re.compile(r"ctl\S*_ContentPlaceHolder\S*_lblLocation$"),
+                    ).text.lower()
+                ):
+                    try:
+                        if parse_qs(urlsplit(video_page_url).query)["videoid"]:
+                            # video link contains specific videoid
+                            return self.parse_content_uris(
+                                video_page_url, event_short_date
+                            )
+                    except KeyError:
+                        pass
 
-        # at this point video_page_url points to generic video list page like
-        # http://www.seattlechannel.org/BudgetCommittee?Mode2=Video
+                # at this point video_page_url points to generic video list page like
+                # http://www.seattlechannel.org/BudgetCommittee?Mode2=Video
 
-        return [
+                return [
+                    uris
+                    # 1 web page per session video for this multi-session event
+                    for page_url in self.get_video_page_urls(
+                        video_page_url, event_short_date
+                    )
+                    # video and caption urls on the session video web page
+                    for uris in self.parse_content_uris(page_url, event_short_date)
+                ]
+            except VideoIdMismatchError:
+                return []
+
+        event_date = datetime.fromisoformat(legistar_ev[LEGISTAR_SESSION_DATE])
+        # Try first using 2-digit year without century and then as 4-digit with century
+        # to account for old and new date strings used on Seattle Channel
+        uris = get_uris_for_date(event_date, event_date.strftime("%y"))
+        uris = (
             uris
-            # 1 web page per session video for this multi-session event
-            for page_url in self.get_video_page_urls(video_page_url, event_short_date)
-            # video and caption urls on the session video web page
-            for uris in self.parse_content_uris(page_url, event_short_date)
-        ]
+            if any(uris)
+            else get_uris_for_date(event_date, event_date.strftime("%Y"))
+        )
+        return uris
 
     @staticmethod
     def get_person_picture_url(person_www: str) -> str | None:

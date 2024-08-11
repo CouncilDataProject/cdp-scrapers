@@ -14,7 +14,7 @@ from cdp_scrapers.instances.seattle import SeattleScraper
     "expected_minutes_item_in_first_meeting, expected_first_supporting_file",
     [
         (
-            datetime(2022, 1, 10),
+            datetime(2022, 1, 11),
             datetime(2022, 1, 12),
             1,
             29,
